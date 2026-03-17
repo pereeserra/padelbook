@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export default function BackToTopButton() {
+function BackToTopButton() {
   const [visible, setVisible] = useState(false);
   const [isGoingUp, setIsGoingUp] = useState(false);
 
@@ -41,3 +41,5 @@ export default function BackToTopButton() {
     </button>
   );
 }
+
+export default BackToTopButton;
