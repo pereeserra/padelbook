@@ -185,7 +185,7 @@ function MyReservationsPage() {
             }}
           >
             <div>
-              <span style={styles.badge}>Gestió de reserves</span>
+              <span className="pb-chip">Gestió de reserves</span>
               <h1
                 style={{
                   ...styles.title,
@@ -228,14 +228,13 @@ function MyReservationsPage() {
         {feedback && (
           <section className="scale-in" style={styles.feedbackSection}>
             <div
-              style={{
-                ...styles.feedbackBox,
-                ...(feedbackType === "success"
-                  ? styles.feedbackSuccess
-                  : styles.feedbackError),
-              }}
+              className={`pb-feedback ${
+                feedbackType === "success"
+                  ? "pb-feedback--success"
+                  : "pb-feedback--error"
+              }`}
             >
-              <p style={styles.feedbackText}>{feedback}</p>
+              <p className="pb-feedback__text">{feedback}</p>
             </div>
           </section>
         )}
@@ -249,7 +248,7 @@ function MyReservationsPage() {
 
         {error && (
           <section className="scale-in" style={styles.feedbackSection}>
-            <div style={styles.errorBox}>
+            <div className="pb-feedback pb-feedback--error" style={styles.errorWrapper}>
               <p style={styles.errorTitle}>No s'han pogut carregar les reserves</p>
               <p style={styles.errorText}>{error}</p>
 
@@ -268,7 +267,7 @@ function MyReservationsPage() {
           <>
             <section
               ref={summaryRef}
-              className="fade-in-up delay-1"
+              className="fade-in-up delay-1 pb-surface-card"
               style={styles.summarySection}
             >
               <div
@@ -278,14 +277,15 @@ function MyReservationsPage() {
                 }}
               >
                 <div>
-                  <h2 style={styles.sectionTitle}>Historial de reserves</h2>
-                  <p style={styles.sectionText}>
+                  <span className="pb-kicker">Historial</span>
+                  <h2 className="pb-panel-title">Historial de reserves</h2>
+                  <p className="pb-panel-text">
                     Filtra ràpidament entre totes les reserves, les actives i
                     les cancel·lades.
                   </p>
                 </div>
 
-                <span style={styles.countBadge}>
+                <span className="pb-badge-pill pb-badge-pill--blue">
                   {filteredReservations.length} {filterLabel}
                 </span>
               </div>
@@ -354,7 +354,7 @@ function MyReservationsPage() {
                 ))}
               </section>
             ) : (
-              <section className="scale-in" style={styles.filteredEmptyState}>
+              <section className="scale-in pb-surface-card" style={styles.filteredEmptyState}>
                 <span style={styles.filteredEmptyIcon}>🔎</span>
                 <h3 style={styles.filteredEmptyTitle}>
                   No hi ha reserves en aquest filtre
@@ -378,7 +378,7 @@ function MyReservationsPage() {
         )}
 
         {!loading && !error && reservations.length === 0 && (
-          <section className="scale-in" style={styles.emptyState}>
+          <section className="scale-in pb-surface-card" style={styles.emptyState}>
             <span style={styles.emptyIcon}>📅</span>
             <h3 style={styles.emptyTitle}>Encara no tens cap reserva</h3>
             <p style={styles.emptyText}>
@@ -449,17 +449,8 @@ const styles = {
   heroGridMobile: {
     gridTemplateColumns: "1fr",
   },
-  badge: {
-    display: "inline-block",
-    padding: "0.5rem 0.85rem",
-    borderRadius: "999px",
-    background: "rgba(255,255,255,0.12)",
-    border: "1px solid rgba(255,255,255,0.14)",
-    fontWeight: "800",
-    marginBottom: "1rem",
-  },
   title: {
-    margin: 0,
+    margin: "1rem 0 0 0",
     fontSize: "3rem",
     lineHeight: 1.03,
   },
@@ -500,35 +491,10 @@ const styles = {
     marginTop: "1.25rem",
     marginBottom: "1.25rem",
   },
-  feedbackBox: {
-    borderRadius: "18px",
-    padding: "1rem 1.1rem",
-    border: "1px solid transparent",
-    boxShadow: "0 10px 24px rgba(15,23,42,0.04)",
-  },
-  feedbackSuccess: {
-    background: "#ecfdf5",
-    borderColor: "#86efac",
-  },
-  feedbackError: {
-    background: "#fff1f2",
-    borderColor: "#fecdd3",
-  },
-  feedbackText: {
-    margin: 0,
-    fontWeight: "800",
-    lineHeight: 1.6,
-    color: "#0f172a",
-  },
-  errorBox: {
-    background: "#fff1f2",
-    border: "1px solid #fecdd3",
-    borderRadius: "24px",
-    padding: "1.25rem",
+  errorWrapper: {
     display: "flex",
     flexDirection: "column",
     gap: "0.9rem",
-    boxShadow: "0 10px 24px rgba(15,23,42,0.04)",
   },
   errorTitle: {
     margin: 0,
@@ -545,12 +511,7 @@ const styles = {
   summarySection: {
     marginTop: "2rem",
     marginBottom: "1rem",
-    background: "rgba(255,255,255,0.82)",
-    border: "1px solid rgba(148,163,184,0.18)",
-    borderRadius: "24px",
     padding: "1.3rem",
-    boxShadow: "0 16px 34px rgba(15,23,42,0.05)",
-    backdropFilter: "blur(10px)",
   },
   sectionHeader: {
     display: "flex",
@@ -562,27 +523,6 @@ const styles = {
   },
   sectionHeaderMobile: {
     flexDirection: "column",
-  },
-  sectionTitle: {
-    margin: 0,
-    fontSize: "1.8rem",
-    color: "#0f172a",
-  },
-  sectionText: {
-    marginTop: "0.45rem",
-    marginBottom: 0,
-    color: "#64748b",
-    lineHeight: 1.7,
-    maxWidth: "760px",
-  },
-  countBadge: {
-    background: "#eff6ff",
-    color: "#1d4ed8",
-    padding: "0.5rem 0.85rem",
-    borderRadius: "999px",
-    fontWeight: "800",
-    fontSize: "0.9rem",
-    border: "1px solid #dbeafe",
   },
   filtersRow: {
     display: "flex",
@@ -608,13 +548,8 @@ const styles = {
   },
   filteredEmptyState: {
     marginTop: "1rem",
-    background: "rgba(255,255,255,0.86)",
-    borderRadius: "26px",
     padding: "2rem",
-    boxShadow: "0 18px 40px rgba(15,23,42,0.06)",
-    border: "1px solid rgba(148,163,184,0.18)",
     textAlign: "center",
-    backdropFilter: "blur(10px)",
   },
   filteredEmptyIcon: {
     fontSize: "2rem",
@@ -638,13 +573,8 @@ const styles = {
   },
   emptyState: {
     marginTop: "2rem",
-    background: "rgba(255,255,255,0.86)",
-    borderRadius: "26px",
     padding: "2rem",
-    boxShadow: "0 18px 40px rgba(15,23,42,0.06)",
-    border: "1px solid rgba(148,163,184,0.18)",
     textAlign: "center",
-    backdropFilter: "blur(10px)",
   },
   emptyIcon: {
     fontSize: "2.2rem",

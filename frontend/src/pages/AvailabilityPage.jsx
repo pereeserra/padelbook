@@ -289,7 +289,7 @@ function AvailabilityPage() {
             }}
           >
             <div>
-              <span style={styles.badge}>Reserva la teva pista</span>
+              <span className="pb-chip">Reserva la teva pista</span>
               <h1
                 style={{
                   ...styles.title,
@@ -312,13 +312,13 @@ function AvailabilityPage() {
               </strong>
 
               <div style={styles.heroDateMeta}>
-                <span style={styles.heroMetaBadge}>
+                <span className="pb-badge-pill pb-badge-pill--blue">
                   {uniqueCourts.length || 0} pistes
                 </span>
-                <span style={styles.heroMetaBadge}>
+                <span className="pb-badge-pill pb-badge-pill--blue">
                   {filteredAvailability.length || 0} franges
                 </span>
-                <span style={styles.heroMetaBadgeSuccess}>
+                <span className="pb-badge-pill pb-badge-pill--green">
                   {availableCount || 0} lliures
                 </span>
               </div>
@@ -327,7 +327,7 @@ function AvailabilityPage() {
         </section>
 
         <section
-          className="fade-in-up delay-1"
+          className="fade-in-up delay-1 pb-surface-card"
           style={{
             ...styles.searchCard,
             ...(isMobileView ? styles.searchCardMobile : {}),
@@ -340,8 +340,9 @@ function AvailabilityPage() {
             }}
           >
             <div>
-              <h2 style={styles.searchTitle}>Tria el dia que vols jugar</h2>
-              <p style={styles.searchText}>
+              <span className="pb-kicker">Selecció de dia</span>
+              <h2 className="pb-panel-title">Tria el dia que vols jugar</h2>
+              <p className="pb-panel-text">
                 Pots usar els dies ràpids, canviar un dia enrere o endavant, o
                 obrir el selector manual.
               </p>
@@ -473,91 +474,91 @@ function AvailabilityPage() {
           <div ref={topFeedbackRef} />
 
           {error && (
-            <div className="scale-in" style={styles.errorBox}>
-              <p style={styles.errorTitle}>Hi ha hagut un problema</p>
-              <p style={styles.errorText}>{error}</p>
+            <div className="scale-in" style={styles.feedbackSpacing}>
+              <div className="pb-feedback pb-feedback--error">
+                <p style={styles.feedbackTitleError}>Hi ha hagut un problema</p>
+                <p style={styles.feedbackTextError}>{error}</p>
+              </div>
             </div>
           )}
 
           {success && (
-            <div
-              className="scale-in"
-              style={{
-                ...styles.successBox,
-                ...(isMobileView ? styles.successBoxMobile : {}),
-              }}
-            >
-              <div>
-                <p style={styles.successTitle}>Reserva confirmada</p>
-                <p style={styles.successText}>{success}</p>
-              </div>
-
+            <div className="scale-in" style={styles.feedbackSpacing}>
               <div
-                style={{
-                  ...styles.successActions,
-                  ...(isMobileView ? styles.successActionsMobile : {}),
-                }}
+                className="pb-feedback pb-feedback--success"
+                style={isMobileView ? styles.successBoxMobile : styles.successBox}
               >
-                <button
-                  type="button"
-                  onClick={() => navigate("/my-reservations")}
-                  className="btn btn-success btn-sm"
-                  style={isMobileView ? styles.fullWidthButton : undefined}
-                >
-                  Veure les meves reserves
-                </button>
+                <div>
+                  <p style={styles.feedbackTitleSuccess}>Reserva confirmada</p>
+                  <p style={styles.feedbackTextSuccess}>{success}</p>
+                </div>
 
-                <button
-                  type="button"
-                  onClick={() => setSuccess("")}
-                  className="btn btn-outline-success btn-sm"
-                  style={isMobileView ? styles.fullWidthButton : undefined}
+                <div
+                  style={{
+                    ...styles.successActions,
+                    ...(isMobileView ? styles.successActionsMobile : {}),
+                  }}
                 >
-                  Continuar aquí
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => navigate("/my-reservations")}
+                    className="btn btn-success btn-sm"
+                    style={isMobileView ? styles.fullWidthButton : undefined}
+                  >
+                    Veure les meves reserves
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setSuccess("")}
+                    className="btn btn-outline-success btn-sm"
+                    style={isMobileView ? styles.fullWidthButton : undefined}
+                  >
+                    Continuar aquí
+                  </button>
+                </div>
               </div>
             </div>
           )}
 
           {showAuthHelp && (
-            <div
-              className="scale-in"
-              style={{
-                ...styles.authHelpBox,
-                ...(isMobileView ? styles.authHelpBoxMobile : {}),
-              }}
-            >
-              <div>
-                <p style={styles.authHelpTitle}>
-                  Necessites iniciar sessió per reservar
-                </p>
-                <p style={styles.authHelpText}>
-                  Si ja tens compte, entra ara. Si encara no, pots registrar-te
-                  en molt poc temps.
-                </p>
-              </div>
-
+            <div className="scale-in" style={styles.feedbackSpacing}>
               <div
-                style={{
-                  ...styles.authHelpActions,
-                  ...(isMobileView ? styles.authHelpActionsMobile : {}),
-                }}
+                className="pb-feedback pb-feedback--info"
+                style={isMobileView ? styles.authHelpBoxMobile : styles.authHelpBox}
               >
-                <Link
-                  to="/login"
-                  className="btn btn-primary btn-sm"
-                  style={isMobileView ? styles.fullWidthButton : undefined}
-                >
-                  Iniciar sessió
-                </Link>
+                <div>
+                  <p style={styles.authHelpTitle}>
+                    Necessites iniciar sessió per reservar
+                  </p>
+                  <p style={styles.authHelpText}>
+                    Si ja tens compte, entra ara. Si encara no, pots registrar-te
+                    en molt poc temps.
+                  </p>
+                </div>
 
-                <Link
-                  to="/register"
-                  className="btn btn-light btn-sm"
-                  style={isMobileView ? styles.fullWidthButton : undefined}
+                <div
+                  style={{
+                    ...styles.authHelpActions,
+                    ...(isMobileView ? styles.authHelpActionsMobile : {}),
+                  }}
                 >
-                  Crear compte
-                </Link>
+                  <Link
+                    to="/login"
+                    className="btn btn-primary btn-sm"
+                    style={isMobileView ? styles.fullWidthButton : undefined}
+                  >
+                    Iniciar sessió
+                  </Link>
+
+                  <Link
+                    to="/register"
+                    className="btn btn-light btn-sm"
+                    style={isMobileView ? styles.fullWidthButton : undefined}
+                  >
+                    Crear compte
+                  </Link>
+                </div>
               </div>
             </div>
           )}
@@ -586,18 +587,27 @@ function AvailabilityPage() {
                 }}
               >
                 <div>
-                  <h2 style={styles.resultsTitle}>Disponibilitat del dia</h2>
-                  <p style={styles.resultsText}>
+                  <span className="pb-kicker">Resultats</span>
+                  <h2 className="pb-panel-title">Disponibilitat del dia</h2>
+                  <p className="pb-panel-text">
                     Aquí tens la vista detallada de totes les franges segons els
                     filtres actuals.
                   </p>
                 </div>
 
                 <div style={styles.stats}>
-                  <span style={styles.countBadge}>{uniqueCourts.length} pistes</span>
-                  <span style={styles.countBadge}>{filteredAvailability.length} franges</span>
-                  <span style={styles.countBadgeSuccess}>{availableCount} lliures</span>
-                  <span style={styles.countBadgeMuted}>{occupiedCount} ocupades</span>
+                  <span className="pb-badge-pill pb-badge-pill--blue">
+                    {uniqueCourts.length} pistes
+                  </span>
+                  <span className="pb-badge-pill pb-badge-pill--blue">
+                    {filteredAvailability.length} franges
+                  </span>
+                  <span className="pb-badge-pill pb-badge-pill--green">
+                    {availableCount} lliures
+                  </span>
+                  <span className="pb-badge-pill pb-badge-pill--rose">
+                    {occupiedCount} ocupades
+                  </span>
                 </div>
               </div>
 
@@ -613,7 +623,7 @@ function AvailabilityPage() {
         )}
 
         {!loading && filteredAvailability.length === 0 && !error && (
-          <section className="scale-in" style={styles.emptyState}>
+          <section className="scale-in pb-surface-card" style={styles.emptyState}>
             <span style={styles.emptyIcon}>🎾</span>
             <h3 style={styles.emptyTitle}>No hi ha disponibilitat per aquest dia</h3>
             <p style={styles.emptyText}>
@@ -644,11 +654,11 @@ const styles = {
     overflow: "hidden",
     borderRadius: "30px",
     padding: "2rem",
-    background:
-      "linear-gradient(135deg, rgba(15,23,42,0.94), rgba(37,99,235,0.88))",
     boxShadow: "0 26px 56px rgba(37,99,235,0.16)",
     color: "white",
     marginBottom: "1.5rem",
+    background:
+      "linear-gradient(135deg, rgba(15,23,42,0.94), rgba(37,99,235,0.88))",
   },
   heroMobile: {
     padding: "1.25rem",
@@ -663,17 +673,8 @@ const styles = {
   heroGridMobile: {
     gridTemplateColumns: "1fr",
   },
-  badge: {
-    display: "inline-block",
-    padding: "0.5rem 0.85rem",
-    borderRadius: "999px",
-    background: "rgba(255,255,255,0.12)",
-    border: "1px solid rgba(255,255,255,0.14)",
-    fontWeight: "800",
-    marginBottom: "1rem",
-  },
   title: {
-    margin: 0,
+    margin: "1rem 0 0 0",
     fontSize: "3rem",
     lineHeight: 1.03,
     maxWidth: "760px",
@@ -718,31 +719,8 @@ const styles = {
     flexWrap: "wrap",
     marginTop: "1rem",
   },
-  heroMetaBadge: {
-    background: "rgba(255,255,255,0.14)",
-    border: "1px solid rgba(255,255,255,0.12)",
-    color: "white",
-    padding: "0.42rem 0.72rem",
-    borderRadius: "999px",
-    fontWeight: "700",
-    fontSize: "0.84rem",
-  },
-  heroMetaBadgeSuccess: {
-    background: "rgba(22,163,74,0.2)",
-    border: "1px solid rgba(134,239,172,0.32)",
-    color: "#dcfce7",
-    padding: "0.42rem 0.72rem",
-    borderRadius: "999px",
-    fontWeight: "700",
-    fontSize: "0.84rem",
-  },
   searchCard: {
-    background: "rgba(255,255,255,0.84)",
-    border: "1px solid rgba(148,163,184,0.18)",
-    borderRadius: "28px",
     padding: "1.5rem",
-    boxShadow: "0 18px 40px rgba(15,23,42,0.06)",
-    backdropFilter: "blur(12px)",
   },
   searchCardMobile: {
     padding: "1rem",
@@ -758,18 +736,6 @@ const styles = {
   },
   searchHeaderMobile: {
     flexDirection: "column",
-  },
-  searchTitle: {
-    margin: 0,
-    fontSize: "1.8rem",
-    color: "#0f172a",
-  },
-  searchText: {
-    marginTop: "0.45rem",
-    marginBottom: 0,
-    color: "#64748b",
-    lineHeight: 1.65,
-    maxWidth: "720px",
   },
   selectionHint: {
     background: "#f8fbff",
@@ -907,19 +873,15 @@ const styles = {
     color: "#334155",
     flexWrap: "wrap",
   },
-  errorBox: {
+  feedbackSpacing: {
     marginTop: "1rem",
-    background: "#fff1f2",
-    border: "1px solid #fecdd3",
-    borderRadius: "18px",
-    padding: "1rem 1.1rem",
   },
-  errorTitle: {
+  feedbackTitleError: {
     margin: 0,
     color: "#be123c",
     fontWeight: "800",
   },
-  errorText: {
+  feedbackTextError: {
     marginTop: "0.35rem",
     marginBottom: 0,
     color: "#9f1239",
@@ -927,29 +889,25 @@ const styles = {
     fontWeight: "600",
   },
   successBox: {
-    marginTop: "1rem",
-    background: "#ecfdf5",
-    border: "1px solid #86efac",
-    padding: "1rem",
-    borderRadius: "18px",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
     gap: "1rem",
     flexWrap: "wrap",
-    boxShadow: "0 10px 24px rgba(22,163,74,0.08)",
   },
   successBoxMobile: {
+    display: "flex",
     flexDirection: "column",
     alignItems: "stretch",
+    gap: "1rem",
   },
-  successTitle: {
+  feedbackTitleSuccess: {
     margin: 0,
     color: "#166534",
     fontWeight: "800",
     fontSize: "1rem",
   },
-  successText: {
+  feedbackTextSuccess: {
     margin: "0.35rem 0 0 0",
     color: "#166534",
     lineHeight: 1.6,
@@ -965,11 +923,6 @@ const styles = {
     alignItems: "stretch",
   },
   authHelpBox: {
-    marginTop: "1rem",
-    background: "#eff6ff",
-    border: "1px solid #bfdbfe",
-    borderRadius: "18px",
-    padding: "1rem",
     display: "flex",
     justifyContent: "space-between",
     gap: "1rem",
@@ -977,8 +930,10 @@ const styles = {
     flexWrap: "wrap",
   },
   authHelpBoxMobile: {
+    display: "flex",
     flexDirection: "column",
     alignItems: "stretch",
+    gap: "1rem",
   },
   authHelpTitle: {
     margin: 0,
@@ -1014,58 +969,15 @@ const styles = {
   resultsHeaderMobile: {
     alignItems: "stretch",
   },
-  resultsTitle: {
-    margin: 0,
-    fontSize: "1.9rem",
-    color: "#0f172a",
-  },
-  resultsText: {
-    marginTop: "0.4rem",
-    marginBottom: 0,
-    color: "#64748b",
-    lineHeight: 1.65,
-  },
   stats: {
     display: "flex",
     gap: "0.6rem",
     flexWrap: "wrap",
   },
-  countBadge: {
-    background: "#eff6ff",
-    color: "#1d4ed8",
-    padding: "0.45rem 0.8rem",
-    borderRadius: "999px",
-    fontWeight: "800",
-    fontSize: "0.9rem",
-    border: "1px solid #dbeafe",
-  },
-  countBadgeSuccess: {
-    background: "#ecfdf5",
-    color: "#15803d",
-    padding: "0.45rem 0.8rem",
-    borderRadius: "999px",
-    fontWeight: "800",
-    fontSize: "0.9rem",
-    border: "1px solid #bbf7d0",
-  },
-  countBadgeMuted: {
-    background: "#f8fafc",
-    color: "#475569",
-    padding: "0.45rem 0.8rem",
-    borderRadius: "999px",
-    fontWeight: "800",
-    fontSize: "0.9rem",
-    border: "1px solid #e2e8f0",
-  },
   emptyState: {
     marginTop: "2rem",
-    background: "rgba(255,255,255,0.86)",
-    borderRadius: "26px",
     padding: "2rem",
-    boxShadow: "0 18px 40px rgba(15,23,42,0.06)",
-    border: "1px solid rgba(148,163,184,0.18)",
     textAlign: "center",
-    backdropFilter: "blur(10px)",
   },
   emptyIcon: {
     fontSize: "2.2rem",
