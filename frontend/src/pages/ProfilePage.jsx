@@ -8,7 +8,7 @@ function ProfilePage() {
   const passwordFormRef = useRef(null);
   const feedbackTimeoutRef = useRef(null);
 
-  const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
+  const [isTabletOrMobile, setIsTabletOrMobile] = useState(window.innerWidth <= 980);
 
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [savingProfile, setSavingProfile] = useState(false);
@@ -37,10 +37,11 @@ function ProfilePage() {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobileView(window.innerWidth <= 768);
+      setIsTabletOrMobile(window.innerWidth <= 980);
     };
 
     window.addEventListener("resize", handleResize);
+
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
@@ -155,6 +156,17 @@ function ProfilePage() {
     return profile.nom.split(" ")[0];
   }, [profile]);
 
+  const initials = useMemo(() => {
+    const fullName = profile?.nom?.trim() || "Usuari";
+    const parts = fullName.split(" ").filter(Boolean);
+
+    if (parts.length === 1) {
+      return parts[0].slice(0, 1).toUpperCase();
+    }
+
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  }, [profile]);
+
   const passwordChecks = useMemo(() => {
     const newPassword = passwordData.newPassword;
 
@@ -187,7 +199,30 @@ function ProfilePage() {
       ? "pb-badge-pill pb-badge-pill--amber"
       : "pb-badge-pill pb-badge-pill--rose";
 
-  const accountSummary = [
+  const accountSummaryCards = [
+    {
+      label: "Estat del perfil",
+      value: hasProfileChanges ? "Amb canvis" : "Actualitzat",
+      text: hasProfileChanges
+        ? "Hi ha informació pendent de guardar."
+        : "Les dades actuals estan sincronitzades.",
+    },
+    {
+      label: "Rol del compte",
+      value: roleLabel,
+      text:
+        profile?.rol === "admin"
+          ? "Tens accés a eines de gestió i administració."
+          : "Tens accés a les funcionalitats habituals de reserva.",
+    },
+    {
+      label: "Seguretat",
+      value: `Nivell ${passwordStrengthText.toLowerCase()}`,
+      text: "Pots reforçar la sessió actualitzant la contrasenya quan vulguis.",
+    },
+  ];
+
+  const accountDetailItems = [
     {
       label: "Nom complet",
       value: profile?.nom || "-",
@@ -199,6 +234,10 @@ function ProfilePage() {
     {
       label: "Rol",
       value: roleLabel,
+    },
+    {
+      label: "Sessió",
+      value: "Activa",
     },
   ];
 
@@ -419,40 +458,59 @@ function ProfilePage() {
 
   return (
     <div style={styles.page}>
-      <div style={{ ...styles.container, ...(isMobileView ? styles.containerMobile : {}) }}>
+      <div
+        style={{
+          ...styles.container,
+          ...(isTabletOrMobile ? styles.containerMobile : {}),
+        }}
+      >
         <section
           className="fade-in-up"
-          style={{ ...styles.hero, ...(isMobileView ? styles.heroMobile : {}) }}
+          style={{
+            ...styles.hero,
+            ...(isTabletOrMobile ? styles.heroMobile : {}),
+          }}
         >
           <div
             style={{
-              ...styles.heroGrid,
-              ...(isMobileView ? styles.heroGridMobile : {}),
+              ...styles.heroLayout,
+              ...(isTabletOrMobile ? styles.heroLayoutMobile : {}),
             }}
           >
-            <div>
+            <div style={styles.heroMain}>
               <span className="pb-chip">El meu compte</span>
 
-              <h1 style={{ ...styles.title, ...(isMobileView ? styles.titleMobile : {}) }}>
-                Hola, {firstName}
-              </h1>
+              <div style={styles.heroIdentityRow}>
+                <div style={styles.heroAvatar}>{initials}</div>
 
-              <p style={styles.subtitle}>
-                Gestiona les dades del teu compte, actualitza el correu i reforça
-                la seguretat de la sessió des d’un entorn més clar i més complet.
-              </p>
+                <div style={styles.heroIdentityText}>
+                  <h1
+                    style={{
+                      ...styles.heroTitle,
+                      ...(isTabletOrMobile ? styles.heroTitleMobile : {}),
+                    }}
+                  >
+                    Hola, {firstName}
+                  </h1>
+
+                  <p style={styles.heroSubtitle}>
+                    Revisa el perfil, mantén el correu actualitzat i reforça la
+                    seguretat del compte des d’un espai molt més clar i ordenat.
+                  </p>
+                </div>
+              </div>
 
               <div
                 style={{
                   ...styles.heroActions,
-                  ...(isMobileView ? styles.heroActionsMobile : {}),
+                  ...(isTabletOrMobile ? styles.heroActionsMobile : {}),
                 }}
               >
                 <button
                   type="button"
                   className="btn btn-light"
                   onClick={() => scrollToElementWithOffset(profileFormRef.current, 110)}
-                  style={isMobileView ? styles.fullWidthButton : undefined}
+                  style={isTabletOrMobile ? styles.fullWidthButton : undefined}
                 >
                   Editar perfil
                 </button>
@@ -461,25 +519,46 @@ function ProfilePage() {
                   type="button"
                   className="btn btn-light"
                   onClick={() => scrollToElementWithOffset(passwordFormRef.current, 110)}
-                  style={isMobileView ? styles.fullWidthButton : undefined}
+                  style={isTabletOrMobile ? styles.fullWidthButton : undefined}
                 >
                   Canviar contrasenya
                 </button>
               </div>
             </div>
 
-            <div style={styles.heroPanel}>
-              <span style={styles.heroPanelLabel}>Estat del compte</span>
+            <aside style={styles.heroAside}>
+              <div style={styles.heroAsideCard}>
+                <span style={styles.heroAsideLabel}>Compte actual</span>
+                <div style={styles.heroAsideTop}>
+                  <span style={styles.heroAsideName}>{profile?.nom || "Usuari"}</span>
+                  <span
+                    className={`pb-badge-pill ${
+                      profile?.rol === "admin"
+                        ? "pb-badge-pill--blue"
+                        : "pb-badge-pill--green"
+                    }`}
+                  >
+                    {roleLabel}
+                  </span>
+                </div>
 
-              <div style={styles.heroPanelGrid}>
-                {accountSummary.map((item) => (
-                  <div key={item.label} style={styles.heroPanelCard}>
-                    <span style={styles.heroPanelCardLabel}>{item.label}</span>
-                    <span style={styles.heroPanelCardValue}>{item.value}</span>
+                <p style={styles.heroAsideEmail}>{profile?.email || "-"}</p>
+
+                <div style={styles.heroAsideStats}>
+                  <div style={styles.heroAsideStat}>
+                    <span style={styles.heroAsideStatLabel}>Perfil</span>
+                    <span style={styles.heroAsideStatValue}>
+                      {hasProfileChanges ? "Pendent" : "Correcte"}
+                    </span>
                   </div>
-                ))}
+
+                  <div style={styles.heroAsideStat}>
+                    <span style={styles.heroAsideStatLabel}>Seguretat</span>
+                    <span style={styles.heroAsideStatValue}>{passwordStrengthText}</span>
+                  </div>
+                </div>
               </div>
-            </div>
+            </aside>
           </div>
         </section>
 
@@ -520,328 +599,431 @@ function ProfilePage() {
               className="fade-in-up delay-1"
               style={{
                 ...styles.summaryGrid,
-                ...(isMobileView ? styles.summaryGridMobile : {}),
+                ...(isTabletOrMobile ? styles.summaryGridMobile : {}),
               }}
             >
-              <article className="pb-surface-card" style={styles.summaryCard}>
-                <span style={styles.summaryLabel}>Canvis pendents</span>
-                <span style={styles.summaryValue}>
-                  {hasProfileChanges ? "Sí" : "No"}
-                </span>
-                <p style={styles.summaryText}>
-                  {hasProfileChanges
-                    ? "Hi ha dades modificades pendents de guardar."
-                    : "El perfil actual està sincronitzat."}
-                </p>
-              </article>
-
-              <article className="pb-surface-card" style={styles.summaryCard}>
-                <span style={styles.summaryLabel}>Seguretat</span>
-                <span style={styles.summaryValue}>Contrasenya</span>
-                <p style={styles.summaryText}>
-                  Pots actualitzar-la quan vulguis amb validació en temps real.
-                </p>
-              </article>
-
-              <article className="pb-surface-card" style={styles.summaryCard}>
-                <span style={styles.summaryLabel}>Sessió</span>
-                <span style={styles.summaryValue}>Activa</span>
-                <p style={styles.summaryText}>
-                  Els canvis es reflecteixen també a la sessió actual.
-                </p>
-              </article>
+              {accountSummaryCards.map((item) => (
+                <article key={item.label} className="pb-surface-card" style={styles.summaryCard}>
+                  <span style={styles.summaryLabel}>{item.label}</span>
+                  <span style={styles.summaryValue}>{item.value}</span>
+                  <p style={styles.summaryText}>{item.text}</p>
+                </article>
+              ))}
             </section>
 
             <div
               style={{
-                ...styles.grid,
-                ...(isMobileView ? styles.gridMobile : {}),
+                ...styles.contentLayout,
+                ...(isTabletOrMobile ? styles.contentLayoutMobile : {}),
               }}
             >
-              <section
-                ref={profileFormRef}
-                className="fade-in-up delay-2 pb-surface-card"
-                style={styles.card}
-              >
-                <div style={styles.cardHeader}>
-                  <div>
-                    <span className="pb-kicker">Dades personals</span>
-                    <h2 className="pb-panel-title">Informació del compte</h2>
-                    <p className="pb-panel-text">
-                      Modifica el teu nom complet i el correu electrònic associat.
-                    </p>
-                  </div>
+              <main style={styles.mainColumn}>
+                <section
+                  ref={profileFormRef}
+                  className="fade-in-up delay-2 pb-surface-card"
+                  style={styles.card}
+                >
+                  <div style={styles.cardHeader}>
+                    <div>
+                      <span className="pb-kicker">Dades personals</span>
+                      <h2 className="pb-panel-title">Informació del compte</h2>
+                      <p className="pb-panel-text">
+                        Modifica el teu nom complet i el correu electrònic associat
+                        a la sessió.
+                      </p>
+                    </div>
 
-                  <span
-                    className={`pb-badge-pill ${
-                      hasProfileChanges
-                        ? "pb-badge-pill--blue"
-                        : "pb-badge-pill--green"
-                    }`}
-                  >
-                    {hasProfileChanges ? "Canvis pendents" : "Sense canvis"}
-                  </span>
-                </div>
-
-                <form onSubmit={handleUpdateProfile} style={styles.form}>
-                  <div className="pb-form-field">
-                    <label htmlFor="nom" className="pb-form-label">
-                      Nom i llinatges
-                    </label>
-                    <input
-                      id="nom"
-                      name="nom"
-                      type="text"
-                      value={formData.nom}
-                      onChange={handleProfileChange}
-                      placeholder="Ex: Pere Serra"
-                      className="pb-input"
-                      required
-                    />
-                  </div>
-
-                  <div className="pb-form-field">
-                    <label htmlFor="email" className="pb-form-label">
-                      Correu electrònic
-                    </label>
-                    <input
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleProfileChange}
-                      placeholder="exemple@correu.com"
-                      className="pb-input"
-                      required
-                    />
-                  </div>
-
-                  <div className="pb-soft-box">
-                    <span className="pb-soft-box__title">Consell</span>
-                    <p className="pb-soft-box__text">
-                      Usa un correu vàlid i un nom complet real per mantenir el
-                      compte ben identificat.
-                    </p>
-                  </div>
-
-                  <div
-                    style={{
-                      ...styles.actions,
-                      ...(isMobileView ? styles.actionsMobile : {}),
-                    }}
-                  >
-                    <button
-                      type="submit"
-                      className="btn btn-primary"
-                      disabled={savingProfile || !hasProfileChanges}
-                      style={isMobileView ? styles.fullWidthButton : undefined}
+                    <span
+                      className={`pb-badge-pill ${
+                        hasProfileChanges
+                          ? "pb-badge-pill--blue"
+                          : "pb-badge-pill--green"
+                      }`}
                     >
-                      {savingProfile ? "Guardant canvis..." : "Guardar canvis"}
-                    </button>
+                      {hasProfileChanges ? "Canvis pendents" : "Sense canvis"}
+                    </span>
+                  </div>
 
-                    <button
-                      type="button"
-                      className="btn btn-light"
-                      onClick={handleResetProfileChanges}
-                      disabled={!hasProfileChanges || savingProfile}
-                      style={isMobileView ? styles.fullWidthButton : undefined}
+                  <form onSubmit={handleUpdateProfile} style={styles.form}>
+                    <div
+                      style={{
+                        ...styles.formGrid,
+                        ...(isTabletOrMobile ? styles.formGridMobile : {}),
+                      }}
                     >
-                      Restablir
-                    </button>
-                  </div>
-                </form>
-              </section>
+                      <div className="pb-form-field">
+                        <label htmlFor="nom" className="pb-form-label">
+                          Nom i llinatges
+                        </label>
+                        <input
+                          id="nom"
+                          name="nom"
+                          type="text"
+                          value={formData.nom}
+                          onChange={handleProfileChange}
+                          placeholder="Ex: Pere Serra"
+                          className="pb-input"
+                          required
+                        />
+                      </div>
 
-              <section
-                ref={passwordFormRef}
-                className="fade-in-up delay-3 pb-surface-card"
-                style={styles.card}
-              >
-                <div style={styles.cardHeader}>
-                  <div>
-                    <span className="pb-kicker">Seguretat</span>
-                    <h2 className="pb-panel-title">Canviar contrasenya</h2>
-                    <p className="pb-panel-text">
-                      Crea una contrasenya més robusta amb ajuda visual en temps real.
-                    </p>
-                  </div>
+                      <div className="pb-form-field">
+                        <label htmlFor="email" className="pb-form-label">
+                          Correu electrònic
+                        </label>
+                        <input
+                          id="email"
+                          name="email"
+                          type="email"
+                          value={formData.email}
+                          onChange={handleProfileChange}
+                          placeholder="exemple@correu.com"
+                          className="pb-input"
+                          required
+                        />
+                      </div>
+                    </div>
 
-                  <span className={passwordStrengthClass}>
-                    Seguretat: {passwordStrengthText}
-                  </span>
-                </div>
-
-                <form onSubmit={handleChangePassword} style={styles.form}>
-                  <div className="pb-form-field">
-                    <label htmlFor="currentPassword" className="pb-form-label">
-                      Contrasenya actual
-                    </label>
+                    <div style={styles.infoStrip}>
+                      <div style={styles.infoStripIcon}>i</div>
+                      <div>
+                        <p style={styles.infoStripTitle}>Consell de perfil</p>
+                        <p style={styles.infoStripText}>
+                          Mantén un nom complet real i un correu vàlid per
+                          identificar millor el compte i rebre comunicacions sense
+                          errors.
+                        </p>
+                      </div>
+                    </div>
 
                     <div
                       style={{
-                        ...styles.passwordWrapper,
-                        ...(isMobileView ? styles.passwordWrapperMobile : {}),
+                        ...styles.actions,
+                        ...(isTabletOrMobile ? styles.actionsMobile : {}),
                       }}
                     >
-                      <input
-                        id="currentPassword"
-                        name="currentPassword"
-                        type={showCurrentPassword ? "text" : "password"}
-                        value={passwordData.currentPassword}
-                        onChange={handlePasswordInputChange}
-                        onKeyDown={handleCapsLockCurrent}
-                        onKeyUp={handleCapsLockCurrent}
-                        placeholder="Introdueix la contrasenya actual"
-                        className="pb-input"
-                        required
-                      />
+                      <button
+                        type="submit"
+                        className="btn btn-primary"
+                        disabled={savingProfile || !hasProfileChanges}
+                        style={isTabletOrMobile ? styles.fullWidthButton : undefined}
+                      >
+                        {savingProfile ? "Guardant canvis..." : "Guardar canvis"}
+                      </button>
 
                       <button
                         type="button"
-                        style={{
-                          ...styles.showButton,
-                          ...(isMobileView ? styles.showButtonMobile : {}),
-                        }}
-                        onClick={() => setShowCurrentPassword((prev) => !prev)}
+                        className="btn btn-light"
+                        onClick={handleResetProfileChanges}
+                        disabled={!hasProfileChanges || savingProfile}
+                        style={isTabletOrMobile ? styles.fullWidthButton : undefined}
                       >
-                        {showCurrentPassword ? "Ocultar" : "Mostrar"}
+                        Restablir
                       </button>
                     </div>
+                  </form>
+                </section>
 
-                    {capsLockCurrent && (
-                      <span style={styles.capsWarning}>
-                        ⚠️ Tens el bloqueig de majúscules activat
-                      </span>
-                    )}
+                <section
+                  ref={passwordFormRef}
+                  className="fade-in-up delay-3 pb-surface-card"
+                  style={styles.card}
+                >
+                  <div style={styles.cardHeader}>
+                    <div>
+                      <span className="pb-kicker">Seguretat</span>
+                      <h2 className="pb-panel-title">Canviar contrasenya</h2>
+                      <p className="pb-panel-text">
+                        Actualitza la contrasenya amb una validació clara i en temps
+                        real.
+                      </p>
+                    </div>
+
+                    <span className={passwordStrengthClass}>
+                      Seguretat: {passwordStrengthText}
+                    </span>
                   </div>
 
-                  <div className="pb-form-field">
-                    <label htmlFor="newPassword" className="pb-form-label">
-                      Nova contrasenya
-                    </label>
+                  <form onSubmit={handleChangePassword} style={styles.form}>
+                    <div className="pb-form-field">
+                      <label htmlFor="currentPassword" className="pb-form-label">
+                        Contrasenya actual
+                      </label>
+
+                      <div
+                        style={{
+                          ...styles.passwordWrapper,
+                          ...(isTabletOrMobile ? styles.passwordWrapperMobile : {}),
+                        }}
+                      >
+                        <input
+                          id="currentPassword"
+                          name="currentPassword"
+                          type={showCurrentPassword ? "text" : "password"}
+                          value={passwordData.currentPassword}
+                          onChange={handlePasswordInputChange}
+                          onKeyDown={handleCapsLockCurrent}
+                          onKeyUp={handleCapsLockCurrent}
+                          placeholder="Introdueix la contrasenya actual"
+                          className="pb-input"
+                          required
+                        />
+
+                        <button
+                          type="button"
+                          style={{
+                            ...styles.showButton,
+                            ...(isTabletOrMobile ? styles.showButtonMobile : {}),
+                          }}
+                          onClick={() => setShowCurrentPassword((prev) => !prev)}
+                        >
+                          {showCurrentPassword ? "Ocultar" : "Mostrar"}
+                        </button>
+                      </div>
+
+                      {capsLockCurrent && (
+                        <span style={styles.capsWarning}>
+                          ⚠️ Tens el bloqueig de majúscules activat
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="pb-form-field">
+                      <label htmlFor="newPassword" className="pb-form-label">
+                        Nova contrasenya
+                      </label>
+
+                      <div
+                        style={{
+                          ...styles.passwordWrapper,
+                          ...(isTabletOrMobile ? styles.passwordWrapperMobile : {}),
+                        }}
+                      >
+                        <input
+                          id="newPassword"
+                          name="newPassword"
+                          type={showNewPassword ? "text" : "password"}
+                          value={passwordData.newPassword}
+                          onChange={handlePasswordInputChange}
+                          onKeyDown={handleCapsLockNew}
+                          onKeyUp={handleCapsLockNew}
+                          placeholder="Mínim 8 caràcters"
+                          className="pb-input"
+                          required
+                        />
+
+                        <button
+                          type="button"
+                          style={{
+                            ...styles.showButton,
+                            ...(isTabletOrMobile ? styles.showButtonMobile : {}),
+                          }}
+                          onClick={() => setShowNewPassword((prev) => !prev)}
+                        >
+                          {showNewPassword ? "Ocultar" : "Mostrar"}
+                        </button>
+                      </div>
+
+                      {capsLockNew && (
+                        <span style={styles.capsWarning}>
+                          ⚠️ Tens el bloqueig de majúscules activat
+                        </span>
+                      )}
+                    </div>
+
+                    <div style={styles.checklistPanel}>
+                      <div style={styles.checklistHeader}>
+                        <span style={styles.checklistTitle}>
+                          Requisits de la nova contrasenya
+                        </span>
+                        <span style={styles.checklistCounter}>
+                          {completedPasswordChecks}/6 complets
+                        </span>
+                      </div>
+
+                      <div
+                        style={{
+                          ...styles.progressTrack,
+                          ...(completedPasswordChecks >= 5
+                            ? styles.progressTrackStrong
+                            : completedPasswordChecks >= 3
+                            ? styles.progressTrackMedium
+                            : styles.progressTrackLow),
+                        }}
+                      >
+                        <div
+                          style={{
+                            ...styles.progressFill,
+                            width: `${(completedPasswordChecks / 6) * 100}%`,
+                          }}
+                        />
+                      </div>
+
+                      <div style={styles.checklist}>
+                        <div style={styles.checkItem}>
+                          <span style={passwordChecks.minLength ? styles.checkOk : styles.checkPending}>
+                            {passwordChecks.minLength ? "✓" : "•"}
+                          </span>
+                          <span>Almenys 8 caràcters</span>
+                        </div>
+
+                        <div style={styles.checkItem}>
+                          <span style={passwordChecks.lowercase ? styles.checkOk : styles.checkPending}>
+                            {passwordChecks.lowercase ? "✓" : "•"}
+                          </span>
+                          <span>Inclou una minúscula</span>
+                        </div>
+
+                        <div style={styles.checkItem}>
+                          <span style={passwordChecks.uppercase ? styles.checkOk : styles.checkPending}>
+                            {passwordChecks.uppercase ? "✓" : "•"}
+                          </span>
+                          <span>Inclou una majúscula</span>
+                        </div>
+
+                        <div style={styles.checkItem}>
+                          <span style={passwordChecks.number ? styles.checkOk : styles.checkPending}>
+                            {passwordChecks.number ? "✓" : "•"}
+                          </span>
+                          <span>Inclou un número</span>
+                        </div>
+
+                        <div style={styles.checkItem}>
+                          <span style={passwordChecks.symbol ? styles.checkOk : styles.checkPending}>
+                            {passwordChecks.symbol ? "✓" : "•"}
+                          </span>
+                          <span>Inclou un símbol</span>
+                        </div>
+
+                        <div style={styles.checkItem}>
+                          <span style={passwordChecks.different ? styles.checkOk : styles.checkPending}>
+                            {passwordChecks.different ? "✓" : "•"}
+                          </span>
+                          <span>Ha de ser diferent de l’actual</span>
+                        </div>
+                      </div>
+                    </div>
 
                     <div
                       style={{
-                        ...styles.passwordWrapper,
-                        ...(isMobileView ? styles.passwordWrapperMobile : {}),
+                        ...styles.actions,
+                        ...(isTabletOrMobile ? styles.actionsMobile : {}),
                       }}
                     >
-                      <input
-                        id="newPassword"
-                        name="newPassword"
-                        type={showNewPassword ? "text" : "password"}
-                        value={passwordData.newPassword}
-                        onChange={handlePasswordInputChange}
-                        onKeyDown={handleCapsLockNew}
-                        onKeyUp={handleCapsLockNew}
-                        placeholder="Mínim 8 caràcters"
-                        className="pb-input"
-                        required
-                      />
+                      <button
+                        type="submit"
+                        className="btn btn-primary"
+                        disabled={changingPassword}
+                        style={isTabletOrMobile ? styles.fullWidthButton : undefined}
+                      >
+                        {changingPassword
+                          ? "Canviant contrasenya..."
+                          : "Canviar contrasenya"}
+                      </button>
 
                       <button
                         type="button"
-                        style={{
-                          ...styles.showButton,
-                          ...(isMobileView ? styles.showButtonMobile : {}),
-                        }}
-                        onClick={() => setShowNewPassword((prev) => !prev)}
+                        className="btn btn-light"
+                        onClick={handleClearPasswordForm}
+                        disabled={
+                          changingPassword ||
+                          (!passwordData.currentPassword && !passwordData.newPassword)
+                        }
+                        style={isTabletOrMobile ? styles.fullWidthButton : undefined}
                       >
-                        {showNewPassword ? "Ocultar" : "Mostrar"}
+                        Netejar camps
                       </button>
                     </div>
+                  </form>
+                </section>
+              </main>
 
-                    {capsLockNew && (
-                      <span style={styles.capsWarning}>
-                        ⚠️ Tens el bloqueig de majúscules activat
-                      </span>
-                    )}
-                  </div>
-
-                  <div style={styles.checklistPanel}>
-                    <div style={styles.checklistHeader}>
-                      <span style={styles.checklistTitle}>
-                        Requisits de la nova contrasenya
-                      </span>
+              <aside style={styles.sidebarColumn}>
+                <div
+                  style={{
+                    ...styles.sidebarStack,
+                    ...(isTabletOrMobile ? styles.sidebarStackMobile : {}),
+                  }}
+                >
+                  <section className="pb-surface-card" style={styles.sidebarCard}>
+                    <div style={styles.sidebarCardHeader}>
+                      <span className="pb-kicker">Resum del compte</span>
+                      <h3 style={styles.sidebarTitle}>Vista ràpida</h3>
                     </div>
 
-                    <div style={styles.checklist}>
-                      <div style={styles.checkItem}>
-                        <span style={passwordChecks.minLength ? styles.checkOk : styles.checkPending}>
-                          {passwordChecks.minLength ? "✓" : "•"}
+                    <div style={styles.accountList}>
+                      {accountDetailItems.map((item) => (
+                        <div key={item.label} style={styles.accountListItem}>
+                          <span style={styles.accountListLabel}>{item.label}</span>
+                          <span style={styles.accountListValue}>{item.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+
+                  <section className="pb-surface-card" style={styles.sidebarCard}>
+                    <div style={styles.sidebarCardHeader}>
+                      <span className="pb-kicker">Estat actual</span>
+                      <h3 style={styles.sidebarTitle}>Seguiment</h3>
+                    </div>
+
+                    <div style={styles.statusStack}>
+                      <div style={styles.statusRow}>
+                        <span style={styles.statusLabel}>Canvis al perfil</span>
+                        <span
+                          className={`pb-badge-pill ${
+                            hasProfileChanges
+                              ? "pb-badge-pill--blue"
+                              : "pb-badge-pill--green"
+                          }`}
+                        >
+                          {hasProfileChanges ? "Pendents" : "Al dia"}
                         </span>
-                        <span>Almenys 8 caràcters</span>
                       </div>
 
-                      <div style={styles.checkItem}>
-                        <span style={passwordChecks.lowercase ? styles.checkOk : styles.checkPending}>
-                          {passwordChecks.lowercase ? "✓" : "•"}
-                        </span>
-                        <span>Inclou una minúscula</span>
+                      <div style={styles.statusRow}>
+                        <span style={styles.statusLabel}>Contrasenya</span>
+                        <span className={passwordStrengthClass}>{passwordStrengthText}</span>
                       </div>
 
-                      <div style={styles.checkItem}>
-                        <span style={passwordChecks.uppercase ? styles.checkOk : styles.checkPending}>
-                          {passwordChecks.uppercase ? "✓" : "•"}
-                        </span>
-                        <span>Inclou una majúscula</span>
-                      </div>
-
-                      <div style={styles.checkItem}>
-                        <span style={passwordChecks.number ? styles.checkOk : styles.checkPending}>
-                          {passwordChecks.number ? "✓" : "•"}
-                        </span>
-                        <span>Inclou un número</span>
-                      </div>
-
-                      <div style={styles.checkItem}>
-                        <span style={passwordChecks.symbol ? styles.checkOk : styles.checkPending}>
-                          {passwordChecks.symbol ? "✓" : "•"}
-                        </span>
-                        <span>Inclou un símbol</span>
-                      </div>
-
-                      <div style={styles.checkItem}>
-                        <span style={passwordChecks.different ? styles.checkOk : styles.checkPending}>
-                          {passwordChecks.different ? "✓" : "•"}
-                        </span>
-                        <span>Ha de ser diferent de l’actual</span>
+                      <div style={styles.statusRow}>
+                        <span style={styles.statusLabel}>Sessió</span>
+                        <span className="pb-badge-pill pb-badge-pill--green">Activa</span>
                       </div>
                     </div>
-                  </div>
+                  </section>
 
-                  <div
-                    style={{
-                      ...styles.actions,
-                      ...(isMobileView ? styles.actionsMobile : {}),
-                    }}
-                  >
-                    <button
-                      type="submit"
-                      className="btn btn-primary"
-                      disabled={changingPassword}
-                      style={isMobileView ? styles.fullWidthButton : undefined}
-                    >
-                      {changingPassword
-                        ? "Canviant contrasenya..."
-                        : "Canviar contrasenya"}
-                    </button>
+                  <section className="pb-surface-card" style={styles.sidebarCard}>
+                    <div style={styles.sidebarCardHeader}>
+                      <span className="pb-kicker">Bones pràctiques</span>
+                      <h3 style={styles.sidebarTitle}>Recomanacions</h3>
+                    </div>
 
-                    <button
-                      type="button"
-                      className="btn btn-light"
-                      onClick={handleClearPasswordForm}
-                      disabled={
-                        changingPassword ||
-                        (!passwordData.currentPassword && !passwordData.newPassword)
-                      }
-                      style={isMobileView ? styles.fullWidthButton : undefined}
-                    >
-                      Netejar camps
-                    </button>
-                  </div>
-                </form>
-              </section>
+                    <div style={styles.tipList}>
+                      <div style={styles.tipItem}>
+                        <span style={styles.tipBullet}>•</span>
+                        <p style={styles.tipText}>
+                          Revisa el correu si canvies l’adreça principal del compte.
+                        </p>
+                      </div>
+
+                      <div style={styles.tipItem}>
+                        <span style={styles.tipBullet}>•</span>
+                        <p style={styles.tipText}>
+                          Evita reutilitzar la mateixa contrasenya en altres serveis.
+                        </p>
+                      </div>
+
+                      <div style={styles.tipItem}>
+                        <span style={styles.tipBullet}>•</span>
+                        <p style={styles.tipText}>
+                          Guarda els canvis del perfil abans de sortir de la pàgina.
+                        </p>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+              </aside>
             </div>
           </>
         )}
@@ -855,7 +1037,7 @@ const styles = {
     padding: "2rem 0 3rem",
   },
   container: {
-    maxWidth: "1200px",
+    maxWidth: "1240px",
     margin: "0 auto",
     padding: "0 1.5rem",
   },
@@ -866,38 +1048,68 @@ const styles = {
     position: "relative",
     overflow: "hidden",
     borderRadius: "30px",
-    padding: "2rem",
-    marginBottom: "1.5rem",
+    padding: "1.7rem",
+    marginBottom: "1.4rem",
     background:
-      "linear-gradient(135deg, rgba(15,23,42,0.94), rgba(37,99,235,0.88))",
-    boxShadow: "0 26px 56px rgba(37,99,235,0.16)",
+      "linear-gradient(135deg, rgba(15,23,42,0.97), rgba(37,99,235,0.88))",
+    boxShadow: "0 28px 60px rgba(37,99,235,0.16)",
     color: "white",
   },
   heroMobile: {
-    padding: "1.25rem",
+    padding: "1.2rem",
     borderRadius: "24px",
   },
-  heroGrid: {
+  heroLayout: {
     display: "grid",
-    gridTemplateColumns: "1.08fr 0.92fr",
-    gap: "1.3rem",
-    alignItems: "center",
+    gridTemplateColumns: "1.25fr 0.75fr",
+    gap: "1.1rem",
+    alignItems: "stretch",
   },
-  heroGridMobile: {
+  heroLayoutMobile: {
     gridTemplateColumns: "1fr",
   },
-  title: {
-    margin: "1rem 0 0 0",
-    fontSize: "3rem",
-    lineHeight: 1.03,
+  heroMain: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
   },
-  titleMobile: {
-    fontSize: "2.2rem",
+  heroIdentityRow: {
+    display: "flex",
+    alignItems: "flex-start",
+    gap: "1rem",
+    marginTop: "1rem",
   },
-  subtitle: {
-    marginTop: "0.9rem",
+  heroAvatar: {
+    width: "68px",
+    height: "68px",
+    borderRadius: "22px",
+    background: "rgba(255,255,255,0.14)",
+    border: "1px solid rgba(255,255,255,0.14)",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "1.15rem",
+    fontWeight: "800",
+    color: "white",
+    flexShrink: 0,
+    backdropFilter: "blur(8px)",
+  },
+  heroIdentityText: {
+    minWidth: 0,
+  },
+  heroTitle: {
+    margin: 0,
+    fontSize: "2.7rem",
+    lineHeight: 1.02,
+    letterSpacing: "-0.03em",
+  },
+  heroTitleMobile: {
+    fontSize: "2.1rem",
+  },
+  heroSubtitle: {
+    marginTop: "0.8rem",
     marginBottom: 0,
-    fontSize: "1.05rem",
+    fontSize: "1rem",
     lineHeight: 1.75,
     color: "rgba(255,255,255,0.84)",
     maxWidth: "760px",
@@ -906,54 +1118,80 @@ const styles = {
     display: "flex",
     gap: "0.8rem",
     flexWrap: "wrap",
-    marginTop: "1.4rem",
+    marginTop: "1.35rem",
   },
   heroActionsMobile: {
     flexDirection: "column",
     alignItems: "stretch",
   },
-  heroPanel: {
+  heroAside: {
+    display: "flex",
+  },
+  heroAsideCard: {
+    width: "100%",
+    borderRadius: "24px",
+    padding: "1.1rem",
     background: "rgba(255,255,255,0.12)",
     border: "1px solid rgba(255,255,255,0.14)",
-    borderRadius: "24px",
-    padding: "1.15rem",
     backdropFilter: "blur(10px)",
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.9rem",
   },
-  heroPanelLabel: {
-    display: "block",
-    fontSize: "0.82rem",
+  heroAsideLabel: {
+    fontSize: "0.78rem",
     fontWeight: "800",
-    opacity: 0.82,
-    marginBottom: "0.85rem",
+    letterSpacing: "0.05em",
+    textTransform: "uppercase",
+    color: "rgba(255,255,255,0.72)",
+  },
+  heroAsideTop: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    gap: "0.7rem",
+    flexWrap: "wrap",
+  },
+  heroAsideName: {
+    fontSize: "1.1rem",
+    fontWeight: "800",
+    lineHeight: 1.4,
+  },
+  heroAsideEmail: {
+    margin: 0,
+    color: "rgba(255,255,255,0.84)",
+    lineHeight: 1.6,
+    wordBreak: "break-word",
+  },
+  heroAsideStats: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "0.75rem",
+  },
+  heroAsideStat: {
+    borderRadius: "18px",
+    background: "rgba(255,255,255,0.08)",
+    border: "1px solid rgba(255,255,255,0.10)",
+    padding: "0.85rem",
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.2rem",
+  },
+  heroAsideStatLabel: {
+    fontSize: "0.76rem",
+    fontWeight: "800",
+    color: "rgba(255,255,255,0.72)",
     textTransform: "uppercase",
     letterSpacing: "0.04em",
   },
-  heroPanelGrid: {
-    display: "grid",
-    gap: "0.7rem",
-  },
-  heroPanelCard: {
-    background: "rgba(255,255,255,0.08)",
-    border: "1px solid rgba(255,255,255,0.10)",
-    borderRadius: "18px",
-    padding: "0.9rem",
-    display: "flex",
-    flexDirection: "column",
-    gap: "0.25rem",
-  },
-  heroPanelCardLabel: {
-    fontSize: "0.78rem",
+  heroAsideStatValue: {
+    fontSize: "0.98rem",
     fontWeight: "800",
-    opacity: 0.8,
-  },
-  heroPanelCardValue: {
-    fontWeight: "800",
-    lineHeight: 1.55,
-    wordBreak: "break-word",
+    color: "#ffffff",
   },
   feedbackSection: {
-    marginTop: "1.25rem",
-    marginBottom: "1.25rem",
+    marginTop: "1.15rem",
+    marginBottom: "1.15rem",
   },
   errorWrapper: {
     display: "flex",
@@ -964,7 +1202,7 @@ const styles = {
     margin: 0,
     color: "#9f1239",
     fontWeight: "800",
-    fontSize: "1.1rem",
+    fontSize: "1.08rem",
   },
   errorText: {
     margin: 0,
@@ -987,7 +1225,7 @@ const styles = {
   summaryLabel: {
     display: "block",
     color: "#64748b",
-    fontSize: "0.82rem",
+    fontSize: "0.8rem",
     fontWeight: "800",
     textTransform: "uppercase",
     letterSpacing: "0.04em",
@@ -996,7 +1234,7 @@ const styles = {
   summaryValue: {
     display: "block",
     color: "#0f172a",
-    fontSize: "1.2rem",
+    fontSize: "1.18rem",
     fontWeight: "800",
     marginBottom: "0.35rem",
   },
@@ -1005,17 +1243,35 @@ const styles = {
     color: "#64748b",
     lineHeight: 1.65,
   },
-  grid: {
+  contentLayout: {
     display: "grid",
-    gridTemplateColumns: "1fr 1fr",
+    gridTemplateColumns: "minmax(0, 1.2fr) minmax(280px, 0.8fr)",
     gap: "1rem",
     alignItems: "start",
   },
-  gridMobile: {
+  contentLayoutMobile: {
     gridTemplateColumns: "1fr",
   },
+  mainColumn: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "1rem",
+  },
+  sidebarColumn: {
+    minWidth: 0,
+  },
+  sidebarStack: {
+    position: "sticky",
+    top: "104px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "1rem",
+  },
+  sidebarStackMobile: {
+    position: "static",
+  },
   card: {
-    padding: "1.4rem",
+    padding: "1.35rem",
   },
   cardHeader: {
     display: "flex",
@@ -1029,6 +1285,47 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     gap: "1rem",
+  },
+  formGrid: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "1rem",
+  },
+  formGridMobile: {
+    gridTemplateColumns: "1fr",
+  },
+  infoStrip: {
+    display: "flex",
+    alignItems: "flex-start",
+    gap: "0.85rem",
+    padding: "1rem",
+    borderRadius: "18px",
+    background: "linear-gradient(135deg, #f8fafc, #eff6ff)",
+    border: "1px solid #dbeafe",
+  },
+  infoStripIcon: {
+    width: "30px",
+    height: "30px",
+    borderRadius: "50%",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+    background: "#dbeafe",
+    color: "#1d4ed8",
+    fontWeight: "800",
+    fontSize: "0.92rem",
+  },
+  infoStripTitle: {
+    margin: 0,
+    color: "#0f172a",
+    fontWeight: "800",
+    fontSize: "0.93rem",
+  },
+  infoStripText: {
+    margin: "0.28rem 0 0 0",
+    color: "#475569",
+    lineHeight: 1.65,
   },
   passwordWrapper: {
     display: "flex",
@@ -1078,6 +1375,28 @@ const styles = {
     fontWeight: "800",
     color: "#0f172a",
   },
+  checklistCounter: {
+    color: "#475569",
+    fontSize: "0.84rem",
+    fontWeight: "800",
+  },
+  progressTrack: {
+    position: "relative",
+    width: "100%",
+    height: "10px",
+    borderRadius: "999px",
+    overflow: "hidden",
+    background: "#e2e8f0",
+  },
+  progressTrackLow: {},
+  progressTrackMedium: {},
+  progressTrackStrong: {},
+  progressFill: {
+    height: "100%",
+    borderRadius: "999px",
+    background: "linear-gradient(135deg, #2563eb, #1d4ed8)",
+    transition: "width 0.25s ease",
+  },
   checklist: {
     display: "grid",
     gap: "0.55rem",
@@ -1113,6 +1432,77 @@ const styles = {
   actionsMobile: {
     flexDirection: "column",
     alignItems: "stretch",
+  },
+  sidebarCard: {
+    padding: "1.15rem",
+  },
+  sidebarCardHeader: {
+    marginBottom: "0.95rem",
+  },
+  sidebarTitle: {
+    margin: "0.32rem 0 0 0",
+    color: "#0f172a",
+    fontSize: "1.02rem",
+    fontWeight: "800",
+    letterSpacing: "-0.02em",
+  },
+  accountList: {
+    display: "grid",
+    gap: "0.8rem",
+  },
+  accountListItem: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.25rem",
+    paddingBottom: "0.75rem",
+    borderBottom: "1px solid rgba(148, 163, 184, 0.18)",
+  },
+  accountListLabel: {
+    color: "#64748b",
+    fontSize: "0.78rem",
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
+  },
+  accountListValue: {
+    color: "#0f172a",
+    fontWeight: "700",
+    lineHeight: 1.5,
+    wordBreak: "break-word",
+  },
+  statusStack: {
+    display: "grid",
+    gap: "0.75rem",
+  },
+  statusRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: "0.8rem",
+    flexWrap: "wrap",
+  },
+  statusLabel: {
+    color: "#334155",
+    fontWeight: "700",
+  },
+  tipList: {
+    display: "grid",
+    gap: "0.8rem",
+  },
+  tipItem: {
+    display: "flex",
+    alignItems: "flex-start",
+    gap: "0.65rem",
+  },
+  tipBullet: {
+    color: "#2563eb",
+    fontWeight: "900",
+    lineHeight: 1.5,
+  },
+  tipText: {
+    margin: 0,
+    color: "#475569",
+    lineHeight: 1.65,
   },
   fullWidthButton: {
     width: "100%",
