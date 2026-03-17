@@ -10,6 +10,9 @@ function CourtCard({
 }) {
   const isAvailable = court.estat === "disponible";
   const isCovered = Number(court.coberta) === 1;
+  const courtTypeLabel = court.tipus === "dobles" ? "Dobles" : "Individual";
+  const courtModeLabel = isCovered ? "Coberta" : "Exterior";
+  const statusLabel = isAvailable ? "Disponible" : "Manteniment";
 
   return (
     <article
@@ -20,12 +23,8 @@ function CourtCard({
         ...(isHighlighted ? styles.cardHighlighted : {}),
       }}
     >
-      <div style={styles.header}>
-        <div>
-          <span style={styles.eyebrow}>Pista</span>
-          <h3 style={styles.title}>{court.nom_pista}</h3>
-          <p style={styles.subtitle}>Gestió individual de pista</p>
-        </div>
+      <div style={styles.topBar}>
+        <span style={styles.eyebrow}>Pista #{court.id}</span>
 
         <span
           style={{
@@ -33,14 +32,31 @@ function CourtCard({
             ...(isAvailable ? styles.statusAvailable : styles.statusMaintenance),
           }}
         >
-          {court.estat}
+          {statusLabel}
         </span>
       </div>
 
+      <div style={styles.header}>
+        <div style={styles.identityBlock}>
+          <h3 style={styles.title}>{court.nom_pista}</h3>
+          <p style={styles.subtitle}>Gestió individual i estat actual de la pista</p>
+        </div>
+      </div>
+
+      <div style={styles.summaryGrid}>
+        <div style={styles.summaryItem}>
+          <span style={styles.summaryLabel}>Tipus</span>
+          <span style={styles.summaryValue}>{courtTypeLabel}</span>
+        </div>
+
+        <div style={styles.summaryItem}>
+          <span style={styles.summaryLabel}>Modalitat</span>
+          <span style={styles.summaryValue}>{courtModeLabel}</span>
+        </div>
+      </div>
+
       <div style={styles.badgesRow}>
-        <span style={styles.infoBadge}>
-          {court.tipus === "dobles" ? "Dobles" : "Individual"}
-        </span>
+        <span style={styles.infoBadge}>{courtTypeLabel}</span>
 
         <span
           style={{
@@ -48,7 +64,7 @@ function CourtCard({
             ...(isCovered ? styles.coveredBadge : styles.outdoorBadge),
           }}
         >
-          {isCovered ? "Coberta" : "Exterior"}
+          {courtModeLabel}
         </span>
       </div>
 
@@ -116,65 +132,76 @@ function CourtCard({
 
 const styles = {
   card: {
-    background: "rgba(255,255,255,0.86)",
+    background: "rgba(255,255,255,0.9)",
     borderRadius: "26px",
     padding: "1.25rem",
     boxShadow: "0 18px 40px rgba(15,23,42,0.06)",
     border: "1px solid rgba(148,163,184,0.18)",
     display: "flex",
     flexDirection: "column",
-    gap: "1rem",
+    gap: "0.95rem",
     minHeight: "100%",
-    transition: "0.25s ease",
-    scrollMarginTop: "120px",
-    backdropFilter: "blur(10px)",
+    transition: "transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease",
   },
   cardConfirming: {
-    border: "1px solid #fdba74",
-    boxShadow: "0 16px 34px rgba(234,88,12,0.12)",
-    transform: "translateY(-2px)",
+    borderColor: "#fdba74",
+    boxShadow: "0 18px 42px rgba(249,115,22,0.12)",
   },
   cardHighlighted: {
-    border: "1px solid #93c5fd",
-    boxShadow:
-      "0 0 0 4px rgba(59,130,246,0.12), 0 18px 34px rgba(37,99,235,0.14)",
+    borderColor: "#93c5fd",
+    boxShadow: "0 0 0 4px rgba(37,99,235,0.08), 0 20px 46px rgba(37,99,235,0.14)",
     transform: "translateY(-2px)",
+  },
+  topBar: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: "0.75rem",
+    flexWrap: "wrap",
   },
   header: {
     display: "flex",
-    justifyContent: "space-between",
     alignItems: "flex-start",
-    gap: "0.9rem",
-    flexWrap: "wrap",
+    justifyContent: "space-between",
+    gap: "1rem",
+  },
+  identityBlock: {
+    minWidth: 0,
   },
   eyebrow: {
     display: "inline-block",
-    marginBottom: "0.35rem",
     fontSize: "0.78rem",
-    color: "#64748b",
     fontWeight: "800",
+    color: "#64748b",
     textTransform: "uppercase",
     letterSpacing: "0.04em",
   },
   title: {
     margin: 0,
-    fontSize: "1.35rem",
     color: "#0f172a",
+    fontSize: "1.3rem",
+    fontWeight: "800",
+    letterSpacing: "-0.02em",
+    lineHeight: 1.2,
   },
   subtitle: {
-    marginTop: "0.35rem",
-    marginBottom: 0,
+    margin: "0.4rem 0 0 0",
     color: "#64748b",
-    fontSize: "0.95rem",
-    lineHeight: 1.55,
+    lineHeight: 1.6,
+    fontWeight: "600",
   },
   statusBadge: {
-    padding: "0.42rem 0.8rem",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: "34px",
+    padding: "0.35rem 0.8rem",
     borderRadius: "999px",
+    fontSize: "0.82rem",
     fontWeight: "800",
-    fontSize: "0.84rem",
     textTransform: "capitalize",
     border: "1px solid transparent",
+    whiteSpace: "nowrap",
   },
   statusAvailable: {
     background: "#ecfdf5",
@@ -182,9 +209,34 @@ const styles = {
     borderColor: "#bbf7d0",
   },
   statusMaintenance: {
-    background: "#fff1f2",
-    color: "#be123c",
-    borderColor: "#fecdd3",
+    background: "#fff7ed",
+    color: "#c2410c",
+    borderColor: "#fdba74",
+  },
+  summaryGrid: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "0.75rem",
+  },
+  summaryItem: {
+    borderRadius: "18px",
+    padding: "0.85rem 0.95rem",
+    background: "linear-gradient(180deg, #f8fafc, #ffffff)",
+    border: "1px solid rgba(148,163,184,0.16)",
+  },
+  summaryLabel: {
+    display: "block",
+    color: "#64748b",
+    fontSize: "0.75rem",
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
+    marginBottom: "0.28rem",
+  },
+  summaryValue: {
+    color: "#0f172a",
+    fontWeight: "800",
+    lineHeight: 1.5,
   },
   badgesRow: {
     display: "flex",
@@ -192,33 +244,37 @@ const styles = {
     flexWrap: "wrap",
   },
   infoBadge: {
-    background: "#f8fafc",
-    color: "#334155",
-    padding: "0.38rem 0.72rem",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: "33px",
+    padding: "0.35rem 0.8rem",
     borderRadius: "999px",
-    fontWeight: "700",
-    fontSize: "0.82rem",
-    border: "1px solid #e2e8f0",
-  },
-  coveredBadge: {
     background: "#eff6ff",
     color: "#1d4ed8",
-    borderColor: "#dbeafe",
+    border: "1px solid #dbeafe",
+    fontSize: "0.82rem",
+    fontWeight: "800",
+  },
+  coveredBadge: {
+    background: "#eefdf4",
+    color: "#15803d",
+    borderColor: "#bbf7d0",
   },
   outdoorBadge: {
-    background: "#f8fafc",
-    color: "#334155",
-    borderColor: "#e2e8f0",
+    background: "#fff7ed",
+    color: "#c2410c",
+    borderColor: "#fdba74",
   },
   descriptionBox: {
-    background: "rgba(248,250,252,0.96)",
-    border: "1px solid #e2e8f0",
-    borderRadius: "18px",
+    borderRadius: "20px",
+    background: "#f8fafc",
+    border: "1px solid rgba(148,163,184,0.16)",
     padding: "1rem",
   },
   descriptionLabel: {
     display: "block",
-    fontSize: "0.8rem",
+    fontSize: "0.76rem",
     fontWeight: "800",
     color: "#64748b",
     marginBottom: "0.38rem",
