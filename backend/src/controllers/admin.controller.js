@@ -1,4 +1,22 @@
 const db = require("../config/db");
+const {
+  normalizeText,
+  parsePositiveInteger,
+  isValidDateFormat,
+  getTodayString,
+} = require("../utils/validators");
+
+const parseBinaryFlag = (value) => {
+  if (value === 1 || value === "1" || value === true || value === "true") {
+    return 1;
+  }
+
+  if (value === 0 || value === "0" || value === false || value === "false") {
+    return 0;
+  }
+
+  return null;
+};
 
 // Controlador per obtenir totes les reserves (per a l'administrador)
 exports.getAllReservations = async (req, res) => {
@@ -147,7 +165,7 @@ exports.createCourt = async (req, res) => {
     coberta = parseBinaryFlag(coberta);
 
     const allowedCourtStatuses = ["disponible", "manteniment"];
-    const allowedCourtTypes = ["indoor", "outdoor"]; // canvia-ho si al teu projecte uses altres valors
+    const allowedCourtTypes = ["dobles", "individual"];
 
     if (!nom_pista || !tipus || coberta === null || !estat) {
       return res.status(400).json({
@@ -242,7 +260,7 @@ exports.updateCourt = async (req, res) => {
     coberta = parseBinaryFlag(coberta);
 
     const allowedCourtStatuses = ["disponible", "manteniment"];
-    const allowedCourtTypes = ["indoor", "outdoor"]; // adapta-ho al teu model real
+    const allowedCourtTypes = ["dobles", "individual"];
 
     if (!nom_pista || !tipus || coberta === null || !estat) {
       return res.status(400).json({
@@ -378,8 +396,8 @@ exports.createMaintenanceBlock = async (req, res) => {
   try {
     let { court_id, time_slot_id, data_bloqueig, motiu } = req.body;
 
-    court_id = Number(court_id);
-    time_slot_id = Number(time_slot_id);
+    court_id = parsePositiveInteger(court_id);
+    time_slot_id = parsePositiveInteger(time_slot_id);
     data_bloqueig =
       typeof data_bloqueig === "string" ? data_bloqueig.trim() : "";
     motiu = normalizeText(motiu);
