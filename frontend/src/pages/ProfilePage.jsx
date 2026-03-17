@@ -180,12 +180,12 @@ function ProfilePage() {
       ? "Mitjana"
       : "Alta";
 
-  const passwordStrengthStyle =
+  const passwordStrengthClass =
     completedPasswordChecks >= 5
-      ? styles.securityStrong
+      ? "pb-badge-pill pb-badge-pill--green"
       : completedPasswordChecks >= 3
-      ? styles.securityMedium
-      : styles.securityLow;
+      ? "pb-badge-pill pb-badge-pill--amber"
+      : "pb-badge-pill pb-badge-pill--rose";
 
   const accountSummary = [
     {
@@ -419,18 +419,10 @@ function ProfilePage() {
 
   return (
     <div style={styles.page}>
-      <div
-        style={{
-          ...styles.container,
-          ...(isMobileView ? styles.containerMobile : {}),
-        }}
-      >
+      <div style={{ ...styles.container, ...(isMobileView ? styles.containerMobile : {}) }}>
         <section
           className="fade-in-up"
-          style={{
-            ...styles.hero,
-            ...(isMobileView ? styles.heroMobile : {}),
-          }}
+          style={{ ...styles.hero, ...(isMobileView ? styles.heroMobile : {}) }}
         >
           <div
             style={{
@@ -439,15 +431,12 @@ function ProfilePage() {
             }}
           >
             <div>
-              <span style={styles.badge}>El meu compte</span>
-              <h1
-                style={{
-                  ...styles.title,
-                  ...(isMobileView ? styles.titleMobile : {}),
-                }}
-              >
+              <span className="pb-chip">El meu compte</span>
+
+              <h1 style={{ ...styles.title, ...(isMobileView ? styles.titleMobile : {}) }}>
                 Hola, {firstName}
               </h1>
+
               <p style={styles.subtitle}>
                 Gestiona les dades del teu compte, actualitza el correu i reforça
                 la seguretat de la sessió des d’un entorn més clar i més complet.
@@ -462,7 +451,7 @@ function ProfilePage() {
                 <button
                   type="button"
                   className="btn btn-light"
-                  onClick={() => scrollToElementWithOffset(profileFormRef.current, 140)}
+                  onClick={() => scrollToElementWithOffset(profileFormRef.current, 110)}
                   style={isMobileView ? styles.fullWidthButton : undefined}
                 >
                   Editar perfil
@@ -471,7 +460,7 @@ function ProfilePage() {
                 <button
                   type="button"
                   className="btn btn-light"
-                  onClick={() => scrollToElementWithOffset(passwordFormRef.current, 140)}
+                  onClick={() => scrollToElementWithOffset(passwordFormRef.current, 110)}
                   style={isMobileView ? styles.fullWidthButton : undefined}
                 >
                   Canviar contrasenya
@@ -499,21 +488,20 @@ function ProfilePage() {
         {feedback && (
           <section className="scale-in" style={styles.feedbackSection}>
             <div
-              style={{
-                ...styles.feedbackBox,
-                ...(feedbackType === "success"
-                  ? styles.feedbackSuccess
-                  : styles.feedbackError),
-              }}
+              className={`pb-feedback ${
+                feedbackType === "success"
+                  ? "pb-feedback--success"
+                  : "pb-feedback--error"
+              }`}
             >
-              <p style={styles.feedbackText}>{feedback}</p>
+              <p className="pb-feedback__text">{feedback}</p>
             </div>
           </section>
         )}
 
         {loadError ? (
           <section className="scale-in" style={styles.feedbackSection}>
-            <div style={styles.errorBox}>
+            <div className="pb-feedback pb-feedback--error" style={styles.errorWrapper}>
               <p style={styles.errorTitle}>No s'han pogut carregar les dades</p>
               <p style={styles.errorText}>{loadError}</p>
 
@@ -535,7 +523,7 @@ function ProfilePage() {
                 ...(isMobileView ? styles.summaryGridMobile : {}),
               }}
             >
-              <article style={styles.summaryCard}>
+              <article className="pb-surface-card" style={styles.summaryCard}>
                 <span style={styles.summaryLabel}>Canvis pendents</span>
                 <span style={styles.summaryValue}>
                   {hasProfileChanges ? "Sí" : "No"}
@@ -547,7 +535,7 @@ function ProfilePage() {
                 </p>
               </article>
 
-              <article style={styles.summaryCard}>
+              <article className="pb-surface-card" style={styles.summaryCard}>
                 <span style={styles.summaryLabel}>Seguretat</span>
                 <span style={styles.summaryValue}>Contrasenya</span>
                 <p style={styles.summaryText}>
@@ -555,7 +543,7 @@ function ProfilePage() {
                 </p>
               </article>
 
-              <article style={styles.summaryCard}>
+              <article className="pb-surface-card" style={styles.summaryCard}>
                 <span style={styles.summaryLabel}>Sessió</span>
                 <span style={styles.summaryValue}>Activa</span>
                 <p style={styles.summaryText}>
@@ -572,33 +560,32 @@ function ProfilePage() {
             >
               <section
                 ref={profileFormRef}
-                className="fade-in-up delay-2"
+                className="fade-in-up delay-2 pb-surface-card"
                 style={styles.card}
               >
                 <div style={styles.cardHeader}>
                   <div>
-                    <span style={styles.cardKicker}>Dades personals</span>
-                    <h2 style={styles.cardTitle}>Informació del compte</h2>
-                    <p style={styles.cardText}>
+                    <span className="pb-kicker">Dades personals</span>
+                    <h2 className="pb-panel-title">Informació del compte</h2>
+                    <p className="pb-panel-text">
                       Modifica el teu nom complet i el correu electrònic associat.
                     </p>
                   </div>
 
                   <span
-                    style={{
-                      ...styles.statusBadge,
-                      ...(hasProfileChanges
-                        ? styles.statusBadgePending
-                        : styles.statusBadgeStable),
-                    }}
+                    className={`pb-badge-pill ${
+                      hasProfileChanges
+                        ? "pb-badge-pill--blue"
+                        : "pb-badge-pill--green"
+                    }`}
                   >
                     {hasProfileChanges ? "Canvis pendents" : "Sense canvis"}
                   </span>
                 </div>
 
                 <form onSubmit={handleUpdateProfile} style={styles.form}>
-                  <div style={styles.field}>
-                    <label htmlFor="nom" style={styles.label}>
+                  <div className="pb-form-field">
+                    <label htmlFor="nom" className="pb-form-label">
                       Nom i llinatges
                     </label>
                     <input
@@ -608,13 +595,13 @@ function ProfilePage() {
                       value={formData.nom}
                       onChange={handleProfileChange}
                       placeholder="Ex: Pere Serra"
-                      style={styles.input}
+                      className="pb-input"
                       required
                     />
                   </div>
 
-                  <div style={styles.field}>
-                    <label htmlFor="email" style={styles.label}>
+                  <div className="pb-form-field">
+                    <label htmlFor="email" className="pb-form-label">
                       Correu electrònic
                     </label>
                     <input
@@ -624,14 +611,14 @@ function ProfilePage() {
                       value={formData.email}
                       onChange={handleProfileChange}
                       placeholder="exemple@correu.com"
-                      style={styles.input}
+                      className="pb-input"
                       required
                     />
                   </div>
 
-                  <div style={styles.tipBox}>
-                    <span style={styles.tipTitle}>Consell</span>
-                    <p style={styles.tipText}>
+                  <div className="pb-soft-box">
+                    <span className="pb-soft-box__title">Consell</span>
+                    <p className="pb-soft-box__text">
                       Usa un correu vàlid i un nom complet real per mantenir el
                       compte ben identificat.
                     </p>
@@ -667,31 +654,26 @@ function ProfilePage() {
 
               <section
                 ref={passwordFormRef}
-                className="fade-in-up delay-3"
+                className="fade-in-up delay-3 pb-surface-card"
                 style={styles.card}
               >
                 <div style={styles.cardHeader}>
                   <div>
-                    <span style={styles.cardKicker}>Seguretat</span>
-                    <h2 style={styles.cardTitle}>Canviar contrasenya</h2>
-                    <p style={styles.cardText}>
+                    <span className="pb-kicker">Seguretat</span>
+                    <h2 className="pb-panel-title">Canviar contrasenya</h2>
+                    <p className="pb-panel-text">
                       Crea una contrasenya més robusta amb ajuda visual en temps real.
                     </p>
                   </div>
 
-                  <span
-                    style={{
-                      ...styles.securityBadge,
-                      ...passwordStrengthStyle,
-                    }}
-                  >
+                  <span className={passwordStrengthClass}>
                     Seguretat: {passwordStrengthText}
                   </span>
                 </div>
 
                 <form onSubmit={handleChangePassword} style={styles.form}>
-                  <div style={styles.field}>
-                    <label htmlFor="currentPassword" style={styles.label}>
+                  <div className="pb-form-field">
+                    <label htmlFor="currentPassword" className="pb-form-label">
                       Contrasenya actual
                     </label>
 
@@ -710,7 +692,7 @@ function ProfilePage() {
                         onKeyDown={handleCapsLockCurrent}
                         onKeyUp={handleCapsLockCurrent}
                         placeholder="Introdueix la contrasenya actual"
-                        style={styles.input}
+                        className="pb-input"
                         required
                       />
 
@@ -733,8 +715,8 @@ function ProfilePage() {
                     )}
                   </div>
 
-                  <div style={styles.field}>
-                    <label htmlFor="newPassword" style={styles.label}>
+                  <div className="pb-form-field">
+                    <label htmlFor="newPassword" className="pb-form-label">
                       Nova contrasenya
                     </label>
 
@@ -753,7 +735,7 @@ function ProfilePage() {
                         onKeyDown={handleCapsLockNew}
                         onKeyUp={handleCapsLockNew}
                         placeholder="Mínim 8 caràcters"
-                        style={styles.input}
+                        className="pb-input"
                         required
                       />
 
@@ -904,17 +886,8 @@ const styles = {
   heroGridMobile: {
     gridTemplateColumns: "1fr",
   },
-  badge: {
-    display: "inline-block",
-    padding: "0.5rem 0.85rem",
-    borderRadius: "999px",
-    background: "rgba(255,255,255,0.12)",
-    border: "1px solid rgba(255,255,255,0.14)",
-    fontWeight: "800",
-    marginBottom: "1rem",
-  },
   title: {
-    margin: 0,
+    margin: "1rem 0 0 0",
     fontSize: "3rem",
     lineHeight: 1.03,
   },
@@ -982,35 +955,10 @@ const styles = {
     marginTop: "1.25rem",
     marginBottom: "1.25rem",
   },
-  feedbackBox: {
-    borderRadius: "18px",
-    padding: "1rem 1.1rem",
-    border: "1px solid transparent",
-    boxShadow: "0 10px 24px rgba(15,23,42,0.04)",
-  },
-  feedbackSuccess: {
-    background: "#ecfdf5",
-    borderColor: "#86efac",
-  },
-  feedbackError: {
-    background: "#fff1f2",
-    borderColor: "#fecdd3",
-  },
-  feedbackText: {
-    margin: 0,
-    fontWeight: "800",
-    lineHeight: 1.6,
-    color: "#0f172a",
-  },
-  errorBox: {
-    background: "#fff1f2",
-    border: "1px solid #fecdd3",
-    borderRadius: "24px",
-    padding: "1.25rem",
+  errorWrapper: {
     display: "flex",
     flexDirection: "column",
     gap: "0.9rem",
-    boxShadow: "0 10px 24px rgba(15,23,42,0.04)",
   },
   errorTitle: {
     margin: 0,
@@ -1034,12 +982,7 @@ const styles = {
     gridTemplateColumns: "1fr",
   },
   summaryCard: {
-    background: "rgba(255,255,255,0.84)",
-    border: "1px solid rgba(148,163,184,0.18)",
-    borderRadius: "22px",
     padding: "1.1rem",
-    boxShadow: "0 16px 34px rgba(15,23,42,0.05)",
-    backdropFilter: "blur(10px)",
   },
   summaryLabel: {
     display: "block",
@@ -1072,12 +1015,7 @@ const styles = {
     gridTemplateColumns: "1fr",
   },
   card: {
-    background: "rgba(255,255,255,0.84)",
-    border: "1px solid rgba(148,163,184,0.18)",
-    borderRadius: "28px",
     padding: "1.4rem",
-    boxShadow: "0 18px 40px rgba(15,23,42,0.06)",
-    backdropFilter: "blur(10px)",
   },
   cardHeader: {
     display: "flex",
@@ -1087,117 +1025,10 @@ const styles = {
     flexWrap: "wrap",
     marginBottom: "1.15rem",
   },
-  cardKicker: {
-    display: "inline-block",
-    marginBottom: "0.45rem",
-    padding: "0.38rem 0.7rem",
-    borderRadius: "999px",
-    background: "rgba(37,99,235,0.08)",
-    color: "#1d4ed8",
-    fontWeight: "800",
-    fontSize: "0.8rem",
-  },
-  cardTitle: {
-    margin: 0,
-    fontSize: "1.65rem",
-    color: "#0f172a",
-  },
-  cardText: {
-    marginTop: "0.45rem",
-    marginBottom: 0,
-    color: "#64748b",
-    lineHeight: 1.7,
-  },
-  statusBadge: {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: "38px",
-    padding: "0.45rem 0.8rem",
-    borderRadius: "999px",
-    fontSize: "0.84rem",
-    fontWeight: "800",
-    whiteSpace: "nowrap",
-  },
-  statusBadgePending: {
-    background: "#eff6ff",
-    color: "#1d4ed8",
-    border: "1px solid #bfdbfe",
-  },
-  statusBadgeStable: {
-    background: "#f8fafc",
-    color: "#475569",
-    border: "1px solid #e2e8f0",
-  },
-  securityBadge: {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: "38px",
-    padding: "0.45rem 0.8rem",
-    borderRadius: "999px",
-    fontSize: "0.84rem",
-    fontWeight: "800",
-    whiteSpace: "nowrap",
-  },
-  securityLow: {
-    background: "#fff1f2",
-    color: "#be123c",
-    border: "1px solid #fecdd3",
-  },
-  securityMedium: {
-    background: "#fff7ed",
-    color: "#c2410c",
-    border: "1px solid #fdba74",
-  },
-  securityStrong: {
-    background: "#ecfdf5",
-    color: "#15803d",
-    border: "1px solid #86efac",
-  },
   form: {
     display: "flex",
     flexDirection: "column",
     gap: "1rem",
-  },
-  field: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "0.45rem",
-  },
-  label: {
-    fontSize: "0.94rem",
-    fontWeight: "800",
-    color: "#1e293b",
-  },
-  input: {
-    width: "100%",
-    padding: "1rem 1rem",
-    fontSize: "1rem",
-    border: "1px solid #cbd5e1",
-    borderRadius: "16px",
-    outline: "none",
-    background: "rgba(255,255,255,0.96)",
-    color: "#0f172a",
-    boxShadow: "0 6px 16px rgba(15,23,42,0.03)",
-    boxSizing: "border-box",
-  },
-  tipBox: {
-    background: "#f8fbff",
-    border: "1px solid #dbeafe",
-    borderRadius: "18px",
-    padding: "1rem",
-  },
-  tipTitle: {
-    display: "block",
-    color: "#1d4ed8",
-    fontWeight: "800",
-    marginBottom: "0.3rem",
-  },
-  tipText: {
-    margin: 0,
-    color: "#475569",
-    lineHeight: 1.65,
   },
   passwordWrapper: {
     display: "flex",
