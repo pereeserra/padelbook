@@ -53,6 +53,7 @@ function ReservationCard({
         ...styles.card,
         ...(confirmingCancel ? styles.cardConfirming : {}),
         ...(!isActive ? styles.cardInactive : {}),
+        ...(isCancelling ? styles.cardCancelling : {}),
       }}
     >
       <div style={styles.header}>
@@ -92,15 +93,18 @@ function ReservationCard({
             className="btn btn-sm"
             onClick={() => onStartCancel(reservation.id)}
             disabled={isCancelling}
-            style={styles.cancelButton}
+            style={{
+              ...styles.cancelButton,
+              ...(isCancelling ? styles.cancelButtonDisabled : {}),
+            }}
           >
-            Cancel·lar reserva
+            {isCancelling ? "Cancel·lant..." : "Cancel·lar reserva"}
           </button>
         </div>
       )}
 
       {isActive && confirmingCancel && (
-        <div style={styles.confirmBox}>
+        <div className="scale-in" style={styles.confirmBox}>
           <p style={styles.confirmTitle}>Confirmar cancel·lació</p>
 
           <p style={styles.confirmText}>
@@ -114,7 +118,10 @@ function ReservationCard({
               className="btn btn-sm"
               onClick={() => onCancel(reservation.id)}
               disabled={isCancelling}
-              style={styles.confirmDangerButton}
+              style={{
+                ...styles.confirmDangerButton,
+                ...(isCancelling ? styles.confirmDangerButtonLoading : {}),
+              }}
             >
               {isCancelling ? "Cancel·lant..." : "Sí, cancel·lar"}
             </button>
@@ -124,7 +131,10 @@ function ReservationCard({
               className="btn btn-light btn-sm"
               onClick={onAbortCancel}
               disabled={isCancelling}
-              style={styles.confirmSecondaryButton}
+              style={{
+                ...styles.confirmSecondaryButton,
+                ...(isCancelling ? styles.confirmSecondaryButtonDisabled : {}),
+              }}
             >
               Mantenir reserva
             </button>
@@ -142,7 +152,8 @@ const styles = {
     padding: "1.4rem",
     boxShadow: "0 8px 22px rgba(0,0,0,0.08)",
     border: "1px solid #e5e7eb",
-    transition: "0.25s ease",
+    transition: "all 0.25s ease",
+    scrollMarginTop: "120px",
   },
 
   cardConfirming: {
@@ -153,6 +164,11 @@ const styles = {
 
   cardInactive: {
     opacity: 0.92,
+  },
+
+  cardCancelling: {
+    opacity: 0.85,
+    pointerEvents: "none",
   },
 
   header: {
@@ -198,65 +214,77 @@ const styles = {
   infoGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-    gap: "0.9rem",
-    marginBottom: "1.2rem",
+    gap: "0.85rem",
   },
 
   infoBox: {
     backgroundColor: "#f8fafc",
     border: "1px solid #e5e7eb",
-    borderRadius: "12px",
-    padding: "0.9rem",
+    borderRadius: "14px",
+    padding: "0.9rem 1rem",
   },
 
   label: {
     display: "block",
-    fontSize: "0.85rem",
-    color: "#6b7280",
     marginBottom: "0.35rem",
+    color: "#64748b",
+    fontSize: "0.85rem",
     fontWeight: "700",
   },
 
   value: {
     margin: 0,
+    color: "#0f172a",
     fontWeight: "700",
-    color: "#111827",
-    textTransform: "capitalize",
     lineHeight: 1.5,
+    textTransform: "capitalize",
   },
 
   footer: {
+    marginTop: "1.1rem",
     display: "flex",
     justifyContent: "flex-end",
   },
 
   cancelButton: {
-    backgroundColor: "#dc2626",
+    backgroundColor: "#ef4444",
     color: "white",
+    border: "none",
+    borderRadius: "10px",
+    fontWeight: "700",
+    padding: "0.7rem 1rem",
+    cursor: "pointer",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.08)",
+  },
+
+  cancelButtonDisabled: {
+    backgroundColor: "#f87171",
+    cursor: "not-allowed",
+    opacity: 0.92,
   },
 
   confirmBox: {
+    marginTop: "1.25rem",
     backgroundColor: "#fff7ed",
-    border: "1px solid #fed7aa",
-    borderRadius: "14px",
+    border: "1px solid #fdba74",
+    borderRadius: "16px",
     padding: "1rem",
-    display: "flex",
-    flexDirection: "column",
-    gap: "0.8rem",
-    animation: "fadeIn 0.35s ease",
   },
 
   confirmTitle: {
-    margin: 0,
+    marginTop: 0,
+    marginBottom: "0.45rem",
     color: "#9a3412",
-    fontWeight: "800",
     fontSize: "1rem",
+    fontWeight: "800",
   },
 
   confirmText: {
-    margin: 0,
+    marginTop: 0,
+    marginBottom: "1rem",
     color: "#7c2d12",
-    lineHeight: 1.65,
+    lineHeight: 1.6,
+    fontWeight: "600",
   },
 
   confirmActions: {
@@ -268,9 +296,29 @@ const styles = {
   confirmDangerButton: {
     backgroundColor: "#dc2626",
     color: "white",
+    border: "none",
+    borderRadius: "10px",
+    fontWeight: "700",
+    padding: "0.7rem 1rem",
+    cursor: "pointer",
   },
 
-  confirmSecondaryButton: {},
+  confirmDangerButtonLoading: {
+    backgroundColor: "#b91c1c",
+    cursor: "not-allowed",
+    opacity: 0.95,
+  },
+
+  confirmSecondaryButton: {
+    borderRadius: "10px",
+    fontWeight: "700",
+    padding: "0.7rem 1rem",
+  },
+
+  confirmSecondaryButtonDisabled: {
+    opacity: 0.75,
+    cursor: "not-allowed",
+  },
 };
 
 export default ReservationCard;
