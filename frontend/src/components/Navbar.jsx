@@ -106,6 +106,34 @@ function Navbar() {
     };
   }, []);
 
+  const scrollToTopSmooth = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  const handleNavClick = (event, path) => {
+    if (location.pathname === path) {
+      event.preventDefault();
+      setIsMobileMenuOpen(false);
+      setIsUserMenuOpen(false);
+      scrollToTopSmooth();
+    }
+  };
+
+  const handleNavigateWithTop = (path) => {
+    setIsMobileMenuOpen(false);
+    setIsUserMenuOpen(false);
+
+    if (location.pathname === path) {
+      scrollToTopSmooth();
+      return;
+    }
+
+    navigate(path);
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -159,7 +187,12 @@ function Navbar() {
     <nav className="pb-navbar">
       <div className="pb-navbar__inner">
         <div className="pb-navbar__left">
-          <Link to="/" className="pb-navbar__brand" aria-label="Anar a l'inici">
+          <Link
+            to="/"
+            className="pb-navbar__brand"
+            aria-label="Anar a l'inici"
+            onClick={(event) => handleNavClick(event, "/")}
+          >
             <span className="pb-navbar__brand-mark">PB</span>
 
             <span className="pb-navbar__brand-copy">
@@ -177,6 +210,7 @@ function Navbar() {
                   key={link.to}
                   to={link.to}
                   className={`pb-navbar__link ${isActive(link.to) ? "is-active" : ""}`}
+                  onClick={(event) => handleNavClick(event, link.to)}
                 >
                   {link.label}
                 </Link>
@@ -238,10 +272,7 @@ function Navbar() {
                     <button
                       type="button"
                       className="pb-navbar__dropdown-item"
-                      onClick={() => {
-                        setIsUserMenuOpen(false);
-                        navigate("/my-account");
-                      }}
+                      onClick={() => handleNavigateWithTop("/my-account")}
                     >
                       <span className="pb-navbar__dropdown-icon" aria-hidden="true">
                         <svg
@@ -269,10 +300,7 @@ function Navbar() {
                       <button
                         type="button"
                         className="pb-navbar__dropdown-item"
-                        onClick={() => {
-                          setIsUserMenuOpen(false);
-                          navigate("/admin");
-                        }}
+                        onClick={() => handleNavigateWithTop("/admin")}
                       >
                         <span className="pb-navbar__dropdown-icon" aria-hidden="true">
                           <svg
@@ -338,10 +366,18 @@ function Navbar() {
           ) : (
             !isMobileView && (
               <div className="pb-navbar__guest-actions">
-                <Link to="/login" className="btn btn-light btn-sm">
+                <Link
+                  to="/login"
+                  className="btn btn-light btn-sm"
+                  onClick={(event) => handleNavClick(event, "/login")}
+                >
                   Iniciar sessió
                 </Link>
-                <Link to="/register" className="btn btn-primary btn-sm">
+                <Link
+                  to="/register"
+                  className="btn btn-primary btn-sm"
+                  onClick={(event) => handleNavClick(event, "/register")}
+                >
                   Crear compte
                 </Link>
               </div>
@@ -372,6 +408,7 @@ function Navbar() {
                 key={link.to}
                 to={link.to}
                 className={`pb-navbar__mobile-link ${isActive(link.to) ? "is-active" : ""}`}
+                onClick={(event) => handleNavClick(event, link.to)}
               >
                 {link.label}
               </Link>
@@ -380,10 +417,18 @@ function Navbar() {
 
           {!user && (
             <div className="pb-navbar__mobile-actions">
-              <Link to="/login" className="btn btn-light btn-full">
+              <Link
+                to="/login"
+                className="btn btn-light btn-full"
+                onClick={(event) => handleNavClick(event, "/login")}
+              >
                 Iniciar sessió
               </Link>
-              <Link to="/register" className="btn btn-primary btn-full">
+              <Link
+                to="/register"
+                className="btn btn-primary btn-full"
+                onClick={(event) => handleNavClick(event, "/register")}
+              >
                 Crear compte
               </Link>
             </div>

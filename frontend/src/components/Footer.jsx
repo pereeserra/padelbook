@@ -1,20 +1,63 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 function Footer() {
+  const location = useLocation();
+
+  const scrollToTopSmooth = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  const handleFooterLinkClick = (event, path) => {
+    if (location.pathname === path) {
+      event.preventDefault();
+      scrollToTopSmooth();
+    }
+  };
+
   return (
     <footer style={styles.footer}>
       <div style={styles.container}>
         <div style={styles.left}>
-          <span style={styles.brand}>PadelBook</span>
+          <Link
+            to="/"
+            style={styles.brandLink}
+            onClick={(event) => handleFooterLinkClick(event, "/")}
+          >
+            <span style={styles.brand}>PadelBook</span>
+          </Link>
+
           <p style={styles.text}>
             Gestió moderna de reserves de pistes de pàdel.
           </p>
         </div>
 
         <div style={styles.center}>
-          <Link to="/" style={styles.link}>Inici</Link>
-          <Link to="/availability" style={styles.link}>Reservar</Link>
-          <Link to="/my-account" style={styles.link}>El meu compte</Link>
+          <Link
+            to="/"
+            style={styles.link}
+            onClick={(event) => handleFooterLinkClick(event, "/")}
+          >
+            Inici
+          </Link>
+
+          <Link
+            to="/availability"
+            style={styles.link}
+            onClick={(event) => handleFooterLinkClick(event, "/availability")}
+          >
+            Reservar
+          </Link>
+
+          <Link
+            to="/my-account"
+            style={styles.link}
+            onClick={(event) => handleFooterLinkClick(event, "/my-account")}
+          >
+            El meu compte
+          </Link>
         </div>
 
         <div style={styles.right}>
@@ -48,6 +91,10 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     gap: "0.4rem",
+  },
+  brandLink: {
+    textDecoration: "none",
+    width: "fit-content",
   },
   brand: {
     fontWeight: "800",
