@@ -269,3 +269,58 @@ exports.deleteReservation = async (req, res) => {
     return fail(res, "Error cancel·lant la reserva");
   }
 };
+
+// Obtenir una reserva pel seu codi
+exports.getReservationByCode = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const userRole = req.user.rol;
+    const codi_reserva =
+      typeof req.params.codi_reserva === "string"
+        ? req.params.codi_reserva.trim().toUpperCase()
+        : "";
+
+    if (!codi_reserva) {
+      return fail(res, "El codi de reserva és obligatori", 400);
+    }
+
+    let query = `
+      SELECT
+        r.id,
+        r.codi_reserva,
+        r.user_id,
+        r.court_id,
+        r.time_slot_id,
+        r.data_reserva,
+        r.estat,
+        r.created_at,
+        c.nom_pista,
+        t.hora_inici,
+        t.hora_fi
+      FROM reservations r
+      JOIN courts c ON r.court_id = c.id
+      JOIN time_slots t ON r.time_slot_id = t.id
+      WHERE r.codi_reserva = ?
+    `;
+
+    const params = [codi_reserva];
+
+    if (userRole !== "admin") {
+      query += ` AND r.user_id = ?`;
+      params.push(userId);
+    }
+
+    query += ` LIMIT 1`;
+
+    const [reservations] = await db.query(query, params);
+
+    if (reservations.length === 0) {
+      return fail(res, "Reserva no trobada", 404);
+    }
+
+    return ok(res, reservations[0]);
+  } catch (error) {
+    console.error("Error getReservationByCode:", error);
+    return fail(res, "Error obtenint la reserva");
+  }
+};
