@@ -101,13 +101,27 @@ exports.createReservation = async (req, res) => {
     }
 
     // 6. Crear la reserva
-    await db.query(
+    const [insertResult] = await db.query(
       `INSERT INTO reservations (user_id, court_id, time_slot_id, data_reserva, estat)
-       VALUES (?, ?, ?, ?, 'activa')`,
+      VALUES (?, ?, ?, ?, 'activa')`,
       [user_id, court_id, time_slot_id, data_reserva]
     );
 
-    return message(res, "Reserva creada correctament", 201);
+    const reservationId = insertResult.insertId;
+    const codi_reserva = `PB-${data_reserva.replace(/-/g, "")}-${String(reservationId).padStart(3, "0")}`;
+
+    // 7. Guardar el codi de reserva
+    await db.query(
+      `UPDATE reservations
+      SET codi_reserva = ?
+      WHERE id = ?`,
+      [codi_reserva, reservationId]
+    );
+
+    return message(res, "Reserva creada correctament", 201, {
+      id: reservationId,
+      codi_reserva,
+    });
       } catch (error) {
         console.error("Error createReservation:", error);
 
@@ -149,6 +163,7 @@ exports.getReservations = async (req, res) => {
       query = `
         SELECT 
           r.id,
+          r.codi_reserva,
           r.data_reserva,
           r.estat,
           r.created_at,
@@ -171,6 +186,7 @@ exports.getReservations = async (req, res) => {
       query = `
         SELECT 
           r.id,
+          r.codi_reserva,
           r.data_reserva,
           r.estat,
           r.created_at,

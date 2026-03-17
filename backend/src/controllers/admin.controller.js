@@ -99,6 +99,7 @@ exports.getAllReservations = async (req, res) => {
     const dataQuery = `
       SELECT
         r.id,
+        r.codi_reserva,
         r.data_reserva,
         r.estat,
         r.created_at,
