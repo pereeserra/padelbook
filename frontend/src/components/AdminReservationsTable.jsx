@@ -16,6 +16,7 @@ function AdminReservationsTable({ reservations = [] }) {
     <div style={styles.wrapper}>
       <div style={styles.tableHeader}>
         <div>
+          <span style={styles.eyebrow}>Control administratiu</span>
           <h3 style={styles.title}>Reserves registrades</h3>
           <p style={styles.subtitle}>
             Vista general de totes les reserves creades al sistema.
@@ -125,13 +126,22 @@ const styles = {
   tableHeader: {
     display: "flex",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
     gap: "1rem",
     flexWrap: "wrap",
   },
+  eyebrow: {
+    display: "inline-block",
+    marginBottom: "0.35rem",
+    fontSize: "0.78rem",
+    color: "#64748b",
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
+  },
   title: {
     margin: 0,
-    fontSize: "1.2rem",
+    fontSize: "1.25rem",
     color: "#0f172a",
   },
   subtitle: {
@@ -141,29 +151,32 @@ const styles = {
     lineHeight: 1.6,
   },
   countBadge: {
-    backgroundColor: "#dbeafe",
+    background: "#eff6ff",
     color: "#1d4ed8",
     padding: "0.45rem 0.8rem",
     borderRadius: "999px",
-    fontWeight: "700",
+    fontWeight: "800",
     fontSize: "0.9rem",
+    border: "1px solid #dbeafe",
   },
   tableContainer: {
     width: "100%",
     overflowX: "auto",
-    border: "1px solid #e5e7eb",
-    borderRadius: "16px",
+    border: "1px solid rgba(148,163,184,0.18)",
+    borderRadius: "22px",
+    boxShadow: "0 16px 34px rgba(15,23,42,0.05)",
+    backdropFilter: "blur(10px)",
   },
   table: {
     width: "100%",
     borderCollapse: "collapse",
     minWidth: "900px",
-    backgroundColor: "white",
+    background: "rgba(255,255,255,0.9)",
   },
   th: {
     textAlign: "left",
     padding: "1rem",
-    backgroundColor: "#f8fafc",
+    background: "#f8fbff",
     color: "#334155",
     fontSize: "0.9rem",
     fontWeight: "800",
@@ -179,10 +192,10 @@ const styles = {
     transition: "background-color 0.2s ease",
   },
   rowEven: {
-    backgroundColor: "#ffffff",
+    background: "rgba(255,255,255,0.96)",
   },
   rowOdd: {
-    backgroundColor: "#fbfdff",
+    background: "rgba(248,250,252,0.9)",
   },
   userCell: {
     display: "flex",
@@ -190,16 +203,17 @@ const styles = {
     gap: "0.75rem",
   },
   userAvatar: {
-    width: "38px",
-    height: "38px",
+    width: "40px",
+    height: "40px",
     borderRadius: "50%",
-    backgroundColor: "#dbeafe",
+    background: "#dbeafe",
     color: "#1d4ed8",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     fontWeight: "800",
     flexShrink: 0,
+    border: "1px solid #bfdbfe",
   },
   primaryText: {
     margin: 0,
@@ -212,38 +226,43 @@ const styles = {
   },
   timeBadge: {
     display: "inline-block",
-    backgroundColor: "#eff6ff",
+    background: "#eff6ff",
     color: "#1d4ed8",
     padding: "0.4rem 0.7rem",
     borderRadius: "999px",
-    fontWeight: "700",
-    fontSize: "0.85rem",
+    fontWeight: "800",
+    fontSize: "0.84rem",
     whiteSpace: "nowrap",
+    border: "1px solid #dbeafe",
   },
   statusBadge: {
     display: "inline-block",
     padding: "0.42rem 0.75rem",
     borderRadius: "999px",
-    fontWeight: "700",
+    fontWeight: "800",
     fontSize: "0.84rem",
     textTransform: "capitalize",
     whiteSpace: "nowrap",
+    border: "1px solid transparent",
   },
   statusActive: {
-    backgroundColor: "#dcfce7",
-    color: "#166534",
+    background: "#ecfdf5",
+    color: "#15803d",
+    borderColor: "#bbf7d0",
   },
   statusInactive: {
-    backgroundColor: "#fee2e2",
-    color: "#991b1b",
+    background: "#fff1f2",
+    color: "#be123c",
+    borderColor: "#fecdd3",
   },
   emptyState: {
-    backgroundColor: "white",
-    border: "1px solid #e5e7eb",
-    borderRadius: "18px",
+    background: "rgba(255,255,255,0.86)",
+    border: "1px solid rgba(148,163,184,0.18)",
+    borderRadius: "24px",
     padding: "2rem",
     textAlign: "center",
-    boxShadow: "0 8px 22px rgba(0,0,0,0.05)",
+    boxShadow: "0 18px 40px rgba(15,23,42,0.05)",
+    backdropFilter: "blur(10px)",
   },
   emptyIcon: {
     fontSize: "2rem",

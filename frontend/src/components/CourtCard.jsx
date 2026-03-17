@@ -22,6 +22,7 @@ function CourtCard({
     >
       <div style={styles.header}>
         <div>
+          <span style={styles.eyebrow}>Pista</span>
           <h3 style={styles.title}>{court.nom_pista}</h3>
           <p style={styles.subtitle}>Gestió individual de pista</p>
         </div>
@@ -115,26 +116,28 @@ function CourtCard({
 
 const styles = {
   card: {
-    backgroundColor: "white",
-    borderRadius: "18px",
+    background: "rgba(255,255,255,0.86)",
+    borderRadius: "26px",
     padding: "1.25rem",
-    boxShadow: "0 8px 22px rgba(0,0,0,0.08)",
-    border: "1px solid #e5e7eb",
+    boxShadow: "0 18px 40px rgba(15,23,42,0.06)",
+    border: "1px solid rgba(148,163,184,0.18)",
     display: "flex",
     flexDirection: "column",
     gap: "1rem",
     minHeight: "100%",
     transition: "0.25s ease",
     scrollMarginTop: "120px",
+    backdropFilter: "blur(10px)",
   },
   cardConfirming: {
-    border: "1px solid #fed7aa",
-    boxShadow: "0 12px 26px rgba(234, 88, 12, 0.12)",
+    border: "1px solid #fdba74",
+    boxShadow: "0 16px 34px rgba(234,88,12,0.12)",
     transform: "translateY(-2px)",
   },
   cardHighlighted: {
     border: "1px solid #93c5fd",
-    boxShadow: "0 0 0 4px rgba(59,130,246,0.12), 0 12px 26px rgba(37,99,235,0.14)",
+    boxShadow:
+      "0 0 0 4px rgba(59,130,246,0.12), 0 18px 34px rgba(37,99,235,0.14)",
     transform: "translateY(-2px)",
   },
   header: {
@@ -144,9 +147,18 @@ const styles = {
     gap: "0.9rem",
     flexWrap: "wrap",
   },
+  eyebrow: {
+    display: "inline-block",
+    marginBottom: "0.35rem",
+    fontSize: "0.78rem",
+    color: "#64748b",
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
+  },
   title: {
     margin: 0,
-    fontSize: "1.25rem",
+    fontSize: "1.35rem",
     color: "#0f172a",
   },
   subtitle: {
@@ -154,21 +166,25 @@ const styles = {
     marginBottom: 0,
     color: "#64748b",
     fontSize: "0.95rem",
+    lineHeight: 1.55,
   },
   statusBadge: {
     padding: "0.42rem 0.8rem",
     borderRadius: "999px",
-    fontWeight: "700",
-    fontSize: "0.85rem",
+    fontWeight: "800",
+    fontSize: "0.84rem",
     textTransform: "capitalize",
+    border: "1px solid transparent",
   },
   statusAvailable: {
-    backgroundColor: "#dcfce7",
-    color: "#166534",
+    background: "#ecfdf5",
+    color: "#15803d",
+    borderColor: "#bbf7d0",
   },
   statusMaintenance: {
-    backgroundColor: "#fee2e2",
-    color: "#991b1b",
+    background: "#fff1f2",
+    color: "#be123c",
+    borderColor: "#fecdd3",
   },
   badgesRow: {
     display: "flex",
@@ -176,38 +192,43 @@ const styles = {
     flexWrap: "wrap",
   },
   infoBadge: {
-    backgroundColor: "#e2e8f0",
+    background: "#f8fafc",
     color: "#334155",
     padding: "0.38rem 0.72rem",
     borderRadius: "999px",
     fontWeight: "700",
     fontSize: "0.82rem",
+    border: "1px solid #e2e8f0",
   },
   coveredBadge: {
-    backgroundColor: "#dbeafe",
+    background: "#eff6ff",
     color: "#1d4ed8",
+    borderColor: "#dbeafe",
   },
   outdoorBadge: {
-    backgroundColor: "#f1f5f9",
+    background: "#f8fafc",
     color: "#334155",
+    borderColor: "#e2e8f0",
   },
   descriptionBox: {
-    backgroundColor: "#f8fafc",
-    border: "1px solid #e5e7eb",
-    borderRadius: "14px",
-    padding: "0.95rem",
+    background: "rgba(248,250,252,0.96)",
+    border: "1px solid #e2e8f0",
+    borderRadius: "18px",
+    padding: "1rem",
   },
   descriptionLabel: {
     display: "block",
-    fontSize: "0.82rem",
-    fontWeight: "700",
+    fontSize: "0.8rem",
+    fontWeight: "800",
     color: "#64748b",
-    marginBottom: "0.4rem",
+    marginBottom: "0.38rem",
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
   },
   descriptionText: {
     margin: 0,
     color: "#334155",
-    lineHeight: 1.65,
+    lineHeight: 1.7,
   },
   footer: {
     marginTop: "auto",
@@ -217,14 +238,16 @@ const styles = {
     flexWrap: "wrap",
   },
   deleteButton: {
-    backgroundColor: "#dc2626",
+    background: "linear-gradient(135deg, #ef4444, #dc2626)",
     color: "white",
+    border: "none",
+    boxShadow: "0 12px 24px rgba(220,38,38,0.16)",
   },
   confirmBox: {
     marginTop: "auto",
-    backgroundColor: "#fff7ed",
-    border: "1px solid #fed7aa",
-    borderRadius: "14px",
+    background: "#fff7ed",
+    border: "1px solid #fdba74",
+    borderRadius: "18px",
     padding: "1rem",
     display: "flex",
     flexDirection: "column",
@@ -240,6 +263,7 @@ const styles = {
     margin: 0,
     color: "#7c2d12",
     lineHeight: 1.65,
+    fontWeight: "600",
   },
   confirmActions: {
     display: "flex",
@@ -247,8 +271,9 @@ const styles = {
     flexWrap: "wrap",
   },
   confirmDangerButton: {
-    backgroundColor: "#dc2626",
+    background: "linear-gradient(135deg, #dc2626, #b91c1c)",
     color: "white",
+    border: "none",
   },
 };
 

@@ -42,22 +42,29 @@ function AvailabilityTable({
           ...(justReserved ? styles.recentlyReservedRow : {}),
         }}
       >
-        <div style={styles.slotInfo}>
-          <span
-            style={{
-              ...styles.time,
-              ...(!slot.disponible ? styles.timeOccupied : {}),
-            }}
-          >
-            {slot.hora_inici} - {slot.hora_fi}
-          </span>
+        <div style={styles.slotLeft}>
+          <div style={styles.slotTimeBlock}>
+            <span
+              style={{
+                ...styles.time,
+                ...(!slot.disponible ? styles.timeOccupied : {}),
+              }}
+            >
+              {slot.hora_inici} - {slot.hora_fi}
+            </span>
+
+            <span style={styles.slotSubtext}>
+              {slot.disponible
+                ? "Reserva disponible ara mateix"
+                : "Aquesta franja ja està ocupada"}
+            </span>
+          </div>
 
           <div style={styles.slotMeta}>
             <span
               style={{
                 ...styles.badge,
-                backgroundColor: slot.disponible ? "#dcfce7" : "#fee2e2",
-                color: slot.disponible ? "#166534" : "#991b1b",
+                ...(slot.disponible ? styles.badgeAvailable : styles.badgeOccupied),
               }}
             >
               {slot.disponible ? "Disponible" : "Ocupada"}
@@ -97,31 +104,57 @@ function AvailabilityTable({
         {Object.entries(groupedCourts).map(([courtName, slots]) => {
           const availableSlots = slots.filter((slot) => slot.disponible);
           const occupiedSlots = slots.filter((slot) => !slot.disponible);
+          const availabilityPercentage = slots.length
+            ? Math.round((availableSlots.length / slots.length) * 100)
+            : 0;
 
           return (
-            <div key={courtName} style={styles.card}>
+            <article key={courtName} style={styles.card}>
               <div style={styles.cardHeader}>
                 <div>
+                  <span style={styles.cardEyebrow}>Pista</span>
                   <h3 style={styles.courtTitle}>{courtName}</h3>
                   <p style={styles.courtSubtitle}>
-                    Consulta i reserva les franges disponibles d’aquesta pista.
+                    Consulta ràpidament les franges disponibles i reserva directament
+                    des d’aquesta targeta.
                   </p>
                 </div>
 
-                <div style={styles.headerBadges}>
-                  <span style={styles.slotCount}>{slots.length} franges</span>
-                  <span style={styles.availableCount}>
-                    {availableSlots.length} lliures
+                <div style={styles.headerSide}>
+                  <span style={styles.percentageBadge}>
+                    {availabilityPercentage}% lliure
                   </span>
-                  <span style={styles.occupiedCount}>
-                    {occupiedSlots.length} ocupades
-                  </span>
+
+                  <div style={styles.headerBadges}>
+                    <span style={styles.slotCount}>{slots.length} franges</span>
+                    <span style={styles.availableCount}>
+                      {availableSlots.length} lliures
+                    </span>
+                    <span style={styles.occupiedCount}>
+                      {occupiedSlots.length} ocupades
+                    </span>
+                  </div>
                 </div>
+              </div>
+
+              <div style={styles.progressTrack}>
+                <div
+                  style={{
+                    ...styles.progressFill,
+                    width: `${availabilityPercentage}%`,
+                  }}
+                />
               </div>
 
               <div style={styles.section}>
                 <div style={styles.sectionHeader}>
-                  <h4 style={styles.sectionTitle}>Franges disponibles</h4>
+                  <div>
+                    <h4 style={styles.sectionTitle}>Franges disponibles</h4>
+                    <p style={styles.sectionText}>
+                      Horaris que es poden reservar ara mateix.
+                    </p>
+                  </div>
+
                   <span style={styles.sectionBadgeGreen}>
                     {availableSlots.length}
                   </span>
@@ -142,7 +175,13 @@ function AvailabilityTable({
 
               <div style={styles.section}>
                 <div style={styles.sectionHeader}>
-                  <h4 style={styles.sectionTitle}>Franges ocupades</h4>
+                  <div>
+                    <h4 style={styles.sectionTitle}>Franges ocupades</h4>
+                    <p style={styles.sectionText}>
+                      Horaris que ja no es poden reservar.
+                    </p>
+                  </div>
+
                   <span style={styles.sectionBadgeRed}>
                     {occupiedSlots.length}
                   </span>
@@ -160,7 +199,7 @@ function AvailabilityTable({
                   </div>
                 )}
               </div>
-            </div>
+            </article>
           );
         })}
       </div>
@@ -178,11 +217,12 @@ const styles = {
     gap: "1rem",
   },
   card: {
-    backgroundColor: "white",
-    borderRadius: "18px",
+    background: "rgba(255,255,255,0.86)",
+    borderRadius: "28px",
     padding: "1.25rem",
-    boxShadow: "0 8px 22px rgba(0,0,0,0.08)",
-    border: "1px solid #e5e7eb",
+    boxShadow: "0 18px 40px rgba(15,23,42,0.06)",
+    border: "1px solid rgba(148,163,184,0.18)",
+    backdropFilter: "blur(10px)",
   },
   cardHeader: {
     display: "flex",
@@ -192,9 +232,18 @@ const styles = {
     marginBottom: "1rem",
     flexWrap: "wrap",
   },
+  cardEyebrow: {
+    display: "inline-block",
+    marginBottom: "0.4rem",
+    fontSize: "0.78rem",
+    color: "#64748b",
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
+  },
   courtTitle: {
     margin: 0,
-    fontSize: "1.3rem",
+    fontSize: "1.4rem",
     color: "#0f172a",
   },
   courtSubtitle: {
@@ -202,8 +251,23 @@ const styles = {
     marginBottom: 0,
     color: "#64748b",
     fontSize: "0.95rem",
-    maxWidth: "300px",
-    lineHeight: 1.55,
+    maxWidth: "360px",
+    lineHeight: 1.65,
+  },
+  headerSide: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-end",
+    gap: "0.7rem",
+  },
+  percentageBadge: {
+    background: "#eff6ff",
+    color: "#1d4ed8",
+    padding: "0.42rem 0.78rem",
+    borderRadius: "999px",
+    fontWeight: "800",
+    fontSize: "0.84rem",
+    border: "1px solid #dbeafe",
   },
   headerBadges: {
     display: "flex",
@@ -212,154 +276,201 @@ const styles = {
     justifyContent: "flex-end",
   },
   slotCount: {
-    backgroundColor: "#dbeafe",
-    color: "#1d4ed8",
-    padding: "0.4rem 0.75rem",
+    background: "#f8fafc",
+    color: "#475569",
+    padding: "0.38rem 0.72rem",
     borderRadius: "999px",
     fontWeight: "700",
-    fontSize: "0.85rem",
+    fontSize: "0.82rem",
+    border: "1px solid #e2e8f0",
   },
   availableCount: {
-    backgroundColor: "#dcfce7",
-    color: "#166534",
-    padding: "0.4rem 0.75rem",
+    background: "#ecfdf5",
+    color: "#15803d",
+    padding: "0.38rem 0.72rem",
     borderRadius: "999px",
     fontWeight: "700",
-    fontSize: "0.85rem",
+    fontSize: "0.82rem",
+    border: "1px solid #bbf7d0",
   },
   occupiedCount: {
-    backgroundColor: "#fee2e2",
-    color: "#991b1b",
-    padding: "0.4rem 0.75rem",
+    background: "#fff1f2",
+    color: "#be123c",
+    padding: "0.38rem 0.72rem",
     borderRadius: "999px",
     fontWeight: "700",
-    fontSize: "0.85rem",
+    fontSize: "0.82rem",
+    border: "1px solid #fecdd3",
+  },
+  progressTrack: {
+    width: "100%",
+    height: "11px",
+    background: "#e2e8f0",
+    borderRadius: "999px",
+    overflow: "hidden",
+    marginBottom: "1rem",
+  },
+  progressFill: {
+    height: "100%",
+    background: "linear-gradient(90deg, #16a34a, #22c55e)",
+    borderRadius: "999px",
   },
   section: {
-    marginTop: "1.1rem",
+    marginTop: "1.15rem",
   },
   sectionHeader: {
     display: "flex",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
     gap: "0.8rem",
-    marginBottom: "0.75rem",
+    marginBottom: "0.8rem",
+    flexWrap: "wrap",
   },
   sectionTitle: {
     margin: 0,
-    fontSize: "1rem",
+    fontSize: "1.02rem",
     color: "#0f172a",
   },
+  sectionText: {
+    marginTop: "0.25rem",
+    marginBottom: 0,
+    color: "#64748b",
+    fontSize: "0.9rem",
+    lineHeight: 1.55,
+  },
   sectionBadgeGreen: {
-    backgroundColor: "#dcfce7",
-    color: "#166534",
-    padding: "0.3rem 0.65rem",
+    background: "#ecfdf5",
+    color: "#15803d",
+    padding: "0.34rem 0.68rem",
     borderRadius: "999px",
-    fontWeight: "700",
+    fontWeight: "800",
     fontSize: "0.8rem",
+    border: "1px solid #bbf7d0",
   },
   sectionBadgeRed: {
-    backgroundColor: "#fee2e2",
-    color: "#991b1b",
-    padding: "0.3rem 0.65rem",
+    background: "#fff1f2",
+    color: "#be123c",
+    padding: "0.34rem 0.68rem",
     borderRadius: "999px",
-    fontWeight: "700",
+    fontWeight: "800",
     fontSize: "0.8rem",
+    border: "1px solid #fecdd3",
   },
   slotsList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "0.8rem",
+    display: "grid",
+    gap: "0.75rem",
   },
   slotRow: {
+    borderRadius: "20px",
+    padding: "0.95rem",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    gap: "1rem",
-    padding: "0.9rem",
-    borderRadius: "12px",
+    gap: "0.9rem",
     flexWrap: "wrap",
-    transition: "all 0.2s ease",
+    transition: "all 0.22s ease",
+    border: "1px solid transparent",
   },
   availableRow: {
-    backgroundColor: "#f8fafc",
-    border: "1px solid #e5e7eb",
+    background: "rgba(240,253,244,0.9)",
+    borderColor: "#bbf7d0",
   },
   occupiedRow: {
-    backgroundColor: "#f3f4f6",
-    border: "1px solid #e5e7eb",
-    opacity: 0.88,
+    background: "rgba(255,241,242,0.9)",
+    borderColor: "#fecdd3",
   },
   recentlyReservedRow: {
-    border: "2px solid #22c55e",
-    backgroundColor: "#f0fdf4",
-    boxShadow: "0 0 0 4px rgba(34,197,94,0.08)",
+    boxShadow: "0 0 0 4px rgba(37,99,235,0.10)",
+    transform: "translateY(-1px)",
   },
-  slotInfo: {
+  slotLeft: {
     display: "flex",
     flexDirection: "column",
-    gap: "0.45rem",
+    gap: "0.65rem",
+    flex: 1,
+    minWidth: "220px",
+  },
+  slotTimeBlock: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.22rem",
+  },
+  time: {
+    fontWeight: "800",
+    color: "#0f172a",
+    fontSize: "1rem",
+  },
+  timeOccupied: {
+    color: "#7f1d1d",
+  },
+  slotSubtext: {
+    color: "#64748b",
+    fontSize: "0.88rem",
+    lineHeight: 1.45,
   },
   slotMeta: {
     display: "flex",
     gap: "0.45rem",
     flexWrap: "wrap",
-    alignItems: "center",
-  },
-  time: {
-    fontWeight: "700",
-    color: "#111827",
-  },
-  timeOccupied: {
-    color: "#6b7280",
   },
   badge: {
-    padding: "0.35rem 0.65rem",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "0.35rem 0.7rem",
     borderRadius: "999px",
-    fontWeight: "700",
-    fontSize: "0.85rem",
-    display: "inline-block",
-    width: "fit-content",
+    fontWeight: "800",
+    fontSize: "0.78rem",
+    border: "1px solid transparent",
+  },
+  badgeAvailable: {
+    background: "#dcfce7",
+    color: "#166534",
+    borderColor: "#86efac",
+  },
+  badgeOccupied: {
+    background: "#fee2e2",
+    color: "#991b1b",
+    borderColor: "#fecaca",
   },
   justReservedBadge: {
-    backgroundColor: "#bbf7d0",
-    color: "#166534",
-    padding: "0.35rem 0.65rem",
+    background: "#dbeafe",
+    color: "#1d4ed8",
+    padding: "0.35rem 0.7rem",
     borderRadius: "999px",
-    fontWeight: "700",
-    fontSize: "0.85rem",
+    fontWeight: "800",
+    fontSize: "0.78rem",
+    border: "1px solid #bfdbfe",
   },
   reserveButton: {
-    padding: "0.7rem 1rem",
+    minWidth: "140px",
     border: "none",
-    borderRadius: "10px",
-    fontWeight: "700",
-    minWidth: "120px",
-    color: "white",
+    borderRadius: "999px",
+    padding: "0.85rem 1rem",
+    fontWeight: "800",
+    cursor: "pointer",
     transition: "all 0.2s ease",
   },
   reserveButtonAvailable: {
-    backgroundColor: "#16a34a",
-    cursor: "pointer",
-    boxShadow: "0 4px 10px rgba(0,0,0,0.08)",
+    background: "linear-gradient(135deg, #2563eb, #1d4ed8)",
+    color: "white",
+    boxShadow: "0 14px 24px rgba(37,99,235,0.18)",
   },
   reserveButtonDisabled: {
-    backgroundColor: "#cbd5e1",
-    color: "#475569",
+    background: "#e2e8f0",
+    color: "#64748b",
     cursor: "not-allowed",
-    boxShadow: "none",
   },
   reserveButtonLoading: {
-    backgroundColor: "#15803d",
-    cursor: "not-allowed",
-    opacity: 0.95,
+    opacity: 0.9,
   },
   emptyMiniState: {
-    backgroundColor: "#f8fafc",
+    background: "#f8fafc",
     border: "1px dashed #cbd5e1",
-    borderRadius: "12px",
-    padding: "0.9rem",
     color: "#64748b",
+    borderRadius: "18px",
+    padding: "1rem",
+    lineHeight: 1.6,
     fontWeight: "600",
   },
 };
