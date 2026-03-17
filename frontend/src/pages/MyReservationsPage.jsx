@@ -1,4 +1,4 @@
-import { use, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../api/axios";
 import ReservationCard from "../components/ReservationCard";
@@ -9,7 +9,7 @@ function MyReservationsPage() {
 
   const summaryRef = useRef(null);
 
-  const [HasInteractedWithFilter, setHasInteractedWithFilter] = useState(false);
+  const [hasInteractedWithFilter, setHasInteractedWithFilter] = useState(false);
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -124,7 +124,7 @@ function MyReservationsPage() {
   }, []);
 
   useEffect(() => {
-    if (!HasInteractedWithFilter) return;
+    if (!hasInteractedWithFilter) return;
     if (!summaryRef.current) return;
 
     const timeout = setTimeout(() => {
@@ -132,7 +132,7 @@ function MyReservationsPage() {
     }, 60);
 
     return () => clearTimeout(timeout);
-  }, [activeFilter, setHasInteractedWithFilter]);
+  }, [activeFilter, hasInteractedWithFilter]);
 
   const activeReservations = useMemo(() => {
     return reservations.filter((reservation) => reservation.estat === "activa");
@@ -323,7 +323,7 @@ function MyReservationsPage() {
                   <button
                     type="button"
                     className="btn btn-primary"
-                    onClick={() => setActiveFilter("all")}
+                    onClick={() => handleFilterChange("all")}
                   >
                     Veure totes les reserves
                   </button>
