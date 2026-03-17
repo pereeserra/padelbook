@@ -17,6 +17,7 @@ function App() {
     <BrowserRouter>
       <ScrollToTop />
       <Navbar />
+
       <main>
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -52,6 +53,7 @@ function App() {
           />
         </Routes>
       </main>
+
       <BackToTopButton />
     </BrowserRouter>
   );

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import api from "../api/axios";
 import { getUserFromToken } from "../utils/auth";
@@ -13,7 +13,7 @@ function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 920);
 
-  const fetchCurrentUser = async () => {
+  const fetchCurrentUser = async ({ silent = false } = {}) => {
     const currentToken = localStorage.getItem("token");
 
     if (!currentToken) {
@@ -28,7 +28,7 @@ function Navbar() {
       if (currentUser) {
         setUser(currentUser);
         localStorage.setItem("user", JSON.stringify(currentUser));
-      } else {
+      } else if (!silent) {
         setUser(getUserFromToken());
       }
     } catch (err) {
@@ -38,18 +38,24 @@ function Navbar() {
   };
 
   useEffect(() => {
-    fetchCurrentUser();
+    fetchCurrentUser({ silent: true });
   }, [location.pathname]);
 
   useEffect(() => {
     const handleProfileUpdated = () => {
-      fetchCurrentUser();
+      fetchCurrentUser({ silent: true });
+    };
+
+    const handleStorageChange = () => {
+      setUser(getUserFromToken());
     };
 
     window.addEventListener("profile-updated", handleProfileUpdated);
+    window.addEventListener("storage", handleStorageChange);
 
     return () => {
       window.removeEventListener("profile-updated", handleProfileUpdated);
+      window.removeEventListener("storage", handleStorageChange);
     };
   }, []);
 
@@ -90,24 +96,50 @@ function Navbar() {
   };
 
   const userName = getDisplayName(user?.nom);
+  const userEmail = user?.email || "";
   const showMenuContent = !isMobileView || isMobileMenuOpen;
+
+  const navLinks = useMemo(() => {
+    const links = [
+      { to: "/", label: "Inici" },
+      { to: "/availability", label: "Disponibilitat" },
+    ];
+
+    if (user) {
+      links.push(
+        { to: "/my-reservations", label: "Les meves reserves" },
+        { to: "/my-account", label: "El meu compte" }
+      );
+
+      if (user?.rol === "admin") {
+        links.push({ to: "/admin", label: "Administració" });
+      }
+    }
+
+    return links;
+  }, [user]);
 
   return (
     <nav style={styles.nav}>
       <div style={styles.inner}>
         <div style={styles.topRow}>
-          <div style={styles.left}>
-            <Link to="/" style={styles.logo}>
-              <span style={styles.logoMark}>PB</span>
+          <Link to="/" style={styles.logo}>
+            <span style={styles.logoMark}>PB</span>
+
+            <div style={styles.logoBlock}>
               <span style={styles.logoText}>PadelBook</span>
-            </Link>
-          </div>
+              <span style={styles.logoSubtext}>Reserves de pàdel</span>
+            </div>
+          </Link>
 
           {isMobileView && (
             <button
               type="button"
               onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-              style={styles.mobileMenuButton}
+              style={{
+                ...styles.mobileMenuButton,
+                ...(isMobileMenuOpen ? styles.mobileMenuButtonOpen : {}),
+              }}
               aria-label={isMobileMenuOpen ? "Tancar menú" : "Obrir menú"}
               aria-expanded={isMobileMenuOpen}
             >
@@ -121,8 +153,8 @@ function Navbar() {
         {showMenuContent && (
           <div
             style={{
-              ...styles.right,
-              ...(isMobileView ? styles.rightMobile : {}),
+              ...styles.content,
+              ...(isMobileView ? styles.contentMobile : {}),
             }}
           >
             <div
@@ -131,61 +163,19 @@ function Navbar() {
                 ...(isMobileView ? styles.linksMobile : {}),
               }}
             >
-              <Link
-                to="/"
-                style={{
-                  ...styles.link,
-                  ...(isActive("/") ? styles.linkActive : {}),
-                }}
-              >
-                Inici
-              </Link>
-
-              <Link
-                to="/availability"
-                style={{
-                  ...styles.link,
-                  ...(isActive("/availability") ? styles.linkActive : {}),
-                }}
-              >
-                Disponibilitat
-              </Link>
-
-              {user && (
-                <>
-                  <Link
-                    to="/my-reservations"
-                    style={{
-                      ...styles.link,
-                      ...(isActive("/my-reservations") ? styles.linkActive : {}),
-                    }}
-                  >
-                    Les meves reserves
-                  </Link>
-
-                  <Link
-                    to="/my-account"
-                    style={{
-                      ...styles.link,
-                      ...(isActive("/my-account") ? styles.linkActive : {}),
-                    }}
-                  >
-                    El meu compte
-                  </Link>
-
-                  {user?.rol === "admin" && (
-                    <Link
-                      to="/admin"
-                      style={{
-                        ...styles.link,
-                        ...(isActive("/admin") ? styles.linkActive : {}),
-                      }}
-                    >
-                      Administració
-                    </Link>
-                  )}
-                </>
-              )}
+              {navLinks.map((link) => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  style={{
+                    ...styles.link,
+                    ...(isActive(link.to) ? styles.linkActive : {}),
+                    ...(isMobileView ? styles.linkMobile : {}),
+                  }}
+                >
+                  {link.label}
+                </Link>
+              ))}
             </div>
 
             <div
@@ -198,12 +188,27 @@ function Navbar() {
                 <>
                   <div
                     style={{
-                      ...styles.userBadge,
-                      ...(isMobileView ? styles.userBadgeMobile : {}),
+                      ...styles.userBox,
+                      ...(isMobileView ? styles.userBoxMobile : {}),
                     }}
                   >
-                    Hola, {userName}
+                    <span style={styles.userGreeting}>Hola, {userName}</span>
+                    <span style={styles.userMeta}>
+                      {user?.rol === "admin" ? "Administrador" : "Usuari"}
+                    </span>
+                    {userEmail && (
+                      <span style={styles.userEmail}>{userEmail}</span>
+                    )}
                   </div>
+
+                  <button
+                    type="button"
+                    onClick={() => navigate("/my-account")}
+                    className="btn btn-light"
+                    style={isMobileView ? styles.fullWidthButton : undefined}
+                  >
+                    Perfil
+                  </button>
 
                   <button
                     type="button"
@@ -246,14 +251,15 @@ const styles = {
     position: "sticky",
     top: 0,
     zIndex: 1000,
-    backgroundColor: "rgba(255,255,255,0.92)",
-    backdropFilter: "blur(10px)",
-    borderBottom: "1px solid #e5e7eb",
+    background: "rgba(255,255,255,0.88)",
+    backdropFilter: "blur(14px)",
+    borderBottom: "1px solid rgba(148,163,184,0.16)",
+    boxShadow: "0 8px 24px rgba(15,23,42,0.04)",
   },
   inner: {
     maxWidth: "1200px",
     margin: "0 auto",
-    padding: "0.9rem 1.25rem",
+    padding: "0.95rem 1.25rem",
   },
   topRow: {
     display: "flex",
@@ -261,49 +267,60 @@ const styles = {
     justifyContent: "space-between",
     gap: "1rem",
   },
-  left: {
-    display: "flex",
-    alignItems: "center",
-  },
   logo: {
     display: "flex",
     alignItems: "center",
-    gap: "0.7rem",
+    gap: "0.8rem",
     textDecoration: "none",
   },
   logoMark: {
-    width: "38px",
-    height: "38px",
-    borderRadius: "12px",
-    background: "linear-gradient(135deg, #1d4ed8, #2563eb)",
+    width: "42px",
+    height: "42px",
+    borderRadius: "14px",
+    background: "linear-gradient(135deg, #2563eb, #1d4ed8)",
     color: "white",
     display: "inline-flex",
     alignItems: "center",
     justifyContent: "center",
     fontWeight: "800",
-    boxShadow: "0 8px 20px rgba(37,99,235,0.22)",
+    boxShadow: "0 14px 24px rgba(37,99,235,0.2)",
+    flexShrink: 0,
+  },
+  logoBlock: {
+    display: "flex",
+    flexDirection: "column",
+    lineHeight: 1.1,
   },
   logoText: {
     color: "#0f172a",
     fontWeight: "800",
-    fontSize: "1.1rem",
-    letterSpacing: "0.01em",
+    fontSize: "1.08rem",
+    letterSpacing: "-0.01em",
   },
-  right: {
-    marginTop: "0.9rem",
+  logoSubtext: {
+    color: "#64748b",
+    fontSize: "0.78rem",
+    marginTop: "0.18rem",
+    fontWeight: "700",
+  },
+  content: {
+    marginTop: "0.95rem",
     display: "flex",
-    alignItems: "center",
     justifyContent: "space-between",
+    alignItems: "center",
     gap: "1rem",
+    flexWrap: "wrap",
   },
-  rightMobile: {
+  contentMobile: {
     flexDirection: "column",
     alignItems: "stretch",
+    paddingTop: "1rem",
+    borderTop: "1px solid rgba(148,163,184,0.14)",
   },
   links: {
     display: "flex",
     alignItems: "center",
-    gap: "0.5rem",
+    gap: "0.45rem",
     flexWrap: "wrap",
   },
   linksMobile: {
@@ -315,13 +332,20 @@ const styles = {
     textDecoration: "none",
     color: "#334155",
     fontWeight: "700",
-    padding: "0.7rem 0.9rem",
-    borderRadius: "12px",
+    padding: "0.72rem 0.95rem",
+    borderRadius: "14px",
+    border: "1px solid transparent",
     transition: "all 0.2s ease",
   },
+  linkMobile: {
+    width: "100%",
+    textAlign: "left",
+  },
   linkActive: {
-    backgroundColor: "#dbeafe",
+    background: "#eff6ff",
     color: "#1d4ed8",
+    border: "1px solid #bfdbfe",
+    boxShadow: "0 6px 16px rgba(37,99,235,0.08)",
   },
   actions: {
     display: "flex",
@@ -330,37 +354,60 @@ const styles = {
     flexWrap: "wrap",
   },
   actionsMobile: {
-    width: "100%",
     flexDirection: "column",
     alignItems: "stretch",
+    width: "100%",
   },
-  userBadge: {
-    backgroundColor: "#eff6ff",
-    color: "#1d4ed8",
-    border: "1px solid #bfdbfe",
-    padding: "0.65rem 0.9rem",
-    borderRadius: "999px",
-    fontWeight: "800",
-    whiteSpace: "nowrap",
+  userBox: {
+    background: "rgba(255,255,255,0.92)",
+    border: "1px solid rgba(148,163,184,0.18)",
+    borderRadius: "18px",
+    padding: "0.75rem 0.9rem",
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.15rem",
+    minWidth: "200px",
+    boxShadow: "0 10px 22px rgba(15,23,42,0.04)",
   },
-  userBadgeMobile: {
+  userBoxMobile: {
     width: "100%",
     textAlign: "center",
-    borderRadius: "14px",
+    minWidth: "unset",
+  },
+  userGreeting: {
+    color: "#0f172a",
+    fontSize: "0.95rem",
+    fontWeight: "800",
+  },
+  userMeta: {
+    color: "#2563eb",
+    fontSize: "0.8rem",
+    fontWeight: "800",
+  },
+  userEmail: {
+    color: "#64748b",
+    fontSize: "0.8rem",
+    fontWeight: "600",
+    wordBreak: "break-word",
   },
   mobileMenuButton: {
-    border: "1px solid #cbd5e1",
-    backgroundColor: "white",
-    borderRadius: "12px",
-    width: "44px",
-    height: "44px",
+    width: "46px",
+    height: "46px",
+    borderRadius: "14px",
+    border: "1px solid rgba(148,163,184,0.22)",
+    background: "white",
     cursor: "pointer",
+    transition: "all 0.2s ease",
+  },
+  mobileMenuButtonOpen: {
+    background: "#eff6ff",
+    border: "1px solid #bfdbfe",
   },
   mobileMenuIcon: {
-    fontSize: "1.25rem",
-    lineHeight: 1,
+    fontSize: "1.2rem",
+    fontWeight: "800",
     color: "#0f172a",
-    fontWeight: "700",
+    lineHeight: 1,
   },
   fullWidthButton: {
     width: "100%",

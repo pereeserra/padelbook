@@ -2,14 +2,18 @@ import { useEffect, useState } from "react";
 
 export default function BackToTopButton() {
   const [visible, setVisible] = useState(false);
+  const [isGoingUp, setIsGoingUp] = useState(false);
 
   useEffect(() => {
+    let lastScrollY = window.scrollY;
+
     const handleScroll = () => {
-      if (window.scrollY > 400) {
-        setVisible(true);
-      } else {
-        setVisible(false);
-      }
+      const currentScrollY = window.scrollY;
+
+      setVisible(currentScrollY > 320);
+      setIsGoingUp(currentScrollY < lastScrollY && currentScrollY > 320);
+
+      lastScrollY = currentScrollY;
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -29,8 +33,9 @@ export default function BackToTopButton() {
   return (
     <button
       onClick={scrollToTop}
-      className={`backToTop ${visible ? "show" : ""}`}
+      className={`backToTop ${visible ? "show" : ""} ${isGoingUp ? "scrolling-up" : ""}`}
       aria-label="Tornar a dalt"
+      title="Tornar a dalt"
     >
       ↑
     </button>
