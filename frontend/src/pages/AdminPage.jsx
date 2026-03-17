@@ -633,7 +633,8 @@ function AdminPage() {
             }}
           >
             <div>
-              <span style={styles.badge}>Administració</span>
+              <span className="pb-chip">Administració</span>
+
               <h1
                 style={{
                   ...styles.title,
@@ -642,6 +643,7 @@ function AdminPage() {
               >
                 Panell d’administració
               </h1>
+
               <p style={styles.subtitle}>
                 Controla pistes, reserves, estadístiques i activitat recent des d’un
                 espai més complet, més ordenat i amb millor lectura visual.
@@ -656,7 +658,7 @@ function AdminPage() {
                 <button
                   type="button"
                   className="btn btn-light"
-                  onClick={() => scrollToElementWithOffset(dashboardSectionRef.current, 110)}
+                  onClick={() => scrollToElementWithOffset(dashboardSectionRef.current, 140)}
                   style={isMobileView ? styles.fullWidthButton : undefined}
                 >
                   Veure dashboard
@@ -665,7 +667,7 @@ function AdminPage() {
                 <button
                   type="button"
                   className="btn btn-light"
-                  onClick={() => scrollToElementWithOffset(editSectionRef.current, 110)}
+                  onClick={() => scrollToElementWithOffset(editSectionRef.current, 140)}
                   style={isMobileView ? styles.fullWidthButton : undefined}
                 >
                   Crear o editar pista
@@ -674,7 +676,7 @@ function AdminPage() {
                 <button
                   type="button"
                   className="btn btn-light"
-                  onClick={() => scrollToElementWithOffset(courtsSectionRef.current, 110)}
+                  onClick={() => scrollToElementWithOffset(courtsSectionRef.current, 140)}
                   style={isMobileView ? styles.fullWidthButton : undefined}
                 >
                   Gestionar pistes
@@ -717,12 +719,11 @@ function AdminPage() {
         {feedback && (
           <section className="scale-in" style={styles.feedbackSection}>
             <div
-              style={{
-                ...styles.feedbackBox,
-                ...(feedbackType === "success"
-                  ? styles.feedbackSuccess
-                  : styles.feedbackError),
-              }}
+              className={`pb-feedback ${
+                feedbackType === "success"
+                  ? "pb-feedback--success"
+                  : "pb-feedback--error"
+              }`}
             >
               <div
                 style={{
@@ -730,7 +731,7 @@ function AdminPage() {
                   ...(isMobileView ? styles.feedbackRowMobile : {}),
                 }}
               >
-                <p style={styles.feedbackText}>{feedback}</p>
+                <p className="pb-feedback__text">{feedback}</p>
 
                 {feedbackAction && (
                   <button
@@ -749,15 +750,15 @@ function AdminPage() {
 
         {loadingDashboard && (
           <section className="scale-in" style={styles.feedbackSection}>
-            <div style={styles.infoBox}>
-              <p style={styles.infoText}>Actualitzant dashboard administratiu...</p>
+            <div className="pb-feedback pb-feedback--info">
+              <p className="pb-feedback__text">Actualitzant dashboard administratiu...</p>
             </div>
           </section>
         )}
 
         {error && (
           <section className="scale-in" style={styles.feedbackSection}>
-            <div style={styles.errorBox}>
+            <div className="pb-feedback pb-feedback--error" style={styles.errorWrapper}>
               <p style={styles.errorTitle}>
                 No s'han pogut carregar les dades d'administració
               </p>
@@ -788,16 +789,11 @@ function AdminPage() {
                 }}
               >
                 <div>
-                  <span style={styles.sectionKicker}>Visió general</span>
-                  <h2
-                    style={{
-                      ...styles.sectionTitle,
-                      ...(isMobileView ? styles.sectionTitleMobile : {}),
-                    }}
-                  >
+                  <span className="pb-kicker">Visió general</span>
+                  <h2 className="pb-panel-title" style={isMobileView ? styles.sectionTitleMobile : undefined}>
                     Dashboard administratiu
                   </h2>
-                  <p style={styles.sectionText}>
+                  <p className="pb-panel-text">
                     Visió ràpida de l’estat del sistema, volum de reserves i pistes.
                   </p>
                 </div>
@@ -821,6 +817,7 @@ function AdminPage() {
                 {dashboardCards.map((card) => (
                   <article
                     key={card.label}
+                    className="pb-surface-card"
                     style={{
                       ...styles.dashboardStatCard,
                       ...card.accent,
@@ -845,7 +842,7 @@ function AdminPage() {
             </section>
 
             <section className="fade-in-up delay-2" style={styles.section}>
-              <div style={styles.sectionCard}>
+              <div className="pb-surface-card" style={styles.sectionCard}>
                 <div
                   style={{
                     ...styles.analyticsHeader,
@@ -853,10 +850,10 @@ function AdminPage() {
                   }}
                 >
                   <div>
-                    <span style={styles.sectionKicker}>Resum ràpid</span>
+                    <span className="pb-kicker">Resum ràpid</span>
                     <h3 style={styles.analyticsTitle}>Insights clau</h3>
                   </div>
-                  <span style={styles.analyticsBadge}>Executiu</span>
+                  <span className="pb-badge-pill pb-badge-pill--blue">Executiu</span>
                 </div>
 
                 <div
@@ -866,7 +863,7 @@ function AdminPage() {
                   }}
                 >
                   {quickInsights.map((insight) => (
-                    <article style={styles.insightCard} key={insight.label}>
+                    <article className="pb-surface-card" style={styles.insightCard} key={insight.label}>
                       <span style={styles.insightLabel}>{insight.label}</span>
                       <span style={styles.insightValue}>{insight.value}</span>
                     </article>
@@ -882,7 +879,7 @@ function AdminPage() {
                   ...(isMobileView ? styles.analyticsGridMobile : {}),
                 }}
               >
-                <div style={styles.sectionCard}>
+                <div className="pb-surface-card" style={styles.sectionCard}>
                   <div
                     style={{
                       ...styles.analyticsHeader,
@@ -890,10 +887,10 @@ function AdminPage() {
                     }}
                   >
                     <div>
-                      <span style={styles.sectionKicker}>Anàlisi</span>
+                      <span className="pb-kicker">Anàlisi</span>
                       <h3 style={styles.analyticsTitle}>Reserves per pista</h3>
                     </div>
-                    <span style={styles.analyticsBadge}>
+                    <span className="pb-badge-pill pb-badge-pill--blue">
                       {statsByCourt.length} pistes
                     </span>
                   </div>
@@ -932,7 +929,7 @@ function AdminPage() {
                   )}
                 </div>
 
-                <div style={styles.sectionCard}>
+                <div className="pb-surface-card" style={styles.sectionCard}>
                   <div
                     style={{
                       ...styles.analyticsHeader,
@@ -940,10 +937,10 @@ function AdminPage() {
                     }}
                   >
                     <div>
-                      <span style={styles.sectionKicker}>Demanda</span>
+                      <span className="pb-kicker">Demanda</span>
                       <h3 style={styles.analyticsTitle}>Franges més reservades</h3>
                     </div>
-                    <span style={styles.analyticsBadge}>
+                    <span className="pb-badge-pill pb-badge-pill--green">
                       {statsByTimeslot.length} franges
                     </span>
                   </div>
@@ -991,7 +988,7 @@ function AdminPage() {
                   ...(isMobileView ? styles.analyticsGridMobile : {}),
                 }}
               >
-                <div style={styles.sectionCard}>
+                <div className="pb-surface-card" style={styles.sectionCard}>
                   <div
                     style={{
                       ...styles.analyticsHeader,
@@ -999,10 +996,10 @@ function AdminPage() {
                     }}
                   >
                     <div>
-                      <span style={styles.sectionKicker}>Tendència</span>
+                      <span className="pb-kicker">Tendència</span>
                       <h3 style={styles.analyticsTitle}>Activitat per dates</h3>
                     </div>
-                    <span style={styles.analyticsBadge}>
+                    <span className="pb-badge-pill pb-badge-pill--amber">
                       {recentDateStats.length} registres
                     </span>
                   </div>
@@ -1041,7 +1038,7 @@ function AdminPage() {
                   )}
                 </div>
 
-                <div style={styles.sectionCard}>
+                <div className="pb-surface-card" style={styles.sectionCard}>
                   <div
                     style={{
                       ...styles.analyticsHeader,
@@ -1049,10 +1046,10 @@ function AdminPage() {
                     }}
                   >
                     <div>
-                      <span style={styles.sectionKicker}>Traçabilitat</span>
+                      <span className="pb-kicker">Traçabilitat</span>
                       <h3 style={styles.analyticsTitle}>Activitat recent admin</h3>
                     </div>
-                    <span style={styles.analyticsBadge}>
+                    <span className="pb-badge-pill pb-badge-pill--rose">
                       {adminLogs.length} accions
                     </span>
                   </div>
@@ -1067,7 +1064,7 @@ function AdminPage() {
                               ...(isMobileView ? styles.logTopRowMobile : {}),
                             }}
                           >
-                            <span style={styles.logActionBadge}>
+                            <span className="pb-badge-pill pb-badge-pill--blue" style={styles.logActionBadge}>
                               {formatActionLabel(log.action)}
                             </span>
                             <span style={styles.logDate}>
@@ -1107,18 +1104,13 @@ function AdminPage() {
                 }}
               >
                 <div>
-                  <span style={styles.sectionKicker}>
+                  <span className="pb-kicker">
                     {editingCourtId ? "Edició" : "Creació"}
                   </span>
-                  <h2
-                    style={{
-                      ...styles.sectionTitle,
-                      ...(isMobileView ? styles.sectionTitleMobile : {}),
-                    }}
-                  >
+                  <h2 className="pb-panel-title" style={isMobileView ? styles.sectionTitleMobile : undefined}>
                     {editingCourtId ? "Editar pista" : "Crear nova pista"}
                   </h2>
-                  <p style={styles.sectionText}>
+                  <p className="pb-panel-text">
                     {editingCourtId
                       ? "Modifica les dades de la pista seleccionada i guarda els canvis."
                       : "Afegeix una pista nova al sistema i defineix-ne les dades principals."}
@@ -1126,11 +1118,11 @@ function AdminPage() {
                 </div>
 
                 {editingCourtId && (
-                  <span style={styles.editingBadge}>Mode edició</span>
+                  <span className="pb-badge-pill pb-badge-pill--amber">Mode edició</span>
                 )}
               </div>
 
-              <div style={styles.sectionCard}>
+              <div className="pb-surface-card" style={styles.sectionCard}>
                 <CreateCourtForm
                   newCourt={newCourt}
                   setNewCourt={setNewCourt}
@@ -1154,24 +1146,22 @@ function AdminPage() {
                 }}
               >
                 <div>
-                  <span style={styles.sectionKicker}>Control operatiu</span>
-                  <h2
-                    style={{
-                      ...styles.sectionTitle,
-                      ...(isMobileView ? styles.sectionTitleMobile : {}),
-                    }}
-                  >
+                  <span className="pb-kicker">Control operatiu</span>
+                  <h2 className="pb-panel-title" style={isMobileView ? styles.sectionTitleMobile : undefined}>
                     Reserves del sistema
                   </h2>
-                  <p style={styles.sectionText}>
+                  <p className="pb-panel-text">
                     Consulta totes les reserves registrades a l’aplicació.
                   </p>
                 </div>
 
-                <span style={styles.countBadge}>{reservations.length} reserves</span>
+                <span className="pb-badge-pill pb-badge-pill--blue">
+                  {reservations.length} reserves
+                </span>
               </div>
 
               <div
+                className="pb-surface-card"
                 style={{
                   ...styles.sectionCard,
                   ...(isMobileView ? styles.sectionCardMobile : {}),
@@ -1193,22 +1183,19 @@ function AdminPage() {
                 }}
               >
                 <div>
-                  <span style={styles.sectionKicker}>Gestió d’espais</span>
-                  <h2
-                    style={{
-                      ...styles.sectionTitle,
-                      ...(isMobileView ? styles.sectionTitleMobile : {}),
-                    }}
-                  >
+                  <span className="pb-kicker">Gestió d’espais</span>
+                  <h2 className="pb-panel-title" style={isMobileView ? styles.sectionTitleMobile : undefined}>
                     Pistes
                   </h2>
-                  <p style={styles.sectionText}>
+                  <p className="pb-panel-text">
                     Gestiona les pistes existents, edita-les o elimina-les quan
                     sigui necessari.
                   </p>
                 </div>
 
-                <span style={styles.countBadge}>{courts.length} pistes</span>
+                <span className="pb-badge-pill pb-badge-pill--green">
+                  {courts.length} pistes
+                </span>
               </div>
 
               <div
@@ -1281,17 +1268,8 @@ const styles = {
   heroGridMobile: {
     gridTemplateColumns: "1fr",
   },
-  badge: {
-    display: "inline-block",
-    padding: "0.5rem 0.85rem",
-    borderRadius: "999px",
-    background: "rgba(255,255,255,0.12)",
-    border: "1px solid rgba(255,255,255,0.14)",
-    fontWeight: "800",
-    marginBottom: "1rem",
-  },
   title: {
-    margin: 0,
+    margin: "1rem 0 0 0",
     fontSize: "3rem",
     lineHeight: 1.03,
   },
@@ -1359,20 +1337,6 @@ const styles = {
     marginTop: "1.25rem",
     marginBottom: "1.25rem",
   },
-  feedbackBox: {
-    borderRadius: "18px",
-    padding: "1rem 1.1rem",
-    border: "1px solid transparent",
-    boxShadow: "0 10px 24px rgba(15,23,42,0.04)",
-  },
-  feedbackSuccess: {
-    background: "#ecfdf5",
-    borderColor: "#86efac",
-  },
-  feedbackError: {
-    background: "#fff1f2",
-    borderColor: "#fecdd3",
-  },
   feedbackRow: {
     display: "flex",
     justifyContent: "space-between",
@@ -1384,32 +1348,10 @@ const styles = {
     flexDirection: "column",
     alignItems: "stretch",
   },
-  feedbackText: {
-    margin: 0,
-    fontWeight: "800",
-    lineHeight: 1.6,
-    color: "#0f172a",
-  },
-  infoBox: {
-    background: "#eff6ff",
-    border: "1px solid #bfdbfe",
-    borderRadius: "18px",
-    padding: "1rem 1.1rem",
-  },
-  infoText: {
-    margin: 0,
-    color: "#1e40af",
-    fontWeight: "800",
-  },
-  errorBox: {
-    background: "#fff1f2",
-    border: "1px solid #fecdd3",
-    borderRadius: "24px",
-    padding: "1.25rem",
+  errorWrapper: {
     display: "flex",
     flexDirection: "column",
     gap: "0.9rem",
-    boxShadow: "0 10px 24px rgba(15,23,42,0.04)",
   },
   errorTitle: {
     margin: 0,
@@ -1437,59 +1379,14 @@ const styles = {
   sectionHeaderMobile: {
     alignItems: "stretch",
   },
-  sectionKicker: {
-    display: "inline-block",
-    marginBottom: "0.45rem",
-    padding: "0.38rem 0.7rem",
-    borderRadius: "999px",
-    background: "rgba(37,99,235,0.08)",
-    color: "#1d4ed8",
-    fontWeight: "800",
-    fontSize: "0.8rem",
-  },
-  sectionTitle: {
-    margin: 0,
-    fontSize: "1.9rem",
-    color: "#0f172a",
-  },
   sectionTitleMobile: {
     fontSize: "1.55rem",
-  },
-  sectionText: {
-    marginTop: "0.45rem",
-    marginBottom: 0,
-    color: "#475569",
-    lineHeight: 1.7,
-    maxWidth: "780px",
-  },
-  countBadge: {
-    background: "#eff6ff",
-    color: "#1d4ed8",
-    padding: "0.5rem 0.85rem",
-    borderRadius: "999px",
-    fontWeight: "800",
-    fontSize: "0.9rem",
-    border: "1px solid #dbeafe",
-  },
-  editingBadge: {
-    background: "#fff7ed",
-    color: "#c2410c",
-    padding: "0.5rem 0.85rem",
-    borderRadius: "999px",
-    fontWeight: "800",
-    fontSize: "0.9rem",
-    border: "1px solid #fdba74",
   },
   fullWidthButton: {
     width: "100%",
   },
   sectionCard: {
-    background: "rgba(255,255,255,0.84)",
-    border: "1px solid rgba(148,163,184,0.18)",
-    borderRadius: "24px",
     padding: "1.25rem",
-    boxShadow: "0 16px 34px rgba(15,23,42,0.05)",
-    backdropFilter: "blur(10px)",
   },
   sectionCardMobile: {
     padding: "1rem",
@@ -1505,13 +1402,7 @@ const styles = {
     gap: "0.8rem",
   },
   dashboardStatCard: {
-    borderRadius: "22px",
     padding: "1.15rem",
-    boxShadow: "0 12px 28px rgba(15,23,42,0.05)",
-    display: "flex",
-    flexDirection: "column",
-    gap: "0.7rem",
-    border: "1px solid rgba(148,163,184,0.12)",
   },
   dashboardStatTop: {
     display: "flex",
@@ -1535,6 +1426,8 @@ const styles = {
     lineHeight: 1.5,
   },
   dashboardStatValue: {
+    display: "block",
+    marginTop: "0.7rem",
     fontSize: "1.9rem",
     fontWeight: "800",
     color: "#0f172a",
@@ -1559,34 +1452,6 @@ const styles = {
   },
   accentAmber: {
     background: "linear-gradient(180deg, #fffdf7, #fff7e6)",
-  },
-  insightsGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-    gap: "1rem",
-  },
-  insightsGridMobile: {
-    gridTemplateColumns: "1fr",
-    gap: "0.8rem",
-  },
-  insightCard: {
-    background: "#f8fafc",
-    border: "1px solid #e5e7eb",
-    borderRadius: "18px",
-    padding: "1rem",
-    display: "flex",
-    flexDirection: "column",
-    gap: "0.45rem",
-  },
-  insightLabel: {
-    color: "#64748b",
-    fontSize: "0.88rem",
-    fontWeight: "800",
-  },
-  insightValue: {
-    color: "#0f172a",
-    fontWeight: "800",
-    lineHeight: 1.55,
   },
   analyticsGrid: {
     display: "grid",
@@ -1613,14 +1478,29 @@ const styles = {
     fontSize: "1.25rem",
     color: "#0f172a",
   },
-  analyticsBadge: {
-    background: "#eff6ff",
-    color: "#1d4ed8",
-    padding: "0.35rem 0.7rem",
-    borderRadius: "999px",
+  insightsGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+    gap: "1rem",
+  },
+  insightsGridMobile: {
+    gridTemplateColumns: "1fr",
+    gap: "0.8rem",
+  },
+  insightCard: {
+    padding: "1rem",
+  },
+  insightLabel: {
+    color: "#64748b",
+    fontSize: "0.88rem",
     fontWeight: "800",
-    fontSize: "0.85rem",
-    border: "1px solid #dbeafe",
+  },
+  insightValue: {
+    display: "block",
+    marginTop: "0.45rem",
+    color: "#0f172a",
+    fontWeight: "800",
+    lineHeight: 1.55,
   },
   metricList: {
     display: "flex",
@@ -1704,13 +1584,9 @@ const styles = {
     flexDirection: "column",
   },
   logActionBadge: {
-    background: "#eff6ff",
-    color: "#1d4ed8",
+    minHeight: "unset",
     padding: "0.35rem 0.7rem",
-    borderRadius: "999px",
-    fontWeight: "800",
     fontSize: "0.8rem",
-    border: "1px solid #dbeafe",
   },
   logDate: {
     color: "#64748b",
