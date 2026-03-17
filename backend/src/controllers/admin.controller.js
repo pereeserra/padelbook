@@ -21,15 +21,14 @@ const parseBinaryFlag = (value) => {
 // Controlador per obtenir totes les reserves (per a l'administrador)
 exports.getAllReservations = async (req, res) => {
   try {
-    const estat =
-      typeof req.query.estat === "string"
-        ? req.query.estat.trim().toLowerCase()
-        : "";
-
-    const data =
-      typeof req.query.data === "string"
-        ? req.query.data.trim()
-        : "";
+    let {
+      estat,
+      data,
+      page = 1,
+      limit = 10,
+      sort_by = "created_at",
+      order = "desc",
+    } = req.query;
 
     const court_id = req.query.court_id ? Number(req.query.court_id) : null;
     const user_id = req.query.user_id ? Number(req.query.user_id) : null;
@@ -39,49 +38,27 @@ exports.getAllReservations = async (req, res) => {
         ? req.query.codi_reserva.trim().toUpperCase()
         : "";
 
-    const page = req.query.page ? Number(req.query.page) : 1;
-    const limit = req.query.limit ? Number(req.query.limit) : 10;
-
-    if (!Number.isInteger(page) || page <= 0) {
-      return res.status(400).json({
-        error: "El paràmetre 'page' ha de ser un enter positiu",
-      });
-    }
-
-    if (!Number.isInteger(limit) || limit <= 0) {
-      return res.status(400).json({
-        error: "El paràmetre 'limit' ha de ser un enter positiu",
-      });
-    }
+    page = parsePositiveInteger(page) || 1;
+    limit = parsePositiveInteger(limit) || 10;
 
     const offset = (page - 1) * limit;
 
+    // Validació ordenació
+    const allowedSortFields = ["created_at", "data_reserva"];
+    const allowedOrder = ["asc", "desc"];
+
+    if (!allowedSortFields.includes(sort_by)) {
+      sort_by = "created_at";
+    }
+
+    if (!allowedOrder.includes(order.toLowerCase())) {
+      order = "desc";
+    }
+
+    order = order.toUpperCase();
+
     const whereClauses = [];
     const params = [];
-
-    if (estat && estat !== "activa" && estat !== "cancel·lada") {
-      return res.status(400).json({
-        error: "El filtre d'estat només pot ser 'activa' o 'cancel·lada'",
-      });
-    }
-
-    if (data && !/^\d{4}-\d{2}-\d{2}$/.test(data)) {
-      return res.status(400).json({
-        error: "La data ha de tenir format YYYY-MM-DD",
-      });
-    }
-
-    if (req.query.court_id && (!Number.isInteger(court_id) || court_id <= 0)) {
-      return res.status(400).json({
-        error: "La pista indicada no és vàlida",
-      });
-    }
-
-    if (req.query.user_id && (!Number.isInteger(user_id) || user_id <= 0)) {
-      return res.status(400).json({
-        error: "L'usuari indicat no és vàlid",
-      });
-    }
 
     if (estat) {
       whereClauses.push("r.estat = ?");
@@ -108,23 +85,13 @@ exports.getAllReservations = async (req, res) => {
       params.push(codi_reserva);
     }
 
-    let baseQuery = `
-      FROM reservations r
-      JOIN users u ON r.user_id = u.id
-      JOIN courts c ON r.court_id = c.id
-      JOIN time_slots t ON r.time_slot_id = t.id
-    `;
+    const whereClause =
+      whereClauses.length > 0 ? `WHERE ${whereClauses.join(" AND ")}` : "";
 
-    if (whereClauses.length > 0) {
-      baseQuery += ` WHERE ${whereClauses.join(" AND ")}`;
-    }
+    const orderClause = `ORDER BY r.${sort_by} ${order}`;
 
-    const countQuery = `SELECT COUNT(*) AS total ${baseQuery}`;
-    const [countRows] = await db.query(countQuery, params);
-    const total = countRows[0].total;
-    const totalPages = Math.ceil(total / limit);
-
-    const dataQuery = `
+    // Query principal
+    const query = `
       SELECT
         r.id,
         r.codi_reserva,
@@ -139,14 +106,29 @@ exports.getAllReservations = async (req, res) => {
         c.nom_pista,
         t.hora_inici,
         t.hora_fi
-      ${baseQuery}
-      ORDER BY r.data_reserva, t.hora_inici
+      FROM reservations r
+      JOIN users u ON r.user_id = u.id
+      JOIN courts c ON r.court_id = c.id
+      JOIN time_slots t ON r.time_slot_id = t.id
+      ${whereClause}
+      ${orderClause}
       LIMIT ? OFFSET ?
     `;
 
-    const [reservations] = await db.query(dataQuery, [...params, limit, offset]);
+    const [reservations] = await db.query(query, [...params, limit, offset]);
 
-    res.json({
+    // Query total per paginació
+    const countQuery = `
+      SELECT COUNT(*) as total
+      FROM reservations r
+      ${whereClause}
+    `;
+
+    const [countResult] = await db.query(countQuery, params);
+    const total = countResult[0].total;
+    const totalPages = Math.ceil(total / limit);
+
+    return res.json({
       data: reservations,
       pagination: {
         page,
@@ -157,9 +139,7 @@ exports.getAllReservations = async (req, res) => {
     });
   } catch (error) {
     console.error("Error getAllReservations:", error);
-    res.status(500).json({
-      error: "Error obtenint totes les reserves",
-    });
+    return res.status(500).json({ error: "Error obtenint reserves" });
   }
 };
 
