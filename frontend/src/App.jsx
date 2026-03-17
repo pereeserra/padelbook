@@ -11,6 +11,7 @@ import MyReservationsPage from "./pages/MyReservationsPage";
 import AdminPage from "./pages/AdminPage";
 import ProfilePage from "./pages/ProfilePage";
 import BackToTopButton from "./components/BackToTopButton";
+import Footer from "./components/Footer";
 
 function App() {
   return (
@@ -53,6 +54,8 @@ function App() {
           />
         </Routes>
       </main>
+
+      <Footer />
 
       <BackToTopButton />
     </BrowserRouter>
