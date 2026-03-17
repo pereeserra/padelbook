@@ -100,17 +100,19 @@ exports.createReservation = async (req, res) => {
       );
     }
 
-    // 6. Crear la reserva
+    // 6. Crear la reserva amb codi temporal
+    const codiTemporal = `TEMP-${Date.now()}-${user_id}`;
+
     const [insertResult] = await db.query(
-      `INSERT INTO reservations (user_id, court_id, time_slot_id, data_reserva, estat)
-      VALUES (?, ?, ?, ?, 'activa')`,
-      [user_id, court_id, time_slot_id, data_reserva]
+      `INSERT INTO reservations (codi_reserva, user_id, court_id, time_slot_id, data_reserva, estat)
+      VALUES (?, ?, ?, ?, ?, 'activa')`,
+      [codiTemporal, user_id, court_id, time_slot_id, data_reserva]
     );
 
     const reservationId = insertResult.insertId;
     const codi_reserva = `PB-${data_reserva.replace(/-/g, "")}-${String(reservationId).padStart(3, "0")}`;
 
-    // 7. Guardar el codi de reserva
+    // 7. Guardar el codi definitiu
     await db.query(
       `UPDATE reservations
       SET codi_reserva = ?
