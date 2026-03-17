@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import api from "../api/axios";
 import { getUserFromToken } from "../utils/auth";
@@ -6,12 +6,14 @@ import { getUserFromToken } from "../utils/auth";
 function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const userMenuRef = useRef(null);
 
   const fallbackUser = getUserFromToken();
 
   const [user, setUser] = useState(fallbackUser);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 920);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isMobileView, setIsMobileView] = useState(() => window.innerWidth <= 920);
 
   const fetchCurrentUser = async ({ silent = false } = {}) => {
     const currentToken = localStorage.getItem("token");
@@ -61,6 +63,7 @@ function Navbar() {
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
+    setIsUserMenuOpen(false);
   }, [location.pathname]);
 
   useEffect(() => {
@@ -80,11 +83,35 @@ function Navbar() {
     };
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setIsUserMenuOpen(false);
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, []);
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setUser(null);
     setIsMobileMenuOpen(false);
+    setIsUserMenuOpen(false);
     navigate("/login");
   };
 
@@ -95,9 +122,21 @@ function Navbar() {
     return fullName.split(" ")[0];
   };
 
+  const getInitials = (fullName) => {
+    if (!fullName) return "U";
+
+    const parts = fullName.trim().split(" ").filter(Boolean);
+
+    if (parts.length === 1) {
+      return parts[0].slice(0, 1).toUpperCase();
+    }
+
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  };
+
   const userName = getDisplayName(user?.nom);
   const userEmail = user?.email || "";
-  const showMenuContent = !isMobileView || isMobileMenuOpen;
+  const userRoleLabel = user?.rol === "admin" ? "Administrador" : "Usuari";
 
   const navLinks = useMemo(() => {
     const links = [
@@ -106,10 +145,7 @@ function Navbar() {
     ];
 
     if (user) {
-      links.push(
-        { to: "/my-reservations", label: "Les meves reserves" },
-        { to: "/my-account", label: "El meu compte" }
-      );
+      links.push({ to: "/my-reservations", label: "Les meves reserves" });
 
       if (user?.rol === "admin") {
         links.push({ to: "/admin", label: "Administració" });
@@ -120,298 +156,242 @@ function Navbar() {
   }, [user]);
 
   return (
-    <nav style={styles.nav}>
-      <div style={styles.inner}>
-        <div style={styles.topRow}>
-          <Link to="/" style={styles.logo}>
-            <span style={styles.logoMark}>PB</span>
+    <nav className="pb-navbar">
+      <div className="pb-navbar__inner">
+        <div className="pb-navbar__left">
+          <Link to="/" className="pb-navbar__brand" aria-label="Anar a l'inici">
+            <span className="pb-navbar__brand-mark">PB</span>
 
-            <div style={styles.logoBlock}>
-              <span style={styles.logoText}>PadelBook</span>
-              <span style={styles.logoSubtext}>Reserves de pàdel</span>
-            </div>
+            <span className="pb-navbar__brand-copy">
+              <span className="pb-navbar__brand-title">PadelBook</span>
+              <span className="pb-navbar__brand-subtitle">Reserves de pàdel</span>
+            </span>
           </Link>
-
-          {isMobileView && (
-            <button
-              type="button"
-              onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-              style={{
-                ...styles.mobileMenuButton,
-                ...(isMobileMenuOpen ? styles.mobileMenuButtonOpen : {}),
-              }}
-              aria-label={isMobileMenuOpen ? "Tancar menú" : "Obrir menú"}
-              aria-expanded={isMobileMenuOpen}
-            >
-              <span style={styles.mobileMenuIcon}>
-                {isMobileMenuOpen ? "✕" : "☰"}
-              </span>
-            </button>
-          )}
         </div>
 
-        {showMenuContent && (
-          <div
-            style={{
-              ...styles.content,
-              ...(isMobileView ? styles.contentMobile : {}),
-            }}
-          >
-            <div
-              style={{
-                ...styles.links,
-                ...(isMobileView ? styles.linksMobile : {}),
-              }}
-            >
+        {!isMobileView && (
+          <div className="pb-navbar__center">
+            <div className="pb-navbar__links">
               {navLinks.map((link) => (
                 <Link
                   key={link.to}
                   to={link.to}
-                  style={{
-                    ...styles.link,
-                    ...(isActive(link.to) ? styles.linkActive : {}),
-                    ...(isMobileView ? styles.linkMobile : {}),
-                  }}
+                  className={`pb-navbar__link ${isActive(link.to) ? "is-active" : ""}`}
                 >
                   {link.label}
                 </Link>
               ))}
             </div>
+          </div>
+        )}
 
-            <div
-              style={{
-                ...styles.actions,
-                ...(isMobileView ? styles.actionsMobile : {}),
-              }}
-            >
-              {user ? (
-                <>
-                  <div
-                    style={{
-                      ...styles.userBox,
-                      ...(isMobileView ? styles.userBoxMobile : {}),
-                    }}
-                  >
-                    <span style={styles.userGreeting}>Hola, {userName}</span>
-                    <span style={styles.userMeta}>
-                      {user?.rol === "admin" ? "Administrador" : "Usuari"}
-                    </span>
+        <div className="pb-navbar__right">
+          {user ? (
+            <div className="pb-navbar__user" ref={userMenuRef}>
+              <button
+                type="button"
+                className={`pb-navbar__user-trigger ${isUserMenuOpen ? "is-open" : ""}`}
+                onClick={() => setIsUserMenuOpen((prev) => !prev)}
+                aria-label="Obrir menú d'usuari"
+                aria-haspopup="menu"
+                aria-expanded={isUserMenuOpen}
+              >
+                <span className="pb-navbar__avatar">{getInitials(user?.nom)}</span>
+
+                {!isMobileView && (
+                  <span className="pb-navbar__user-meta">
+                    <span className="pb-navbar__user-name">{userName}</span>
+                    <span className="pb-navbar__user-role">{userRoleLabel}</span>
+                  </span>
+                )}
+
+                {!isMobileView && (
+                  <span className="pb-navbar__chevron" aria-hidden="true">
+                    <svg
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M5 7.5L10 12.5L15 7.5"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </span>
+                )}
+              </button>
+
+              {isUserMenuOpen && (
+                <div className="pb-navbar__dropdown" role="menu">
+                  <div className="pb-navbar__dropdown-head">
+                    <span className="pb-navbar__dropdown-name">{user?.nom || "Usuari"}</span>
+                    <span className="pb-navbar__dropdown-role">{userRoleLabel}</span>
                     {userEmail && (
-                      <span style={styles.userEmail}>{userEmail}</span>
+                      <span className="pb-navbar__dropdown-email">{userEmail}</span>
                     )}
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => navigate("/my-account")}
-                    className="btn btn-light"
-                    style={isMobileView ? styles.fullWidthButton : undefined}
-                  >
-                    Perfil
-                  </button>
+                  <div className="pb-navbar__dropdown-body">
+                    <button
+                      type="button"
+                      className="pb-navbar__dropdown-item"
+                      onClick={() => {
+                        setIsUserMenuOpen(false);
+                        navigate("/my-account");
+                      }}
+                    >
+                      <span className="pb-navbar__dropdown-icon" aria-hidden="true">
+                        <svg
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M10 10C12.2091 10 14 8.20914 14 6C14 3.79086 12.2091 2 10 2C7.79086 2 6 3.79086 6 6C6 8.20914 7.79086 10 10 10Z"
+                            stroke="currentColor"
+                            strokeWidth="1.6"
+                          />
+                          <path
+                            d="M3 17C3.87518 14.3766 6.49511 12.5 10 12.5C13.5049 12.5 16.1248 14.3766 17 17"
+                            stroke="currentColor"
+                            strokeWidth="1.6"
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                      </span>
+                      <span>El meu compte</span>
+                    </button>
 
-                  <button
-                    type="button"
-                    onClick={handleLogout}
-                    className="btn btn-light"
-                    style={isMobileView ? styles.fullWidthButton : undefined}
-                  >
-                    Tancar sessió
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link
-                    to="/login"
-                    className="btn btn-light"
-                    style={isMobileView ? styles.fullWidthButton : undefined}
-                  >
-                    Iniciar sessió
-                  </Link>
+                    {user?.rol === "admin" && (
+                      <button
+                        type="button"
+                        className="pb-navbar__dropdown-item"
+                        onClick={() => {
+                          setIsUserMenuOpen(false);
+                          navigate("/admin");
+                        }}
+                      >
+                        <span className="pb-navbar__dropdown-icon" aria-hidden="true">
+                          <svg
+                            viewBox="0 0 20 20"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M10 2L12.25 4.25L15.5 4.5L15.75 7.75L18 10L15.75 12.25L15.5 15.5L12.25 15.75L10 18L7.75 15.75L4.5 15.5L4.25 12.25L2 10L4.25 7.75L4.5 4.5L7.75 4.25L10 2Z"
+                              stroke="currentColor"
+                              strokeWidth="1.4"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z"
+                              stroke="currentColor"
+                              strokeWidth="1.4"
+                            />
+                          </svg>
+                        </span>
+                        <span>Administració</span>
+                      </button>
+                    )}
 
-                  <Link
-                    to="/register"
-                    className="btn btn-primary"
-                    style={isMobileView ? styles.fullWidthButton : undefined}
-                  >
-                    Crear compte
-                  </Link>
-                </>
+                    <button
+                      type="button"
+                      className="pb-navbar__dropdown-item is-danger"
+                      onClick={handleLogout}
+                    >
+                      <span className="pb-navbar__dropdown-icon" aria-hidden="true">
+                        <svg
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M8 4H5.75C5.05964 4 4.5 4.55964 4.5 5.25V14.75C4.5 15.4404 5.05964 16 5.75 16H8"
+                            stroke="currentColor"
+                            strokeWidth="1.6"
+                            strokeLinecap="round"
+                          />
+                          <path
+                            d="M11.5 13.5L15 10L11.5 6.5"
+                            stroke="currentColor"
+                            strokeWidth="1.6"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          <path
+                            d="M15 10H8"
+                            stroke="currentColor"
+                            strokeWidth="1.6"
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                      </span>
+                      <span>Tancar sessió</span>
+                    </button>
+                  </div>
+                </div>
               )}
             </div>
-          </div>
-        )}
+          ) : (
+            !isMobileView && (
+              <div className="pb-navbar__guest-actions">
+                <Link to="/login" className="btn btn-light btn-sm">
+                  Iniciar sessió
+                </Link>
+                <Link to="/register" className="btn btn-primary btn-sm">
+                  Crear compte
+                </Link>
+              </div>
+            )
+          )}
+
+          {isMobileView && (
+            <button
+              type="button"
+              className={`pb-navbar__mobile-toggle ${isMobileMenuOpen ? "is-open" : ""}`}
+              onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+              aria-label={isMobileMenuOpen ? "Tancar menú" : "Obrir menú"}
+              aria-expanded={isMobileMenuOpen}
+            >
+              <span className="pb-navbar__mobile-toggle-line" />
+              <span className="pb-navbar__mobile-toggle-line" />
+              <span className="pb-navbar__mobile-toggle-line" />
+            </button>
+          )}
+        </div>
       </div>
+
+      {isMobileView && isMobileMenuOpen && (
+        <div className="pb-navbar__mobile-panel">
+          <div className="pb-navbar__mobile-links">
+            {navLinks.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className={`pb-navbar__mobile-link ${isActive(link.to) ? "is-active" : ""}`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+
+          {!user && (
+            <div className="pb-navbar__mobile-actions">
+              <Link to="/login" className="btn btn-light btn-full">
+                Iniciar sessió
+              </Link>
+              <Link to="/register" className="btn btn-primary btn-full">
+                Crear compte
+              </Link>
+            </div>
+          )}
+        </div>
+      )}
     </nav>
   );
 }
-
-const styles = {
-  nav: {
-    position: "sticky",
-    top: 0,
-    zIndex: 1000,
-    background: "rgba(255,255,255,0.88)",
-    backdropFilter: "blur(14px)",
-    borderBottom: "1px solid rgba(148,163,184,0.16)",
-    boxShadow: "0 8px 24px rgba(15,23,42,0.04)",
-  },
-  inner: {
-    maxWidth: "1200px",
-    margin: "0 auto",
-    padding: "0.95rem 1.25rem",
-  },
-  topRow: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: "1rem",
-  },
-  logo: {
-    display: "flex",
-    alignItems: "center",
-    gap: "0.8rem",
-    textDecoration: "none",
-  },
-  logoMark: {
-    width: "42px",
-    height: "42px",
-    borderRadius: "14px",
-    background: "linear-gradient(135deg, #2563eb, #1d4ed8)",
-    color: "white",
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontWeight: "800",
-    boxShadow: "0 14px 24px rgba(37,99,235,0.2)",
-    flexShrink: 0,
-  },
-  logoBlock: {
-    display: "flex",
-    flexDirection: "column",
-    lineHeight: 1.1,
-  },
-  logoText: {
-    color: "#0f172a",
-    fontWeight: "800",
-    fontSize: "1.08rem",
-    letterSpacing: "-0.01em",
-  },
-  logoSubtext: {
-    color: "#64748b",
-    fontSize: "0.78rem",
-    marginTop: "0.18rem",
-    fontWeight: "700",
-  },
-  content: {
-    marginTop: "0.95rem",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: "1rem",
-    flexWrap: "wrap",
-  },
-  contentMobile: {
-    flexDirection: "column",
-    alignItems: "stretch",
-    paddingTop: "1rem",
-    borderTop: "1px solid rgba(148,163,184,0.14)",
-  },
-  links: {
-    display: "flex",
-    alignItems: "center",
-    gap: "0.45rem",
-    flexWrap: "wrap",
-  },
-  linksMobile: {
-    flexDirection: "column",
-    alignItems: "stretch",
-    width: "100%",
-  },
-  link: {
-    textDecoration: "none",
-    color: "#334155",
-    fontWeight: "700",
-    padding: "0.72rem 0.95rem",
-    borderRadius: "14px",
-    border: "1px solid transparent",
-    transition: "all 0.2s ease",
-  },
-  linkMobile: {
-    width: "100%",
-    textAlign: "left",
-  },
-  linkActive: {
-    background: "#eff6ff",
-    color: "#1d4ed8",
-    border: "1px solid #bfdbfe",
-    boxShadow: "0 6px 16px rgba(37,99,235,0.08)",
-  },
-  actions: {
-    display: "flex",
-    alignItems: "center",
-    gap: "0.75rem",
-    flexWrap: "wrap",
-  },
-  actionsMobile: {
-    flexDirection: "column",
-    alignItems: "stretch",
-    width: "100%",
-  },
-  userBox: {
-    background: "rgba(255,255,255,0.92)",
-    border: "1px solid rgba(148,163,184,0.18)",
-    borderRadius: "18px",
-    padding: "0.75rem 0.9rem",
-    display: "flex",
-    flexDirection: "column",
-    gap: "0.15rem",
-    minWidth: "200px",
-    boxShadow: "0 10px 22px rgba(15,23,42,0.04)",
-  },
-  userBoxMobile: {
-    width: "100%",
-    textAlign: "center",
-    minWidth: "unset",
-  },
-  userGreeting: {
-    color: "#0f172a",
-    fontSize: "0.95rem",
-    fontWeight: "800",
-  },
-  userMeta: {
-    color: "#2563eb",
-    fontSize: "0.8rem",
-    fontWeight: "800",
-  },
-  userEmail: {
-    color: "#64748b",
-    fontSize: "0.8rem",
-    fontWeight: "600",
-    wordBreak: "break-word",
-  },
-  mobileMenuButton: {
-    width: "46px",
-    height: "46px",
-    borderRadius: "14px",
-    border: "1px solid rgba(148,163,184,0.22)",
-    background: "white",
-    cursor: "pointer",
-    transition: "all 0.2s ease",
-  },
-  mobileMenuButtonOpen: {
-    background: "#eff6ff",
-    border: "1px solid #bfdbfe",
-  },
-  mobileMenuIcon: {
-    fontSize: "1.2rem",
-    fontWeight: "800",
-    color: "#0f172a",
-    lineHeight: 1,
-  },
-  fullWidthButton: {
-    width: "100%",
-  },
-};
 
 export default Navbar;
