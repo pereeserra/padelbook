@@ -34,6 +34,11 @@ exports.getAllReservations = async (req, res) => {
     const court_id = req.query.court_id ? Number(req.query.court_id) : null;
     const user_id = req.query.user_id ? Number(req.query.user_id) : null;
 
+    const codi_reserva =
+      typeof req.query.codi_reserva === "string"
+        ? req.query.codi_reserva.trim().toUpperCase()
+        : "";
+
     const page = req.query.page ? Number(req.query.page) : 1;
     const limit = req.query.limit ? Number(req.query.limit) : 10;
 
@@ -96,6 +101,11 @@ exports.getAllReservations = async (req, res) => {
     if (user_id) {
       whereClauses.push("r.user_id = ?");
       params.push(user_id);
+    }
+
+    if (codi_reserva) {
+      whereClauses.push("r.codi_reserva = ?");
+      params.push(codi_reserva);
     }
 
     let baseQuery = `
