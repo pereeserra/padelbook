@@ -742,3 +742,18 @@ p {
     font-size: 0.96rem;
   }
 }
+
+/* ===============================
+   BACK TO TOP SCROLLING UP
+================================ */
+.backToTop.scrolling-up {
+  transform: translateY(0) scale(1.05);
+}
+
+.backToTop:hover {
+  transform: translateY(-2px) scale(1.05);
+}
+
+.backToTop:active {
+  transform: scale(0.96);
+}
