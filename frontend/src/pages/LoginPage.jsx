@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api/axios";
 
 function LoginPage() {
-  const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
+  const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 900);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -13,15 +13,28 @@ function LoginPage() {
   const [capsLock, setCapsLock] = useState(false);
 
   const navigate = useNavigate();
+  const feedbackRef = useRef(null);
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobileView(window.innerWidth <= 768);
+      setIsMobileView(window.innerWidth <= 900);
     };
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  useEffect(() => {
+    if (!error || !feedbackRef.current) return;
+
+    const top =
+      feedbackRef.current.getBoundingClientRect().top + window.scrollY - 120;
+
+    window.scrollTo({
+      top,
+      behavior: "smooth",
+    });
+  }, [error]);
 
   const handleCapsLock = (e) => {
     setCapsLock(e.getModifierState("CapsLock"));
@@ -62,7 +75,7 @@ function LoginPage() {
       } else if (err.response?.data?.message) {
         setError(err.response.data.message);
       } else {
-        setError("Error iniciant sessió");
+        setError("Error iniciant sessió.");
       }
     } finally {
       setLoading(false);
@@ -80,40 +93,60 @@ function LoginPage() {
         <section
           className="fade-in-up"
           style={{
-            ...styles.infoPanel,
-            ...(isMobileView ? styles.infoPanelMobile : {}),
+            ...styles.visualPanel,
+            ...(isMobileView ? styles.visualPanelMobile : {}),
           }}
         >
-          <span style={styles.badge}>Accés d’usuaris</span>
+          <div style={styles.visualGlowOne} />
+          <div style={styles.visualGlowTwo} />
 
-          <h1
-            style={{
-              ...styles.title,
-              ...(isMobileView ? styles.titleMobile : {}),
-            }}
-          >
-            Inicia sessió a PadelBook
-          </h1>
+          <div style={styles.visualContent}>
+            <span style={styles.badge}>Accés segur</span>
 
-          <p style={styles.text}>
-            Accedeix per reservar pistes, consultar les teves reserves i, si ets
-            administrador, gestionar el sistema.
-          </p>
+            <h1
+              style={{
+                ...styles.title,
+                ...(isMobileView ? styles.titleMobile : {}),
+              }}
+            >
+              Torna a entrar i continua gestionant les teves reserves
+            </h1>
 
-          <div style={styles.featureList}>
-            <div style={styles.featureItem}>
-              <span style={styles.featureDot} />
-              <span>Consulta la disponibilitat de pistes en segons</span>
-            </div>
+            <p style={styles.text}>
+              Accedeix a PadelBook per consultar disponibilitat, reservar pistes i
+              revisar el teu historial amb una experiència més clara i agradable.
+            </p>
 
-            <div style={styles.featureItem}>
-              <span style={styles.featureDot} />
-              <span>Gestiona les teves reserves des d’un únic espai</span>
-            </div>
+            <div style={styles.featureStack}>
+              <div style={styles.featureCard}>
+                <span style={styles.featureIcon}>🎾</span>
+                <div>
+                  <strong style={styles.featureTitle}>Disponibilitat al moment</strong>
+                  <p style={styles.featureText}>
+                    Consulta pistes i franges disponibles de manera ràpida.
+                  </p>
+                </div>
+              </div>
 
-            <div style={styles.featureItem}>
-              <span style={styles.featureDot} />
-              <span>Accedeix a una experiència clara, ràpida i moderna</span>
+              <div style={styles.featureCard}>
+                <span style={styles.featureIcon}>📅</span>
+                <div>
+                  <strong style={styles.featureTitle}>Reserves sota control</strong>
+                  <p style={styles.featureText}>
+                    Revisa, confirma o cancel·la les teves reserves des del mateix espai.
+                  </p>
+                </div>
+              </div>
+
+              <div style={styles.featureCard}>
+                <span style={styles.featureIcon}>✨</span>
+                <div>
+                  <strong style={styles.featureTitle}>Experiència més cuidada</strong>
+                  <p style={styles.featureText}>
+                    Navegació més neta, feedback visible i millor sensació general.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -125,12 +158,21 @@ function LoginPage() {
             ...(isMobileView ? styles.formCardMobile : {}),
           }}
         >
-          <div style={styles.formHeader}>
+          <div style={styles.formTop}>
+            <span style={styles.formKicker}>Iniciar sessió</span>
             <h2 style={styles.formTitle}>Benvingut de nou</h2>
             <p style={styles.formText}>
-              Introdueix les teves credencials per continuar.
+              Introdueix les teves credencials per accedir al teu compte.
             </p>
           </div>
+
+          <div ref={feedbackRef} />
+
+          {error && (
+            <div className="scale-in" style={styles.errorBox}>
+              <p style={styles.errorText}>{error}</p>
+            </div>
+          )}
 
           <form onSubmit={handleLogin} style={styles.form}>
             <div style={styles.field}>
@@ -196,23 +238,22 @@ function LoginPage() {
             <button
               type="submit"
               className="btn btn-primary btn-full"
-              style={styles.button}
               disabled={loading}
             >
-              {loading ? "Iniciant sessió..." : "Iniciar sessió"}
+              {loading ? "Iniciant sessió..." : "Entrar a PadelBook"}
             </button>
           </form>
 
-          {error && <p style={styles.error}>{error}</p>}
+          <div style={styles.separator}>
+            <span style={styles.separatorLine} />
+            <span style={styles.separatorText}>o</span>
+            <span style={styles.separatorLine} />
+          </div>
 
           <div style={styles.footerBox}>
-            <p style={styles.registerText}>Encara no tens compte?</p>
+            <p style={styles.footerText}>Encara no tens compte?</p>
 
-            <Link
-              to="/register"
-              className="btn btn-light btn-full"
-              style={styles.registerButton}
-            >
+            <Link to="/register" className="btn btn-light btn-full">
               Crear compte
             </Link>
           </div>
@@ -225,191 +266,296 @@ function LoginPage() {
 const styles = {
   page: {
     minHeight: "calc(100vh - 80px)",
+    padding: "2rem 1rem 3rem",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    padding: "2rem 1rem",
-    background:
-      "linear-gradient(180deg, rgba(248,250,252,1) 0%, rgba(239,246,255,1) 100%)",
   },
+
   wrapper: {
     width: "100%",
-    maxWidth: "1120px",
+    maxWidth: "1180px",
     display: "grid",
-    gridTemplateColumns: "1.1fr 0.9fr",
-    gap: "1.5rem",
+    gridTemplateColumns: "1.08fr 0.92fr",
+    gap: "1.4rem",
     alignItems: "stretch",
   },
+
   wrapperMobile: {
     gridTemplateColumns: "1fr",
   },
-  infoPanel: {
-    background: "linear-gradient(135deg, #1d4ed8, #2563eb)",
-    color: "white",
-    borderRadius: "24px",
-    padding: "2.25rem",
-    boxShadow: "0 20px 40px rgba(37,99,235,0.18)",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-  },
-  infoPanelMobile: {
-    padding: "1.5rem",
-    borderRadius: "18px",
-  },
-  badge: {
-    display: "inline-block",
-    alignSelf: "flex-start",
-    backgroundColor: "rgba(255,255,255,0.16)",
-    color: "white",
-    borderRadius: "999px",
-    padding: "0.4rem 0.85rem",
-    fontWeight: "700",
-    fontSize: "0.9rem",
-    marginBottom: "1rem",
-  },
-  title: {
-    margin: 0,
-    fontSize: "2.5rem",
-    lineHeight: 1.15,
-  },
-  titleMobile: {
-    fontSize: "2rem",
-  },
-  text: {
-    marginTop: "1rem",
-    marginBottom: "1.5rem",
-    fontSize: "1.05rem",
-    lineHeight: 1.7,
-    color: "rgba(255,255,255,0.92)",
-    maxWidth: "560px",
-  },
-  featureList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "0.85rem",
-  },
-  featureItem: {
+
+  visualPanel: {
+    position: "relative",
+    overflow: "hidden",
+    borderRadius: "30px",
+    padding: "2rem",
+    background:
+      "linear-gradient(135deg, rgba(15,23,42,0.94), rgba(37,99,235,0.9))",
+    boxShadow: "0 26px 56px rgba(37,99,235,0.16)",
+    minHeight: "640px",
     display: "flex",
     alignItems: "center",
-    gap: "0.75rem",
-    fontWeight: "600",
-    lineHeight: 1.5,
   },
-  featureDot: {
-    width: "10px",
-    height: "10px",
-    minWidth: "10px",
-    borderRadius: "999px",
-    backgroundColor: "#bfdbfe",
-  },
-  formCard: {
-    backgroundColor: "white",
+
+  visualPanelMobile: {
+    minHeight: "unset",
+    padding: "1.25rem",
     borderRadius: "24px",
+  },
+
+  visualGlowOne: {
+    position: "absolute",
+    width: "260px",
+    height: "260px",
+    borderRadius: "50%",
+    background: "rgba(255,255,255,0.08)",
+    top: "-60px",
+    right: "-40px",
+    filter: "blur(4px)",
+  },
+
+  visualGlowTwo: {
+    position: "absolute",
+    width: "220px",
+    height: "220px",
+    borderRadius: "50%",
+    background: "rgba(16,185,129,0.12)",
+    bottom: "-60px",
+    left: "-40px",
+    filter: "blur(8px)",
+  },
+
+  visualContent: {
+    position: "relative",
+    zIndex: 2,
+    width: "100%",
+  },
+
+  badge: {
+    display: "inline-block",
+    padding: "0.5rem 0.85rem",
+    borderRadius: "999px",
+    background: "rgba(255,255,255,0.12)",
+    border: "1px solid rgba(255,255,255,0.14)",
+    color: "white",
+    fontWeight: "800",
+    marginBottom: "1rem",
+  },
+
+  title: {
+    color: "white",
+    marginBottom: "1rem",
+    maxWidth: "620px",
+    fontSize: "3.3rem",
+    lineHeight: 1.02,
+  },
+
+  titleMobile: {
+    fontSize: "2.3rem",
+  },
+
+  text: {
+    color: "rgba(255,255,255,0.84)",
+    marginBottom: "1.5rem",
+    maxWidth: "620px",
+    fontSize: "1.04rem",
+  },
+
+  featureStack: {
+    display: "grid",
+    gap: "0.95rem",
+  },
+
+  featureCard: {
+    display: "flex",
+    alignItems: "flex-start",
+    gap: "0.85rem",
+    background: "rgba(255,255,255,0.1)",
+    border: "1px solid rgba(255,255,255,0.12)",
+    borderRadius: "20px",
+    padding: "1rem",
+    backdropFilter: "blur(10px)",
+  },
+
+  featureIcon: {
+    width: "46px",
+    height: "46px",
+    borderRadius: "14px",
+    background: "rgba(255,255,255,0.14)",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "1.2rem",
+    flexShrink: 0,
+  },
+
+  featureTitle: {
+    display: "block",
+    color: "white",
+    marginBottom: "0.25rem",
+    fontSize: "1rem",
+  },
+
+  featureText: {
+    margin: 0,
+    color: "rgba(255,255,255,0.78)",
+    fontSize: "0.95rem",
+    lineHeight: 1.6,
+  },
+
+  formCard: {
+    background: "rgba(255,255,255,0.86)",
+    border: "1px solid rgba(148,163,184,0.18)",
+    borderRadius: "30px",
     padding: "2rem",
-    boxShadow: "0 16px 32px rgba(15,23,42,0.08)",
-    border: "1px solid #e5e7eb",
+    boxShadow: "0 22px 48px rgba(15,23,42,0.08)",
+    backdropFilter: "blur(14px)",
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
   },
+
   formCardMobile: {
-    padding: "1.35rem",
-    borderRadius: "18px",
+    padding: "1.25rem",
+    borderRadius: "24px",
   },
-  formHeader: {
+
+  formTop: {
     marginBottom: "1.25rem",
   },
+
+  formKicker: {
+    display: "inline-block",
+    marginBottom: "0.7rem",
+    padding: "0.42rem 0.75rem",
+    borderRadius: "999px",
+    background: "rgba(37,99,235,0.08)",
+    color: "#1d4ed8",
+    fontWeight: "800",
+    fontSize: "0.82rem",
+  },
+
   formTitle: {
     margin: 0,
-    fontSize: "1.75rem",
     color: "#0f172a",
+    fontSize: "2rem",
   },
+
   formText: {
-    marginTop: "0.5rem",
+    marginTop: "0.55rem",
     marginBottom: 0,
-    color: "#475569",
+    color: "#64748b",
+  },
+
+  errorBox: {
+    marginBottom: "1rem",
+    background: "#fff1f2",
+    border: "1px solid #fecdd3",
+    borderRadius: "16px",
+    padding: "0.95rem 1rem",
+  },
+
+  errorText: {
+    margin: 0,
+    color: "#be123c",
+    fontWeight: "700",
     lineHeight: 1.6,
   },
+
   form: {
     display: "flex",
     flexDirection: "column",
     gap: "1rem",
   },
+
   field: {
     display: "flex",
     flexDirection: "column",
     gap: "0.45rem",
   },
+
   label: {
     fontWeight: "700",
-    color: "#1e293b",
+    color: "#0f172a",
     fontSize: "0.95rem",
   },
+
   input: {
     width: "100%",
-    padding: "0.95rem 1rem",
-    borderRadius: "12px",
-    border: "1px solid #cbd5e1",
-    backgroundColor: "white",
-    color: "#0f172a",
-    fontSize: "1rem",
-    outline: "none",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.03)",
     boxSizing: "border-box",
+    border: "1px solid #cbd5e1",
+    borderRadius: "16px",
+    padding: "1rem 1rem",
+    background: "rgba(255,255,255,0.92)",
+    fontSize: "1rem",
+    color: "#0f172a",
+    outline: "none",
   },
+
   passwordWrapper: {
     display: "flex",
-    gap: "0.5rem",
+    gap: "0.55rem",
     alignItems: "stretch",
   },
+
   passwordWrapperMobile: {
     flexDirection: "column",
   },
+
   showButton: {
     border: "1px solid #cbd5e1",
-    borderRadius: "10px",
-    padding: "0 0.9rem",
-    backgroundColor: "white",
+    borderRadius: "14px",
+    padding: "0 1rem",
+    background: "white",
     cursor: "pointer",
     fontWeight: "700",
+    minWidth: "110px",
     color: "#334155",
-    minWidth: "96px",
   },
+
   showButtonMobile: {
     width: "100%",
-    minHeight: "44px",
+    minHeight: "46px",
   },
+
   capsWarning: {
     color: "#b91c1c",
     fontSize: "0.85rem",
-    fontWeight: "600",
-  },
-  button: {
-    marginTop: "0.35rem",
-  },
-  error: {
-    color: "#b91c1c",
     fontWeight: "700",
-    marginTop: "1rem",
-    backgroundColor: "#fee2e2",
-    padding: "0.9rem 1rem",
-    borderRadius: "12px",
   },
+
+  separator: {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.8rem",
+    margin: "1.2rem 0 1rem",
+  },
+
+  separatorLine: {
+    flex: 1,
+    height: "1px",
+    background: "#e2e8f0",
+  },
+
+  separatorText: {
+    color: "#94a3b8",
+    fontWeight: "700",
+    fontSize: "0.9rem",
+  },
+
   footerBox: {
-    marginTop: "1.4rem",
-    paddingTop: "1.2rem",
-    borderTop: "1px solid #e5e7eb",
     display: "flex",
     flexDirection: "column",
-    gap: "0.85rem",
+    gap: "0.8rem",
   },
-  registerText: {
+
+  footerText: {
     margin: 0,
-    color: "#475569",
+    color: "#64748b",
+    textAlign: "center",
     fontWeight: "600",
   },
-  registerButton: {},
 };
 
 export default LoginPage;

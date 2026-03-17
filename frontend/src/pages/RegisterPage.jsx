@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api/axios";
 
 function RegisterPage() {
   const navigate = useNavigate();
-  const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
+  const feedbackRef = useRef(null);
+
+  const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 900);
 
   const [nom, setNom] = useState("");
   const [email, setEmail] = useState("");
@@ -19,14 +21,45 @@ function RegisterPage() {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobileView(window.innerWidth <= 768);
+      setIsMobileView(window.innerWidth <= 900);
     };
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+    if (!error || !feedbackRef.current) return;
+
+    const top =
+      feedbackRef.current.getBoundingClientRect().top + window.scrollY - 120;
+
+    window.scrollTo({
+      top,
+      behavior: "smooth",
+    });
+  }, [error]);
+
   const normalizeSpaces = (value) => value.trim().replace(/\s+/g, " ");
+
+  const passwordChecks = useMemo(() => {
+    return {
+      minLength: password.length >= 8,
+      lowercase: /[a-z]/.test(password),
+      uppercase: /[A-Z]/.test(password),
+      number: /[0-9]/.test(password),
+      symbol: /[^A-Za-z0-9]/.test(password),
+      match: !!confirmPassword && password === confirmPassword,
+    };
+  }, [password, confirmPassword]);
+
+  const completedPasswordChecks = Object.values(passwordChecks).filter(Boolean).length;
+  const passwordStrengthText =
+    completedPasswordChecks <= 2
+      ? "Baixa"
+      : completedPasswordChecks <= 4
+      ? "Mitjana"
+      : "Alta";
 
   const validateForm = () => {
     const cleanNom = normalizeSpaces(nom);
@@ -146,25 +179,56 @@ function RegisterPage() {
         <section
           className="fade-in-up"
           style={{
-            ...styles.infoPanel,
-            ...(isMobileView ? styles.infoPanelMobile : {}),
+            ...styles.visualPanel,
+            ...(isMobileView ? styles.visualPanelMobile : {}),
           }}
         >
-          <span style={styles.badge}>Crear compte</span>
+          <div style={styles.visualGlowOne} />
+          <div style={styles.visualGlowTwo} />
 
-          <h1
-            style={{
-              ...styles.title,
-              ...(isMobileView ? styles.titleMobile : {}),
-            }}
-          >
-            Registra't a PadelBook
-          </h1>
+          <div style={styles.visualContent}>
+            <span style={styles.badge}>Nou compte</span>
 
-          <p style={styles.text}>
-            Crea el teu compte gratuïtament per reservar pistes de pàdel,
-            consultar disponibilitat i gestionar les teves reserves.
-          </p>
+            <h1
+              style={{
+                ...styles.title,
+                ...(isMobileView ? styles.titleMobile : {}),
+              }}
+            >
+              Crea el teu compte i comença a explorar PadelBook
+            </h1>
+
+            <p style={styles.text}>
+              Registra’t per reservar pistes, consultar disponibilitat i gestionar
+              les teves reserves dins una experiència més moderna i agradable.
+            </p>
+
+            <div style={styles.benefitGrid}>
+              <div style={styles.benefitCard}>
+                <span style={styles.benefitIcon}>⚡</span>
+                <strong style={styles.benefitTitle}>Accés ràpid</strong>
+                <p style={styles.benefitText}>
+                  Entra i comença a utilitzar la plataforma en pocs segons.
+                </p>
+              </div>
+
+              <div style={styles.benefitCard}>
+                <span style={styles.benefitIcon}>🎾</span>
+                <strong style={styles.benefitTitle}>Reserva fàcil</strong>
+                <p style={styles.benefitText}>
+                  Consulta pistes i gestiona el teu historial sense complicacions.
+                </p>
+              </div>
+
+              <div style={styles.benefitCard}>
+                <span style={styles.benefitIcon}>🔒</span>
+                <strong style={styles.benefitTitle}>Compte segur</strong>
+                <p style={styles.benefitText}>
+                  Crea una contrasenya robusta amb ajuda visual en temps real.
+                </p>
+              </div>
+            </div>
+          </div>
         </section>
 
         <section
@@ -174,18 +238,30 @@ function RegisterPage() {
             ...(isMobileView ? styles.formCardMobile : {}),
           }}
         >
-          <div style={styles.formHeader}>
+          <div style={styles.formTop}>
+            <span style={styles.formKicker}>Registre</span>
             <h2 style={styles.formTitle}>Crear compte</h2>
             <p style={styles.formText}>
-              Omple el formulari per començar a utilitzar PadelBook.
+              Omple el formulari i comença a utilitzar la plataforma.
             </p>
           </div>
 
+          <div ref={feedbackRef} />
+
+          {error && (
+            <div className="scale-in" style={styles.errorBox}>
+              <p style={styles.errorText}>{error}</p>
+            </div>
+          )}
+
           <form onSubmit={handleRegister} style={styles.form}>
             <div style={styles.field}>
-              <label style={styles.label}>Nom i llinatges</label>
+              <label htmlFor="nom" style={styles.label}>
+                Nom i llinatges
+              </label>
 
               <input
+                id="nom"
                 type="text"
                 placeholder="Ex: Pere Serra"
                 value={nom}
@@ -196,9 +272,12 @@ function RegisterPage() {
             </div>
 
             <div style={styles.field}>
-              <label style={styles.label}>Correu electrònic</label>
+              <label htmlFor="email" style={styles.label}>
+                Correu electrònic
+              </label>
 
               <input
+                id="email"
                 type="email"
                 placeholder="exemple@correu.com"
                 value={email}
@@ -209,7 +288,9 @@ function RegisterPage() {
             </div>
 
             <div style={styles.field}>
-              <label style={styles.label}>Contrasenya</label>
+              <label htmlFor="password" style={styles.label}>
+                Contrasenya
+              </label>
 
               <div
                 style={{
@@ -218,6 +299,7 @@ function RegisterPage() {
                 }}
               >
                 <input
+                  id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Mínim 8 caràcters"
                   value={password}
@@ -234,7 +316,7 @@ function RegisterPage() {
                     ...styles.showButton,
                     ...(isMobileView ? styles.showButtonMobile : {}),
                   }}
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={() => setShowPassword((prev) => !prev)}
                 >
                   {showPassword ? "Ocultar" : "Mostrar"}
                 </button>
@@ -245,16 +327,15 @@ function RegisterPage() {
                   ⚠️ Tens el bloqueig de majúscules activat
                 </span>
               )}
-
-              <span style={styles.helpText}>
-                Ha d'incloure majúscula, minúscula, número i símbol.
-              </span>
             </div>
 
             <div style={styles.field}>
-              <label style={styles.label}>Confirmar contrasenya</label>
+              <label htmlFor="confirmPassword" style={styles.label}>
+                Confirmar contrasenya
+              </label>
 
               <input
+                id="confirmPassword"
                 type={showPassword ? "text" : "password"}
                 placeholder="Repeteix la contrasenya"
                 value={confirmPassword}
@@ -264,20 +345,86 @@ function RegisterPage() {
               />
             </div>
 
+            <div style={styles.passwordPanel}>
+              <div style={styles.passwordPanelHeader}>
+                <span style={styles.passwordPanelTitle}>Requisits de la contrasenya</span>
+
+                <span
+                  style={{
+                    ...styles.passwordStrengthBadge,
+                    ...(completedPasswordChecks >= 5
+                      ? styles.passwordStrengthGood
+                      : completedPasswordChecks >= 3
+                      ? styles.passwordStrengthMedium
+                      : styles.passwordStrengthLow),
+                  }}
+                >
+                  Seguretat: {passwordStrengthText}
+                </span>
+              </div>
+
+              <div style={styles.passwordChecklist}>
+                <div style={styles.passwordChecklistItem}>
+                  <span style={passwordChecks.minLength ? styles.checkOk : styles.checkPending}>
+                    {passwordChecks.minLength ? "✓" : "•"}
+                  </span>
+                  <span>Almenys 8 caràcters</span>
+                </div>
+
+                <div style={styles.passwordChecklistItem}>
+                  <span style={passwordChecks.lowercase ? styles.checkOk : styles.checkPending}>
+                    {passwordChecks.lowercase ? "✓" : "•"}
+                  </span>
+                  <span>Inclou una minúscula</span>
+                </div>
+
+                <div style={styles.passwordChecklistItem}>
+                  <span style={passwordChecks.uppercase ? styles.checkOk : styles.checkPending}>
+                    {passwordChecks.uppercase ? "✓" : "•"}
+                  </span>
+                  <span>Inclou una majúscula</span>
+                </div>
+
+                <div style={styles.passwordChecklistItem}>
+                  <span style={passwordChecks.number ? styles.checkOk : styles.checkPending}>
+                    {passwordChecks.number ? "✓" : "•"}
+                  </span>
+                  <span>Inclou un número</span>
+                </div>
+
+                <div style={styles.passwordChecklistItem}>
+                  <span style={passwordChecks.symbol ? styles.checkOk : styles.checkPending}>
+                    {passwordChecks.symbol ? "✓" : "•"}
+                  </span>
+                  <span>Inclou un símbol</span>
+                </div>
+
+                <div style={styles.passwordChecklistItem}>
+                  <span style={passwordChecks.match ? styles.checkOk : styles.checkPending}>
+                    {passwordChecks.match ? "✓" : "•"}
+                  </span>
+                  <span>Les dues contrasenyes coincideixen</span>
+                </div>
+              </div>
+            </div>
+
             <button
               type="submit"
               className="btn btn-primary btn-full"
-              style={styles.button}
               disabled={loading}
             >
               {loading ? "Creant compte..." : "Crear compte"}
             </button>
           </form>
 
-          {error && <p style={styles.error}>{error}</p>}
+          <div style={styles.separator}>
+            <span style={styles.separatorLine} />
+            <span style={styles.separatorText}>o</span>
+            <span style={styles.separatorLine} />
+          </div>
 
           <div style={styles.footerBox}>
-            <p style={styles.loginText}>Ja tens compte?</p>
+            <p style={styles.footerText}>Ja tens compte?</p>
 
             <Link to="/login" className="btn btn-light btn-full">
               Iniciar sessió
@@ -290,77 +437,199 @@ function RegisterPage() {
 }
 
 const styles = {
-  page: { padding: "2rem 1.5rem 3rem" },
+  page: {
+    minHeight: "calc(100vh - 80px)",
+    padding: "2rem 1rem 3rem",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
 
   wrapper: {
-    maxWidth: "1100px",
-    margin: "0 auto",
+    width: "100%",
+    maxWidth: "1180px",
     display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: "1.5rem",
+    gridTemplateColumns: "1.02fr 0.98fr",
+    gap: "1.4rem",
     alignItems: "stretch",
   },
 
   wrapperMobile: {
     gridTemplateColumns: "1fr",
-    gap: "1rem",
   },
 
-  infoPanel: {
-    background: "linear-gradient(135deg,#1e40af,#2563eb)",
-    color: "white",
+  visualPanel: {
+    position: "relative",
+    overflow: "hidden",
+    borderRadius: "30px",
     padding: "2rem",
-    borderRadius: "20px",
-    boxShadow: "0 10px 24px rgba(37,99,235,0.18)",
+    background:
+      "linear-gradient(135deg, rgba(16,185,129,0.92), rgba(37,99,235,0.9))",
+    boxShadow: "0 26px 56px rgba(37,99,235,0.16)",
+    minHeight: "720px",
+    display: "flex",
+    alignItems: "center",
   },
 
-  infoPanelMobile: {
-    padding: "1.4rem",
-    borderRadius: "16px",
+  visualPanelMobile: {
+    minHeight: "unset",
+    padding: "1.25rem",
+    borderRadius: "24px",
+  },
+
+  visualGlowOne: {
+    position: "absolute",
+    width: "260px",
+    height: "260px",
+    borderRadius: "50%",
+    background: "rgba(255,255,255,0.08)",
+    top: "-50px",
+    right: "-30px",
+  },
+
+  visualGlowTwo: {
+    position: "absolute",
+    width: "220px",
+    height: "220px",
+    borderRadius: "50%",
+    background: "rgba(15,23,42,0.12)",
+    bottom: "-60px",
+    left: "-40px",
+  },
+
+  visualContent: {
+    position: "relative",
+    zIndex: 2,
+    width: "100%",
   },
 
   badge: {
-    background: "rgba(255,255,255,0.2)",
-    padding: "0.4rem 0.7rem",
-    borderRadius: "999px",
-    fontWeight: "700",
     display: "inline-block",
+    padding: "0.5rem 0.85rem",
+    borderRadius: "999px",
+    background: "rgba(255,255,255,0.14)",
+    border: "1px solid rgba(255,255,255,0.16)",
+    color: "white",
+    fontWeight: "800",
     marginBottom: "1rem",
   },
 
   title: {
-    marginTop: 0,
-    fontSize: "2.3rem",
-    lineHeight: 1.15,
+    color: "white",
+    marginBottom: "1rem",
+    maxWidth: "620px",
+    fontSize: "3.1rem",
+    lineHeight: 1.02,
   },
 
   titleMobile: {
-    fontSize: "1.9rem",
+    fontSize: "2.2rem",
   },
 
   text: {
-    lineHeight: 1.7,
-    marginBottom: 0,
+    color: "rgba(255,255,255,0.86)",
+    marginBottom: "1.5rem",
+    maxWidth: "620px",
+    fontSize: "1.03rem",
+  },
+
+  benefitGrid: {
+    display: "grid",
+    gap: "0.95rem",
+  },
+
+  benefitCard: {
+    background: "rgba(255,255,255,0.12)",
+    border: "1px solid rgba(255,255,255,0.14)",
+    borderRadius: "20px",
+    padding: "1rem",
+    backdropFilter: "blur(10px)",
+  },
+
+  benefitIcon: {
+    width: "44px",
+    height: "44px",
+    borderRadius: "14px",
+    background: "rgba(255,255,255,0.16)",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "1.15rem",
+    marginBottom: "0.75rem",
+  },
+
+  benefitTitle: {
+    display: "block",
+    color: "white",
+    marginBottom: "0.3rem",
+    fontSize: "1rem",
+  },
+
+  benefitText: {
+    margin: 0,
+    color: "rgba(255,255,255,0.8)",
+    lineHeight: 1.6,
+    fontSize: "0.95rem",
   },
 
   formCard: {
-    background: "white",
+    background: "rgba(255,255,255,0.88)",
+    border: "1px solid rgba(148,163,184,0.18)",
+    borderRadius: "30px",
     padding: "2rem",
-    borderRadius: "20px",
-    boxShadow: "0 8px 22px rgba(0,0,0,0.08)",
-    border: "1px solid #e5e7eb",
+    boxShadow: "0 22px 48px rgba(15,23,42,0.08)",
+    backdropFilter: "blur(14px)",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
   },
 
   formCardMobile: {
     padding: "1.25rem",
-    borderRadius: "16px",
+    borderRadius: "24px",
   },
 
-  formHeader: { marginBottom: "1.4rem" },
+  formTop: {
+    marginBottom: "1.2rem",
+  },
 
-  formTitle: { margin: 0, fontSize: "2rem" },
+  formKicker: {
+    display: "inline-block",
+    marginBottom: "0.7rem",
+    padding: "0.42rem 0.75rem",
+    borderRadius: "999px",
+    background: "rgba(16,185,129,0.12)",
+    color: "#047857",
+    fontWeight: "800",
+    fontSize: "0.82rem",
+  },
 
-  formText: { color: "#475569" },
+  formTitle: {
+    margin: 0,
+    color: "#0f172a",
+    fontSize: "2rem",
+  },
+
+  formText: {
+    marginTop: "0.55rem",
+    marginBottom: 0,
+    color: "#64748b",
+  },
+
+  errorBox: {
+    marginBottom: "1rem",
+    background: "#fff1f2",
+    border: "1px solid #fecdd3",
+    borderRadius: "16px",
+    padding: "0.95rem 1rem",
+  },
+
+  errorText: {
+    margin: 0,
+    color: "#be123c",
+    fontWeight: "700",
+    lineHeight: 1.6,
+  },
 
   form: {
     display: "flex",
@@ -371,25 +640,30 @@ const styles = {
   field: {
     display: "flex",
     flexDirection: "column",
-    gap: "0.4rem",
+    gap: "0.45rem",
   },
 
   label: {
     fontWeight: "700",
+    color: "#0f172a",
+    fontSize: "0.95rem",
   },
 
   input: {
-    padding: "0.9rem 1rem",
-    borderRadius: "12px",
-    border: "1px solid #cbd5e1",
-    fontSize: "1rem",
     width: "100%",
     boxSizing: "border-box",
+    border: "1px solid #cbd5e1",
+    borderRadius: "16px",
+    padding: "1rem 1rem",
+    background: "rgba(255,255,255,0.94)",
+    fontSize: "1rem",
+    color: "#0f172a",
+    outline: "none",
   },
 
   passwordWrapper: {
     display: "flex",
-    gap: "0.5rem",
+    gap: "0.55rem",
     alignItems: "stretch",
   },
 
@@ -399,49 +673,138 @@ const styles = {
 
   showButton: {
     border: "1px solid #cbd5e1",
-    borderRadius: "10px",
-    padding: "0 0.8rem",
+    borderRadius: "14px",
+    padding: "0 1rem",
     background: "white",
     cursor: "pointer",
-    fontWeight: "600",
+    fontWeight: "700",
     minWidth: "110px",
+    color: "#334155",
   },
 
   showButtonMobile: {
     width: "100%",
-    minHeight: "44px",
+    minHeight: "46px",
   },
 
   capsWarning: {
     color: "#b91c1c",
     fontSize: "0.85rem",
-    fontWeight: "600",
-  },
-
-  helpText: {
-    fontSize: "0.8rem",
-    color: "#64748b",
-  },
-
-  button: { marginTop: "0.5rem" },
-
-  error: {
-    background: "#fee2e2",
-    padding: "0.8rem",
-    borderRadius: "10px",
-    color: "#b91c1c",
     fontWeight: "700",
-    marginTop: "1rem",
+  },
+
+  passwordPanel: {
+    background: "#f8fafc",
+    border: "1px solid #e2e8f0",
+    borderRadius: "18px",
+    padding: "1rem",
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.9rem",
+  },
+
+  passwordPanelHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: "0.8rem",
+    flexWrap: "wrap",
+  },
+
+  passwordPanelTitle: {
+    fontSize: "0.92rem",
+    fontWeight: "800",
+    color: "#0f172a",
+  },
+
+  passwordStrengthBadge: {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "0.35rem 0.72rem",
+    borderRadius: "999px",
+    fontSize: "0.8rem",
+    fontWeight: "800",
+  },
+
+  passwordStrengthLow: {
+    background: "#fff1f2",
+    color: "#be123c",
+    border: "1px solid #fecdd3",
+  },
+
+  passwordStrengthMedium: {
+    background: "#fff7ed",
+    color: "#c2410c",
+    border: "1px solid #fdba74",
+  },
+
+  passwordStrengthGood: {
+    background: "#ecfdf5",
+    color: "#15803d",
+    border: "1px solid #86efac",
+  },
+
+  passwordChecklist: {
+    display: "grid",
+    gap: "0.55rem",
+  },
+
+  passwordChecklistItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.55rem",
+    color: "#334155",
+    fontSize: "0.92rem",
+    lineHeight: 1.5,
+  },
+
+  checkOk: {
+    display: "inline-flex",
+    width: "20px",
+    justifyContent: "center",
+    color: "#15803d",
+    fontWeight: "800",
+  },
+
+  checkPending: {
+    display: "inline-flex",
+    width: "20px",
+    justifyContent: "center",
+    color: "#94a3b8",
+    fontWeight: "800",
+  },
+
+  separator: {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.8rem",
+    margin: "1.2rem 0 1rem",
+  },
+
+  separatorLine: {
+    flex: 1,
+    height: "1px",
+    background: "#e2e8f0",
+  },
+
+  separatorText: {
+    color: "#94a3b8",
+    fontWeight: "700",
+    fontSize: "0.9rem",
   },
 
   footerBox: {
-    marginTop: "1.2rem",
-    borderTop: "1px solid #e5e7eb",
-    paddingTop: "1rem",
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.8rem",
   },
 
-  loginText: {
-    marginBottom: "0.5rem",
+  footerText: {
+    margin: 0,
+    color: "#64748b",
+    textAlign: "center",
+    fontWeight: "600",
   },
 };
 
