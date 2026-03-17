@@ -478,7 +478,7 @@ function ProfilePage() {
             }}
           >
             <div style={styles.heroMain}>
-              <span className="pb-chip">El meu compte</span>
+              <span style={styles.heroKicker}>El meu compte</span>
 
               <div style={styles.heroIdentityRow}>
                 <div style={styles.heroAvatar}>{initials}</div>
@@ -528,33 +528,36 @@ function ProfilePage() {
 
             <aside style={styles.heroAside}>
               <div style={styles.heroAsideCard}>
-                <span style={styles.heroAsideLabel}>Compte actual</span>
-                <div style={styles.heroAsideTop}>
-                  <span style={styles.heroAsideName}>{profile?.nom || "Usuari"}</span>
+                <div style={styles.heroAsideTopRow}>
+                  <div style={styles.heroAsideIdentity}>
+                    <span style={styles.heroAsideLabel}>Compte actual</span>
+                    <span style={styles.heroAsideName}>{profile?.nom || "Usuari"}</span>
+                    <p style={styles.heroAsideEmail}>{profile?.email || "-"}</p>
+                  </div>
+
                   <span
                     className={`pb-badge-pill ${
                       profile?.rol === "admin"
                         ? "pb-badge-pill--blue"
                         : "pb-badge-pill--green"
                     }`}
+                    style={styles.heroRoleBadge}
                   >
                     {roleLabel}
                   </span>
                 </div>
 
-                <p style={styles.heroAsideEmail}>{profile?.email || "-"}</p>
-
-                <div style={styles.heroAsideStats}>
-                  <div style={styles.heroAsideStat}>
-                    <span style={styles.heroAsideStatLabel}>Perfil</span>
-                    <span style={styles.heroAsideStatValue}>
+                <div style={styles.heroAsideMiniStats}>
+                  <div style={styles.heroAsideMiniStat}>
+                    <span style={styles.heroAsideMiniLabel}>Perfil</span>
+                    <span style={styles.heroAsideMiniValue}>
                       {hasProfileChanges ? "Pendent" : "Correcte"}
                     </span>
                   </div>
 
-                  <div style={styles.heroAsideStat}>
-                    <span style={styles.heroAsideStatLabel}>Seguretat</span>
-                    <span style={styles.heroAsideStatValue}>{passwordStrengthText}</span>
+                  <div style={styles.heroAsideMiniStat}>
+                    <span style={styles.heroAsideMiniLabel}>Seguretat</span>
+                    <span style={styles.heroAsideMiniValue}>{passwordStrengthText}</span>
                   </div>
                 </div>
               </div>
@@ -841,16 +844,7 @@ function ProfilePage() {
                         </span>
                       </div>
 
-                      <div
-                        style={{
-                          ...styles.progressTrack,
-                          ...(completedPasswordChecks >= 5
-                            ? styles.progressTrackStrong
-                            : completedPasswordChecks >= 3
-                            ? styles.progressTrackMedium
-                            : styles.progressTrackLow),
-                        }}
-                      >
+                      <div style={styles.progressTrack}>
                         <div
                           style={{
                             ...styles.progressFill,
@@ -945,7 +939,10 @@ function ProfilePage() {
                     ...(isTabletOrMobile ? styles.sidebarStackMobile : {}),
                   }}
                 >
-                  <section className="pb-surface-card" style={styles.sidebarCard}>
+                  <section
+                    className="fade-in-up delay-3 pb-surface-card"
+                    style={styles.sidebarCard}
+                  >
                     <div style={styles.sidebarCardHeader}>
                       <span className="pb-kicker">Resum del compte</span>
                       <h3 style={styles.sidebarTitle}>Vista ràpida</h3>
@@ -961,7 +958,10 @@ function ProfilePage() {
                     </div>
                   </section>
 
-                  <section className="pb-surface-card" style={styles.sidebarCard}>
+                  <section
+                    className="fade-in-up delay-4 pb-surface-card"
+                    style={styles.sidebarCard}
+                  >
                     <div style={styles.sidebarCardHeader}>
                       <span className="pb-kicker">Estat actual</span>
                       <h3 style={styles.sidebarTitle}>Seguiment</h3>
@@ -993,7 +993,10 @@ function ProfilePage() {
                     </div>
                   </section>
 
-                  <section className="pb-surface-card" style={styles.sidebarCard}>
+                  <section
+                    className="fade-in-up delay-4 pb-surface-card"
+                    style={styles.sidebarCard}
+                  >
                     <div style={styles.sidebarCardHeader}>
                       <span className="pb-kicker">Bones pràctiques</span>
                       <h3 style={styles.sidebarTitle}>Recomanacions</h3>
@@ -1034,7 +1037,7 @@ function ProfilePage() {
 
 const styles = {
   page: {
-    padding: "2rem 0 3rem",
+    padding: "1.7rem 0 3rem",
   },
   container: {
     maxWidth: "1240px",
@@ -1048,21 +1051,21 @@ const styles = {
     position: "relative",
     overflow: "hidden",
     borderRadius: "30px",
-    padding: "1.7rem",
-    marginBottom: "1.4rem",
+    padding: "1.35rem",
+    marginBottom: "1.2rem",
     background:
       "linear-gradient(135deg, rgba(15,23,42,0.97), rgba(37,99,235,0.88))",
     boxShadow: "0 28px 60px rgba(37,99,235,0.16)",
     color: "white",
   },
   heroMobile: {
-    padding: "1.2rem",
+    padding: "1.1rem",
     borderRadius: "24px",
   },
   heroLayout: {
     display: "grid",
-    gridTemplateColumns: "1.25fr 0.75fr",
-    gap: "1.1rem",
+    gridTemplateColumns: "1.35fr 0.8fr",
+    gap: "0.95rem",
     alignItems: "stretch",
   },
   heroLayoutMobile: {
@@ -1071,24 +1074,42 @@ const styles = {
   heroMain: {
     display: "flex",
     flexDirection: "column",
-    justifyContent: "space-between",
+    justifyContent: "center",
+  },
+  heroKicker: {
+    alignSelf: "flex-start",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: "34px",
+    padding: "0.35rem 0.9rem",
+    borderRadius: "999px",
+    background: "rgba(255,255,255,0.14)",
+    border: "1px solid rgba(255,255,255,0.16)",
+    color: "rgba(255,255,255,0.94)",
+    fontSize: "0.84rem",
+    fontWeight: "800",
+    letterSpacing: "-0.01em",
+    width: "fit-content",
+    maxWidth: "100%",
+    backdropFilter: "blur(8px)",
   },
   heroIdentityRow: {
     display: "flex",
     alignItems: "flex-start",
-    gap: "1rem",
-    marginTop: "1rem",
+    gap: "0.9rem",
+    marginTop: "0.95rem",
   },
   heroAvatar: {
-    width: "68px",
-    height: "68px",
-    borderRadius: "22px",
+    width: "58px",
+    height: "58px",
+    borderRadius: "18px",
     background: "rgba(255,255,255,0.14)",
     border: "1px solid rgba(255,255,255,0.14)",
     display: "inline-flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: "1.15rem",
+    fontSize: "1rem",
     fontWeight: "800",
     color: "white",
     flexShrink: 0,
@@ -1099,26 +1120,26 @@ const styles = {
   },
   heroTitle: {
     margin: 0,
-    fontSize: "2.7rem",
+    fontSize: "2.25rem",
     lineHeight: 1.02,
     letterSpacing: "-0.03em",
   },
   heroTitleMobile: {
-    fontSize: "2.1rem",
+    fontSize: "1.9rem",
   },
   heroSubtitle: {
-    marginTop: "0.8rem",
+    marginTop: "0.7rem",
     marginBottom: 0,
-    fontSize: "1rem",
-    lineHeight: 1.75,
+    fontSize: "0.98rem",
+    lineHeight: 1.7,
     color: "rgba(255,255,255,0.84)",
-    maxWidth: "760px",
+    maxWidth: "700px",
   },
   heroActions: {
     display: "flex",
-    gap: "0.8rem",
+    gap: "0.7rem",
     flexWrap: "wrap",
-    marginTop: "1.35rem",
+    marginTop: "1.15rem",
   },
   heroActionsMobile: {
     flexDirection: "column",
@@ -1130,68 +1151,82 @@ const styles = {
   heroAsideCard: {
     width: "100%",
     borderRadius: "24px",
-    padding: "1.1rem",
-    background: "rgba(255,255,255,0.12)",
-    border: "1px solid rgba(255,255,255,0.14)",
+    padding: "1rem",
+    background: "rgba(255,255,255,0.11)",
+    border: "1px solid rgba(255,255,255,0.12)",
     backdropFilter: "blur(10px)",
     display: "flex",
     flexDirection: "column",
-    gap: "0.9rem",
+    gap: "0.85rem",
+    justifyContent: "space-between",
+  },
+  heroAsideTopRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    gap: "0.8rem",
+    flexWrap: "wrap",
+  },
+  heroAsideIdentity: {
+    minWidth: 0,
+    flex: "1 1 220px",
   },
   heroAsideLabel: {
-    fontSize: "0.78rem",
+    display: "block",
+    fontSize: "0.76rem",
     fontWeight: "800",
     letterSpacing: "0.05em",
     textTransform: "uppercase",
     color: "rgba(255,255,255,0.72)",
-  },
-  heroAsideTop: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    gap: "0.7rem",
-    flexWrap: "wrap",
+    marginBottom: "0.45rem",
   },
   heroAsideName: {
-    fontSize: "1.1rem",
+    display: "block",
+    fontSize: "1rem",
     fontWeight: "800",
-    lineHeight: 1.4,
+    lineHeight: 1.35,
   },
   heroAsideEmail: {
-    margin: 0,
+    margin: "0.45rem 0 0 0",
     color: "rgba(255,255,255,0.84)",
-    lineHeight: 1.6,
+    lineHeight: 1.55,
     wordBreak: "break-word",
+    fontSize: "0.94rem",
   },
-  heroAsideStats: {
+  heroRoleBadge: {
+    alignSelf: "flex-start",
+  },
+  heroAsideMiniStats: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
-    gap: "0.75rem",
+    gap: "0.7rem",
   },
-  heroAsideStat: {
-    borderRadius: "18px",
-    background: "rgba(255,255,255,0.08)",
-    border: "1px solid rgba(255,255,255,0.10)",
-    padding: "0.85rem",
+  heroAsideMiniStat: {
+    borderRadius: "16px",
+    background: "rgba(255,255,255,0.07)",
+    border: "1px solid rgba(255,255,255,0.09)",
+    padding: "0.8rem 0.9rem",
     display: "flex",
     flexDirection: "column",
-    gap: "0.2rem",
+    gap: "0.22rem",
+    minHeight: "auto",
   },
-  heroAsideStatLabel: {
-    fontSize: "0.76rem",
+  heroAsideMiniLabel: {
+    fontSize: "0.72rem",
     fontWeight: "800",
-    color: "rgba(255,255,255,0.72)",
+    color: "rgba(255,255,255,0.68)",
     textTransform: "uppercase",
-    letterSpacing: "0.04em",
+    letterSpacing: "0.05em",
   },
-  heroAsideStatValue: {
+  heroAsideMiniValue: {
     fontSize: "0.98rem",
     fontWeight: "800",
     color: "#ffffff",
+    lineHeight: 1.3,
   },
   feedbackSection: {
-    marginTop: "1.15rem",
-    marginBottom: "1.15rem",
+    marginTop: "1.05rem",
+    marginBottom: "1.05rem",
   },
   errorWrapper: {
     display: "flex",
@@ -1388,9 +1423,6 @@ const styles = {
     overflow: "hidden",
     background: "#e2e8f0",
   },
-  progressTrackLow: {},
-  progressTrackMedium: {},
-  progressTrackStrong: {},
   progressFill: {
     height: "100%",
     borderRadius: "999px",
