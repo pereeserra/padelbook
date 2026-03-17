@@ -15,6 +15,11 @@ function AdminPage() {
   };
 
   const editSectionRef = useRef(null);
+  const dashboardSectionRef = useRef(null);
+  const reservationsSectionRef = useRef(null);
+  const courtsSectionRef = useRef(null);
+  const feedbackRef = useRef(null);
+
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
 
   const [reservations, setReservations] = useState([]);
@@ -54,11 +59,10 @@ function AdminPage() {
   const scrollToElementWithOffset = (element, offset = 110) => {
     if (!element) return;
 
-    const elementTop = element.getBoundingClientRect().top + window.scrollY;
-    const targetPosition = elementTop - offset;
+    const targetTop = element.getBoundingClientRect().top + window.scrollY - offset;
 
     window.scrollTo({
-      top: targetPosition,
+      top: targetTop,
       behavior: "smooth",
     });
   };
@@ -235,6 +239,10 @@ function AdminPage() {
       setFeedback("");
       setFeedbackAction(null);
     }, 5000);
+
+    setTimeout(() => {
+      scrollToElementWithOffset(feedbackRef.current, 120);
+    }, 60);
   };
 
   const fetchDashboardData = async (
@@ -594,6 +602,15 @@ function AdminPage() {
     },
   ];
 
+  if (loading && !feedback) {
+    return (
+      <LoadingSpinner
+        text="Carregant dades d'administració..."
+        minHeight="260px"
+      />
+    );
+  }
+
   return (
     <div style={styles.page}>
       <div
@@ -609,49 +626,93 @@ function AdminPage() {
             ...(isMobileView ? styles.heroMobile : {}),
           }}
         >
-          <span style={styles.badge}>Administració</span>
-          <h1
+          <div
             style={{
-              ...styles.title,
-              ...(isMobileView ? styles.titleMobile : {}),
+              ...styles.heroGrid,
+              ...(isMobileView ? styles.heroGridMobile : {}),
             }}
           >
-            Panell d'administració
-          </h1>
-          <p style={styles.subtitle}>
-            Gestiona pistes, revisa les reserves del sistema i consulta les
-            estadístiques i l'activitat recent des d'un únic espai.
-          </p>
+            <div>
+              <span style={styles.badge}>Administració</span>
+              <h1
+                style={{
+                  ...styles.title,
+                  ...(isMobileView ? styles.titleMobile : {}),
+                }}
+              >
+                Panell d’administració
+              </h1>
+              <p style={styles.subtitle}>
+                Controla pistes, reserves, estadístiques i activitat recent des d’un
+                espai més complet, més ordenat i amb millor lectura visual.
+              </p>
 
-          {!loading && !error && (
-            <div
-              style={{
-                ...styles.heroStats,
-                ...(isMobileView ? styles.heroStatsMobile : {}),
-              }}
-            >
-              <div style={styles.statCard}>
-                <span style={styles.statNumber}>{courts.length}</span>
-                <span style={styles.statLabel}>Pistes totals</span>
-              </div>
+              <div
+                style={{
+                  ...styles.heroActions,
+                  ...(isMobileView ? styles.heroActionsMobile : {}),
+                }}
+              >
+                <button
+                  type="button"
+                  className="btn btn-light"
+                  onClick={() => scrollToElementWithOffset(dashboardSectionRef.current, 110)}
+                  style={isMobileView ? styles.fullWidthButton : undefined}
+                >
+                  Veure dashboard
+                </button>
 
-              <div style={styles.statCard}>
-                <span style={styles.statNumber}>{availableCourts.length}</span>
-                <span style={styles.statLabel}>Disponibles</span>
-              </div>
+                <button
+                  type="button"
+                  className="btn btn-light"
+                  onClick={() => scrollToElementWithOffset(editSectionRef.current, 110)}
+                  style={isMobileView ? styles.fullWidthButton : undefined}
+                >
+                  Crear o editar pista
+                </button>
 
-              <div style={styles.statCard}>
-                <span style={styles.statNumber}>{coveredCourts.length}</span>
-                <span style={styles.statLabel}>Cobertes</span>
-              </div>
-
-              <div style={styles.statCard}>
-                <span style={styles.statNumber}>{reservations.length}</span>
-                <span style={styles.statLabel}>Reserves del sistema</span>
+                <button
+                  type="button"
+                  className="btn btn-light"
+                  onClick={() => scrollToElementWithOffset(courtsSectionRef.current, 110)}
+                  style={isMobileView ? styles.fullWidthButton : undefined}
+                >
+                  Gestionar pistes
+                </button>
               </div>
             </div>
-          )}
+
+            {!error && (
+              <div style={styles.heroPanel}>
+                <span style={styles.heroPanelLabel}>Resum executiu</span>
+
+                <div style={styles.heroPanelGrid}>
+                  <div style={styles.heroPanelCard}>
+                    <span style={styles.heroPanelCardLabel}>Pistes totals</span>
+                    <span style={styles.heroPanelCardValue}>{courts.length}</span>
+                  </div>
+
+                  <div style={styles.heroPanelCard}>
+                    <span style={styles.heroPanelCardLabel}>Disponibles</span>
+                    <span style={styles.heroPanelCardValue}>{availableCourts.length}</span>
+                  </div>
+
+                  <div style={styles.heroPanelCard}>
+                    <span style={styles.heroPanelCardLabel}>Reserves</span>
+                    <span style={styles.heroPanelCardValue}>{reservations.length}</span>
+                  </div>
+
+                  <div style={styles.heroPanelCard}>
+                    <span style={styles.heroPanelCardLabel}>Cobertes</span>
+                    <span style={styles.heroPanelCardValue}>{coveredCourts.length}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </section>
+
+        <div ref={feedbackRef} />
 
         {feedback && (
           <section className="scale-in" style={styles.feedbackSection}>
@@ -676,10 +737,7 @@ function AdminPage() {
                     type="button"
                     className="btn btn-light btn-sm"
                     onClick={feedbackAction.onClick}
-                    style={{
-                      ...styles.feedbackButton,
-                      ...(isMobileView ? styles.feedbackButtonMobile : {}),
-                    }}
+                    style={isMobileView ? styles.fullWidthButton : undefined}
                   >
                     {feedbackAction.label}
                   </button>
@@ -689,13 +747,12 @@ function AdminPage() {
           </section>
         )}
 
-        {(loading || loadingDashboard) && (
-          <div className="fade-in">
-            <LoadingSpinner
-              text="Carregant dades d'administració..."
-              minHeight="250px"
-            />
-          </div>
+        {loadingDashboard && (
+          <section className="scale-in" style={styles.feedbackSection}>
+            <div style={styles.infoBox}>
+              <p style={styles.infoText}>Actualitzant dashboard administratiu...</p>
+            </div>
+          </section>
         )}
 
         {error && (
@@ -717,9 +774,13 @@ function AdminPage() {
           </section>
         )}
 
-        {!loading && !error && (
+        {!error && (
           <>
-            <section className="fade-in-up delay-1" style={styles.section}>
+            <section
+              ref={dashboardSectionRef}
+              className="fade-in-up delay-1"
+              style={styles.section}
+            >
               <div
                 style={{
                   ...styles.sectionHeader,
@@ -727,6 +788,7 @@ function AdminPage() {
                 }}
               >
                 <div>
+                  <span style={styles.sectionKicker}>Visió general</span>
                   <h2
                     style={{
                       ...styles.sectionTitle,
@@ -736,8 +798,7 @@ function AdminPage() {
                     Dashboard administratiu
                   </h2>
                   <p style={styles.sectionText}>
-                    Visió ràpida de l'estat general de l'aplicació, el volum de
-                    reserves i l'activitat recent.
+                    Visió ràpida de l’estat del sistema, volum de reserves i pistes.
                   </p>
                 </div>
 
@@ -763,7 +824,6 @@ function AdminPage() {
                     style={{
                       ...styles.dashboardStatCard,
                       ...card.accent,
-                      ...(isMobileView ? styles.dashboardStatCardMobile : {}),
                     }}
                   >
                     <div style={styles.dashboardStatTop}>
@@ -792,8 +852,11 @@ function AdminPage() {
                     ...(isMobileView ? styles.analyticsHeaderMobile : {}),
                   }}
                 >
-                  <h3 style={styles.analyticsTitle}>Insights ràpids</h3>
-                  <span style={styles.analyticsBadge}>Resum</span>
+                  <div>
+                    <span style={styles.sectionKicker}>Resum ràpid</span>
+                    <h3 style={styles.analyticsTitle}>Insights clau</h3>
+                  </div>
+                  <span style={styles.analyticsBadge}>Executiu</span>
                 </div>
 
                 <div
@@ -826,7 +889,10 @@ function AdminPage() {
                       ...(isMobileView ? styles.analyticsHeaderMobile : {}),
                     }}
                   >
-                    <h3 style={styles.analyticsTitle}>Reserves per pista</h3>
+                    <div>
+                      <span style={styles.sectionKicker}>Anàlisi</span>
+                      <h3 style={styles.analyticsTitle}>Reserves per pista</h3>
+                    </div>
                     <span style={styles.analyticsBadge}>
                       {statsByCourt.length} pistes
                     </span>
@@ -853,12 +919,7 @@ function AdminPage() {
                             </div>
 
                             <div style={styles.metricBarTrack}>
-                              <div
-                                style={{
-                                  ...styles.metricBarFill,
-                                  width,
-                                }}
-                              />
+                              <div style={{ ...styles.metricBarFill, width }} />
                             </div>
                           </div>
                         );
@@ -878,7 +939,10 @@ function AdminPage() {
                       ...(isMobileView ? styles.analyticsHeaderMobile : {}),
                     }}
                   >
-                    <h3 style={styles.analyticsTitle}>Franges més reservades</h3>
+                    <div>
+                      <span style={styles.sectionKicker}>Demanda</span>
+                      <h3 style={styles.analyticsTitle}>Franges més reservades</h3>
+                    </div>
                     <span style={styles.analyticsBadge}>
                       {statsByTimeslot.length} franges
                     </span>
@@ -905,12 +969,7 @@ function AdminPage() {
                             </div>
 
                             <div style={styles.metricBarTrack}>
-                              <div
-                                style={{
-                                  ...styles.metricBarFillSecondary,
-                                  width,
-                                }}
-                              />
+                              <div style={{ ...styles.metricBarFillSecondary, width }} />
                             </div>
                           </div>
                         );
@@ -939,7 +998,10 @@ function AdminPage() {
                       ...(isMobileView ? styles.analyticsHeaderMobile : {}),
                     }}
                   >
-                    <h3 style={styles.analyticsTitle}>Activitat per dates</h3>
+                    <div>
+                      <span style={styles.sectionKicker}>Tendència</span>
+                      <h3 style={styles.analyticsTitle}>Activitat per dates</h3>
+                    </div>
                     <span style={styles.analyticsBadge}>
                       {recentDateStats.length} registres
                     </span>
@@ -966,12 +1028,7 @@ function AdminPage() {
                             </div>
 
                             <div style={styles.metricBarTrack}>
-                              <div
-                                style={{
-                                  ...styles.metricBarFillTertiary,
-                                  width,
-                                }}
-                              />
+                              <div style={{ ...styles.metricBarFillTertiary, width }} />
                             </div>
                           </div>
                         );
@@ -991,7 +1048,10 @@ function AdminPage() {
                       ...(isMobileView ? styles.analyticsHeaderMobile : {}),
                     }}
                   >
-                    <h3 style={styles.analyticsTitle}>Activitat recent admin</h3>
+                    <div>
+                      <span style={styles.sectionKicker}>Traçabilitat</span>
+                      <h3 style={styles.analyticsTitle}>Activitat recent admin</h3>
+                    </div>
                     <span style={styles.analyticsBadge}>
                       {adminLogs.length} accions
                     </span>
@@ -1047,6 +1107,9 @@ function AdminPage() {
                 }}
               >
                 <div>
+                  <span style={styles.sectionKicker}>
+                    {editingCourtId ? "Edició" : "Creació"}
+                  </span>
                   <h2
                     style={{
                       ...styles.sectionTitle,
@@ -1061,6 +1124,10 @@ function AdminPage() {
                       : "Afegeix una pista nova al sistema i defineix-ne les dades principals."}
                   </p>
                 </div>
+
+                {editingCourtId && (
+                  <span style={styles.editingBadge}>Mode edició</span>
+                )}
               </div>
 
               <div style={styles.sectionCard}>
@@ -1075,7 +1142,11 @@ function AdminPage() {
               </div>
             </section>
 
-            <section className="fade-in-up delay-2" style={styles.section}>
+            <section
+              ref={reservationsSectionRef}
+              className="fade-in-up delay-2"
+              style={styles.section}
+            >
               <div
                 style={{
                   ...styles.sectionHeader,
@@ -1083,6 +1154,7 @@ function AdminPage() {
                 }}
               >
                 <div>
+                  <span style={styles.sectionKicker}>Control operatiu</span>
                   <h2
                     style={{
                       ...styles.sectionTitle,
@@ -1092,13 +1164,11 @@ function AdminPage() {
                     Reserves del sistema
                   </h2>
                   <p style={styles.sectionText}>
-                    Consulta totes les reserves registrades a l'aplicació.
+                    Consulta totes les reserves registrades a l’aplicació.
                   </p>
                 </div>
 
-                <span style={styles.countBadge}>
-                  {reservations.length} reserves
-                </span>
+                <span style={styles.countBadge}>{reservations.length} reserves</span>
               </div>
 
               <div
@@ -1111,7 +1181,11 @@ function AdminPage() {
               </div>
             </section>
 
-            <section className="fade-in-up delay-3" style={styles.section}>
+            <section
+              ref={courtsSectionRef}
+              className="fade-in-up delay-3"
+              style={styles.section}
+            >
               <div
                 style={{
                   ...styles.sectionHeader,
@@ -1119,6 +1193,7 @@ function AdminPage() {
                 }}
               >
                 <div>
+                  <span style={styles.sectionKicker}>Gestió d’espais</span>
                   <h2
                     style={{
                       ...styles.sectionTitle,
@@ -1183,85 +1258,119 @@ const styles = {
     padding: "0 1rem",
   },
   hero: {
-    background: "linear-gradient(135deg, #1e40af, #2563eb)",
-    color: "white",
+    position: "relative",
+    overflow: "hidden",
+    borderRadius: "30px",
     padding: "2rem",
-    borderRadius: "18px",
-    marginBottom: "2rem",
-    boxShadow: "0 10px 24px rgba(37,99,235,0.22)",
+    marginBottom: "1.5rem",
+    background:
+      "linear-gradient(135deg, rgba(15,23,42,0.94), rgba(37,99,235,0.88))",
+    boxShadow: "0 26px 56px rgba(37,99,235,0.16)",
+    color: "white",
   },
   heroMobile: {
-    padding: "1.35rem",
-    borderRadius: "16px",
+    padding: "1.25rem",
+    borderRadius: "24px",
+  },
+  heroGrid: {
+    display: "grid",
+    gridTemplateColumns: "1.08fr 0.92fr",
+    gap: "1.3rem",
+    alignItems: "center",
+  },
+  heroGridMobile: {
+    gridTemplateColumns: "1fr",
   },
   badge: {
     display: "inline-block",
-    backgroundColor: "rgba(255,255,255,0.15)",
-    border: "1px solid rgba(255,255,255,0.18)",
-    padding: "0.45rem 0.8rem",
+    padding: "0.5rem 0.85rem",
     borderRadius: "999px",
-    fontWeight: "700",
+    background: "rgba(255,255,255,0.12)",
+    border: "1px solid rgba(255,255,255,0.14)",
+    fontWeight: "800",
     marginBottom: "1rem",
   },
   title: {
     margin: 0,
-    fontSize: "2.4rem",
+    fontSize: "3rem",
+    lineHeight: 1.03,
   },
   titleMobile: {
-    fontSize: "2rem",
-    lineHeight: 1.15,
+    fontSize: "2.2rem",
   },
   subtitle: {
-    marginTop: "0.75rem",
+    marginTop: "0.9rem",
     marginBottom: 0,
     fontSize: "1.05rem",
-    lineHeight: 1.7,
-    opacity: 0.95,
+    lineHeight: 1.75,
+    color: "rgba(255,255,255,0.84)",
     maxWidth: "760px",
   },
-  heroStats: {
+  heroActions: {
+    display: "flex",
+    gap: "0.8rem",
+    flexWrap: "wrap",
+    marginTop: "1.4rem",
+  },
+  heroActionsMobile: {
+    flexDirection: "column",
+    alignItems: "stretch",
+  },
+  heroPanel: {
+    background: "rgba(255,255,255,0.12)",
+    border: "1px solid rgba(255,255,255,0.14)",
+    borderRadius: "24px",
+    padding: "1.15rem",
+    backdropFilter: "blur(10px)",
+  },
+  heroPanelLabel: {
+    display: "block",
+    fontSize: "0.82rem",
+    fontWeight: "800",
+    opacity: 0.82,
+    marginBottom: "0.85rem",
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
+  },
+  heroPanelGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-    gap: "0.9rem",
-    marginTop: "1.5rem",
-  },
-  heroStatsMobile: {
     gridTemplateColumns: "1fr 1fr",
-    gap: "0.75rem",
+    gap: "0.7rem",
   },
-  statCard: {
-    backgroundColor: "rgba(255,255,255,0.12)",
-    border: "1px solid rgba(255,255,255,0.16)",
-    borderRadius: "16px",
-    padding: "1rem",
+  heroPanelCard: {
+    background: "rgba(255,255,255,0.08)",
+    border: "1px solid rgba(255,255,255,0.10)",
+    borderRadius: "18px",
+    padding: "0.9rem",
     display: "flex",
     flexDirection: "column",
-    gap: "0.3rem",
+    gap: "0.25rem",
   },
-  statNumber: {
-    fontSize: "1.4rem",
+  heroPanelCardLabel: {
+    fontSize: "0.78rem",
     fontWeight: "800",
+    opacity: 0.8,
   },
-  statLabel: {
-    opacity: 0.92,
-    lineHeight: 1.5,
+  heroPanelCardValue: {
+    fontWeight: "800",
+    lineHeight: 1.55,
   },
   feedbackSection: {
     marginTop: "1.25rem",
     marginBottom: "1.25rem",
   },
   feedbackBox: {
-    borderRadius: "16px",
+    borderRadius: "18px",
     padding: "1rem 1.1rem",
     border: "1px solid transparent",
-    boxShadow: "0 8px 22px rgba(0,0,0,0.04)",
+    boxShadow: "0 10px 24px rgba(15,23,42,0.04)",
   },
   feedbackSuccess: {
-    backgroundColor: "#ecfdf5",
+    background: "#ecfdf5",
     borderColor: "#86efac",
   },
   feedbackError: {
-    backgroundColor: "#fff1f2",
+    background: "#fff1f2",
     borderColor: "#fecdd3",
   },
   feedbackRow: {
@@ -1277,25 +1386,30 @@ const styles = {
   },
   feedbackText: {
     margin: 0,
-    fontWeight: "700",
+    fontWeight: "800",
     lineHeight: 1.6,
     color: "#0f172a",
   },
-  feedbackButton: {
-    whiteSpace: "nowrap",
+  infoBox: {
+    background: "#eff6ff",
+    border: "1px solid #bfdbfe",
+    borderRadius: "18px",
+    padding: "1rem 1.1rem",
   },
-  feedbackButtonMobile: {
-    width: "100%",
+  infoText: {
+    margin: 0,
+    color: "#1e40af",
+    fontWeight: "800",
   },
   errorBox: {
-    backgroundColor: "#fff1f2",
+    background: "#fff1f2",
     border: "1px solid #fecdd3",
-    borderRadius: "18px",
+    borderRadius: "24px",
     padding: "1.25rem",
     display: "flex",
     flexDirection: "column",
     gap: "0.9rem",
-    boxShadow: "0 8px 22px rgba(0,0,0,0.04)",
+    boxShadow: "0 10px 24px rgba(15,23,42,0.04)",
   },
   errorTitle: {
     margin: 0,
@@ -1323,6 +1437,16 @@ const styles = {
   sectionHeaderMobile: {
     alignItems: "stretch",
   },
+  sectionKicker: {
+    display: "inline-block",
+    marginBottom: "0.45rem",
+    padding: "0.38rem 0.7rem",
+    borderRadius: "999px",
+    background: "rgba(37,99,235,0.08)",
+    color: "#1d4ed8",
+    fontWeight: "800",
+    fontSize: "0.8rem",
+  },
   sectionTitle: {
     margin: 0,
     fontSize: "1.9rem",
@@ -1335,25 +1459,37 @@ const styles = {
     marginTop: "0.45rem",
     marginBottom: 0,
     color: "#475569",
-    lineHeight: 1.65,
+    lineHeight: 1.7,
+    maxWidth: "780px",
   },
   countBadge: {
-    backgroundColor: "#dbeafe",
+    background: "#eff6ff",
     color: "#1d4ed8",
-    padding: "0.45rem 0.8rem",
+    padding: "0.5rem 0.85rem",
     borderRadius: "999px",
-    fontWeight: "700",
-    fontSize: "0.95rem",
+    fontWeight: "800",
+    fontSize: "0.9rem",
+    border: "1px solid #dbeafe",
+  },
+  editingBadge: {
+    background: "#fff7ed",
+    color: "#c2410c",
+    padding: "0.5rem 0.85rem",
+    borderRadius: "999px",
+    fontWeight: "800",
+    fontSize: "0.9rem",
+    border: "1px solid #fdba74",
   },
   fullWidthButton: {
     width: "100%",
   },
   sectionCard: {
-    backgroundColor: "white",
-    border: "1px solid #e5e7eb",
-    borderRadius: "18px",
+    background: "rgba(255,255,255,0.84)",
+    border: "1px solid rgba(148,163,184,0.18)",
+    borderRadius: "24px",
     padding: "1.25rem",
-    boxShadow: "0 8px 22px rgba(0,0,0,0.06)",
+    boxShadow: "0 16px 34px rgba(15,23,42,0.05)",
+    backdropFilter: "blur(10px)",
   },
   sectionCardMobile: {
     padding: "1rem",
@@ -1369,17 +1505,13 @@ const styles = {
     gap: "0.8rem",
   },
   dashboardStatCard: {
-    borderRadius: "18px",
+    borderRadius: "22px",
     padding: "1.15rem",
-    boxShadow: "0 8px 22px rgba(0,0,0,0.06)",
+    boxShadow: "0 12px 28px rgba(15,23,42,0.05)",
     display: "flex",
     flexDirection: "column",
     gap: "0.7rem",
-    border: "1px solid #e5e7eb",
-    transition: "transform 0.18s ease, box-shadow 0.18s ease",
-  },
-  dashboardStatCardMobile: {
-    padding: "1rem",
+    border: "1px solid rgba(148,163,184,0.12)",
   },
   dashboardStatTop: {
     display: "flex",
@@ -1387,19 +1519,19 @@ const styles = {
     gap: "0.7rem",
   },
   dashboardStatIcon: {
-    width: "40px",
-    height: "40px",
-    borderRadius: "12px",
+    width: "42px",
+    height: "42px",
+    borderRadius: "14px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: "1.1rem",
-    backgroundColor: "rgba(255,255,255,0.7)",
+    fontSize: "1.15rem",
+    backgroundColor: "rgba(255,255,255,0.75)",
     boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.45)",
   },
   dashboardStatLabel: {
     color: "#334155",
-    fontWeight: "700",
+    fontWeight: "800",
     lineHeight: 1.5,
   },
   dashboardStatValue: {
@@ -1438,9 +1570,9 @@ const styles = {
     gap: "0.8rem",
   },
   insightCard: {
-    backgroundColor: "#f8fafc",
+    background: "#f8fafc",
     border: "1px solid #e5e7eb",
-    borderRadius: "16px",
+    borderRadius: "18px",
     padding: "1rem",
     display: "flex",
     flexDirection: "column",
@@ -1448,8 +1580,8 @@ const styles = {
   },
   insightLabel: {
     color: "#64748b",
-    fontSize: "0.9rem",
-    fontWeight: "700",
+    fontSize: "0.88rem",
+    fontWeight: "800",
   },
   insightValue: {
     color: "#0f172a",
@@ -1482,12 +1614,13 @@ const styles = {
     color: "#0f172a",
   },
   analyticsBadge: {
-    backgroundColor: "#eff6ff",
+    background: "#eff6ff",
     color: "#1d4ed8",
     padding: "0.35rem 0.7rem",
     borderRadius: "999px",
-    fontWeight: "700",
+    fontWeight: "800",
     fontSize: "0.85rem",
+    border: "1px solid #dbeafe",
   },
   metricList: {
     display: "flex",
@@ -1518,32 +1651,28 @@ const styles = {
   metricValue: {
     color: "#334155",
     fontWeight: "800",
-    whiteSpace: "nowrap",
   },
   metricBarTrack: {
     width: "100%",
-    height: "10px",
+    height: "11px",
+    background: "#e2e8f0",
     borderRadius: "999px",
-    backgroundColor: "#e5e7eb",
     overflow: "hidden",
   },
   metricBarFill: {
     height: "100%",
+    background: "linear-gradient(90deg, #2563eb, #1d4ed8)",
     borderRadius: "999px",
-    background: "linear-gradient(90deg, #2563eb, #60a5fa)",
-    transition: "width 0.45s ease",
   },
   metricBarFillSecondary: {
     height: "100%",
+    background: "linear-gradient(90deg, #10b981, #059669)",
     borderRadius: "999px",
-    background: "linear-gradient(90deg, #0f766e, #2dd4bf)",
-    transition: "width 0.45s ease",
   },
   metricBarFillTertiary: {
     height: "100%",
+    background: "linear-gradient(90deg, #f59e0b, #d97706)",
     borderRadius: "999px",
-    background: "linear-gradient(90deg, #7c3aed, #a78bfa)",
-    transition: "width 0.45s ease",
   },
   emptyAnalyticsText: {
     margin: 0,
@@ -1551,57 +1680,57 @@ const styles = {
     lineHeight: 1.7,
   },
   logsList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "0.9rem",
+    display: "grid",
+    gap: "0.85rem",
   },
   logItem: {
-    border: "1px solid #e5e7eb",
-    borderRadius: "14px",
+    background: "#f8fafc",
+    border: "1px solid #e2e8f0",
+    borderRadius: "18px",
     padding: "1rem",
-    backgroundColor: "#f8fafc",
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.5rem",
   },
   logTopRow: {
     display: "flex",
     justifyContent: "space-between",
-    gap: "0.75rem",
+    gap: "0.8rem",
     alignItems: "center",
     flexWrap: "wrap",
-    marginBottom: "0.45rem",
   },
   logTopRowMobile: {
     alignItems: "flex-start",
     flexDirection: "column",
-    gap: "0.4rem",
   },
   logActionBadge: {
-    backgroundColor: "#dbeafe",
+    background: "#eff6ff",
     color: "#1d4ed8",
     padding: "0.35rem 0.7rem",
     borderRadius: "999px",
     fontWeight: "800",
     fontSize: "0.8rem",
+    border: "1px solid #dbeafe",
   },
   logDate: {
     color: "#64748b",
-    fontSize: "0.85rem",
-    fontWeight: "600",
+    fontSize: "0.84rem",
+    fontWeight: "700",
   },
   logAdmin: {
     margin: 0,
     color: "#0f172a",
-    fontWeight: "700",
+    fontWeight: "800",
   },
   logDetails: {
-    margin: "0.4rem 0 0 0",
+    margin: 0,
     color: "#475569",
-    lineHeight: 1.6,
+    lineHeight: 1.65,
   },
   cards: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
     gap: "1rem",
-    alignItems: "stretch",
   },
   cardsMobile: {
     gridTemplateColumns: "1fr",

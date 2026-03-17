@@ -4,6 +4,8 @@ import LoadingSpinner from "../components/LoadingSpinner";
 
 function ProfilePage() {
   const topFeedbackRef = useRef(null);
+  const profileFormRef = useRef(null);
+  const passwordFormRef = useRef(null);
   const feedbackTimeoutRef = useRef(null);
 
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
@@ -54,14 +56,13 @@ function ProfilePage() {
 
   const normalizeSpaces = (value) => value.trim().replace(/\s+/g, " ");
 
-  const scrollToFeedback = () => {
-    if (!topFeedbackRef.current) return;
+  const scrollToElementWithOffset = (element, offset = 120) => {
+    if (!element) return;
 
-    const top =
-      topFeedbackRef.current.getBoundingClientRect().top + window.scrollY - 140;
+    const targetTop = element.getBoundingClientRect().top + window.scrollY - offset;
 
     window.scrollTo({
-      top,
+      top: targetTop,
       behavior: "smooth",
     });
   };
@@ -79,7 +80,7 @@ function ProfilePage() {
     }, 4500);
 
     setTimeout(() => {
-      scrollToFeedback();
+      scrollToElementWithOffset(topFeedbackRef.current, 130);
     }, 80);
   };
 
@@ -126,14 +127,14 @@ function ProfilePage() {
     return profile.rol === "admin" ? "Administrador" : "Usuari";
   }, [profile]);
 
-  const normalizedCurrentProfile = useMemo(() => {
+  const normalizedProfile = useMemo(() => {
     return {
       nom: normalizeSpaces(profile?.nom || ""),
       email: (profile?.email || "").trim().toLowerCase(),
     };
   }, [profile]);
 
-  const normalizedFormData = useMemo(() => {
+  const normalizedForm = useMemo(() => {
     return {
       nom: normalizeSpaces(formData.nom || ""),
       email: (formData.email || "").trim().toLowerCase(),
@@ -144,10 +145,15 @@ function ProfilePage() {
     if (!profile) return false;
 
     return (
-      normalizedFormData.nom !== normalizedCurrentProfile.nom ||
-      normalizedFormData.email !== normalizedCurrentProfile.email
+      normalizedProfile.nom !== normalizedForm.nom ||
+      normalizedProfile.email !== normalizedForm.email
     );
-  }, [profile, normalizedFormData, normalizedCurrentProfile]);
+  }, [profile, normalizedProfile, normalizedForm]);
+
+  const firstName = useMemo(() => {
+    if (!profile?.nom) return "Usuari";
+    return profile.nom.split(" ")[0];
+  }, [profile]);
 
   const passwordChecks = useMemo(() => {
     const newPassword = passwordData.newPassword;
@@ -166,12 +172,35 @@ function ProfilePage() {
   }, [passwordData]);
 
   const completedPasswordChecks = Object.values(passwordChecks).filter(Boolean).length;
+
   const passwordStrengthText =
     completedPasswordChecks <= 2
       ? "Baixa"
       : completedPasswordChecks <= 4
       ? "Mitjana"
       : "Alta";
+
+  const passwordStrengthStyle =
+    completedPasswordChecks >= 5
+      ? styles.securityStrong
+      : completedPasswordChecks >= 3
+      ? styles.securityMedium
+      : styles.securityLow;
+
+  const accountSummary = [
+    {
+      label: "Nom complet",
+      value: profile?.nom || "-",
+    },
+    {
+      label: "Correu",
+      value: profile?.email || "-",
+    },
+    {
+      label: "Rol",
+      value: roleLabel,
+    },
+  ];
 
   const handleProfileChange = (e) => {
     const { name, value } = e.target;
@@ -403,43 +432,66 @@ function ProfilePage() {
             ...(isMobileView ? styles.heroMobile : {}),
           }}
         >
-          <span style={styles.badge}>El meu compte</span>
-          <h1
+          <div
             style={{
-              ...styles.title,
-              ...(isMobileView ? styles.titleMobile : {}),
+              ...styles.heroGrid,
+              ...(isMobileView ? styles.heroGridMobile : {}),
             }}
           >
-            Perfil d’usuari
-          </h1>
-          <p style={styles.subtitle}>
-            Consulta la informació del teu compte, actualitza les teves dades i
-            canvia la contrasenya des d’un únic espai.
-          </p>
+            <div>
+              <span style={styles.badge}>El meu compte</span>
+              <h1
+                style={{
+                  ...styles.title,
+                  ...(isMobileView ? styles.titleMobile : {}),
+                }}
+              >
+                Hola, {firstName}
+              </h1>
+              <p style={styles.subtitle}>
+                Gestiona les dades del teu compte, actualitza el correu i reforça
+                la seguretat de la sessió des d’un entorn més clar i més complet.
+              </p>
 
-          {profile && (
-            <div
-              style={{
-                ...styles.heroStats,
-                ...(isMobileView ? styles.heroStatsMobile : {}),
-              }}
-            >
-              <div style={styles.statCard}>
-                <span style={styles.statLabel}>Nom</span>
-                <span style={styles.statValue}>{profile.nom}</span>
-              </div>
+              <div
+                style={{
+                  ...styles.heroActions,
+                  ...(isMobileView ? styles.heroActionsMobile : {}),
+                }}
+              >
+                <button
+                  type="button"
+                  className="btn btn-light"
+                  onClick={() => scrollToElementWithOffset(profileFormRef.current, 140)}
+                  style={isMobileView ? styles.fullWidthButton : undefined}
+                >
+                  Editar perfil
+                </button>
 
-              <div style={styles.statCard}>
-                <span style={styles.statLabel}>Email</span>
-                <span style={styles.statValue}>{profile.email}</span>
-              </div>
-
-              <div style={styles.statCard}>
-                <span style={styles.statLabel}>Rol</span>
-                <span style={styles.statValue}>{roleLabel}</span>
+                <button
+                  type="button"
+                  className="btn btn-light"
+                  onClick={() => scrollToElementWithOffset(passwordFormRef.current, 140)}
+                  style={isMobileView ? styles.fullWidthButton : undefined}
+                >
+                  Canviar contrasenya
+                </button>
               </div>
             </div>
-          )}
+
+            <div style={styles.heroPanel}>
+              <span style={styles.heroPanelLabel}>Estat del compte</span>
+
+              <div style={styles.heroPanelGrid}>
+                {accountSummary.map((item) => (
+                  <div key={item.label} style={styles.heroPanelCard}>
+                    <span style={styles.heroPanelCardLabel}>{item.label}</span>
+                    <span style={styles.heroPanelCardValue}>{item.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </section>
 
         <div ref={topFeedbackRef} />
@@ -475,294 +527,341 @@ function ProfilePage() {
             </div>
           </section>
         ) : (
-          <div
-            style={{
-              ...styles.grid,
-              ...(isMobileView ? styles.gridMobile : {}),
-            }}
-          >
-            <section className="fade-in-up delay-1" style={styles.card}>
-              <div style={styles.cardHeader}>
-                <div>
-                  <h2 style={styles.cardTitle}>Informació del compte</h2>
-                  <p style={styles.cardText}>
-                    Modifica el teu nom i el correu electrònic associat al compte.
-                  </p>
-                </div>
-
-                <span
-                  style={{
-                    ...styles.statusBadge,
-                    ...(hasProfileChanges
-                      ? styles.statusBadgePending
-                      : styles.statusBadgeStable),
-                  }}
-                >
-                  {hasProfileChanges ? "Canvis pendents" : "Sense canvis"}
+          <>
+            <section
+              className="fade-in-up delay-1"
+              style={{
+                ...styles.summaryGrid,
+                ...(isMobileView ? styles.summaryGridMobile : {}),
+              }}
+            >
+              <article style={styles.summaryCard}>
+                <span style={styles.summaryLabel}>Canvis pendents</span>
+                <span style={styles.summaryValue}>
+                  {hasProfileChanges ? "Sí" : "No"}
                 </span>
-              </div>
-
-              <form onSubmit={handleUpdateProfile} style={styles.form}>
-                <div style={styles.field}>
-                  <label htmlFor="nom" style={styles.label}>
-                    Nom i llinatges
-                  </label>
-                  <input
-                    id="nom"
-                    name="nom"
-                    type="text"
-                    value={formData.nom}
-                    onChange={handleProfileChange}
-                    placeholder="Ex: Pere Serra"
-                    style={styles.input}
-                    required
-                  />
-                </div>
-
-                <div style={styles.field}>
-                  <label htmlFor="email" style={styles.label}>
-                    Correu electrònic
-                  </label>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleProfileChange}
-                    placeholder="exemple@correu.com"
-                    style={styles.input}
-                    required
-                  />
-                </div>
-
-                <p style={styles.helperNote}>
-                  Els canvis s’actualitzaran també a la sessió actual.
+                <p style={styles.summaryText}>
+                  {hasProfileChanges
+                    ? "Hi ha dades modificades pendents de guardar."
+                    : "El perfil actual està sincronitzat."}
                 </p>
+              </article>
 
-                <div
-                  style={{
-                    ...styles.actions,
-                    ...(isMobileView ? styles.actionsMobile : {}),
-                  }}
-                >
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    disabled={savingProfile || !hasProfileChanges}
-                    style={isMobileView ? styles.fullWidthButton : undefined}
-                  >
-                    {savingProfile ? "Guardant canvis..." : "Guardar canvis"}
-                  </button>
+              <article style={styles.summaryCard}>
+                <span style={styles.summaryLabel}>Seguretat</span>
+                <span style={styles.summaryValue}>Contrasenya</span>
+                <p style={styles.summaryText}>
+                  Pots actualitzar-la quan vulguis amb validació en temps real.
+                </p>
+              </article>
 
-                  <button
-                    type="button"
-                    className="btn btn-light"
-                    onClick={handleResetProfileChanges}
-                    disabled={!hasProfileChanges || savingProfile}
-                    style={isMobileView ? styles.fullWidthButton : undefined}
-                  >
-                    Restablir
-                  </button>
-                </div>
-              </form>
+              <article style={styles.summaryCard}>
+                <span style={styles.summaryLabel}>Sessió</span>
+                <span style={styles.summaryValue}>Activa</span>
+                <p style={styles.summaryText}>
+                  Els canvis es reflecteixen també a la sessió actual.
+                </p>
+              </article>
             </section>
 
-            <section className="fade-in-up delay-2" style={styles.card}>
-              <div style={styles.cardHeader}>
-                <div>
-                  <h2 style={styles.cardTitle}>Canviar contrasenya</h2>
-                  <p style={styles.cardText}>
-                    Introdueix la contrasenya actual i defineix-ne una de nova amb
-                    els requisits de seguretat necessaris.
-                  </p>
-                </div>
-              </div>
+            <div
+              style={{
+                ...styles.grid,
+                ...(isMobileView ? styles.gridMobile : {}),
+              }}
+            >
+              <section
+                ref={profileFormRef}
+                className="fade-in-up delay-2"
+                style={styles.card}
+              >
+                <div style={styles.cardHeader}>
+                  <div>
+                    <span style={styles.cardKicker}>Dades personals</span>
+                    <h2 style={styles.cardTitle}>Informació del compte</h2>
+                    <p style={styles.cardText}>
+                      Modifica el teu nom complet i el correu electrònic associat.
+                    </p>
+                  </div>
 
-              <form onSubmit={handleChangePassword} style={styles.form}>
-                <div style={styles.field}>
-                  <label htmlFor="currentPassword" style={styles.label}>
-                    Contrasenya actual
-                  </label>
-
-                  <div
+                  <span
                     style={{
-                      ...styles.passwordWrapper,
-                      ...(isMobileView ? styles.passwordWrapperMobile : {}),
+                      ...styles.statusBadge,
+                      ...(hasProfileChanges
+                        ? styles.statusBadgePending
+                        : styles.statusBadgeStable),
                     }}
                   >
+                    {hasProfileChanges ? "Canvis pendents" : "Sense canvis"}
+                  </span>
+                </div>
+
+                <form onSubmit={handleUpdateProfile} style={styles.form}>
+                  <div style={styles.field}>
+                    <label htmlFor="nom" style={styles.label}>
+                      Nom i llinatges
+                    </label>
                     <input
-                      id="currentPassword"
-                      name="currentPassword"
-                      type={showCurrentPassword ? "text" : "password"}
-                      value={passwordData.currentPassword}
-                      onChange={handlePasswordInputChange}
-                      onKeyDown={handleCapsLockCurrent}
-                      onKeyUp={handleCapsLockCurrent}
-                      placeholder="Introdueix la contrasenya actual"
+                      id="nom"
+                      name="nom"
+                      type="text"
+                      value={formData.nom}
+                      onChange={handleProfileChange}
+                      placeholder="Ex: Pere Serra"
                       style={styles.input}
                       required
                     />
-
-                    <button
-                      type="button"
-                      style={{
-                        ...styles.showButton,
-                        ...(isMobileView ? styles.showButtonMobile : {}),
-                      }}
-                      onClick={() => setShowCurrentPassword((prev) => !prev)}
-                    >
-                      {showCurrentPassword ? "Ocultar" : "Mostrar"}
-                    </button>
                   </div>
 
-                  {capsLockCurrent && (
-                    <span style={styles.capsWarning}>
-                      ⚠️ Tens el bloqueig de majúscules activat
-                    </span>
-                  )}
-                </div>
-
-                <div style={styles.field}>
-                  <label htmlFor="newPassword" style={styles.label}>
-                    Nova contrasenya
-                  </label>
-
-                  <div
-                    style={{
-                      ...styles.passwordWrapper,
-                      ...(isMobileView ? styles.passwordWrapperMobile : {}),
-                    }}
-                  >
+                  <div style={styles.field}>
+                    <label htmlFor="email" style={styles.label}>
+                      Correu electrònic
+                    </label>
                     <input
-                      id="newPassword"
-                      name="newPassword"
-                      type={showNewPassword ? "text" : "password"}
-                      value={passwordData.newPassword}
-                      onChange={handlePasswordInputChange}
-                      onKeyDown={handleCapsLockNew}
-                      onKeyUp={handleCapsLockNew}
-                      placeholder="Mínim 8 caràcters"
+                      id="email"
+                      name="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleProfileChange}
+                      placeholder="exemple@correu.com"
                       style={styles.input}
                       required
                     />
+                  </div>
+
+                  <div style={styles.tipBox}>
+                    <span style={styles.tipTitle}>Consell</span>
+                    <p style={styles.tipText}>
+                      Usa un correu vàlid i un nom complet real per mantenir el
+                      compte ben identificat.
+                    </p>
+                  </div>
+
+                  <div
+                    style={{
+                      ...styles.actions,
+                      ...(isMobileView ? styles.actionsMobile : {}),
+                    }}
+                  >
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={savingProfile || !hasProfileChanges}
+                      style={isMobileView ? styles.fullWidthButton : undefined}
+                    >
+                      {savingProfile ? "Guardant canvis..." : "Guardar canvis"}
+                    </button>
 
                     <button
                       type="button"
-                      style={{
-                        ...styles.showButton,
-                        ...(isMobileView ? styles.showButtonMobile : {}),
-                      }}
-                      onClick={() => setShowNewPassword((prev) => !prev)}
+                      className="btn btn-light"
+                      onClick={handleResetProfileChanges}
+                      disabled={!hasProfileChanges || savingProfile}
+                      style={isMobileView ? styles.fullWidthButton : undefined}
                     >
-                      {showNewPassword ? "Ocultar" : "Mostrar"}
+                      Restablir
                     </button>
                   </div>
+                </form>
+              </section>
 
-                  {capsLockNew && (
-                    <span style={styles.capsWarning}>
-                      ⚠️ Tens el bloqueig de majúscules activat
-                    </span>
-                  )}
+              <section
+                ref={passwordFormRef}
+                className="fade-in-up delay-3"
+                style={styles.card}
+              >
+                <div style={styles.cardHeader}>
+                  <div>
+                    <span style={styles.cardKicker}>Seguretat</span>
+                    <h2 style={styles.cardTitle}>Canviar contrasenya</h2>
+                    <p style={styles.cardText}>
+                      Crea una contrasenya més robusta amb ajuda visual en temps real.
+                    </p>
+                  </div>
+
+                  <span
+                    style={{
+                      ...styles.securityBadge,
+                      ...passwordStrengthStyle,
+                    }}
+                  >
+                    Seguretat: {passwordStrengthText}
+                  </span>
                 </div>
 
-                <div style={styles.passwordPanel}>
-                  <div style={styles.passwordPanelHeader}>
-                    <span style={styles.passwordPanelTitle}>
-                      Requisits de la nova contrasenya
-                    </span>
+                <form onSubmit={handleChangePassword} style={styles.form}>
+                  <div style={styles.field}>
+                    <label htmlFor="currentPassword" style={styles.label}>
+                      Contrasenya actual
+                    </label>
 
-                    <span
+                    <div
                       style={{
-                        ...styles.passwordStrengthBadge,
-                        ...(completedPasswordChecks >= 5
-                          ? styles.passwordStrengthGood
-                          : completedPasswordChecks >= 3
-                          ? styles.passwordStrengthMedium
-                          : styles.passwordStrengthLow),
+                        ...styles.passwordWrapper,
+                        ...(isMobileView ? styles.passwordWrapperMobile : {}),
                       }}
                     >
-                      Seguretat: {passwordStrengthText}
-                    </span>
+                      <input
+                        id="currentPassword"
+                        name="currentPassword"
+                        type={showCurrentPassword ? "text" : "password"}
+                        value={passwordData.currentPassword}
+                        onChange={handlePasswordInputChange}
+                        onKeyDown={handleCapsLockCurrent}
+                        onKeyUp={handleCapsLockCurrent}
+                        placeholder="Introdueix la contrasenya actual"
+                        style={styles.input}
+                        required
+                      />
+
+                      <button
+                        type="button"
+                        style={{
+                          ...styles.showButton,
+                          ...(isMobileView ? styles.showButtonMobile : {}),
+                        }}
+                        onClick={() => setShowCurrentPassword((prev) => !prev)}
+                      >
+                        {showCurrentPassword ? "Ocultar" : "Mostrar"}
+                      </button>
+                    </div>
+
+                    {capsLockCurrent && (
+                      <span style={styles.capsWarning}>
+                        ⚠️ Tens el bloqueig de majúscules activat
+                      </span>
+                    )}
                   </div>
 
-                  <div style={styles.passwordChecklist}>
-                    <div style={styles.passwordChecklistItem}>
-                      <span style={passwordChecks.minLength ? styles.checkOk : styles.checkPending}>
-                        {passwordChecks.minLength ? "✓" : "•"}
-                      </span>
-                      <span>Almenys 8 caràcters</span>
+                  <div style={styles.field}>
+                    <label htmlFor="newPassword" style={styles.label}>
+                      Nova contrasenya
+                    </label>
+
+                    <div
+                      style={{
+                        ...styles.passwordWrapper,
+                        ...(isMobileView ? styles.passwordWrapperMobile : {}),
+                      }}
+                    >
+                      <input
+                        id="newPassword"
+                        name="newPassword"
+                        type={showNewPassword ? "text" : "password"}
+                        value={passwordData.newPassword}
+                        onChange={handlePasswordInputChange}
+                        onKeyDown={handleCapsLockNew}
+                        onKeyUp={handleCapsLockNew}
+                        placeholder="Mínim 8 caràcters"
+                        style={styles.input}
+                        required
+                      />
+
+                      <button
+                        type="button"
+                        style={{
+                          ...styles.showButton,
+                          ...(isMobileView ? styles.showButtonMobile : {}),
+                        }}
+                        onClick={() => setShowNewPassword((prev) => !prev)}
+                      >
+                        {showNewPassword ? "Ocultar" : "Mostrar"}
+                      </button>
                     </div>
 
-                    <div style={styles.passwordChecklistItem}>
-                      <span style={passwordChecks.lowercase ? styles.checkOk : styles.checkPending}>
-                        {passwordChecks.lowercase ? "✓" : "•"}
+                    {capsLockNew && (
+                      <span style={styles.capsWarning}>
+                        ⚠️ Tens el bloqueig de majúscules activat
                       </span>
-                      <span>Inclou una lletra minúscula</span>
+                    )}
+                  </div>
+
+                  <div style={styles.checklistPanel}>
+                    <div style={styles.checklistHeader}>
+                      <span style={styles.checklistTitle}>
+                        Requisits de la nova contrasenya
+                      </span>
                     </div>
 
-                    <div style={styles.passwordChecklistItem}>
-                      <span style={passwordChecks.uppercase ? styles.checkOk : styles.checkPending}>
-                        {passwordChecks.uppercase ? "✓" : "•"}
-                      </span>
-                      <span>Inclou una lletra majúscula</span>
-                    </div>
+                    <div style={styles.checklist}>
+                      <div style={styles.checkItem}>
+                        <span style={passwordChecks.minLength ? styles.checkOk : styles.checkPending}>
+                          {passwordChecks.minLength ? "✓" : "•"}
+                        </span>
+                        <span>Almenys 8 caràcters</span>
+                      </div>
 
-                    <div style={styles.passwordChecklistItem}>
-                      <span style={passwordChecks.number ? styles.checkOk : styles.checkPending}>
-                        {passwordChecks.number ? "✓" : "•"}
-                      </span>
-                      <span>Inclou un número</span>
-                    </div>
+                      <div style={styles.checkItem}>
+                        <span style={passwordChecks.lowercase ? styles.checkOk : styles.checkPending}>
+                          {passwordChecks.lowercase ? "✓" : "•"}
+                        </span>
+                        <span>Inclou una minúscula</span>
+                      </div>
 
-                    <div style={styles.passwordChecklistItem}>
-                      <span style={passwordChecks.symbol ? styles.checkOk : styles.checkPending}>
-                        {passwordChecks.symbol ? "✓" : "•"}
-                      </span>
-                      <span>Inclou un símbol</span>
-                    </div>
+                      <div style={styles.checkItem}>
+                        <span style={passwordChecks.uppercase ? styles.checkOk : styles.checkPending}>
+                          {passwordChecks.uppercase ? "✓" : "•"}
+                        </span>
+                        <span>Inclou una majúscula</span>
+                      </div>
 
-                    <div style={styles.passwordChecklistItem}>
-                      <span style={passwordChecks.different ? styles.checkOk : styles.checkPending}>
-                        {passwordChecks.different ? "✓" : "•"}
-                      </span>
-                      <span>Ha de ser diferent de l’actual</span>
+                      <div style={styles.checkItem}>
+                        <span style={passwordChecks.number ? styles.checkOk : styles.checkPending}>
+                          {passwordChecks.number ? "✓" : "•"}
+                        </span>
+                        <span>Inclou un número</span>
+                      </div>
+
+                      <div style={styles.checkItem}>
+                        <span style={passwordChecks.symbol ? styles.checkOk : styles.checkPending}>
+                          {passwordChecks.symbol ? "✓" : "•"}
+                        </span>
+                        <span>Inclou un símbol</span>
+                      </div>
+
+                      <div style={styles.checkItem}>
+                        <span style={passwordChecks.different ? styles.checkOk : styles.checkPending}>
+                          {passwordChecks.different ? "✓" : "•"}
+                        </span>
+                        <span>Ha de ser diferent de l’actual</span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div
-                  style={{
-                    ...styles.actions,
-                    ...(isMobileView ? styles.actionsMobile : {}),
-                  }}
-                >
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    disabled={changingPassword}
-                    style={isMobileView ? styles.fullWidthButton : undefined}
+                  <div
+                    style={{
+                      ...styles.actions,
+                      ...(isMobileView ? styles.actionsMobile : {}),
+                    }}
                   >
-                    {changingPassword
-                      ? "Canviant contrasenya..."
-                      : "Canviar contrasenya"}
-                  </button>
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={changingPassword}
+                      style={isMobileView ? styles.fullWidthButton : undefined}
+                    >
+                      {changingPassword
+                        ? "Canviant contrasenya..."
+                        : "Canviar contrasenya"}
+                    </button>
 
-                  <button
-                    type="button"
-                    className="btn btn-light"
-                    onClick={handleClearPasswordForm}
-                    disabled={
-                      changingPassword ||
-                      (!passwordData.currentPassword && !passwordData.newPassword)
-                    }
-                    style={isMobileView ? styles.fullWidthButton : undefined}
-                  >
-                    Netejar camps
-                  </button>
-                </div>
-              </form>
-            </section>
-          </div>
+                    <button
+                      type="button"
+                      className="btn btn-light"
+                      onClick={handleClearPasswordForm}
+                      disabled={
+                        changingPassword ||
+                        (!passwordData.currentPassword && !passwordData.newPassword)
+                      }
+                      style={isMobileView ? styles.fullWidthButton : undefined}
+                    >
+                      Netejar camps
+                    </button>
+                  </div>
+                </form>
+              </section>
+            </div>
+          </>
         )}
       </div>
     </div>
@@ -782,68 +881,101 @@ const styles = {
     padding: "0 1rem",
   },
   hero: {
-    background: "linear-gradient(135deg, #1e40af, #2563eb)",
-    color: "white",
+    position: "relative",
+    overflow: "hidden",
+    borderRadius: "30px",
     padding: "2rem",
-    borderRadius: "18px",
-    marginBottom: "1.75rem",
-    boxShadow: "0 10px 24px rgba(37,99,235,0.22)",
+    marginBottom: "1.5rem",
+    background:
+      "linear-gradient(135deg, rgba(15,23,42,0.94), rgba(37,99,235,0.88))",
+    boxShadow: "0 26px 56px rgba(37,99,235,0.16)",
+    color: "white",
   },
   heroMobile: {
-    padding: "1.35rem",
-    borderRadius: "16px",
+    padding: "1.25rem",
+    borderRadius: "24px",
+  },
+  heroGrid: {
+    display: "grid",
+    gridTemplateColumns: "1.08fr 0.92fr",
+    gap: "1.3rem",
+    alignItems: "center",
+  },
+  heroGridMobile: {
+    gridTemplateColumns: "1fr",
   },
   badge: {
     display: "inline-block",
-    backgroundColor: "rgba(255,255,255,0.15)",
-    border: "1px solid rgba(255,255,255,0.18)",
-    padding: "0.45rem 0.8rem",
+    padding: "0.5rem 0.85rem",
     borderRadius: "999px",
-    fontWeight: "700",
+    background: "rgba(255,255,255,0.12)",
+    border: "1px solid rgba(255,255,255,0.14)",
+    fontWeight: "800",
     marginBottom: "1rem",
   },
   title: {
     margin: 0,
-    fontSize: "2.5rem",
+    fontSize: "3rem",
+    lineHeight: 1.03,
   },
   titleMobile: {
-    fontSize: "2rem",
+    fontSize: "2.2rem",
   },
   subtitle: {
-    marginTop: "0.75rem",
+    marginTop: "0.9rem",
     marginBottom: 0,
     fontSize: "1.05rem",
-    lineHeight: 1.7,
-    opacity: 0.96,
+    lineHeight: 1.75,
+    color: "rgba(255,255,255,0.84)",
     maxWidth: "760px",
   },
-  heroStats: {
+  heroActions: {
+    display: "flex",
+    gap: "0.8rem",
+    flexWrap: "wrap",
+    marginTop: "1.4rem",
+  },
+  heroActionsMobile: {
+    flexDirection: "column",
+    alignItems: "stretch",
+  },
+  heroPanel: {
+    background: "rgba(255,255,255,0.12)",
+    border: "1px solid rgba(255,255,255,0.14)",
+    borderRadius: "24px",
+    padding: "1.15rem",
+    backdropFilter: "blur(10px)",
+  },
+  heroPanelLabel: {
+    display: "block",
+    fontSize: "0.82rem",
+    fontWeight: "800",
+    opacity: 0.82,
+    marginBottom: "0.85rem",
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
+  },
+  heroPanelGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-    gap: "0.9rem",
-    marginTop: "1.5rem",
+    gap: "0.7rem",
   },
-  heroStatsMobile: {
-    gridTemplateColumns: "1fr",
-  },
-  statCard: {
-    backgroundColor: "rgba(255,255,255,0.12)",
-    border: "1px solid rgba(255,255,255,0.16)",
-    borderRadius: "16px",
-    padding: "1rem",
+  heroPanelCard: {
+    background: "rgba(255,255,255,0.08)",
+    border: "1px solid rgba(255,255,255,0.10)",
+    borderRadius: "18px",
+    padding: "0.9rem",
     display: "flex",
     flexDirection: "column",
-    gap: "0.3rem",
+    gap: "0.25rem",
   },
-  statLabel: {
-    opacity: 0.88,
-    lineHeight: 1.4,
-    fontSize: "0.85rem",
-    fontWeight: "700",
-  },
-  statValue: {
-    fontSize: "1.1rem",
+  heroPanelCardLabel: {
+    fontSize: "0.78rem",
     fontWeight: "800",
+    opacity: 0.8,
+  },
+  heroPanelCardValue: {
+    fontWeight: "800",
+    lineHeight: 1.55,
     wordBreak: "break-word",
   },
   feedbackSection: {
@@ -851,101 +983,177 @@ const styles = {
     marginBottom: "1.25rem",
   },
   feedbackBox: {
-    borderRadius: "16px",
+    borderRadius: "18px",
     padding: "1rem 1.1rem",
     border: "1px solid transparent",
-    boxShadow: "0 8px 22px rgba(0,0,0,0.04)",
+    boxShadow: "0 10px 24px rgba(15,23,42,0.04)",
   },
   feedbackSuccess: {
-    backgroundColor: "#ecfdf5",
+    background: "#ecfdf5",
     borderColor: "#86efac",
   },
   feedbackError: {
-    backgroundColor: "#fff1f2",
+    background: "#fff1f2",
     borderColor: "#fecdd3",
   },
   feedbackText: {
     margin: 0,
-    fontWeight: "700",
+    fontWeight: "800",
     lineHeight: 1.6,
     color: "#0f172a",
   },
   errorBox: {
-    backgroundColor: "#ffffff",
-    border: "1px solid #fecaca",
-    borderRadius: "18px",
+    background: "#fff1f2",
+    border: "1px solid #fecdd3",
+    borderRadius: "24px",
     padding: "1.25rem",
-    boxShadow: "0 8px 22px rgba(0,0,0,0.06)",
     display: "flex",
     flexDirection: "column",
-    gap: "0.85rem",
+    gap: "0.9rem",
+    boxShadow: "0 10px 24px rgba(15,23,42,0.04)",
   },
   errorTitle: {
     margin: 0,
-    fontSize: "1.15rem",
+    color: "#9f1239",
     fontWeight: "800",
-    color: "#991b1b",
+    fontSize: "1.1rem",
   },
   errorText: {
     margin: 0,
-    color: "#475569",
-    lineHeight: 1.7,
+    color: "#881337",
+    lineHeight: 1.6,
+    fontWeight: "600",
+  },
+  summaryGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+    gap: "1rem",
+    marginBottom: "1rem",
+  },
+  summaryGridMobile: {
+    gridTemplateColumns: "1fr",
+  },
+  summaryCard: {
+    background: "rgba(255,255,255,0.84)",
+    border: "1px solid rgba(148,163,184,0.18)",
+    borderRadius: "22px",
+    padding: "1.1rem",
+    boxShadow: "0 16px 34px rgba(15,23,42,0.05)",
+    backdropFilter: "blur(10px)",
+  },
+  summaryLabel: {
+    display: "block",
+    color: "#64748b",
+    fontSize: "0.82rem",
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
+    marginBottom: "0.35rem",
+  },
+  summaryValue: {
+    display: "block",
+    color: "#0f172a",
+    fontSize: "1.2rem",
+    fontWeight: "800",
+    marginBottom: "0.35rem",
+  },
+  summaryText: {
+    margin: 0,
+    color: "#64748b",
+    lineHeight: 1.65,
   },
   grid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-    gap: "1.2rem",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "1rem",
     alignItems: "start",
   },
   gridMobile: {
     gridTemplateColumns: "1fr",
   },
   card: {
-    backgroundColor: "white",
-    borderRadius: "18px",
-    padding: "1.5rem",
-    boxShadow: "0 8px 22px rgba(0,0,0,0.08)",
-    border: "1px solid #e5e7eb",
+    background: "rgba(255,255,255,0.84)",
+    border: "1px solid rgba(148,163,184,0.18)",
+    borderRadius: "28px",
+    padding: "1.4rem",
+    boxShadow: "0 18px 40px rgba(15,23,42,0.06)",
+    backdropFilter: "blur(10px)",
   },
   cardHeader: {
-    marginBottom: "1.25rem",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "flex-start",
     gap: "1rem",
     flexWrap: "wrap",
+    marginBottom: "1.15rem",
+  },
+  cardKicker: {
+    display: "inline-block",
+    marginBottom: "0.45rem",
+    padding: "0.38rem 0.7rem",
+    borderRadius: "999px",
+    background: "rgba(37,99,235,0.08)",
+    color: "#1d4ed8",
+    fontWeight: "800",
+    fontSize: "0.8rem",
   },
   cardTitle: {
-    marginTop: 0,
-    marginBottom: "0.45rem",
-    fontSize: "1.7rem",
+    margin: 0,
+    fontSize: "1.65rem",
     color: "#0f172a",
   },
   cardText: {
-    margin: 0,
-    color: "#475569",
-    lineHeight: 1.65,
+    marginTop: "0.45rem",
+    marginBottom: 0,
+    color: "#64748b",
+    lineHeight: 1.7,
   },
   statusBadge: {
     display: "inline-flex",
     alignItems: "center",
     justifyContent: "center",
-    minHeight: "36px",
+    minHeight: "38px",
     padding: "0.45rem 0.8rem",
     borderRadius: "999px",
-    fontSize: "0.85rem",
-    fontWeight: "700",
+    fontSize: "0.84rem",
+    fontWeight: "800",
     whiteSpace: "nowrap",
   },
   statusBadgePending: {
-    backgroundColor: "#eff6ff",
+    background: "#eff6ff",
     color: "#1d4ed8",
     border: "1px solid #bfdbfe",
   },
   statusBadgeStable: {
-    backgroundColor: "#f8fafc",
+    background: "#f8fafc",
     color: "#475569",
     border: "1px solid #e2e8f0",
+  },
+  securityBadge: {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: "38px",
+    padding: "0.45rem 0.8rem",
+    borderRadius: "999px",
+    fontSize: "0.84rem",
+    fontWeight: "800",
+    whiteSpace: "nowrap",
+  },
+  securityLow: {
+    background: "#fff1f2",
+    color: "#be123c",
+    border: "1px solid #fecdd3",
+  },
+  securityMedium: {
+    background: "#fff7ed",
+    color: "#c2410c",
+    border: "1px solid #fdba74",
+  },
+  securityStrong: {
+    background: "#ecfdf5",
+    color: "#15803d",
+    border: "1px solid #86efac",
   },
   form: {
     display: "flex",
@@ -958,32 +1166,42 @@ const styles = {
     gap: "0.45rem",
   },
   label: {
-    fontSize: "0.95rem",
-    fontWeight: "700",
+    fontSize: "0.94rem",
+    fontWeight: "800",
     color: "#1e293b",
   },
   input: {
-    flex: 1,
-    padding: "0.95rem 1rem",
+    width: "100%",
+    padding: "1rem 1rem",
     fontSize: "1rem",
     border: "1px solid #cbd5e1",
-    borderRadius: "12px",
+    borderRadius: "16px",
     outline: "none",
-    backgroundColor: "#ffffff",
+    background: "rgba(255,255,255,0.96)",
     color: "#0f172a",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.03)",
-    width: "100%",
+    boxShadow: "0 6px 16px rgba(15,23,42,0.03)",
     boxSizing: "border-box",
   },
-  helperNote: {
+  tipBox: {
+    background: "#f8fbff",
+    border: "1px solid #dbeafe",
+    borderRadius: "18px",
+    padding: "1rem",
+  },
+  tipTitle: {
+    display: "block",
+    color: "#1d4ed8",
+    fontWeight: "800",
+    marginBottom: "0.3rem",
+  },
+  tipText: {
     margin: 0,
-    fontSize: "0.9rem",
-    color: "#64748b",
-    lineHeight: 1.6,
+    color: "#475569",
+    lineHeight: 1.65,
   },
   passwordWrapper: {
     display: "flex",
-    gap: "0.5rem",
+    gap: "0.55rem",
     alignItems: "stretch",
   },
   passwordWrapperMobile: {
@@ -991,103 +1209,79 @@ const styles = {
   },
   showButton: {
     border: "1px solid #cbd5e1",
-    borderRadius: "10px",
-    padding: "0 0.9rem",
-    backgroundColor: "white",
+    borderRadius: "14px",
+    padding: "0 1rem",
+    background: "white",
     cursor: "pointer",
     fontWeight: "700",
+    minWidth: "110px",
     color: "#334155",
-    minWidth: "96px",
   },
   showButtonMobile: {
     width: "100%",
-    minHeight: "44px",
+    minHeight: "46px",
   },
   capsWarning: {
     color: "#b91c1c",
     fontSize: "0.85rem",
-    fontWeight: "600",
+    fontWeight: "700",
   },
-  passwordPanel: {
-    backgroundColor: "#f8fafc",
+  checklistPanel: {
+    background: "#f8fafc",
     border: "1px solid #e2e8f0",
-    borderRadius: "14px",
+    borderRadius: "18px",
     padding: "1rem",
     display: "flex",
     flexDirection: "column",
     gap: "0.9rem",
   },
-  passwordPanelHeader: {
+  checklistHeader: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    gap: "0.75rem",
+    gap: "0.8rem",
     flexWrap: "wrap",
   },
-  passwordPanelTitle: {
+  checklistTitle: {
     fontSize: "0.92rem",
-    fontWeight: "700",
+    fontWeight: "800",
     color: "#0f172a",
   },
-  passwordStrengthBadge: {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "0.35rem 0.7rem",
-    borderRadius: "999px",
-    fontSize: "0.8rem",
-    fontWeight: "800",
-  },
-  passwordStrengthLow: {
-    backgroundColor: "#fff1f2",
-    color: "#be123c",
-    border: "1px solid #fecdd3",
-  },
-  passwordStrengthMedium: {
-    backgroundColor: "#fff7ed",
-    color: "#c2410c",
-    border: "1px solid #fdba74",
-  },
-  passwordStrengthGood: {
-    backgroundColor: "#ecfdf5",
-    color: "#15803d",
-    border: "1px solid #86efac",
-  },
-  passwordChecklist: {
+  checklist: {
     display: "grid",
-    gridTemplateColumns: "1fr",
     gap: "0.55rem",
   },
-  passwordChecklistItem: {
+  checkItem: {
     display: "flex",
     alignItems: "center",
     gap: "0.55rem",
     color: "#334155",
-    lineHeight: 1.5,
     fontSize: "0.92rem",
+    lineHeight: 1.5,
   },
   checkOk: {
     display: "inline-flex",
     width: "20px",
     justifyContent: "center",
-    fontWeight: "800",
     color: "#15803d",
+    fontWeight: "800",
   },
   checkPending: {
     display: "inline-flex",
     width: "20px",
     justifyContent: "center",
-    fontWeight: "800",
     color: "#94a3b8",
+    fontWeight: "800",
   },
   actions: {
     display: "flex",
     gap: "0.75rem",
     flexWrap: "wrap",
-    marginTop: "0.3rem",
+    marginTop: "0.25rem",
   },
   actionsMobile: {
     flexDirection: "column",
+    alignItems: "stretch",
   },
   fullWidthButton: {
     width: "100%",
