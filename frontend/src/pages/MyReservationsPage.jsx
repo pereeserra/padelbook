@@ -9,6 +9,7 @@ function MyReservationsPage() {
 
   const summaryRef = useRef(null);
 
+  const [HasInteractedWithFilter, setHasInteractedWithFilter] = useState(false);
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
