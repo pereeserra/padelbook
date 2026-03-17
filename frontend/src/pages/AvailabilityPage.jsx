@@ -26,7 +26,6 @@ function AvailabilityPage() {
   const [showAuthHelp, setShowAuthHelp] = useState(false);
   const [recentlyReservedSlot, setRecentlyReservedSlot] = useState(null);
 
-  // Detectar canvis de mida per adaptar la vista a dispositius mòbils
   useEffect(() => {
     const handleResize = () => {
       setIsMobileView(window.innerWidth <= 768);
@@ -84,11 +83,10 @@ function AvailabilityPage() {
     });
   };
 
-  // Funció per obtenir la disponibilitat de pistes per a una data determinada
   const fetchAvailability = async (selectedDate) => {
     try {
       if (!selectedDate) {
-        setError("Has de seleccionar una data");
+        setError("Has de seleccionar una data.");
         setAvailability([]);
         return;
       }
@@ -109,7 +107,7 @@ function AvailabilityPage() {
       setAvailability(Array.isArray(availabilityData) ? availabilityData : []);
     } catch (err) {
       console.error(err);
-      setError("Error obtenint la disponibilitat");
+      setError("Error obtenint la disponibilitat.");
       setAvailability([]);
     } finally {
       setLoading(false);
@@ -159,7 +157,6 @@ function AvailabilityPage() {
     setDate(newDate);
   };
 
-  // Funció per gestionar la reserva d'una franja horària
   const handleReserve = async (slot) => {
     try {
       const token = localStorage.getItem("token");
@@ -205,7 +202,7 @@ function AvailabilityPage() {
       } else if (err.response?.data?.error) {
         setError(err.response.data.error);
       } else {
-        setError("Error creant la reserva");
+        setError("Error creant la reserva.");
       }
 
       setSuccess("");
@@ -213,12 +210,10 @@ function AvailabilityPage() {
     }
   };
 
-  // Carregar la disponibilitat inicialment i cada vegada que canviï la data seleccionada
   useEffect(() => {
     fetchAvailability(date);
   }, [date]);
 
-  // Scroll a Disponibilitat del dia
   useEffect(() => {
     if (success) return;
     if (!shouldScrollToResultsRef.current) return;
@@ -229,7 +224,6 @@ function AvailabilityPage() {
     }
   }, [availability, loading, success]);
 
-  // Scroll a Reserva confirmada o error
   useEffect(() => {
     if (!success && !error && !showAuthHelp) return;
 
@@ -269,6 +263,8 @@ function AvailabilityPage() {
     (slot) => slot.disponible
   ).length;
 
+  const occupiedCount = filteredAvailability.length - availableCount;
+
   const previousDayDisabled = date <= getToday();
 
   return (
@@ -286,19 +282,48 @@ function AvailabilityPage() {
             ...(isMobileView ? styles.heroMobile : {}),
           }}
         >
-          <span style={styles.badge}>Reserva la teva pista</span>
-          <h1
+          <div
             style={{
-              ...styles.title,
-              ...(isMobileView ? styles.titleMobile : {}),
+              ...styles.heroGrid,
+              ...(isMobileView ? styles.heroGridMobile : {}),
             }}
           >
-            Disponibilitat
-          </h1>
-          <p style={styles.subtitle}>
-            Selecciona un dia, consulta les pistes disponibles i fes la teva
-            reserva de manera ràpida i clara.
-          </p>
+            <div>
+              <span style={styles.badge}>Reserva la teva pista</span>
+              <h1
+                style={{
+                  ...styles.title,
+                  ...(isMobileView ? styles.titleMobile : {}),
+                }}
+              >
+                Consulta la disponibilitat d’una manera més clara i visual
+              </h1>
+              <p style={styles.subtitle}>
+                Selecciona un dia, revisa ràpidament quines pistes i franges
+                tens disponibles i confirma la teva reserva amb una experiència
+                més neta i agradable.
+              </p>
+            </div>
+
+            <div style={styles.heroDateCard}>
+              <span style={styles.heroDateLabel}>Data seleccionada</span>
+              <strong style={styles.heroDateValue}>
+                {formatDisplayDate(date)}
+              </strong>
+
+              <div style={styles.heroDateMeta}>
+                <span style={styles.heroMetaBadge}>
+                  {uniqueCourts.length || 0} pistes
+                </span>
+                <span style={styles.heroMetaBadge}>
+                  {filteredAvailability.length || 0} franges
+                </span>
+                <span style={styles.heroMetaBadgeSuccess}>
+                  {availableCount || 0} lliures
+                </span>
+              </div>
+            </div>
+          </div>
         </section>
 
         <section
@@ -315,22 +340,16 @@ function AvailabilityPage() {
             }}
           >
             <div>
-              <h2 style={styles.searchTitle}>Selecciona una data</h2>
+              <h2 style={styles.searchTitle}>Tria el dia que vols jugar</h2>
               <p style={styles.searchText}>
-                Canvia de dia i la disponibilitat s’actualitzarà automàticament.
+                Pots usar els dies ràpids, canviar un dia enrere o endavant, o
+                obrir el selector manual.
               </p>
             </div>
 
-            <div
-              style={{
-                ...styles.selectedDateBox,
-                ...(isMobileView ? styles.selectedDateBoxMobile : {}),
-              }}
-            >
-              <span style={styles.selectedDateLabel}>Data seleccionada</span>
-              <span style={styles.selectedDateValue}>
-                {formatDisplayDate(date)}
-              </span>
+            <div style={styles.selectionHint}>
+              <span style={styles.selectionHintLabel}>Vista actual</span>
+              <span style={styles.selectionHintValue}>Disponibilitat del dia</span>
             </div>
           </div>
 
@@ -357,7 +376,7 @@ function AvailabilityPage() {
                 <span style={styles.quickDayWeekday}>{day.weekday}</span>
                 <span style={styles.quickDayNumber}>{day.dayNumber}</span>
                 <span style={styles.quickDayLabel}>
-                  {day.isToday ? "Avui" : ""}
+                  {day.isToday ? "Avui" : "Disponible"}
                 </span>
               </button>
             ))}
@@ -372,11 +391,7 @@ function AvailabilityPage() {
             <button
               onClick={() => changeDay(-1)}
               className={`btn btn-secondary ${previousDayDisabled ? "is-disabled" : ""}`}
-              style={
-                isMobileView
-                  ? styles.fullWidthButton
-                  : styles.secondaryButton
-              }
+              style={isMobileView ? styles.fullWidthButton : undefined}
               disabled={previousDayDisabled}
             >
               ← Dia anterior
@@ -417,11 +432,7 @@ function AvailabilityPage() {
             <button
               onClick={() => changeDay(1)}
               className="btn btn-secondary"
-              style={
-                isMobileView
-                  ? styles.fullWidthButton
-                  : styles.secondaryButton
-              }
+              style={isMobileView ? styles.fullWidthButton : undefined}
             >
               Dia següent →
             </button>
@@ -429,7 +440,7 @@ function AvailabilityPage() {
             <button
               onClick={handleSetToday}
               className="btn btn-light"
-              style={isMobileView ? styles.fullWidthButton : styles.lightButton}
+              style={isMobileView ? styles.fullWidthButton : undefined}
             >
               Avui
             </button>
@@ -442,11 +453,7 @@ function AvailabilityPage() {
                 fetchAvailability(date);
               }}
               className="btn btn-primary"
-              style={
-                isMobileView
-                  ? styles.fullWidthButton
-                  : styles.primaryButton
-              }
+              style={isMobileView ? styles.fullWidthButton : undefined}
             >
               {loading ? "Consultant..." : "Consultar disponibilitat"}
             </button>
@@ -465,10 +472,16 @@ function AvailabilityPage() {
 
           <div ref={topFeedbackRef} />
 
-          {error && <p style={styles.error}>{error}</p>}
+          {error && (
+            <div className="scale-in" style={styles.errorBox}>
+              <p style={styles.errorTitle}>Hi ha hagut un problema</p>
+              <p style={styles.errorText}>{error}</p>
+            </div>
+          )}
 
           {success && (
             <div
+              className="scale-in"
               style={{
                 ...styles.successBox,
                 ...(isMobileView ? styles.successBoxMobile : {}),
@@ -489,11 +502,7 @@ function AvailabilityPage() {
                   type="button"
                   onClick={() => navigate("/my-reservations")}
                   className="btn btn-success btn-sm"
-                  style={
-                    isMobileView
-                      ? styles.fullWidthButton
-                      : styles.successPrimaryButton
-                  }
+                  style={isMobileView ? styles.fullWidthButton : undefined}
                 >
                   Veure les meves reserves
                 </button>
@@ -502,11 +511,7 @@ function AvailabilityPage() {
                   type="button"
                   onClick={() => setSuccess("")}
                   className="btn btn-outline-success btn-sm"
-                  style={
-                    isMobileView
-                      ? styles.fullWidthButton
-                      : styles.successSecondaryButton
-                  }
+                  style={isMobileView ? styles.fullWidthButton : undefined}
                 >
                   Continuar aquí
                 </button>
@@ -515,17 +520,21 @@ function AvailabilityPage() {
           )}
 
           {showAuthHelp && (
-            <div style={styles.authHelpBox}>
-              <div style={styles.authHelpTop}>
-                <div>
-                  <p style={styles.authHelpTitle}>
-                    Necessites un compte per reservar
-                  </p>
-                  <p style={styles.authHelpText}>
-                    Si ja tens compte, inicia sessió. Si encara no, registra’t en
-                    menys d’un minut.
-                  </p>
-                </div>
+            <div
+              className="scale-in"
+              style={{
+                ...styles.authHelpBox,
+                ...(isMobileView ? styles.authHelpBoxMobile : {}),
+              }}
+            >
+              <div>
+                <p style={styles.authHelpTitle}>
+                  Necessites iniciar sessió per reservar
+                </p>
+                <p style={styles.authHelpText}>
+                  Si ja tens compte, entra ara. Si encara no, pots registrar-te
+                  en molt poc temps.
+                </p>
               </div>
 
               <div
@@ -537,22 +546,15 @@ function AvailabilityPage() {
                 <Link
                   to="/login"
                   className="btn btn-primary btn-sm"
-                  style={
-                    isMobileView
-                      ? styles.fullWidthButton
-                      : styles.authHelpPrimary
-                  }
+                  style={isMobileView ? styles.fullWidthButton : undefined}
                 >
                   Iniciar sessió
                 </Link>
+
                 <Link
                   to="/register"
                   className="btn btn-light btn-sm"
-                  style={
-                    isMobileView
-                      ? styles.fullWidthButton
-                      : styles.authHelpSecondary
-                  }
+                  style={isMobileView ? styles.fullWidthButton : undefined}
                 >
                   Crear compte
                 </Link>
@@ -583,18 +585,19 @@ function AvailabilityPage() {
                   ...(isMobileView ? styles.resultsHeaderMobile : {}),
                 }}
               >
-                <h2 style={styles.resultsTitle}>Disponibilitat del dia</h2>
+                <div>
+                  <h2 style={styles.resultsTitle}>Disponibilitat del dia</h2>
+                  <p style={styles.resultsText}>
+                    Aquí tens la vista detallada de totes les franges segons els
+                    filtres actuals.
+                  </p>
+                </div>
 
                 <div style={styles.stats}>
-                  <span style={styles.countBadge}>
-                    {uniqueCourts.length} pistes
-                  </span>
-                  <span style={styles.countBadge}>
-                    {filteredAvailability.length} franges
-                  </span>
-                  <span style={styles.countBadge}>
-                    {availableCount} disponibles
-                  </span>
+                  <span style={styles.countBadge}>{uniqueCourts.length} pistes</span>
+                  <span style={styles.countBadge}>{filteredAvailability.length} franges</span>
+                  <span style={styles.countBadgeSuccess}>{availableCount} lliures</span>
+                  <span style={styles.countBadgeMuted}>{occupiedCount} ocupades</span>
                 </div>
               </div>
 
@@ -610,11 +613,12 @@ function AvailabilityPage() {
         )}
 
         {!loading && filteredAvailability.length === 0 && !error && (
-          <section style={styles.emptyState}>
+          <section className="scale-in" style={styles.emptyState}>
+            <span style={styles.emptyIcon}>🎾</span>
             <h3 style={styles.emptyTitle}>No hi ha disponibilitat per aquest dia</h3>
             <p style={styles.emptyText}>
-              Prova un altre dia o desactiva el filtre de franges disponibles si
-              vols veure totes les franges del sistema.
+              Prova una altra data o desactiva el filtre de franges disponibles
+              per veure totes les franges del sistema.
             </p>
           </section>
         )}
@@ -636,50 +640,113 @@ const styles = {
     padding: "0 1rem",
   },
   hero: {
-    background: "linear-gradient(135deg, #1e40af, #2563eb)",
-    color: "white",
+    position: "relative",
+    overflow: "hidden",
+    borderRadius: "30px",
     padding: "2rem",
-    borderRadius: "18px",
-    marginBottom: "1.75rem",
-    boxShadow: "0 10px 24px rgba(37,99,235,0.22)",
+    background:
+      "linear-gradient(135deg, rgba(15,23,42,0.94), rgba(37,99,235,0.88))",
+    boxShadow: "0 26px 56px rgba(37,99,235,0.16)",
+    color: "white",
+    marginBottom: "1.5rem",
   },
   heroMobile: {
-    padding: "1.35rem",
-    borderRadius: "16px",
+    padding: "1.25rem",
+    borderRadius: "24px",
+  },
+  heroGrid: {
+    display: "grid",
+    gridTemplateColumns: "1.15fr 0.85fr",
+    gap: "1.4rem",
+    alignItems: "center",
+  },
+  heroGridMobile: {
+    gridTemplateColumns: "1fr",
   },
   badge: {
     display: "inline-block",
-    backgroundColor: "rgba(255,255,255,0.15)",
-    border: "1px solid rgba(255,255,255,0.18)",
-    padding: "0.45rem 0.8rem",
+    padding: "0.5rem 0.85rem",
     borderRadius: "999px",
-    fontWeight: "700",
+    background: "rgba(255,255,255,0.12)",
+    border: "1px solid rgba(255,255,255,0.14)",
+    fontWeight: "800",
     marginBottom: "1rem",
   },
   title: {
     margin: 0,
-    fontSize: "2.5rem",
-  },
-  titleMobile: {
-    fontSize: "2rem",
-  },
-  subtitle: {
-    marginTop: "0.75rem",
-    marginBottom: 0,
-    fontSize: "1.05rem",
-    lineHeight: 1.7,
-    opacity: 0.96,
+    fontSize: "3rem",
+    lineHeight: 1.03,
     maxWidth: "760px",
   },
+  titleMobile: {
+    fontSize: "2.2rem",
+  },
+  subtitle: {
+    marginTop: "0.95rem",
+    marginBottom: 0,
+    fontSize: "1.05rem",
+    lineHeight: 1.75,
+    color: "rgba(255,255,255,0.84)",
+    maxWidth: "760px",
+  },
+  heroDateCard: {
+    background: "rgba(255,255,255,0.12)",
+    border: "1px solid rgba(255,255,255,0.14)",
+    borderRadius: "24px",
+    padding: "1.2rem",
+    backdropFilter: "blur(10px)",
+    boxShadow: "0 14px 30px rgba(15,23,42,0.08)",
+  },
+  heroDateLabel: {
+    display: "block",
+    fontSize: "0.82rem",
+    fontWeight: "800",
+    opacity: 0.82,
+    marginBottom: "0.45rem",
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
+  },
+  heroDateValue: {
+    display: "block",
+    fontSize: "1.2rem",
+    lineHeight: 1.5,
+    textTransform: "capitalize",
+  },
+  heroDateMeta: {
+    display: "flex",
+    gap: "0.55rem",
+    flexWrap: "wrap",
+    marginTop: "1rem",
+  },
+  heroMetaBadge: {
+    background: "rgba(255,255,255,0.14)",
+    border: "1px solid rgba(255,255,255,0.12)",
+    color: "white",
+    padding: "0.42rem 0.72rem",
+    borderRadius: "999px",
+    fontWeight: "700",
+    fontSize: "0.84rem",
+  },
+  heroMetaBadgeSuccess: {
+    background: "rgba(22,163,74,0.2)",
+    border: "1px solid rgba(134,239,172,0.32)",
+    color: "#dcfce7",
+    padding: "0.42rem 0.72rem",
+    borderRadius: "999px",
+    fontWeight: "700",
+    fontSize: "0.84rem",
+  },
   searchCard: {
-    backgroundColor: "white",
-    borderRadius: "18px",
+    background: "rgba(255,255,255,0.84)",
+    border: "1px solid rgba(148,163,184,0.18)",
+    borderRadius: "28px",
     padding: "1.5rem",
-    boxShadow: "0 8px 22px rgba(0,0,0,0.08)",
-    border: "1px solid #e5e7eb",
+    boxShadow: "0 18px 40px rgba(15,23,42,0.06)",
+    backdropFilter: "blur(12px)",
   },
   searchCardMobile: {
     padding: "1rem",
+    borderRadius: "22px",
   },
   searchHeader: {
     display: "flex",
@@ -687,84 +754,85 @@ const styles = {
     alignItems: "flex-start",
     gap: "1rem",
     flexWrap: "wrap",
-    marginBottom: "1rem",
+    marginBottom: "1.1rem",
   },
   searchHeaderMobile: {
     flexDirection: "column",
   },
   searchTitle: {
     margin: 0,
-    fontSize: "1.6rem",
+    fontSize: "1.8rem",
+    color: "#0f172a",
   },
   searchText: {
-    marginTop: "0.4rem",
+    marginTop: "0.45rem",
     marginBottom: 0,
-    color: "#4b5563",
+    color: "#64748b",
+    lineHeight: 1.65,
+    maxWidth: "720px",
   },
-  selectedDateBox: {
-    backgroundColor: "#eff6ff",
-    color: "#1d4ed8",
-    padding: "0.8rem 1rem",
-    borderRadius: "12px",
+  selectionHint: {
+    background: "#f8fbff",
+    border: "1px solid #dbeafe",
+    borderRadius: "18px",
+    padding: "0.9rem 1rem",
+    minWidth: "220px",
     display: "flex",
     flexDirection: "column",
-    gap: "0.25rem",
-    minWidth: "260px",
+    gap: "0.22rem",
   },
-  selectedDateBoxMobile: {
-    width: "100%",
-    minWidth: "unset",
-    boxSizing: "border-box",
-  },
-  selectedDateLabel: {
+  selectionHintLabel: {
     fontSize: "0.8rem",
-    fontWeight: "700",
-    opacity: 0.75,
-  },
-  selectedDateValue: {
     fontWeight: "800",
-    textTransform: "capitalize",
+    color: "#64748b",
+  },
+  selectionHintValue: {
+    fontWeight: "800",
+    color: "#1d4ed8",
   },
   quickDaysGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))",
-    gap: "0.75rem",
+    gridTemplateColumns: "repeat(auto-fit, minmax(105px, 1fr))",
+    gap: "0.8rem",
     marginBottom: "1rem",
   },
   quickDaysGridMobile: {
     gridTemplateColumns: "repeat(2, 1fr)",
   },
   quickDayButton: {
-    border: "1px solid #dbeafe",
-    backgroundColor: "#f8fbff",
-    borderRadius: "14px",
-    padding: "0.9rem 0.6rem",
+    border: "1px solid rgba(148,163,184,0.18)",
+    background: "rgba(255,255,255,0.88)",
+    borderRadius: "20px",
+    padding: "1rem 0.7rem",
     cursor: "pointer",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    gap: "0.25rem",
-    transition: "0.2s",
+    gap: "0.28rem",
+    transition: "all 0.22s ease",
+    boxShadow: "0 10px 24px rgba(15,23,42,0.04)",
   },
   quickDayActive: {
-    backgroundColor: "#2563eb",
+    background: "linear-gradient(135deg, #2563eb, #1d4ed8)",
     color: "white",
     border: "1px solid #2563eb",
-    boxShadow: "0 8px 16px rgba(37,99,235,0.22)",
+    boxShadow: "0 18px 34px rgba(37,99,235,0.22)",
+    transform: "translateY(-1px)",
   },
   quickDayWeekday: {
     fontSize: "0.9rem",
-    fontWeight: "700",
+    fontWeight: "800",
     textTransform: "capitalize",
   },
   quickDayNumber: {
-    fontSize: "1.4rem",
+    fontSize: "1.45rem",
     fontWeight: "800",
     lineHeight: 1,
   },
   quickDayLabel: {
-    fontSize: "0.8rem",
+    fontSize: "0.76rem",
     minHeight: "1rem",
+    opacity: 0.9,
   },
   controls: {
     display: "flex",
@@ -787,22 +855,22 @@ const styles = {
   },
   dateInputLabel: {
     fontSize: "0.8rem",
-    fontWeight: "700",
+    fontWeight: "800",
     color: "#64748b",
   },
   customDateButton: {
-    minWidth: "230px",
-    padding: "0.9rem 1rem",
+    minWidth: "240px",
+    padding: "0.98rem 1rem",
     fontSize: "1rem",
-    border: "1px solid #d1d5db",
-    borderRadius: "12px",
-    backgroundColor: "white",
+    border: "1px solid rgba(148,163,184,0.24)",
+    borderRadius: "18px",
+    background: "rgba(255,255,255,0.96)",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
     gap: "0.75rem",
     cursor: "pointer",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+    boxShadow: "0 8px 20px rgba(15,23,42,0.04)",
   },
   customDateButtonMobile: {
     width: "100%",
@@ -810,7 +878,7 @@ const styles = {
     boxSizing: "border-box",
   },
   customDateText: {
-    fontWeight: "700",
+    fontWeight: "800",
     color: "#0f172a",
   },
   calendarIcon: {
@@ -823,43 +891,53 @@ const styles = {
     width: 0,
     height: 0,
   },
-  primaryButton: {
-    minWidth: "140px",
-  },
-  secondaryButton: {},
-  lightButton: {},
   fullWidthButton: {
     width: "100%",
   },
   filtersRow: {
     marginTop: "1rem",
+    paddingTop: "1rem",
+    borderTop: "1px solid rgba(148,163,184,0.14)",
   },
   checkboxLabel: {
     display: "inline-flex",
     alignItems: "center",
     gap: "0.6rem",
-    fontWeight: "600",
-    color: "#334155",
-  },
-  error: {
-    color: "#b91c1c",
     fontWeight: "700",
+    color: "#334155",
+    flexWrap: "wrap",
+  },
+  errorBox: {
     marginTop: "1rem",
-    backgroundColor: "#fee2e2",
-    padding: "0.8rem 1rem",
-    borderRadius: "10px",
+    background: "#fff1f2",
+    border: "1px solid #fecdd3",
+    borderRadius: "18px",
+    padding: "1rem 1.1rem",
+  },
+  errorTitle: {
+    margin: 0,
+    color: "#be123c",
+    fontWeight: "800",
+  },
+  errorText: {
+    marginTop: "0.35rem",
+    marginBottom: 0,
+    color: "#9f1239",
+    lineHeight: 1.6,
+    fontWeight: "600",
   },
   successBox: {
     marginTop: "1rem",
-    backgroundColor: "#ecfdf5",
+    background: "#ecfdf5",
     border: "1px solid #86efac",
     padding: "1rem",
-    borderRadius: "14px",
+    borderRadius: "18px",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
     gap: "1rem",
     flexWrap: "wrap",
+    boxShadow: "0 10px 24px rgba(22,163,74,0.08)",
   },
   successBoxMobile: {
     flexDirection: "column",
@@ -874,6 +952,7 @@ const styles = {
   successText: {
     margin: "0.35rem 0 0 0",
     color: "#166534",
+    lineHeight: 1.6,
     fontWeight: "600",
   },
   successActions: {
@@ -885,46 +964,49 @@ const styles = {
     flexDirection: "column",
     alignItems: "stretch",
   },
-  successPrimaryButton: {},
-  successSecondaryButton: {},
   authHelpBox: {
     marginTop: "1rem",
-    backgroundColor: "#eff6ff",
+    background: "#eff6ff",
     border: "1px solid #bfdbfe",
-    borderRadius: "14px",
+    borderRadius: "18px",
     padding: "1rem",
+    display: "flex",
+    justifyContent: "space-between",
+    gap: "1rem",
+    alignItems: "center",
+    flexWrap: "wrap",
   },
-  authHelpTop: {
-    marginBottom: "0.8rem",
+  authHelpBoxMobile: {
+    flexDirection: "column",
+    alignItems: "stretch",
   },
   authHelpTitle: {
     margin: 0,
-    color: "#1e3a8a",
+    color: "#1e40af",
     fontWeight: "800",
   },
   authHelpText: {
-    margin: "0.35rem 0 0 0",
+    marginTop: "0.35rem",
+    marginBottom: 0,
     color: "#334155",
     lineHeight: 1.6,
   },
   authHelpActions: {
     display: "flex",
-    gap: "0.8rem",
+    gap: "0.75rem",
     flexWrap: "wrap",
   },
   authHelpActionsMobile: {
     flexDirection: "column",
     alignItems: "stretch",
   },
-  authHelpPrimary: {},
-  authHelpSecondary: {},
   resultsSection: {
     marginTop: "2rem",
   },
   resultsHeader: {
     display: "flex",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
     gap: "1rem",
     flexWrap: "wrap",
     marginBottom: "1rem",
@@ -934,7 +1016,14 @@ const styles = {
   },
   resultsTitle: {
     margin: 0,
-    fontSize: "1.8rem",
+    fontSize: "1.9rem",
+    color: "#0f172a",
+  },
+  resultsText: {
+    marginTop: "0.4rem",
+    marginBottom: 0,
+    color: "#64748b",
+    lineHeight: 1.65,
   },
   stats: {
     display: "flex",
@@ -942,31 +1031,58 @@ const styles = {
     flexWrap: "wrap",
   },
   countBadge: {
-    backgroundColor: "#dbeafe",
+    background: "#eff6ff",
     color: "#1d4ed8",
     padding: "0.45rem 0.8rem",
     borderRadius: "999px",
-    fontWeight: "700",
-    fontSize: "0.95rem",
+    fontWeight: "800",
+    fontSize: "0.9rem",
+    border: "1px solid #dbeafe",
+  },
+  countBadgeSuccess: {
+    background: "#ecfdf5",
+    color: "#15803d",
+    padding: "0.45rem 0.8rem",
+    borderRadius: "999px",
+    fontWeight: "800",
+    fontSize: "0.9rem",
+    border: "1px solid #bbf7d0",
+  },
+  countBadgeMuted: {
+    background: "#f8fafc",
+    color: "#475569",
+    padding: "0.45rem 0.8rem",
+    borderRadius: "999px",
+    fontWeight: "800",
+    fontSize: "0.9rem",
+    border: "1px solid #e2e8f0",
   },
   emptyState: {
     marginTop: "2rem",
-    backgroundColor: "white",
-    borderRadius: "18px",
+    background: "rgba(255,255,255,0.86)",
+    borderRadius: "26px",
     padding: "2rem",
-    boxShadow: "0 8px 22px rgba(0,0,0,0.06)",
-    border: "1px solid #e5e7eb",
+    boxShadow: "0 18px 40px rgba(15,23,42,0.06)",
+    border: "1px solid rgba(148,163,184,0.18)",
     textAlign: "center",
+    backdropFilter: "blur(10px)",
+  },
+  emptyIcon: {
+    fontSize: "2.2rem",
+    display: "inline-block",
+    marginBottom: "0.75rem",
   },
   emptyTitle: {
     marginTop: 0,
     marginBottom: "0.75rem",
     fontSize: "1.5rem",
+    color: "#0f172a",
   },
   emptyText: {
-    margin: 0,
-    color: "#4b5563",
-    lineHeight: 1.7,
+    margin: "0 auto",
+    color: "#64748b",
+    lineHeight: 1.75,
+    maxWidth: "680px",
   },
 };
 

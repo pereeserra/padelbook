@@ -6,9 +6,9 @@ import LoadingSpinner from "../components/LoadingSpinner";
 
 function MyReservationsPage() {
   const topFeedbackRef = useRef(null);
-
   const summaryRef = useRef(null);
 
+  const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
   const [hasInteractedWithFilter, setHasInteractedWithFilter] = useState(false);
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,6 +20,15 @@ function MyReservationsPage() {
   const [activeFilter, setActiveFilter] = useState("all");
   const [recentlyCancelledReservationId, setRecentlyCancelledReservationId] =
     useState(null);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileView(window.innerWidth <= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const scrollToFeedback = () => {
     if (!topFeedbackRef.current) return;
@@ -69,7 +78,7 @@ function MyReservationsPage() {
       setReservations(Array.isArray(reservationsData) ? reservationsData : []);
     } catch (err) {
       console.error(err);
-      setError("Error obtenint les reserves");
+      setError("Error obtenint les reserves.");
     } finally {
       setLoading(false);
     }
@@ -146,12 +155,7 @@ function MyReservationsPage() {
     if (activeFilter === "active") return activeReservations;
     if (activeFilter === "cancelled") return cancelledReservations;
     return reservations;
-  }, [
-    activeFilter,
-    reservations,
-    activeReservations,
-    cancelledReservations,
-  ]);
+  }, [activeFilter, reservations, activeReservations, cancelledReservations]);
 
   const filterLabel = useMemo(() => {
     if (activeFilter === "active") return "actives";
@@ -161,35 +165,62 @@ function MyReservationsPage() {
 
   return (
     <div style={styles.page}>
-      <div style={styles.container}>
-        <section className="fade-in-up" style={styles.hero}>
-          <span style={styles.badge}>Gestió de reserves</span>
-          <h1 style={styles.title}>Les meves reserves</h1>
-          <p style={styles.subtitle}>
-            Consulta l’historial de reserves actives i cancel·lades, i gestiona
-            fàcilment les teves pistes reservades.
-          </p>
-
-          {!loading && !error && reservations.length > 0 && (
-            <div style={styles.heroStats}>
-              <div style={styles.statCard}>
-                <span style={styles.statNumber}>{reservations.length}</span>
-                <span style={styles.statLabel}>Reserves totals</span>
-              </div>
-
-              <div style={styles.statCard}>
-                <span style={styles.statNumber}>{activeReservations.length}</span>
-                <span style={styles.statLabel}>Actives</span>
-              </div>
-
-              <div style={styles.statCard}>
-                <span style={styles.statNumber}>
-                  {cancelledReservations.length}
-                </span>
-                <span style={styles.statLabel}>Cancel·lades</span>
-              </div>
+      <div
+        style={{
+          ...styles.container,
+          ...(isMobileView ? styles.containerMobile : {}),
+        }}
+      >
+        <section
+          className="fade-in-up"
+          style={{
+            ...styles.hero,
+            ...(isMobileView ? styles.heroMobile : {}),
+          }}
+        >
+          <div
+            style={{
+              ...styles.heroGrid,
+              ...(isMobileView ? styles.heroGridMobile : {}),
+            }}
+          >
+            <div>
+              <span style={styles.badge}>Gestió de reserves</span>
+              <h1
+                style={{
+                  ...styles.title,
+                  ...(isMobileView ? styles.titleMobile : {}),
+                }}
+              >
+                Les meves reserves
+              </h1>
+              <p style={styles.subtitle}>
+                Consulta el teu historial, revisa les reserves actives i gestiona
+                les cancel·lacions dins una vista més ordenada i agradable.
+              </p>
             </div>
-          )}
+
+            {!loading && !error && reservations.length > 0 && (
+              <div style={styles.heroStats}>
+                <div style={styles.statCard}>
+                  <span style={styles.statNumber}>{reservations.length}</span>
+                  <span style={styles.statLabel}>Reserves totals</span>
+                </div>
+
+                <div style={styles.statCard}>
+                  <span style={styles.statNumber}>{activeReservations.length}</span>
+                  <span style={styles.statLabel}>Actives</span>
+                </div>
+
+                <div style={styles.statCard}>
+                  <span style={styles.statNumber}>
+                    {cancelledReservations.length}
+                  </span>
+                  <span style={styles.statLabel}>Cancel·lades</span>
+                </div>
+              </div>
+            )}
+          </div>
         </section>
 
         <div ref={topFeedbackRef} />
@@ -235,17 +266,22 @@ function MyReservationsPage() {
 
         {!loading && !error && reservations.length > 0 && (
           <>
-            <section 
+            <section
               ref={summaryRef}
-              className="fade-in-up delay-1" 
+              className="fade-in-up delay-1"
               style={styles.summarySection}
             >
-              <div style={styles.sectionHeader}>
+              <div
+                style={{
+                  ...styles.sectionHeader,
+                  ...(isMobileView ? styles.sectionHeaderMobile : {}),
+                }}
+              >
                 <div>
                   <h2 style={styles.sectionTitle}>Historial de reserves</h2>
                   <p style={styles.sectionText}>
-                    Filtra ràpidament les teves reserves per veure només les que
-                    tens actives o les que ja has cancel·lat.
+                    Filtra ràpidament entre totes les reserves, les actives i
+                    les cancel·lades.
                   </p>
                 </div>
 
@@ -254,13 +290,19 @@ function MyReservationsPage() {
                 </span>
               </div>
 
-              <div style={styles.filtersRow}>
+              <div
+                style={{
+                  ...styles.filtersRow,
+                  ...(isMobileView ? styles.filtersRowMobile : {}),
+                }}
+              >
                 <button
                   type="button"
                   className={`btn ${
                     activeFilter === "all" ? "btn-primary" : "btn-light"
                   }`}
                   onClick={() => handleFilterChange("all")}
+                  style={isMobileView ? styles.fullWidthButton : undefined}
                 >
                   Totes ({reservations.length})
                 </button>
@@ -271,6 +313,7 @@ function MyReservationsPage() {
                     activeFilter === "active" ? "btn-primary" : "btn-light"
                   }`}
                   onClick={() => handleFilterChange("active")}
+                  style={isMobileView ? styles.fullWidthButton : undefined}
                 >
                   Actives ({activeReservations.length})
                 </button>
@@ -281,6 +324,7 @@ function MyReservationsPage() {
                     activeFilter === "cancelled" ? "btn-primary" : "btn-light"
                   }`}
                   onClick={() => handleFilterChange("cancelled")}
+                  style={isMobileView ? styles.fullWidthButton : undefined}
                 >
                   Cancel·lades ({cancelledReservations.length})
                 </button>
@@ -292,11 +336,11 @@ function MyReservationsPage() {
                 {filteredReservations.map((reservation) => (
                   <div
                     key={reservation.id}
-                    style={{
-                      ...(recentlyCancelledReservationId === reservation.id
+                    style={
+                      recentlyCancelledReservationId === reservation.id
                         ? styles.recentlyCancelledWrapper
-                        : {}),
-                    }}
+                        : undefined
+                    }
                   >
                     <ReservationCard
                       reservation={reservation}
@@ -342,11 +386,16 @@ function MyReservationsPage() {
               la informació i cancel·lar-la si és necessari.
             </p>
 
-            <div style={styles.emptyActions}>
+            <div
+              style={{
+                ...styles.emptyActions,
+                ...(isMobileView ? styles.emptyActionsMobile : {}),
+              }}
+            >
               <Link
                 to="/availability"
                 className="btn btn-primary"
-                style={styles.emptyPrimary}
+                style={isMobileView ? styles.fullWidthButton : undefined}
               >
                 Veure disponibilitat
               </Link>
@@ -354,7 +403,7 @@ function MyReservationsPage() {
               <Link
                 to="/"
                 className="btn btn-light"
-                style={styles.emptySecondary}
+                style={isMobileView ? styles.fullWidthButton : undefined}
               >
                 Tornar a inici
               </Link>
@@ -375,56 +424,76 @@ const styles = {
     margin: "0 auto",
     padding: "0 1.5rem",
   },
+  containerMobile: {
+    padding: "0 1rem",
+  },
   hero: {
-    background: "linear-gradient(135deg, #1e40af, #2563eb)",
-    color: "white",
+    borderRadius: "30px",
     padding: "2rem",
-    borderRadius: "18px",
-    marginBottom: "1.75rem",
-    boxShadow: "0 10px 24px rgba(37,99,235,0.22)",
+    marginBottom: "1.5rem",
+    background:
+      "linear-gradient(135deg, rgba(15,23,42,0.94), rgba(37,99,235,0.88))",
+    boxShadow: "0 26px 56px rgba(37,99,235,0.16)",
+    color: "white",
+  },
+  heroMobile: {
+    padding: "1.25rem",
+    borderRadius: "24px",
+  },
+  heroGrid: {
+    display: "grid",
+    gridTemplateColumns: "1.1fr 0.9fr",
+    gap: "1.2rem",
+    alignItems: "center",
+  },
+  heroGridMobile: {
+    gridTemplateColumns: "1fr",
   },
   badge: {
     display: "inline-block",
-    backgroundColor: "rgba(255,255,255,0.15)",
-    border: "1px solid rgba(255,255,255,0.18)",
-    padding: "0.45rem 0.8rem",
+    padding: "0.5rem 0.85rem",
     borderRadius: "999px",
-    fontWeight: "700",
+    background: "rgba(255,255,255,0.12)",
+    border: "1px solid rgba(255,255,255,0.14)",
+    fontWeight: "800",
     marginBottom: "1rem",
   },
   title: {
     margin: 0,
-    fontSize: "2.5rem",
+    fontSize: "3rem",
+    lineHeight: 1.03,
+  },
+  titleMobile: {
+    fontSize: "2.2rem",
   },
   subtitle: {
-    marginTop: "0.75rem",
+    marginTop: "0.9rem",
     marginBottom: 0,
     fontSize: "1.05rem",
-    lineHeight: 1.7,
-    opacity: 0.96,
+    lineHeight: 1.75,
+    color: "rgba(255,255,255,0.84)",
     maxWidth: "760px",
   },
   heroStats: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-    gap: "0.9rem",
-    marginTop: "1.5rem",
+    gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+    gap: "0.8rem",
   },
   statCard: {
-    backgroundColor: "rgba(255,255,255,0.12)",
-    border: "1px solid rgba(255,255,255,0.16)",
-    borderRadius: "16px",
+    background: "rgba(255,255,255,0.12)",
+    border: "1px solid rgba(255,255,255,0.14)",
+    borderRadius: "20px",
     padding: "1rem",
     display: "flex",
     flexDirection: "column",
-    gap: "0.3rem",
+    gap: "0.25rem",
   },
   statNumber: {
-    fontSize: "1.4rem",
+    fontSize: "1.45rem",
     fontWeight: "800",
   },
   statLabel: {
-    opacity: 0.92,
+    color: "rgba(255,255,255,0.82)",
     lineHeight: 1.5,
   },
   feedbackSection: {
@@ -432,34 +501,34 @@ const styles = {
     marginBottom: "1.25rem",
   },
   feedbackBox: {
-    borderRadius: "16px",
+    borderRadius: "18px",
     padding: "1rem 1.1rem",
     border: "1px solid transparent",
-    boxShadow: "0 8px 22px rgba(0,0,0,0.04)",
+    boxShadow: "0 10px 24px rgba(15,23,42,0.04)",
   },
   feedbackSuccess: {
-    backgroundColor: "#ecfdf5",
+    background: "#ecfdf5",
     borderColor: "#86efac",
   },
   feedbackError: {
-    backgroundColor: "#fff1f2",
+    background: "#fff1f2",
     borderColor: "#fecdd3",
   },
   feedbackText: {
     margin: 0,
-    fontWeight: "700",
+    fontWeight: "800",
     lineHeight: 1.6,
     color: "#0f172a",
   },
   errorBox: {
-    backgroundColor: "#fff1f2",
+    background: "#fff1f2",
     border: "1px solid #fecdd3",
-    borderRadius: "18px",
+    borderRadius: "24px",
     padding: "1.25rem",
     display: "flex",
     flexDirection: "column",
     gap: "0.9rem",
-    boxShadow: "0 8px 22px rgba(0,0,0,0.04)",
+    boxShadow: "0 10px 24px rgba(15,23,42,0.04)",
   },
   errorTitle: {
     margin: 0,
@@ -476,14 +545,23 @@ const styles = {
   summarySection: {
     marginTop: "2rem",
     marginBottom: "1rem",
+    background: "rgba(255,255,255,0.82)",
+    border: "1px solid rgba(148,163,184,0.18)",
+    borderRadius: "24px",
+    padding: "1.3rem",
+    boxShadow: "0 16px 34px rgba(15,23,42,0.05)",
+    backdropFilter: "blur(10px)",
   },
   sectionHeader: {
     display: "flex",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
     gap: "1rem",
     flexWrap: "wrap",
     marginBottom: "1rem",
+  },
+  sectionHeaderMobile: {
+    flexDirection: "column",
   },
   sectionTitle: {
     margin: 0,
@@ -493,24 +571,30 @@ const styles = {
   sectionText: {
     marginTop: "0.45rem",
     marginBottom: 0,
-    color: "#475569",
-    lineHeight: 1.65,
+    color: "#64748b",
+    lineHeight: 1.7,
+    maxWidth: "760px",
   },
   countBadge: {
-    backgroundColor: "#dbeafe",
+    background: "#eff6ff",
     color: "#1d4ed8",
-    padding: "0.45rem 0.8rem",
+    padding: "0.5rem 0.85rem",
     borderRadius: "999px",
-    fontWeight: "700",
-    fontSize: "0.95rem",
+    fontWeight: "800",
+    fontSize: "0.9rem",
+    border: "1px solid #dbeafe",
   },
   filtersRow: {
     display: "flex",
     gap: "0.75rem",
     flexWrap: "wrap",
   },
-  filterButton: {
-    minWidth: "140px",
+  filtersRowMobile: {
+    flexDirection: "column",
+    alignItems: "stretch",
+  },
+  fullWidthButton: {
+    width: "100%",
   },
   grid: {
     display: "grid",
@@ -518,18 +602,19 @@ const styles = {
     gap: "1rem",
   },
   recentlyCancelledWrapper: {
-    borderRadius: "18px",
-    boxShadow: "0 0 0 4px rgba(239,68,68,0.12)",
+    borderRadius: "22px",
+    boxShadow: "0 0 0 4px rgba(239,68,68,0.10)",
     transition: "all 0.2s ease",
   },
   filteredEmptyState: {
     marginTop: "1rem",
-    backgroundColor: "white",
-    borderRadius: "18px",
+    background: "rgba(255,255,255,0.86)",
+    borderRadius: "26px",
     padding: "2rem",
-    boxShadow: "0 8px 22px rgba(0,0,0,0.06)",
-    border: "1px solid #e5e7eb",
+    boxShadow: "0 18px 40px rgba(15,23,42,0.06)",
+    border: "1px solid rgba(148,163,184,0.18)",
     textAlign: "center",
+    backdropFilter: "blur(10px)",
   },
   filteredEmptyIcon: {
     fontSize: "2rem",
@@ -544,8 +629,8 @@ const styles = {
   },
   filteredEmptyText: {
     margin: "0 auto",
-    color: "#4b5563",
-    lineHeight: 1.7,
+    color: "#64748b",
+    lineHeight: 1.75,
     maxWidth: "620px",
   },
   filteredEmptyActions: {
@@ -553,12 +638,13 @@ const styles = {
   },
   emptyState: {
     marginTop: "2rem",
-    backgroundColor: "white",
-    borderRadius: "18px",
+    background: "rgba(255,255,255,0.86)",
+    borderRadius: "26px",
     padding: "2rem",
-    boxShadow: "0 8px 22px rgba(0,0,0,0.06)",
-    border: "1px solid #e5e7eb",
+    boxShadow: "0 18px 40px rgba(15,23,42,0.06)",
+    border: "1px solid rgba(148,163,184,0.18)",
     textAlign: "center",
+    backdropFilter: "blur(10px)",
   },
   emptyIcon: {
     fontSize: "2.2rem",
@@ -573,8 +659,8 @@ const styles = {
   },
   emptyText: {
     margin: "0 auto",
-    color: "#4b5563",
-    lineHeight: 1.7,
+    color: "#64748b",
+    lineHeight: 1.75,
     maxWidth: "680px",
   },
   emptyActions: {
@@ -584,8 +670,10 @@ const styles = {
     flexWrap: "wrap",
     marginTop: "1.5rem",
   },
-  emptyPrimary: {},
-  emptySecondary: {},
+  emptyActionsMobile: {
+    flexDirection: "column",
+    alignItems: "stretch",
+  },
 };
 
 export default MyReservationsPage;

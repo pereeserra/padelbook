@@ -58,8 +58,9 @@ function ReservationCard({
     >
       <div style={styles.header}>
         <div>
+          <span style={styles.eyebrow}>Reserva de pista</span>
           <h3 style={styles.title}>{reservation.nom_pista}</h3>
-          <p style={styles.subtitle}>Reserva de pista de pàdel</p>
+          <p style={styles.subtitle}>Gestió ràpida de la teva reserva</p>
         </div>
 
         <span
@@ -147,130 +148,127 @@ function ReservationCard({
 
 const styles = {
   card: {
-    backgroundColor: "white",
-    borderRadius: "18px",
-    padding: "1.4rem",
-    boxShadow: "0 8px 22px rgba(0,0,0,0.08)",
-    border: "1px solid #e5e7eb",
+    background: "rgba(255,255,255,0.86)",
+    borderRadius: "24px",
+    padding: "1.3rem",
+    boxShadow: "0 16px 34px rgba(15,23,42,0.05)",
+    border: "1px solid rgba(148,163,184,0.18)",
     transition: "all 0.25s ease",
     scrollMarginTop: "120px",
+    backdropFilter: "blur(10px)",
   },
-
   cardConfirming: {
     border: "1px solid #fecaca",
-    boxShadow: "0 12px 26px rgba(220,38,38,0.12)",
+    boxShadow: "0 16px 34px rgba(220,38,38,0.10)",
     transform: "scale(1.01)",
   },
-
   cardInactive: {
-    opacity: 0.92,
+    opacity: 0.94,
   },
-
   cardCancelling: {
     opacity: 0.85,
     pointerEvents: "none",
   },
-
   header: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "flex-start",
     gap: "1rem",
-    marginBottom: "1.25rem",
+    marginBottom: "1.15rem",
     flexWrap: "wrap",
   },
-
+  eyebrow: {
+    display: "inline-block",
+    marginBottom: "0.4rem",
+    fontSize: "0.78rem",
+    color: "#64748b",
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
+  },
   title: {
     margin: 0,
     fontSize: "1.35rem",
     color: "#0f172a",
   },
-
   subtitle: {
     marginTop: "0.35rem",
     marginBottom: 0,
-    color: "#6b7280",
+    color: "#64748b",
     fontSize: "0.95rem",
+    lineHeight: 1.6,
   },
-
   badge: {
     padding: "0.45rem 0.8rem",
     borderRadius: "999px",
-    fontWeight: "700",
-    fontSize: "0.9rem",
+    fontWeight: "800",
+    fontSize: "0.88rem",
     textTransform: "capitalize",
   },
-
   badgeActive: {
-    backgroundColor: "#dcfce7",
-    color: "#166534",
+    background: "#ecfdf5",
+    color: "#15803d",
+    border: "1px solid #bbf7d0",
   },
-
   badgeInactive: {
-    backgroundColor: "#fee2e2",
-    color: "#991b1b",
+    background: "#fff1f2",
+    color: "#be123c",
+    border: "1px solid #fecdd3",
   },
-
   infoGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
     gap: "0.85rem",
   },
-
   infoBox: {
-    backgroundColor: "#f8fafc",
-    border: "1px solid #e5e7eb",
-    borderRadius: "14px",
-    padding: "0.9rem 1rem",
+    background: "rgba(248,250,252,0.95)",
+    border: "1px solid #e2e8f0",
+    borderRadius: "18px",
+    padding: "0.95rem 1rem",
   },
-
   label: {
     display: "block",
     marginBottom: "0.35rem",
     color: "#64748b",
-    fontSize: "0.85rem",
-    fontWeight: "700",
+    fontSize: "0.82rem",
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
   },
-
   value: {
     margin: 0,
     color: "#0f172a",
     fontWeight: "700",
-    lineHeight: 1.5,
+    lineHeight: 1.55,
     textTransform: "capitalize",
   },
-
   footer: {
     marginTop: "1.1rem",
     display: "flex",
     justifyContent: "flex-end",
   },
-
   cancelButton: {
-    backgroundColor: "#ef4444",
+    background: "linear-gradient(135deg, #ef4444, #dc2626)",
     color: "white",
     border: "none",
-    borderRadius: "10px",
-    fontWeight: "700",
-    padding: "0.7rem 1rem",
+    borderRadius: "999px",
+    fontWeight: "800",
+    padding: "0.78rem 1rem",
     cursor: "pointer",
-    boxShadow: "0 4px 10px rgba(0,0,0,0.08)",
+    boxShadow: "0 12px 24px rgba(220,38,38,0.16)",
   },
-
   cancelButtonDisabled: {
-    backgroundColor: "#f87171",
+    background: "#f87171",
     cursor: "not-allowed",
     opacity: 0.92,
   },
-
   confirmBox: {
     marginTop: "1.25rem",
-    backgroundColor: "#fff7ed",
+    background: "#fff7ed",
     border: "1px solid #fdba74",
-    borderRadius: "16px",
+    borderRadius: "20px",
     padding: "1rem",
   },
-
   confirmTitle: {
     marginTop: 0,
     marginBottom: "0.45rem",
@@ -278,43 +276,37 @@ const styles = {
     fontSize: "1rem",
     fontWeight: "800",
   },
-
   confirmText: {
     marginTop: 0,
     marginBottom: "1rem",
     color: "#7c2d12",
-    lineHeight: 1.6,
+    lineHeight: 1.65,
     fontWeight: "600",
   },
-
   confirmActions: {
     display: "flex",
     gap: "0.75rem",
     flexWrap: "wrap",
   },
-
   confirmDangerButton: {
-    backgroundColor: "#dc2626",
+    background: "linear-gradient(135deg, #dc2626, #b91c1c)",
     color: "white",
     border: "none",
-    borderRadius: "10px",
-    fontWeight: "700",
-    padding: "0.7rem 1rem",
+    borderRadius: "999px",
+    fontWeight: "800",
+    padding: "0.75rem 1rem",
     cursor: "pointer",
   },
-
   confirmDangerButtonLoading: {
-    backgroundColor: "#b91c1c",
+    background: "#b91c1c",
     cursor: "not-allowed",
     opacity: 0.95,
   },
-
   confirmSecondaryButton: {
-    borderRadius: "10px",
-    fontWeight: "700",
-    padding: "0.7rem 1rem",
+    borderRadius: "999px",
+    fontWeight: "800",
+    padding: "0.75rem 1rem",
   },
-
   confirmSecondaryButtonDisabled: {
     opacity: 0.75,
     cursor: "not-allowed",
