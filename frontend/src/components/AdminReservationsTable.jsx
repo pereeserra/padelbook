@@ -1,4 +1,58 @@
+import { useMemo, useState } from "react";
+
 function AdminReservationsTable({ reservations = [] }) {
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("totes");
+
+  const normalizedReservations = useMemo(() => {
+    return [...reservations].sort((a, b) => {
+      const dateA = new Date(`${a.data_reserva || ""}T${a.hora_inici || "00:00"}`).getTime();
+      const dateB = new Date(`${b.data_reserva || ""}T${b.hora_inici || "00:00"}`).getTime();
+      return dateB - dateA;
+    });
+  }, [reservations]);
+
+  const filteredReservations = useMemo(() => {
+    const query = search.trim().toLowerCase();
+
+    return normalizedReservations.filter((reservation) => {
+      const userName = (reservation.nom_usuari || "").toLowerCase();
+      const email = (reservation.email || "").toLowerCase();
+      const courtName = (reservation.nom_pista || "").toLowerCase();
+      const status = (reservation.estat || "").toLowerCase();
+
+      const matchesSearch =
+        !query ||
+        userName.includes(query) ||
+        email.includes(query) ||
+        courtName.includes(query);
+
+      const matchesStatus =
+        statusFilter === "totes" || status === statusFilter;
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [normalizedReservations, search, statusFilter]);
+
+  const activeCount = useMemo(() => {
+    return reservations.filter((reservation) => {
+      const status = (reservation.estat || "").toLowerCase();
+      return status === "activa" || status === "active";
+    }).length;
+  }, [reservations]);
+
+  const cancelledCount = useMemo(() => {
+    return reservations.filter((reservation) => {
+      const status = (reservation.estat || "").toLowerCase();
+      return status !== "activa" && status !== "active";
+    }).length;
+  }, [reservations]);
+
+  const clearFilters = () => {
+    setSearch("");
+    setStatusFilter("totes");
+  };
+
   if (!reservations.length) {
     return (
       <div style={styles.emptyState}>
@@ -19,100 +73,184 @@ function AdminReservationsTable({ reservations = [] }) {
           <span style={styles.eyebrow}>Control administratiu</span>
           <h3 style={styles.title}>Reserves registrades</h3>
           <p style={styles.subtitle}>
-            Vista general de totes les reserves creades al sistema.
+            Vista general de totes les reserves creades al sistema, amb filtres
+            ràpids per revisar-les millor.
           </p>
         </div>
 
-        <span style={styles.countBadge}>{reservations.length} reserves</span>
+        <span style={styles.countBadge}>{filteredReservations.length} visibles</span>
       </div>
 
-      <div style={styles.tableContainer}>
-        <table style={styles.table}>
-          <thead>
-            <tr>
-              <th style={styles.th}>Usuari</th>
-              <th style={styles.th}>Correu</th>
-              <th style={styles.th}>Pista</th>
-              <th style={styles.th}>Data</th>
-              <th style={styles.th}>Hora</th>
-              <th style={styles.th}>Estat</th>
-            </tr>
-          </thead>
+      <div style={styles.summaryGrid}>
+        <article style={styles.summaryCard}>
+          <span style={styles.summaryLabel}>Totals</span>
+          <span style={styles.summaryValue}>{reservations.length}</span>
+        </article>
 
-          <tbody>
-            {reservations.map((reservation, index) => {
-              const formattedDate = new Date(
-                reservation.data_reserva
-              ).toLocaleDateString("ca-ES", {
-                weekday: "short",
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              });
+        <article style={styles.summaryCard}>
+          <span style={styles.summaryLabel}>Actives</span>
+          <span style={styles.summaryValue}>{activeCount}</span>
+        </article>
 
-              const isActive = reservation.estat === "activa";
+        <article style={styles.summaryCard}>
+          <span style={styles.summaryLabel}>Cancel·lades</span>
+          <span style={styles.summaryValue}>{cancelledCount}</span>
+        </article>
 
-              return (
-                <tr
-                  key={reservation.id}
-                  style={{
-                    ...styles.row,
-                    ...(index % 2 === 0 ? styles.rowEven : styles.rowOdd),
-                  }}
-                >
-                  <td style={styles.td}>
-                    <div style={styles.userCell}>
-                      <span style={styles.userAvatar}>
-                        {(reservation.nom_usuari || "U").charAt(0).toUpperCase()}
-                      </span>
-                      <div>
-                        <p style={styles.primaryText}>
-                          {reservation.nom_usuari || "Usuari"}
-                        </p>
+        <article style={styles.summaryCard}>
+          <span style={styles.summaryLabel}>Mostrades</span>
+          <span style={styles.summaryValue}>{filteredReservations.length}</span>
+        </article>
+      </div>
+
+      <div style={styles.toolsGrid}>
+        <div style={styles.field}>
+          <label htmlFor="reservationSearch" style={styles.label}>
+            Cercar reserva
+          </label>
+          <input
+            id="reservationSearch"
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Usuari, correu o pista..."
+            className="pb-input"
+          />
+        </div>
+
+        <div style={styles.field}>
+          <label htmlFor="reservationStatus" style={styles.label}>
+            Estat
+          </label>
+          <select
+            id="reservationStatus"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="pb-input"
+          >
+            <option value="totes">Totes</option>
+            <option value="activa">Actives</option>
+            <option value="cancelada">Cancel·lades</option>
+          </select>
+        </div>
+
+        <div style={styles.fieldAction}>
+          <button
+            type="button"
+            className="btn btn-light"
+            onClick={clearFilters}
+          >
+            Netejar filtres
+          </button>
+        </div>
+      </div>
+
+      {filteredReservations.length > 0 ? (
+        <div style={styles.tableContainer}>
+          <table style={styles.table}>
+            <thead>
+              <tr>
+                <th style={styles.th}>Usuari</th>
+                <th style={styles.th}>Correu</th>
+                <th style={styles.th}>Pista</th>
+                <th style={styles.th}>Data</th>
+                <th style={styles.th}>Hora</th>
+                <th style={styles.th}>Estat</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {filteredReservations.map((reservation, index) => {
+                const formattedDate = new Date(
+                  reservation.data_reserva
+                ).toLocaleDateString("ca-ES", {
+                  weekday: "short",
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                });
+
+                const isActive =
+                  (reservation.estat || "").toLowerCase() === "activa" ||
+                  (reservation.estat || "").toLowerCase() === "active";
+
+                return (
+                  <tr
+                    key={reservation.id}
+                    style={{
+                      ...styles.row,
+                      ...(index % 2 === 0 ? styles.rowEven : styles.rowOdd),
+                    }}
+                  >
+                    <td style={styles.td}>
+                      <div style={styles.userCell}>
+                        <span style={styles.userAvatar}>
+                          {(reservation.nom_usuari || "U").charAt(0).toUpperCase()}
+                        </span>
+                        <div>
+                          <p style={styles.primaryText}>
+                            {reservation.nom_usuari || "Usuari"}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </td>
+                    </td>
 
-                  <td style={styles.td}>
-                    <span style={styles.secondaryText}>
-                      {reservation.email || "-"}
-                    </span>
-                  </td>
+                    <td style={styles.td}>
+                      <span style={styles.secondaryText}>
+                        {reservation.email || "-"}
+                      </span>
+                    </td>
 
-                  <td style={styles.td}>
-                    <span style={styles.primaryText}>
-                      {reservation.nom_pista || "-"}
-                    </span>
-                  </td>
+                    <td style={styles.td}>
+                      <span style={styles.primaryText}>
+                        {reservation.nom_pista || "-"}
+                      </span>
+                    </td>
 
-                  <td style={styles.td}>
-                    <span style={styles.secondaryText}>{formattedDate}</span>
-                  </td>
+                    <td style={styles.td}>
+                      <span style={styles.secondaryText}>{formattedDate}</span>
+                    </td>
 
-                  <td style={styles.td}>
-                    <span style={styles.timeBadge}>
-                      {reservation.hora_inici} - {reservation.hora_fi}
-                    </span>
-                  </td>
+                    <td style={styles.td}>
+                      <span style={styles.timeBadge}>
+                        {reservation.hora_inici} - {reservation.hora_fi}
+                      </span>
+                    </td>
 
-                  <td style={styles.td}>
-                    <span
-                      style={{
-                        ...styles.statusBadge,
-                        ...(isActive
-                          ? styles.statusActive
-                          : styles.statusInactive),
-                      }}
-                    >
-                      {reservation.estat}
-                    </span>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                    <td style={styles.td}>
+                      <span
+                        style={{
+                          ...styles.statusBadge,
+                          ...(isActive
+                            ? styles.statusActive
+                            : styles.statusInactive),
+                        }}
+                      >
+                        {reservation.estat}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div style={styles.emptyFilteredState}>
+          <p style={styles.emptyFilteredTitle}>No s'ha trobat cap reserva</p>
+          <p style={styles.emptyFilteredText}>
+            Ajusta la cerca o l’estat seleccionat per tornar a veure resultats.
+          </p>
+
+          <button
+            type="button"
+            className="btn btn-light"
+            onClick={clearFilters}
+          >
+            Mostrar totes les reserves
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -158,6 +296,51 @@ const styles = {
     fontWeight: "800",
     fontSize: "0.9rem",
     border: "1px solid #dbeafe",
+  },
+  summaryGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+    gap: "0.85rem",
+  },
+  summaryCard: {
+    borderRadius: "18px",
+    padding: "0.95rem 1rem",
+    background: "linear-gradient(180deg, #f8fafc, #ffffff)",
+    border: "1px solid rgba(148, 163, 184, 0.18)",
+  },
+  summaryLabel: {
+    display: "block",
+    color: "#64748b",
+    fontSize: "0.78rem",
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
+    marginBottom: "0.35rem",
+  },
+  summaryValue: {
+    color: "#0f172a",
+    fontSize: "1.25rem",
+    fontWeight: "800",
+  },
+  toolsGrid: {
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 1.4fr) minmax(200px, 0.7fr) auto",
+    gap: "0.85rem",
+    alignItems: "end",
+  },
+  field: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.45rem",
+  },
+  fieldAction: {
+    display: "flex",
+    alignItems: "end",
+  },
+  label: {
+    fontSize: "0.88rem",
+    fontWeight: "800",
+    color: "#334155",
   },
   tableContainer: {
     width: "100%",
@@ -278,6 +461,27 @@ const styles = {
     margin: 0,
     color: "#64748b",
     lineHeight: 1.7,
+  },
+  emptyFilteredState: {
+    borderRadius: "20px",
+    border: "1px solid rgba(148,163,184,0.18)",
+    background: "#f8fafc",
+    padding: "1.25rem",
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.75rem",
+    alignItems: "flex-start",
+  },
+  emptyFilteredTitle: {
+    margin: 0,
+    color: "#0f172a",
+    fontWeight: "800",
+    fontSize: "1rem",
+  },
+  emptyFilteredText: {
+    margin: 0,
+    color: "#64748b",
+    lineHeight: 1.65,
   },
 };
 

@@ -47,6 +47,10 @@ function AdminPage() {
 
   const [newCourt, setNewCourt] = useState(emptyCourt);
 
+  const [courtSearch, setCourtSearch] = useState("");
+  const [courtStatusFilter, setCourtStatusFilter] = useState("totes");
+  const [courtTypeFilter, setCourtTypeFilter] = useState("tots");
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobileView(window.innerWidth <= 768);
@@ -335,6 +339,12 @@ function AdminPage() {
     setEditingCourtId(null);
   };
 
+  const resetCourtFilters = () => {
+    setCourtSearch("");
+    setCourtStatusFilter("totes");
+    setCourtTypeFilter("tots");
+  };
+
   const handleCreateOrUpdateCourt = async (e) => {
     e.preventDefault();
 
@@ -521,6 +531,36 @@ function AdminPage() {
     return [...statsByDate].sort((a, b) => b.value - a.value)[0];
   }, [statsByDate]);
 
+  const filteredCourts = useMemo(() => {
+    const query = courtSearch.trim().toLowerCase();
+
+    return courts.filter((court) => {
+      const name = (court.nom_pista || "").toLowerCase();
+      const description = (court.descripcio || "").toLowerCase();
+      const status = (court.estat || "").toLowerCase();
+      const type = (court.tipus || "").toLowerCase();
+
+      const matchesQuery =
+        !query || name.includes(query) || description.includes(query);
+
+      const matchesStatus =
+        courtStatusFilter === "totes" || status === courtStatusFilter;
+
+      const matchesType =
+        courtTypeFilter === "tots" || type === courtTypeFilter;
+
+      return matchesQuery && matchesStatus && matchesType;
+    });
+  }, [courts, courtSearch, courtStatusFilter, courtTypeFilter]);
+
+  const filteredAvailableCourtsCount = useMemo(() => {
+    return filteredCourts.filter((court) => court.estat === "disponible").length;
+  }, [filteredCourts]);
+
+  const filteredMaintenanceCourtsCount = useMemo(() => {
+    return filteredCourts.filter((court) => court.estat === "manteniment").length;
+  }, [filteredCourts]);
+
   const formatDateTime = (value) => {
     if (!value) return "Data no disponible";
 
@@ -676,6 +716,15 @@ function AdminPage() {
                 <button
                   type="button"
                   className="btn btn-light"
+                  onClick={() => scrollToElementWithOffset(reservationsSectionRef.current, 140)}
+                  style={isMobileView ? styles.fullWidthButton : undefined}
+                >
+                  Veure reserves
+                </button>
+
+                <button
+                  type="button"
+                  className="btn btn-light"
                   onClick={() => scrollToElementWithOffset(courtsSectionRef.current, 140)}
                   style={isMobileView ? styles.fullWidthButton : undefined}
                 >
@@ -790,7 +839,10 @@ function AdminPage() {
               >
                 <div>
                   <span className="pb-kicker">Visió general</span>
-                  <h2 className="pb-panel-title" style={isMobileView ? styles.sectionTitleMobile : undefined}>
+                  <h2
+                    className="pb-panel-title"
+                    style={isMobileView ? styles.sectionTitleMobile : undefined}
+                  >
                     Dashboard administratiu
                   </h2>
                   <p className="pb-panel-text">
@@ -863,7 +915,11 @@ function AdminPage() {
                   }}
                 >
                   {quickInsights.map((insight) => (
-                    <article className="pb-surface-card" style={styles.insightCard} key={insight.label}>
+                    <article
+                      className="pb-surface-card"
+                      style={styles.insightCard}
+                      key={insight.label}
+                    >
                       <span style={styles.insightLabel}>{insight.label}</span>
                       <span style={styles.insightValue}>{insight.value}</span>
                     </article>
@@ -1064,7 +1120,10 @@ function AdminPage() {
                               ...(isMobileView ? styles.logTopRowMobile : {}),
                             }}
                           >
-                            <span className="pb-badge-pill pb-badge-pill--blue" style={styles.logActionBadge}>
+                            <span
+                              className="pb-badge-pill pb-badge-pill--blue"
+                              style={styles.logActionBadge}
+                            >
                               {formatActionLabel(log.action)}
                             </span>
                             <span style={styles.logDate}>
@@ -1107,7 +1166,10 @@ function AdminPage() {
                   <span className="pb-kicker">
                     {editingCourtId ? "Edició" : "Creació"}
                   </span>
-                  <h2 className="pb-panel-title" style={isMobileView ? styles.sectionTitleMobile : undefined}>
+                  <h2
+                    className="pb-panel-title"
+                    style={isMobileView ? styles.sectionTitleMobile : undefined}
+                  >
                     {editingCourtId ? "Editar pista" : "Crear nova pista"}
                   </h2>
                   <p className="pb-panel-text">
@@ -1147,11 +1209,14 @@ function AdminPage() {
               >
                 <div>
                   <span className="pb-kicker">Control operatiu</span>
-                  <h2 className="pb-panel-title" style={isMobileView ? styles.sectionTitleMobile : undefined}>
+                  <h2
+                    className="pb-panel-title"
+                    style={isMobileView ? styles.sectionTitleMobile : undefined}
+                  >
                     Reserves del sistema
                   </h2>
                   <p className="pb-panel-text">
-                    Consulta totes les reserves registrades a l’aplicació.
+                    Consulta, filtra i revisa totes les reserves registrades.
                   </p>
                 </div>
 
@@ -1184,46 +1249,154 @@ function AdminPage() {
               >
                 <div>
                   <span className="pb-kicker">Gestió d’espais</span>
-                  <h2 className="pb-panel-title" style={isMobileView ? styles.sectionTitleMobile : undefined}>
+                  <h2
+                    className="pb-panel-title"
+                    style={isMobileView ? styles.sectionTitleMobile : undefined}
+                  >
                     Pistes
                   </h2>
                   <p className="pb-panel-text">
-                    Gestiona les pistes existents, edita-les o elimina-les quan
-                    sigui necessari.
+                    Cerca, filtra i gestiona les pistes existents amb més rapidesa.
                   </p>
                 </div>
 
                 <span className="pb-badge-pill pb-badge-pill--green">
-                  {courts.length} pistes
+                  {filteredCourts.length} visibles
                 </span>
               </div>
 
-              <div
-                style={{
-                  ...styles.cards,
-                  ...(isMobileView ? styles.cardsMobile : {}),
-                }}
-              >
-                {courts.map((court) => (
-                  <CourtCard
-                    key={court.id}
-                    court={court}
-                    onEdit={() => handleStartEditCourt(court)}
-                    onStartDelete={() => {
-                      setConfirmingCourtId(court.id);
+              <div className="pb-surface-card" style={styles.sectionCard}>
+                <div
+                  style={{
+                    ...styles.courtToolsGrid,
+                    ...(isMobileView ? styles.courtToolsGridMobile : {}),
+                  }}
+                >
+                  <div style={styles.courtFilterField}>
+                    <label htmlFor="courtSearch" style={styles.filterLabel}>
+                      Cercar pista
+                    </label>
+                    <input
+                      id="courtSearch"
+                      type="text"
+                      value={courtSearch}
+                      onChange={(e) => setCourtSearch(e.target.value)}
+                      placeholder="Nom o descripció..."
+                      className="pb-input"
+                    />
+                  </div>
 
-                      setTimeout(() => {
-                        scrollToCourtCard(court.id);
-                      }, 150);
-                    }}
-                    onAbortDelete={() => setConfirmingCourtId(null)}
-                    onDelete={() => handleDeleteCourt(court.id)}
-                    confirmingDelete={confirmingCourtId === court.id}
-                    isDeleting={deletingCourtId === court.id}
-                    isHighlighted={highlightedCourtId === court.id}
-                  />
-                ))}
+                  <div style={styles.courtFilterField}>
+                    <label htmlFor="courtStatusFilter" style={styles.filterLabel}>
+                      Estat
+                    </label>
+                    <select
+                      id="courtStatusFilter"
+                      value={courtStatusFilter}
+                      onChange={(e) => setCourtStatusFilter(e.target.value)}
+                      className="pb-input"
+                    >
+                      <option value="totes">Totes</option>
+                      <option value="disponible">Disponibles</option>
+                      <option value="manteniment">Manteniment</option>
+                    </select>
+                  </div>
+
+                  <div style={styles.courtFilterField}>
+                    <label htmlFor="courtTypeFilter" style={styles.filterLabel}>
+                      Tipus
+                    </label>
+                    <select
+                      id="courtTypeFilter"
+                      value={courtTypeFilter}
+                      onChange={(e) => setCourtTypeFilter(e.target.value)}
+                      className="pb-input"
+                    >
+                      <option value="tots">Tots</option>
+                      <option value="dobles">Dobles</option>
+                      <option value="individual">Individual</option>
+                    </select>
+                  </div>
+
+                  <div style={styles.courtFilterActions}>
+                    <button
+                      type="button"
+                      className="btn btn-light"
+                      onClick={resetCourtFilters}
+                      style={isMobileView ? styles.fullWidthButton : undefined}
+                    >
+                      Netejar filtres
+                    </button>
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    ...styles.courtQuickStats,
+                    ...(isMobileView ? styles.courtQuickStatsMobile : {}),
+                  }}
+                >
+                  <div style={styles.courtQuickStat}>
+                    <span style={styles.courtQuickStatLabel}>Mostrades</span>
+                    <span style={styles.courtQuickStatValue}>{filteredCourts.length}</span>
+                  </div>
+
+                  <div style={styles.courtQuickStat}>
+                    <span style={styles.courtQuickStatLabel}>Disponibles</span>
+                    <span style={styles.courtQuickStatValue}>{filteredAvailableCourtsCount}</span>
+                  </div>
+
+                  <div style={styles.courtQuickStat}>
+                    <span style={styles.courtQuickStatLabel}>Manteniment</span>
+                    <span style={styles.courtQuickStatValue}>{filteredMaintenanceCourtsCount}</span>
+                  </div>
+                </div>
               </div>
+
+              {filteredCourts.length > 0 ? (
+                <div
+                  style={{
+                    ...styles.cards,
+                    ...(isMobileView ? styles.cardsMobile : {}),
+                  }}
+                >
+                  {filteredCourts.map((court) => (
+                    <CourtCard
+                      key={court.id}
+                      court={court}
+                      onEdit={() => handleStartEditCourt(court)}
+                      onStartDelete={() => {
+                        setConfirmingCourtId(court.id);
+
+                        setTimeout(() => {
+                          scrollToCourtCard(court.id);
+                        }, 150);
+                      }}
+                      onAbortDelete={() => setConfirmingCourtId(null)}
+                      onDelete={() => handleDeleteCourt(court.id)}
+                      confirmingDelete={confirmingCourtId === court.id}
+                      isDeleting={deletingCourtId === court.id}
+                      isHighlighted={highlightedCourtId === court.id}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="pb-surface-card" style={styles.emptyFilteredState}>
+                  <p style={styles.emptyFilteredTitle}>No hi ha pistes que coincideixin</p>
+                  <p style={styles.emptyFilteredText}>
+                    Revisa els filtres aplicats o neteja la cerca per tornar a veure
+                    totes les pistes.
+                  </p>
+
+                  <button
+                    type="button"
+                    className="btn btn-light"
+                    onClick={resetCourtFilters}
+                  >
+                    Mostrar totes les pistes
+                  </button>
+                </div>
+              )}
             </section>
           </>
         )}
@@ -1603,13 +1776,85 @@ const styles = {
     color: "#475569",
     lineHeight: 1.65,
   },
+  courtToolsGrid: {
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 1.4fr) repeat(2, minmax(180px, 0.8fr)) auto",
+    gap: "0.9rem",
+    alignItems: "end",
+  },
+  courtToolsGridMobile: {
+    gridTemplateColumns: "1fr",
+  },
+  courtFilterField: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.45rem",
+  },
+  filterLabel: {
+    fontSize: "0.88rem",
+    fontWeight: "800",
+    color: "#334155",
+  },
+  courtFilterActions: {
+    display: "flex",
+    alignItems: "end",
+  },
+  courtQuickStats: {
+    marginTop: "1rem",
+    display: "grid",
+    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+    gap: "0.85rem",
+  },
+  courtQuickStatsMobile: {
+    gridTemplateColumns: "1fr",
+  },
+  courtQuickStat: {
+    borderRadius: "18px",
+    padding: "0.95rem 1rem",
+    background: "linear-gradient(180deg, #f8fafc, #ffffff)",
+    border: "1px solid rgba(148, 163, 184, 0.18)",
+  },
+  courtQuickStatLabel: {
+    display: "block",
+    color: "#64748b",
+    fontSize: "0.78rem",
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
+    marginBottom: "0.35rem",
+  },
+  courtQuickStatValue: {
+    color: "#0f172a",
+    fontSize: "1.3rem",
+    fontWeight: "800",
+  },
   cards: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
     gap: "1rem",
+    marginTop: "1rem",
   },
   cardsMobile: {
     gridTemplateColumns: "1fr",
+  },
+  emptyFilteredState: {
+    marginTop: "1rem",
+    padding: "1.25rem",
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.8rem",
+    alignItems: "flex-start",
+  },
+  emptyFilteredTitle: {
+    margin: 0,
+    color: "#0f172a",
+    fontWeight: "800",
+    fontSize: "1.05rem",
+  },
+  emptyFilteredText: {
+    margin: 0,
+    color: "#64748b",
+    lineHeight: 1.65,
   },
 };
 
