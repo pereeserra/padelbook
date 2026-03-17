@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../api/axios";
 import ReservationCard from "../components/ReservationCard";
 import LoadingSpinner from "../components/LoadingSpinner";
 
 function MyReservationsPage() {
+  const topFeedbackRef = useRef(null);
+
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -13,6 +15,20 @@ function MyReservationsPage() {
   const [confirmingReservationId, setConfirmingReservationId] = useState(null);
   const [cancellingReservationId, setCancellingReservationId] = useState(null);
   const [activeFilter, setActiveFilter] = useState("all");
+  const [recentlyCancelledReservationId, setRecentlyCancelledReservationId] =
+    useState(null);
+
+  const scrollToFeedback = () => {
+    if (!topFeedbackRef.current) return;
+
+    const top =
+      topFeedbackRef.current.getBoundingClientRect().top + window.scrollY - 150;
+
+    window.scrollTo({
+      top,
+      behavior: "smooth",
+    });
+  };
 
   const fetchReservations = async () => {
     try {
@@ -21,6 +37,7 @@ function MyReservationsPage() {
 
       const response = await api.get("/reservations");
       const reservationsData = response?.data?.data || [];
+
       setReservations(Array.isArray(reservationsData) ? reservationsData : []);
     } catch (err) {
       console.error(err);
@@ -43,12 +60,23 @@ function MyReservationsPage() {
     try {
       setCancellingReservationId(id);
 
-      await api.delete(`/reservations/${id}`);
+      const response = await api.delete(`/reservations/${id}`);
 
       setConfirmingReservationId(null);
-      showFeedbackMessage("La reserva s'ha cancel·lat correctament.", "success");
+      setRecentlyCancelledReservationId(id);
+
+      showFeedbackMessage(
+        response?.data?.message || "La reserva s'ha cancel·lat correctament.",
+        "success"
+      );
+
+      scrollToFeedback();
 
       await fetchReservations();
+
+      setTimeout(() => {
+        setRecentlyCancelledReservationId(null);
+      }, 2500);
     } catch (err) {
       console.error(err);
 
@@ -57,6 +85,7 @@ function MyReservationsPage() {
         "No s'ha pogut cancel·lar la reserva. Torna-ho a provar.";
 
       showFeedbackMessage(backendError, "error");
+      scrollToFeedback();
     } finally {
       setCancellingReservationId(null);
     }
@@ -123,6 +152,8 @@ function MyReservationsPage() {
             </div>
           )}
         </section>
+
+        <div ref={topFeedbackRef} />
 
         {feedback && (
           <section className="scale-in" style={styles.feedbackSection}>
@@ -219,15 +250,23 @@ function MyReservationsPage() {
             {filteredReservations.length > 0 ? (
               <section className="fade-in-up delay-2" style={styles.grid}>
                 {filteredReservations.map((reservation) => (
-                  <ReservationCard
+                  <div
                     key={reservation.id}
-                    reservation={reservation}
-                    onCancel={handleCancel}
-                    isCancelling={cancellingReservationId === reservation.id}
-                    confirmingCancel={confirmingReservationId === reservation.id}
-                    onStartCancel={setConfirmingReservationId}
-                    onAbortCancel={() => setConfirmingReservationId(null)}
-                  />
+                    style={{
+                      ...(recentlyCancelledReservationId === reservation.id
+                        ? styles.recentlyCancelledWrapper
+                        : {}),
+                    }}
+                  >
+                    <ReservationCard
+                      reservation={reservation}
+                      onCancel={handleCancel}
+                      isCancelling={cancellingReservationId === reservation.id}
+                      confirmingCancel={confirmingReservationId === reservation.id}
+                      onStartCancel={setConfirmingReservationId}
+                      onAbortCancel={() => setConfirmingReservationId(null)}
+                    />
+                  </div>
                 ))}
               </section>
             ) : (
@@ -437,6 +476,11 @@ const styles = {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
     gap: "1rem",
+  },
+  recentlyCancelledWrapper: {
+    borderRadius: "18px",
+    boxShadow: "0 0 0 4px rgba(239,68,68,0.12)",
+    transition: "all 0.2s ease",
   },
   filteredEmptyState: {
     marginTop: "1rem",
