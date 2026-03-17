@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { use, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../api/axios";
 import ReservationCard from "../components/ReservationCard";
@@ -6,6 +6,8 @@ import LoadingSpinner from "../components/LoadingSpinner";
 
 function MyReservationsPage() {
   const topFeedbackRef = useRef(null);
+
+  const summaryRef = useRef(null);
 
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,6 +30,31 @@ function MyReservationsPage() {
       top,
       behavior: "smooth",
     });
+  };
+
+  const scrollToSummary = () => {
+    if (!summaryRef.current) return;
+
+    const top =
+      summaryRef.current.getBoundingClientRect().top + window.scrollY - 150;
+
+    window.scrollTo({
+      top,
+      behavior: "smooth",
+    });
+  };
+
+  const handleFilterChange = (filter) => {
+    setHasInteractedWithFilter(true);
+
+    if (activeFilter === filter) {
+      setTimeout(() => {
+        scrollToSummary();
+      }, 60);
+      return;
+    }
+
+    setActiveFilter(filter);
   };
 
   const fetchReservations = async () => {
@@ -94,6 +121,17 @@ function MyReservationsPage() {
   useEffect(() => {
     fetchReservations();
   }, []);
+
+  useEffect(() => {
+    if (!HasInteractedWithFilter) return;
+    if (!summaryRef.current) return;
+
+    const timeout = setTimeout(() => {
+      scrollToSummary();
+    }, 60);
+
+    return () => clearTimeout(timeout);
+  }, [activeFilter, setHasInteractedWithFilter]);
 
   const activeReservations = useMemo(() => {
     return reservations.filter((reservation) => reservation.estat === "activa");
@@ -196,7 +234,11 @@ function MyReservationsPage() {
 
         {!loading && !error && reservations.length > 0 && (
           <>
-            <section className="fade-in-up delay-1" style={styles.summarySection}>
+            <section 
+              ref={summaryRef}
+              className="fade-in-up delay-1" 
+              style={styles.summarySection}
+            >
               <div style={styles.sectionHeader}>
                 <div>
                   <h2 style={styles.sectionTitle}>Historial de reserves</h2>
@@ -217,8 +259,7 @@ function MyReservationsPage() {
                   className={`btn ${
                     activeFilter === "all" ? "btn-primary" : "btn-light"
                   }`}
-                  onClick={() => setActiveFilter("all")}
-                  style={styles.filterButton}
+                  onClick={() => handleFilterChange("all")}
                 >
                   Totes ({reservations.length})
                 </button>
@@ -228,8 +269,7 @@ function MyReservationsPage() {
                   className={`btn ${
                     activeFilter === "active" ? "btn-primary" : "btn-light"
                   }`}
-                  onClick={() => setActiveFilter("active")}
-                  style={styles.filterButton}
+                  onClick={() => handleFilterChange("active")}
                 >
                   Actives ({activeReservations.length})
                 </button>
@@ -239,8 +279,7 @@ function MyReservationsPage() {
                   className={`btn ${
                     activeFilter === "cancelled" ? "btn-primary" : "btn-light"
                   }`}
-                  onClick={() => setActiveFilter("cancelled")}
-                  style={styles.filterButton}
+                  onClick={() => handleFilterChange("cancelled")}
                 >
                   Cancel·lades ({cancelledReservations.length})
                 </button>
