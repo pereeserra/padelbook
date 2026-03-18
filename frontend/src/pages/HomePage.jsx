@@ -103,50 +103,52 @@ function HomePage() {
             </div>
 
             <div style={styles.heroVisual}>
-              <div className="float-soft" style={styles.visualMainCard}>
-                <div style={styles.visualTop}>
-                  <span style={styles.visualPill}>Pista 2 · Disponible</span>
-                  <span style={styles.visualMiniText}>Avui</span>
+              <div style={styles.mockupCard}>
+                <div style={styles.mockupTop}>
+                  <span style={styles.mockupCourtBadge}>Pista 2 · Disponible</span>
+                  <span style={styles.mockupToday}>Avui</span>
                 </div>
 
-                <div style={styles.visualCourt}>
-                  <div style={styles.courtInner}>
-                    <div style={styles.courtLineVertical} />
-                    <div style={styles.courtLineHorizontal} />
-                    <div style={styles.courtCircle} />
+                <div style={styles.mockupCourt}>
+                  <div style={styles.courtLineVertical} />
+                  <div style={styles.courtLineHorizontal} />
+                  <div style={styles.courtCircle} />
+                </div>
+
+                <div style={styles.mockupSlots}>
+                  <div style={styles.mockupSlotRow}>
+                    <span style={styles.mockupHour}>17:00</span>
+                    <span style={styles.slotFree}>Lliure</span>
+                  </div>
+
+                  <div style={styles.mockupSlotRow}>
+                    <span style={styles.mockupHour}>18:30</span>
+                    <span style={styles.slotReserved}>Reservada</span>
+                  </div>
+
+                  <div style={styles.mockupSlotRow}>
+                    <span style={styles.mockupHour}>20:00</span>
+                    <span style={styles.slotFree}>Lliure</span>
                   </div>
                 </div>
 
-                <div style={styles.slotList}>
-                  <div style={styles.slotItem}>
-                    <span>17:00</span>
-                    <span style={styles.slotBadgeOk}>Lliure</span>
+                <div style={styles.mockupBottomCards}>
+                  <div style={styles.mockupMiniCard}>
+                    <span style={styles.mockupMiniEyebrow}>Experiència</span>
+                    <h4 style={styles.mockupMiniTitle}>Visual i intuïtiva</h4>
+                    <p style={styles.mockupMiniText}>
+                      Tot més ordenat, més net i amb millor sensació d’ús.
+                    </p>
                   </div>
-                  <div style={styles.slotItem}>
-                    <span>18:30</span>
-                    <span style={styles.slotBadgeBusy}>Reservada</span>
-                  </div>
-                  <div style={styles.slotItem}>
-                    <span>20:00</span>
-                    <span style={styles.slotBadgeOk}>Lliure</span>
+
+                  <div style={styles.mockupMiniCard}>
+                    <span style={styles.mockupMiniEyebrow}>Gestió</span>
+                    <h4 style={styles.mockupMiniTitle}>Control de reserves</h4>
+                    <p style={styles.mockupMiniText}>
+                      Disponibilitat, historial i perfil dins un entorn coherent.
+                    </p>
                   </div>
                 </div>
-              </div>
-
-              <div style={styles.floatingCardTop}>
-                <span style={styles.floatingLabel}>Experiència</span>
-                <strong style={styles.floatingTitle}>Visual i intuïtiva</strong>
-                <p style={styles.floatingText}>
-                  Tot més ordenat, més net i amb millor sensació d’ús.
-                </p>
-              </div>
-
-              <div style={styles.floatingCardBottom}>
-                <span style={styles.floatingLabel}>Gestió</span>
-                <strong style={styles.floatingTitle}>Control de reserves</strong>
-                <p style={styles.floatingText}>
-                  Disponibilitat, historial i perfil dins un entorn coherent.
-                </p>
               </div>
             </div>
           </div>
@@ -474,6 +476,175 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    padding: "1rem",
+  },
+
+  mockupCard: {
+    width: "100%",
+    maxWidth: "420px",
+    background: "linear-gradient(180deg, #f8fafc, #ffffff)",
+    border: "1px solid rgba(148,163,184,0.18)",
+    borderRadius: "30px",
+    padding: "1.25rem",
+    boxShadow: "0 24px 48px rgba(15,23,42,0.08)",
+    display: "flex",
+    flexDirection: "column",
+    gap: "1rem",
+  },
+
+  mockupTop: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: "0.75rem",
+    flexWrap: "wrap",
+  },
+
+  mockupCourtBadge: {
+    display: "inline-flex",
+    alignItems: "center",
+    padding: "0.5rem 0.9rem",
+    borderRadius: "999px",
+    background: "#e0f2fe",
+    color: "#0369a1",
+    fontWeight: "800",
+    fontSize: "0.95rem",
+  },
+
+  mockupToday: {
+    color: "#64748b",
+    fontWeight: "800",
+    fontSize: "0.95rem",
+  },
+
+  mockupCourt: {
+    position: "relative",
+    height: "220px",
+    borderRadius: "24px",
+    background: "linear-gradient(180deg, #157a6e, #136b62)",
+    border: "1px solid rgba(255,255,255,0.18)",
+    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.14)",
+    overflow: "hidden",
+  },
+
+  courtLineVertical: {
+    position: "absolute",
+    top: "16px",
+    bottom: "16px",
+    left: "50%",
+    width: "3px",
+    transform: "translateX(-50%)",
+    background: "rgba(255,255,255,0.85)",
+    borderRadius: "999px",
+  },
+
+  courtLineHorizontal: {
+    position: "absolute",
+    left: "16px",
+    right: "16px",
+    top: "50%",
+    height: "3px",
+    transform: "translateY(-50%)",
+    background: "rgba(255,255,255,0.85)",
+    borderRadius: "999px",
+  },
+
+  courtCircle: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    width: "48px",
+    height: "48px",
+    transform: "translate(-50%, -50%)",
+    border: "3px solid rgba(255,255,255,0.9)",
+    borderRadius: "50%",
+  },
+
+  mockupSlots: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.7rem",
+  },
+
+  mockupSlotRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "0.9rem 1rem",
+    borderRadius: "18px",
+    background: "#f8fafc",
+    border: "1px solid #e2e8f0",
+  },
+
+  mockupHour: {
+    fontSize: "1rem",
+    fontWeight: "800",
+    color: "#0f172a",
+  },
+
+  slotFree: {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: "88px",
+    padding: "0.45rem 0.8rem",
+    borderRadius: "999px",
+    background: "#dcfce7",
+    color: "#15803d",
+    fontWeight: "800",
+    fontSize: "0.9rem",
+  },
+
+  slotReserved: {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: "88px",
+    padding: "0.45rem 0.8rem",
+    borderRadius: "999px",
+    background: "#fee2e2",
+    color: "#b91c1c",
+    fontWeight: "800",
+    fontSize: "0.9rem",
+  },
+
+  mockupBottomCards: {
+    display: "grid",
+    gridTemplateColumns: "1fr",
+    gap: "0.85rem",
+  },
+
+  mockupMiniCard: {
+    background: "rgba(255,255,255,0.96)",
+    border: "1px solid rgba(148,163,184,0.16)",
+    borderRadius: "22px",
+    padding: "1rem",
+    boxShadow: "0 12px 28px rgba(15,23,42,0.05)",
+  },
+
+  mockupMiniEyebrow: {
+    display: "inline-block",
+    marginBottom: "0.35rem",
+    color: "#2563eb",
+    fontWeight: "800",
+    fontSize: "0.78rem",
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
+  },
+
+  mockupMiniTitle: {
+    margin: 0,
+    color: "#0f172a",
+    fontSize: "1.05rem",
+    lineHeight: 1.3,
+  },
+
+  mockupMiniText: {
+    marginTop: "0.45rem",
+    marginBottom: 0,
+    color: "#64748b",
+    lineHeight: 1.6,
+    fontSize: "0.95rem",
   },
 
   visualMainCard: {
@@ -595,32 +766,6 @@ const styles = {
     padding: "0.35rem 0.7rem",
     fontSize: "0.8rem",
     fontWeight: "800",
-  },
-
-  floatingCardTop: {
-    position: "absolute",
-    top: "18px",
-    right: "-10px",
-    width: "220px",
-    background: "rgba(255,255,255,0.9)",
-    border: "1px solid rgba(148,163,184,0.18)",
-    borderRadius: "20px",
-    padding: "1rem",
-    boxShadow: "0 18px 38px rgba(15,23,42,0.08)",
-    backdropFilter: "blur(12px)",
-  },
-
-  floatingCardBottom: {
-    position: "absolute",
-    left: "-12px",
-    bottom: "12px",
-    width: "220px",
-    background: "rgba(255,255,255,0.9)",
-    border: "1px solid rgba(148,163,184,0.18)",
-    borderRadius: "20px",
-    padding: "1rem",
-    boxShadow: "0 18px 38px rgba(15,23,42,0.08)",
-    backdropFilter: "blur(12px)",
   },
 
   floatingLabel: {
