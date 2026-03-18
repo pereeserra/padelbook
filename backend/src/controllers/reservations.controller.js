@@ -12,6 +12,7 @@ exports.createReservation = async (req, res) => {
   try {
     const user_id = req.user.id;
     let { court_id, time_slot_id, data_reserva } = req.body;
+    let { metode_pagament } = req.body;
 
     court_id = parsePositiveInteger(court_id);
     time_slot_id = parsePositiveInteger(time_slot_id);
@@ -30,6 +31,27 @@ exports.createReservation = async (req, res) => {
 
     if (data_reserva < todayString) {
       return fail(res, "No es poden fer reserves en dates passades", 400);
+    }
+
+    // Normalitzar i validar el mètode de pagament
+    if (typeof metode_pagament === "string") {
+      metode_pagament = metode_pagament.trim().toLowerCase();
+    } else {
+      metode_pagament = "al_club";
+    }
+
+    // Validar que el mètode de pagament és vàlid
+    const allowedMethods = ["online_simulat", "al_club"];
+
+    if (!allowedMethods.includes(metode_pagament)) {
+      return res.status(400).json({ error: "Mètode de pagament no vàlid" });
+    }
+
+    // Determinar l'estat del pagament en funció del mètode de pagament
+    let estat_pagament = "pendent";
+
+    if (metode_pagament === "online_simulat") {
+      estat_pagament = "pagat";
     }
 
     // 1. Comprovar que la pista existeix i que sigui reservable
@@ -106,9 +128,19 @@ exports.createReservation = async (req, res) => {
     const codiTemporal = `TEMP-${Date.now()}-${user_id}`;
 
     const [insertResult] = await db.query(
-      `INSERT INTO reservations (codi_reserva, user_id, court_id, time_slot_id, data_reserva, estat, preu_total)
-      VALUES (?, ?, ?, ?, ?, 'activa', ?)`,
-      [codiTemporal, user_id, court_id, time_slot_id, data_reserva, preu_total]
+      `INSERT INTO reservations (
+        codi_reserva, 
+        user_id, 
+        court_id, 
+        time_slot_id, 
+        data_reserva, 
+        estat, 
+        preu_total,
+        estat_pagament,
+        metode_pagament
+        )
+      VALUES (?, ?, ?, ?, ?, 'activa', ?, ?, ?)`,
+      [codiTemporal, user_id, court_id, time_slot_id, data_reserva, preu_total, estat_pagament, metode_pagament]
     );
 
     const reservationId = insertResult.insertId;
@@ -125,7 +157,8 @@ exports.createReservation = async (req, res) => {
     return message(res, "Reserva creada correctament", 201, {
       id: reservationId,
       codi_reserva,
-      preu_total
+      preu_total,
+      estat_pagament,
     });
       } catch (error) {
         console.error("Error createReservation:", error);
@@ -172,6 +205,8 @@ exports.getReservations = async (req, res) => {
           r.data_reserva,
           r.estat,
           r.preu_total,
+          r.estat_pagament,
+          r.metode_pagament,
           r.created_at,
           u.nom AS usuari_nom,
           u.email AS usuari_email,
@@ -298,6 +333,8 @@ exports.getReservationByCode = async (req, res) => {
         r.data_reserva,
         r.estat,
         r.preu_total,
+        r.estat_pagament,
+        r.metode_pagament,
         r.created_at,
         c.nom_pista,
         t.hora_inici,

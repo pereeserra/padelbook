@@ -98,6 +98,8 @@ exports.getAllReservations = async (req, res) => {
         r.data_reserva,
         r.estat,
         r.preu_total,
+        r.estat_pagament,
+        r.metode_pagament,
         r.created_at,
         r.user_id,
         r.court_id,
@@ -901,6 +903,8 @@ exports.getReservationByIdAdmin = async (req, res) => {
         r.data_reserva,
         r.estat,
         r.preu_total,
+        r.estat_pagament,
+        r.metode_pagament,
         r.created_at,
 
         r.user_id,
