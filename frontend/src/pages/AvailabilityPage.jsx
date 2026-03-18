@@ -25,6 +25,8 @@ function AvailabilityPage() {
   const [showOnlyAvailable, setShowOnlyAvailable] = useState(false);
   const [showAuthHelp, setShowAuthHelp] = useState(false);
   const [recentlyReservedSlot, setRecentlyReservedSlot] = useState(null);
+  const [paymentMethod, setPaymentMethod] = useState("online");
+  const [reservationSummary, setReservationSummary] = useState(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -59,6 +61,7 @@ function AvailabilityPage() {
     setError("");
     setSuccess("");
     setShowAuthHelp(false);
+    setReservationSummary(null);
   };
 
   const handleOpenDatePicker = () => {
@@ -177,12 +180,31 @@ function AvailabilityPage() {
         court_id: slot.court_id,
         time_slot_id: slot.time_slot_id,
         data_reserva: date,
+        metode_pagament: paymentMethod,
       });
+
+      const reservationData = response?.data?.data || null;
 
       setSuccess(
         response?.data?.message ||
           `Reserva confirmada a ${slot.nom_pista} (${slot.hora_inici} - ${slot.hora_fi}).`
       );
+
+      setReservationSummary({
+        codi_reserva: reservationData?.codi_reserva || "No disponible",
+        preu_total:
+          reservationData?.preu_total != null
+            ? reservationData.preu_total
+            : reservationData?.preu != null
+            ? reservationData.preu
+            : null,
+        metode_pagament: reservationData?.metode_pagament || paymentMethod,
+        estat_pagament: reservationData?.estat_pagament || "No disponible",
+        nom_pista: slot.nom_pista,
+        hora_inici: slot.hora_inici,
+        hora_fi: slot.hora_fi,
+        data_reserva: date,
+      });
 
       setRecentlyReservedSlot({
         court_id: slot.court_id,
@@ -350,7 +372,9 @@ function AvailabilityPage() {
 
             <div style={styles.selectionHint}>
               <span style={styles.selectionHintLabel}>Vista actual</span>
-              <span style={styles.selectionHintValue}>Disponibilitat del dia</span>
+              <span style={styles.selectionHintValue}>
+                Disponibilitat del dia
+              </span>
             </div>
           </div>
 
@@ -391,7 +415,9 @@ function AvailabilityPage() {
           >
             <button
               onClick={() => changeDay(-1)}
-              className={`btn btn-secondary ${previousDayDisabled ? "is-disabled" : ""}`}
+              className={`btn btn-secondary ${
+                previousDayDisabled ? "is-disabled" : ""
+              }`}
               style={isMobileView ? styles.fullWidthButton : undefined}
               disabled={previousDayDisabled}
             >
@@ -460,6 +486,26 @@ function AvailabilityPage() {
             </button>
           </div>
 
+          <div style={styles.paymentBox}>
+            <label htmlFor="paymentMethod" style={styles.paymentLabel}>
+              Mètode de pagament
+            </label>
+
+            <select
+              id="paymentMethod"
+              className="pb-input"
+              value={paymentMethod}
+              onChange={(e) => setPaymentMethod(e.target.value)}
+            >
+              <option value="online">Online</option>
+              <option value="club">Club</option>
+            </select>
+
+            <p style={styles.paymentHelp}>
+              Selecciona com vols registrar el pagament de la reserva.
+            </p>
+          </div>
+
           <div style={styles.filtersRow}>
             <label style={styles.checkboxLabel}>
               <input
@@ -519,6 +565,73 @@ function AvailabilityPage() {
                 </div>
               </div>
             </div>
+          )}
+
+          {success && reservationSummary && (
+            <section
+              className="scale-in pb-surface-card"
+              style={styles.successCard}
+            >
+              <div style={styles.successHeader}>
+                <div>
+                  <span style={styles.successEyebrow}>Reserva confirmada</span>
+                  <h2 style={styles.successTitle}>
+                    {reservationSummary.codi_reserva}
+                  </h2>
+                  <p style={styles.successSubtitle}>
+                    La reserva s’ha registrat correctament i ja tens el resum complet.
+                  </p>
+                </div>
+
+                <Link to="/my-reservations" className="btn btn-sm">
+                  Veure les meves reserves
+                </Link>
+              </div>
+
+              <div style={styles.successGrid}>
+                <div style={styles.successInfoBox}>
+                  <span style={styles.successLabel}>Pista</span>
+                  <p style={styles.successValue}>{reservationSummary.nom_pista}</p>
+                </div>
+
+                <div style={styles.successInfoBox}>
+                  <span style={styles.successLabel}>Data</span>
+                  <p style={styles.successValue}>
+                    {reservationSummary.data_reserva}
+                  </p>
+                </div>
+
+                <div style={styles.successInfoBox}>
+                  <span style={styles.successLabel}>Hora</span>
+                  <p style={styles.successValue}>
+                    {reservationSummary.hora_inici} - {reservationSummary.hora_fi}
+                  </p>
+                </div>
+
+                <div style={styles.successInfoBox}>
+                  <span style={styles.successLabel}>Preu</span>
+                  <p style={styles.successValue}>
+                    {reservationSummary.preu_total != null
+                      ? `${Number(reservationSummary.preu_total).toFixed(2)} €`
+                      : "No disponible"}
+                  </p>
+                </div>
+
+                <div style={styles.successInfoBox}>
+                  <span style={styles.successLabel}>Pagament</span>
+                  <p style={styles.successValue}>
+                    {reservationSummary.metode_pagament}
+                  </p>
+                </div>
+
+                <div style={styles.successInfoBox}>
+                  <span style={styles.successLabel}>Estat pagament</span>
+                  <p style={styles.successValue}>
+                    {reservationSummary.estat_pagament}
+                  </p>
+                </div>
+              </div>
+            </section>
           )}
 
           {showAuthHelp && (
@@ -860,6 +973,23 @@ const styles = {
   fullWidthButton: {
     width: "100%",
   },
+  paymentBox: {
+    marginTop: "1rem",
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.45rem",
+  },
+  paymentLabel: {
+    fontSize: "0.9rem",
+    fontWeight: "800",
+    color: "#334155",
+  },
+  paymentHelp: {
+    margin: 0,
+    fontSize: "0.88rem",
+    color: "#64748b",
+    lineHeight: 1.6,
+  },
   filtersRow: {
     marginTop: "1rem",
     paddingTop: "1rem",
@@ -921,6 +1051,65 @@ const styles = {
   successActionsMobile: {
     flexDirection: "column",
     alignItems: "stretch",
+  },
+  successCard: {
+    marginTop: "1rem",
+    padding: "1.25rem",
+    borderRadius: "24px",
+  },
+  successHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    gap: "1rem",
+    flexWrap: "wrap",
+    marginBottom: "1rem",
+  },
+  successEyebrow: {
+    display: "inline-block",
+    marginBottom: "0.4rem",
+    fontSize: "0.78rem",
+    color: "#15803d",
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
+  },
+  successTitle: {
+    margin: 0,
+    fontSize: "1.6rem",
+    color: "#0f172a",
+  },
+  successSubtitle: {
+    marginTop: "0.35rem",
+    marginBottom: 0,
+    color: "#64748b",
+    lineHeight: 1.65,
+  },
+  successGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+    gap: "0.85rem",
+  },
+  successInfoBox: {
+    background: "rgba(248,250,252,0.95)",
+    border: "1px solid #e2e8f0",
+    borderRadius: "18px",
+    padding: "0.95rem 1rem",
+  },
+  successLabel: {
+    display: "block",
+    marginBottom: "0.35rem",
+    color: "#64748b",
+    fontSize: "0.82rem",
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
+  },
+  successValue: {
+    margin: 0,
+    color: "#0f172a",
+    fontWeight: "700",
+    lineHeight: 1.55,
   },
   authHelpBox: {
     display: "flex",

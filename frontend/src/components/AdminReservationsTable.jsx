@@ -6,8 +6,12 @@ function AdminReservationsTable({ reservations = [] }) {
 
   const normalizedReservations = useMemo(() => {
     return [...reservations].sort((a, b) => {
-      const dateA = new Date(`${a.data_reserva || ""}T${a.hora_inici || "00:00"}`).getTime();
-      const dateB = new Date(`${b.data_reserva || ""}T${b.hora_inici || "00:00"}`).getTime();
+      const dateA = new Date(
+        `${a.data_reserva || ""}T${a.hora_inici || "00:00"}`
+      ).getTime();
+      const dateB = new Date(
+        `${b.data_reserva || ""}T${b.hora_inici || "00:00"}`
+      ).getTime();
       return dateB - dateA;
     });
   }, [reservations]);
@@ -19,13 +23,15 @@ function AdminReservationsTable({ reservations = [] }) {
       const userName = (reservation.nom_usuari || "").toLowerCase();
       const email = (reservation.email || "").toLowerCase();
       const courtName = (reservation.nom_pista || "").toLowerCase();
+      const reservationCode = (reservation.codi_reserva || "").toLowerCase();
       const status = (reservation.estat || "").toLowerCase();
 
       const matchesSearch =
         !query ||
         userName.includes(query) ||
         email.includes(query) ||
-        courtName.includes(query);
+        courtName.includes(query) ||
+        reservationCode.includes(query);
 
       const matchesStatus =
         statusFilter === "totes" || status === statusFilter;
@@ -60,7 +66,7 @@ function AdminReservationsTable({ reservations = [] }) {
         <h3 style={styles.emptyTitle}>No hi ha reserves registrades</h3>
         <p style={styles.emptyText}>
           Quan els usuaris facin reserves, apareixeran aquí perquè les puguis
-          consultar des del panell d'administració.
+          consultar des del panell d&apos;administració.
         </p>
       </div>
     );
@@ -78,7 +84,9 @@ function AdminReservationsTable({ reservations = [] }) {
           </p>
         </div>
 
-        <span style={styles.countBadge}>{filteredReservations.length} visibles</span>
+        <span style={styles.countBadge}>
+          {filteredReservations.length} visibles
+        </span>
       </div>
 
       <div style={styles.summaryGrid}>
@@ -113,7 +121,7 @@ function AdminReservationsTable({ reservations = [] }) {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Usuari, correu o pista..."
+            placeholder="Codi, usuari, correu o pista..."
             className="pb-input"
           />
         </div>
@@ -150,11 +158,15 @@ function AdminReservationsTable({ reservations = [] }) {
           <table style={styles.table}>
             <thead>
               <tr>
+                <th style={styles.th}>Codi</th>
                 <th style={styles.th}>Usuari</th>
                 <th style={styles.th}>Correu</th>
                 <th style={styles.th}>Pista</th>
                 <th style={styles.th}>Data</th>
                 <th style={styles.th}>Hora</th>
+                <th style={styles.th}>Preu</th>
+                <th style={styles.th}>Pagament</th>
+                <th style={styles.th}>Estat pagament</th>
                 <th style={styles.th}>Estat</th>
               </tr>
             </thead>
@@ -183,9 +195,17 @@ function AdminReservationsTable({ reservations = [] }) {
                     }}
                   >
                     <td style={styles.td}>
+                      <span style={styles.codeBadge}>
+                        {reservation.codi_reserva || "-"}
+                      </span>
+                    </td>
+
+                    <td style={styles.td}>
                       <div style={styles.userCell}>
                         <span style={styles.userAvatar}>
-                          {(reservation.nom_usuari || "U").charAt(0).toUpperCase()}
+                          {(reservation.nom_usuari || "U")
+                            .charAt(0)
+                            .toUpperCase()}
                         </span>
                         <div>
                           <p style={styles.primaryText}>
@@ -218,6 +238,28 @@ function AdminReservationsTable({ reservations = [] }) {
                     </td>
 
                     <td style={styles.td}>
+                      <span style={styles.primaryText}>
+                        {reservation.preu_total != null
+                          ? `${Number(reservation.preu_total).toFixed(2)} €`
+                          : reservation.preu != null
+                          ? `${Number(reservation.preu).toFixed(2)} €`
+                          : "-"}
+                      </span>
+                    </td>
+
+                    <td style={styles.td}>
+                      <span style={styles.secondaryText}>
+                        {reservation.metode_pagament || "-"}
+                      </span>
+                    </td>
+
+                    <td style={styles.td}>
+                      <span style={styles.secondaryText}>
+                        {reservation.estat_pagament || "-"}
+                      </span>
+                    </td>
+
+                    <td style={styles.td}>
                       <span
                         style={{
                           ...styles.statusBadge,
@@ -237,7 +279,7 @@ function AdminReservationsTable({ reservations = [] }) {
         </div>
       ) : (
         <div style={styles.emptyFilteredState}>
-          <p style={styles.emptyFilteredTitle}>No s'ha trobat cap reserva</p>
+          <p style={styles.emptyFilteredTitle}>No s&apos;ha trobat cap reserva</p>
           <p style={styles.emptyFilteredText}>
             Ajusta la cerca o l’estat seleccionat per tornar a veure resultats.
           </p>
@@ -353,7 +395,7 @@ const styles = {
   table: {
     width: "100%",
     borderCollapse: "collapse",
-    minWidth: "900px",
+    minWidth: "1100px",
     background: "rgba(255,255,255,0.9)",
   },
   th: {
@@ -482,6 +524,17 @@ const styles = {
     margin: 0,
     color: "#64748b",
     lineHeight: 1.65,
+  },
+  codeBadge: {
+    display: "inline-block",
+    padding: "0.38rem 0.7rem",
+    borderRadius: "999px",
+    background: "#eff6ff",
+    border: "1px solid #dbeafe",
+    color: "#1d4ed8",
+    fontWeight: "800",
+    fontSize: "0.8rem",
+    whiteSpace: "nowrap",
   },
 };
 

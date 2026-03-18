@@ -60,7 +60,7 @@ function ReservationCard({
         <div>
           <span style={styles.eyebrow}>Reserva de pista</span>
           <h3 style={styles.title}>{reservation.nom_pista}</h3>
-          <p style={styles.subtitle}>Gestió ràpida de la teva reserva</p>
+          <p style={styles.subtitle}>Consulta el detall i gestiona la teva reserva</p>
         </div>
 
         <span
@@ -73,19 +73,49 @@ function ReservationCard({
         </span>
       </div>
 
-      <div style={styles.infoGrid}>
-        <div style={styles.infoBox}>
-          <span style={styles.label}>Data</span>
-          <p style={styles.value}>{formattedDate}</p>
-        </div>
+            <div style={styles.infoGrid}>
+              <div style={styles.infoBox}>
+                <span style={styles.label}>Codi reserva</span>
+                <p style={styles.value}>{reservation.codi_reserva || "No disponible"}</p>
+              </div>
 
-        <div style={styles.infoBox}>
-          <span style={styles.label}>Hora</span>
-          <p style={styles.value}>
-            {reservation.hora_inici} - {reservation.hora_fi}
-          </p>
-        </div>
-      </div>
+              <div style={styles.infoBox}>
+                <span style={styles.label}>Data</span>
+                <p style={styles.value}>{formattedDate}</p>
+              </div>
+
+              <div style={styles.infoBox}>
+                <span style={styles.label}>Hora</span>
+                <p style={styles.value}>
+                  {reservation.hora_inici} - {reservation.hora_fi}
+                </p>
+              </div>
+
+              <div style={styles.infoBox}>
+                <span style={styles.label}>Preu</span>
+                <p style={styles.value}>
+                  {reservation.preu_total != null
+                    ? `${Number(reservation.preu_total).toFixed(2)} €`
+                    : reservation.preu != null
+                    ? `${Number(reservation.preu).toFixed(2)} €`
+                    : "No disponible"}
+                </p>
+              </div>
+
+              <div style={styles.infoBox}>
+                <span style={styles.label}>Pagament</span>
+                <p style={styles.value}>
+                  {reservation.metode_pagament || "No disponible"}
+                </p>
+              </div>
+
+              <div style={styles.infoBox}>
+                <span style={styles.label}>Estat pagament</span>
+                <p style={styles.value}>
+                  {reservation.estat_pagament || "No disponible"}
+                </p>
+              </div>
+            </div>
 
       {isActive && !confirmingCancel && (
         <div style={styles.footer}>

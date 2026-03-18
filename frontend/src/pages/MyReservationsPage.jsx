@@ -151,6 +151,19 @@ function MyReservationsPage() {
     return reservations.filter((reservation) => reservation.estat !== "activa");
   }, [reservations]);
 
+    const totalSpent = useMemo(() => {
+      return reservations.reduce((sum, reservation) => {
+        const amount =
+          reservation.preu_total != null
+            ? Number(reservation.preu_total)
+            : reservation.preu != null
+            ? Number(reservation.preu)
+            : 0;
+
+        return sum + (Number.isNaN(amount) ? 0 : amount);
+      }, 0);
+    }, [reservations]);
+
   const filteredReservations = useMemo(() => {
     if (activeFilter === "active") return activeReservations;
     if (activeFilter === "cancelled") return cancelledReservations;
@@ -217,6 +230,11 @@ function MyReservationsPage() {
                     {cancelledReservations.length}
                   </span>
                   <span style={styles.statLabel}>Cancel·lades</span>
+                </div>
+
+                <div style={styles.statCard}>
+                  <span style={styles.statNumber}>{totalSpent.toFixed(2)}€</span>
+                  <span style={styles.statLabel}>Import total</span>
                 </div>
               </div>
             )}
