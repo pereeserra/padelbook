@@ -6,6 +6,11 @@ const {
   parsePositiveInteger,
   isValidReservationStatus,
 } = require("../utils/validators");
+const {
+  sendEmail,
+  buildReservationCreatedEmail,
+  buildReservationCancelledEmail,
+} = require("../services/email.service");
 
 // Crear reserva (amb comprovacions de disponibilitat i bloqueig)
 exports.createReservation = async (req, res) => {
@@ -153,6 +158,94 @@ exports.createReservation = async (req, res) => {
       WHERE id = ?`,
       [codi_reserva, reservationId]
     );
+
+    // 8. Enviar email de confirmació de reserva
+    const [reservationDetails] = await db.query(
+      `
+        SELECT
+          u.nom,
+          u.email,
+          c.nom_pista,
+          t.hora_inici,
+          t.hora_fi
+        FROM users u
+        JOIN courts c ON c.id = ?
+        JOIN time_slots t ON t.id = ?
+        WHERE u.id = ?
+        LIMIT 1
+      `,
+      [court_id, time_slot_id, user_id]
+    );
+
+    const detail = reservationDetails[0];
+
+    // Enviar email només si l'usuari té un email vàlid
+    if (detail?.email) {
+      try {
+        await sendEmail({
+          to: detail.email,
+          subject: `Reserva confirmada - ${codi_reserva}`,
+          html: buildReservationCreatedEmail({
+            nom: detail.nom,
+            codi_reserva,
+            nom_pista: detail.nom_pista,
+            data_reserva,
+            hora_inici: detail.hora_inici,
+            hora_fi: detail.hora_fi,
+            preu_total,
+            estat_pagament,
+          }),
+        });
+      } catch (emailError) {
+        console.error("Error enviant email de reserva:", emailError);
+      }
+    }
+
+    const [reservationRows] = await db.query(
+      `
+        SELECT
+          r.id,
+          r.codi_reserva,
+          r.user_id,
+          r.court_id,
+          r.time_slot_id,
+          r.data_reserva,
+          r.estat,
+          u.nom,
+          u.email,
+          c.nom_pista,
+          t.hora_inici,
+          t.hora_fi
+        FROM reservations r
+        JOIN users u ON r.user_id = u.id
+        JOIN courts c ON r.court_id = c.id
+        JOIN time_slots t ON r.time_slot_id = t.id
+        WHERE r.id = ?
+        LIMIT 1
+      `,
+      [reservationId]
+    );
+
+    const reservation = reservationRows[0];
+
+    if (reservation?.email) {
+      try {
+        await sendEmail({
+          to: reservation.email,
+          subject: `Reserva cancel·lada - ${reservation.codi_reserva}`,
+          html: buildReservationCancelledEmail({
+            nom: reservation.nom,
+            codi_reserva: reservation.codi_reserva,
+            nom_pista: reservation.nom_pista,
+            data_reserva: reservation.data_reserva,
+            hora_inici: reservation.hora_inici,
+            hora_fi: reservation.hora_fi,
+          }),
+        });
+      } catch (emailError) {
+        console.error("Error enviant email de cancel·lació:", emailError);
+      }
+    }
 
     return message(res, "Reserva creada correctament", 201, {
       id: reservationId,
