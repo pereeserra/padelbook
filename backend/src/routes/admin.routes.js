@@ -13,20 +13,20 @@ router.get(
   adminController.getAllReservations
 );
 
-// Ruta protegida per a administradors per obtenir una reserva específica
-router.get(
-  "/reservations/:id",
-  authMiddleware,
-  roleMiddleware("admin"),
-  adminController.getReservationByIdAdmin
-);
-
 // Ruta protegida per a administradors per exportar les reserves a CSV
 router.get(
   "/reservations/export/csv",
   authMiddleware,
   roleMiddleware("admin"),
   adminController.exportReservationsCsv
+);
+
+// Ruta protegida per a administradors per obtenir una reserva específica
+router.get(
+  "/reservations/:id",
+  authMiddleware,
+  roleMiddleware("admin"),
+  adminController.getReservationByIdAdmin
 );
 
 // Ruta protegida per a administradors per obtenir estadístiques generals

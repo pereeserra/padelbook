@@ -43,6 +43,8 @@ exports.getAvailability = async (req, res) => {
         ON m.court_id = c.id
         AND m.time_slot_id = t.id
         AND m.data_bloqueig = ?
+      
+      WHERE c.estat = 'disponible'
 
       ORDER BY c.id, t.hora_inici
       `,

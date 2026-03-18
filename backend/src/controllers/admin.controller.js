@@ -1,3 +1,4 @@
+const { parse } = require("dotenv");
 const db = require("../config/db");
 const {
   normalizeText,
@@ -30,8 +31,24 @@ exports.getAllReservations = async (req, res) => {
       order = "desc",
     } = req.query;
 
-    const court_id = req.query.court_id ? Number(req.query.court_id) : null;
-    const user_id = req.query.user_id ? Number(req.query.user_id) : null;
+    const court_id = req.query.court_id
+      ? parsePositiveInteger(req.query.court_id)
+      : null;
+    const user_id = req.query.user_id
+      ? parsePositiveInteger(req.query.user_id)
+      : null;
+    
+    if (req.query.court_id && !court_id) {
+      return res.status(400).json({ 
+        error: "La pista indicada no és vàlida", 
+      });
+    }
+
+    if (req.query.user_id && !user_id) {
+      return res.status(400).json({ 
+        error: "L'usuari indicat no és vàlid", 
+      });
+    }
 
     const codi_reserva =
       typeof req.query.codi_reserva === "string"
@@ -242,10 +259,10 @@ exports.createCourt = async (req, res) => {
 // Controlador per actualitzar una pista
 exports.updateCourt = async (req, res) => {
   try {
-    const courtId = Number(req.params.id);
+    const courtId = parsePositiveInteger(req.params.id);
     let { nom_pista, tipus, coberta, estat, descripcio, preu_reserva } = req.body;
 
-    if (!Number.isInteger(courtId) || courtId <= 0) {
+    if (!courtId) {
       return res.status(400).json({
         error: "L'identificador de la pista no és vàlid",
       });
@@ -787,23 +804,26 @@ exports.getAdminLogs = async (req, res) => {
     const accio =
       typeof req.query.accio === "string" ? req.query.accio.trim() : "";
 
-    const admin_id = req.query.admin_id ? Number(req.query.admin_id) : null;
-    const page = req.query.page ? Number(req.query.page) : 1;
-    const limit = req.query.limit ? Number(req.query.limit) : 10;
+    const admin_id = req.query.admin_id
+      ? parsePositiveInteger(req.query.admin_id)
+      : null;
+    
+      const page = req.query.page ? parsePositiveInteger(req.query.page) : 1;
+      const limit = req.query.limit ? parsePositiveInteger(req.query.limit) : 10;
 
-    if (!Number.isInteger(page) || page <= 0) {
+    if (!page) {
       return res.status(400).json({
         error: "El paràmetre 'page' ha de ser un enter positiu",
       });
     }
 
-    if (!Number.isInteger(limit) || limit <= 0) {
+    if (!limit) {
       return res.status(400).json({
         error: "El paràmetre 'limit' ha de ser un enter positiu",
       });
     }
 
-    if (req.query.admin_id && (!Number.isInteger(admin_id) || admin_id <= 0)) {
+    if (req.query.admin_id && !admin_id) {
       return res.status(400).json({
         error: "L'admin indicat no és vàlid",
       });

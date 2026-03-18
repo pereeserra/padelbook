@@ -1,4 +1,5 @@
 const db = require("../config/db");
+const { ok, fail } = require("../utils/response");
 
 // Controlador de pistes
 exports.getCourts = async (req, res) => {
@@ -31,9 +32,7 @@ exports.getCourts = async (req, res) => {
 
     if (cobertaRaw !== "") {
       if (cobertaRaw !== "0" && cobertaRaw !== "1") {
-        return res.status(400).json({
-          error: "El filtre 'coberta' només pot ser 0 o 1",
-        });
+        return fail(res, "El filtre 'coberta' només pot ser 0 o 1", 400);
       }
 
       whereClauses.push("coberta = ?");
@@ -50,11 +49,9 @@ exports.getCourts = async (req, res) => {
 
     const [courts] = await db.query(query, params);
 
-    res.json({
-      data: courts,
-    });
+    return ok(res, courts);
   } catch (error) {
     console.error("Error getCourts:", error);
-    res.status(500).json({ error: "Error obtenint pistes" });
+    return fail(res, "Error obtenint pistes");
   }
 };
