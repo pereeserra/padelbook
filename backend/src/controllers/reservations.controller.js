@@ -277,6 +277,9 @@ exports.getReservations = async (req, res) => {
           r.codi_reserva,
           r.data_reserva,
           r.estat,
+          r.preu_total,
+          r.estat_pagament,
+          r.metode_pagament,
           r.created_at,
           c.nom_pista,
           t.hora_inici,
@@ -400,6 +403,49 @@ exports.deleteReservation = async (req, res) => {
   } catch (error) {
     console.error("Error deleteReservation:", error);
     return fail(res, "Error cancel·lant la reserva");
+  }
+};
+
+// Eliminar definitivament una reserva cancel·lada (només el propietari o admin)
+exports.deleteCancelledReservationPermanently = async (req, res) => {
+  try {
+    const reservationId = parsePositiveInteger(req.params.id);
+    const userId = req.user.id;
+    const userRole = req.user.rol;
+
+    if (!reservationId) {
+      return fail(res, "L'identificador de la reserva no és vàlid", 400);
+    }
+
+    const [reservations] = await db.query(
+      "SELECT * FROM reservations WHERE id = ? LIMIT 1",
+      [reservationId]
+    );
+
+    if (reservations.length === 0) {
+      return fail(res, "Reserva no trobada", 404);
+    }
+
+    const reservation = reservations[0];
+
+    if (userRole !== "admin" && reservation.user_id !== userId) {
+      return fail(res, "No tens permís per eliminar aquesta reserva", 403);
+    }
+
+    if (reservation.estat !== "cancel·lada") {
+      return fail(
+        res,
+        "Només es poden eliminar definitivament les reserves cancel·lades",
+        400
+      );
+    }
+
+    await db.query("DELETE FROM reservations WHERE id = ?", [reservationId]);
+
+    return message(res, "Reserva cancel·lada eliminada correctament");
+  } catch (error) {
+    console.error("Error deleteCancelledReservationPermanently:", error);
+    return fail(res, "Error eliminant definitivament la reserva");
   }
 };
 

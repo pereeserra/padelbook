@@ -4,7 +4,7 @@ const router = express.Router();
 const reservationsController = require("../controllers/reservations.controller");
 const authMiddleware = require("../middleware/auth.middleware");
 
-// Rutas para gestionar las reservas
+// Rutes per gestionar les reserves
 router.get("/", authMiddleware, reservationsController.getReservations);
 router.get(
   "/code/:codi_reserva",
@@ -12,6 +12,13 @@ router.get(
   reservationsController.getReservationByCode
 );
 router.post("/", authMiddleware, reservationsController.createReservation);
+
+router.delete(
+  "/:id/permanent",
+  authMiddleware,
+  reservationsController.deleteCancelledReservationPermanently
+);
+
 router.delete("/:id", authMiddleware, reservationsController.deleteReservation);
 
 module.exports = router;

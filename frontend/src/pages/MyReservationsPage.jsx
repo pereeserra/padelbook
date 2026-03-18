@@ -17,6 +17,8 @@ function MyReservationsPage() {
   const [feedbackType, setFeedbackType] = useState("success");
   const [confirmingReservationId, setConfirmingReservationId] = useState(null);
   const [cancellingReservationId, setCancellingReservationId] = useState(null);
+  const [deletingCancelledReservationId, setDeletingCancelledReservationId] =
+    useState(null);
   const [activeFilter, setActiveFilter] = useState("all");
   const [recentlyCancelledReservationId, setRecentlyCancelledReservationId] =
     useState(null);
@@ -128,6 +130,39 @@ function MyReservationsPage() {
     }
   };
 
+  const handleDeleteCancelled = async (id) => {
+    try {
+      setDeletingCancelledReservationId(id);
+
+      const response = await api.delete(`/reservations/${id}/permanent`);
+
+      setReservations((prev) => prev.filter((reservation) => reservation.id !== id));
+
+      if (confirmingReservationId === id) {
+        setConfirmingReservationId(null);
+      }
+
+      showFeedbackMessage(
+        response?.data?.message ||
+          "Reserva cancel·lada eliminada correctament.",
+        "success"
+      );
+
+      scrollToFeedback();
+    } catch (err) {
+      console.error(err);
+
+      const backendError =
+        err.response?.data?.error ||
+        "No s'ha pogut eliminar la reserva cancel·lada.";
+
+      showFeedbackMessage(backendError, "error");
+      scrollToFeedback();
+    } finally {
+      setDeletingCancelledReservationId(null);
+    }
+  };
+
   useEffect(() => {
     fetchReservations();
   }, []);
@@ -151,18 +186,18 @@ function MyReservationsPage() {
     return reservations.filter((reservation) => reservation.estat !== "activa");
   }, [reservations]);
 
-    const totalSpent = useMemo(() => {
-      return reservations.reduce((sum, reservation) => {
-        const amount =
-          reservation.preu_total != null
-            ? Number(reservation.preu_total)
-            : reservation.preu != null
-            ? Number(reservation.preu)
-            : 0;
+  const totalSpent = useMemo(() => {
+    return reservations.reduce((sum, reservation) => {
+      const amount =
+        reservation.preu_total != null
+          ? Number(reservation.preu_total)
+          : reservation.preu != null
+          ? Number(reservation.preu)
+          : 0;
 
-        return sum + (Number.isNaN(amount) ? 0 : amount);
-      }, 0);
-    }, [reservations]);
+      return sum + (Number.isNaN(amount) ? 0 : amount);
+    }, 0);
+  }, [reservations]);
 
   const filteredReservations = useMemo(() => {
     if (activeFilter === "active") return activeReservations;
@@ -363,7 +398,11 @@ function MyReservationsPage() {
                     <ReservationCard
                       reservation={reservation}
                       onCancel={handleCancel}
+                      onDeleteCancelled={handleDeleteCancelled}
                       isCancelling={cancellingReservationId === reservation.id}
+                      isDeletingCancelled={
+                        deletingCancelledReservationId === reservation.id
+                      }
                       confirmingCancel={confirmingReservationId === reservation.id}
                       onStartCancel={setConfirmingReservationId}
                       onAbortCancel={() => setConfirmingReservationId(null)}
@@ -446,13 +485,15 @@ const styles = {
     padding: "0 1rem",
   },
   hero: {
+    position: "relative",
+    overflow: "hidden",
     borderRadius: "30px",
     padding: "2rem",
+    boxShadow: "0 26px 56px rgba(37,99,235,0.16)",
+    color: "white",
     marginBottom: "1.5rem",
     background:
       "linear-gradient(135deg, rgba(15,23,42,0.94), rgba(37,99,235,0.88))",
-    boxShadow: "0 26px 56px rgba(37,99,235,0.16)",
-    color: "white",
   },
   heroMobile: {
     padding: "1.25rem",
@@ -460,8 +501,8 @@ const styles = {
   },
   heroGrid: {
     display: "grid",
-    gridTemplateColumns: "1.1fr 0.9fr",
-    gap: "1.2rem",
+    gridTemplateColumns: "1.15fr 0.85fr",
+    gap: "1.4rem",
     alignItems: "center",
   },
   heroGridMobile: {
@@ -471,12 +512,13 @@ const styles = {
     margin: "1rem 0 0 0",
     fontSize: "3rem",
     lineHeight: 1.03,
+    maxWidth: "760px",
   },
   titleMobile: {
     fontSize: "2.2rem",
   },
   subtitle: {
-    marginTop: "0.9rem",
+    marginTop: "0.95rem",
     marginBottom: 0,
     fontSize: "1.05rem",
     lineHeight: 1.75,
@@ -485,51 +527,52 @@ const styles = {
   },
   heroStats: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
-    gap: "0.8rem",
+    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+    gap: "0.9rem",
   },
   statCard: {
     background: "rgba(255,255,255,0.12)",
     border: "1px solid rgba(255,255,255,0.14)",
-    borderRadius: "20px",
+    borderRadius: "22px",
     padding: "1rem",
+    backdropFilter: "blur(10px)",
+    boxShadow: "0 14px 30px rgba(15,23,42,0.08)",
     display: "flex",
     flexDirection: "column",
-    gap: "0.25rem",
+    gap: "0.3rem",
   },
   statNumber: {
-    fontSize: "1.45rem",
+    fontSize: "1.6rem",
     fontWeight: "800",
+    color: "white",
   },
   statLabel: {
     color: "rgba(255,255,255,0.82)",
-    lineHeight: 1.5,
+    fontWeight: "700",
+    fontSize: "0.9rem",
   },
   feedbackSection: {
-    marginTop: "1.25rem",
-    marginBottom: "1.25rem",
+    marginBottom: "1rem",
   },
   errorWrapper: {
     display: "flex",
     flexDirection: "column",
-    gap: "0.9rem",
+    gap: "0.85rem",
+    alignItems: "flex-start",
   },
   errorTitle: {
     margin: 0,
-    color: "#9f1239",
     fontWeight: "800",
-    fontSize: "1.1rem",
+    color: "#991b1b",
   },
   errorText: {
     margin: 0,
-    color: "#881337",
-    lineHeight: 1.6,
-    fontWeight: "600",
+    color: "#7f1d1d",
+    lineHeight: 1.65,
   },
   summarySection: {
-    marginTop: "2rem",
+    padding: "1.5rem",
     marginBottom: "1rem",
-    padding: "1.3rem",
   },
   sectionHeader: {
     display: "flex",

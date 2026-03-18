@@ -3,7 +3,9 @@ import { useEffect, useRef } from "react";
 function ReservationCard({
   reservation,
   onCancel,
+  onDeleteCancelled,
   isCancelling = false,
+  isDeletingCancelled = false,
   confirmingCancel = false,
   onStartCancel,
   onAbortCancel,
@@ -53,69 +55,89 @@ function ReservationCard({
         ...styles.card,
         ...(confirmingCancel ? styles.cardConfirming : {}),
         ...(!isActive ? styles.cardInactive : {}),
-        ...(isCancelling ? styles.cardCancelling : {}),
+        ...(isCancelling || isDeletingCancelled ? styles.cardBusy : {}),
       }}
     >
       <div style={styles.header}>
         <div>
           <span style={styles.eyebrow}>Reserva de pista</span>
           <h3 style={styles.title}>{reservation.nom_pista}</h3>
-          <p style={styles.subtitle}>Consulta el detall i gestiona la teva reserva</p>
+          <p style={styles.subtitle}>
+            Consulta el detall i gestiona la teva reserva
+          </p>
         </div>
 
-        <span
-          style={{
-            ...styles.badge,
-            ...(isActive ? styles.badgeActive : styles.badgeInactive),
-          }}
-        >
-          {reservation.estat}
-        </span>
+        <div style={styles.headerActions}>
+          {!isActive && (
+            <button
+              type="button"
+              onClick={() => onDeleteCancelled(reservation.id)}
+              disabled={isDeletingCancelled}
+              title="Eliminar reserva cancel·lada"
+              aria-label="Eliminar reserva cancel·lada"
+              style={{
+                ...styles.deleteIconButton,
+                ...(isDeletingCancelled ? styles.deleteIconButtonDisabled : {}),
+              }}
+            >
+              {isDeletingCancelled ? "…" : "🗑"}
+            </button>
+          )}
+
+          <span
+            style={{
+              ...styles.badge,
+              ...(isActive ? styles.badgeActive : styles.badgeInactive),
+            }}
+          >
+            {reservation.estat}
+          </span>
+        </div>
       </div>
 
-            <div style={styles.infoGrid}>
-              <div style={styles.infoBox}>
-                <span style={styles.label}>Codi reserva</span>
-                <p style={styles.value}>{reservation.codi_reserva || "No disponible"}</p>
-              </div>
+      <div style={styles.infoGrid}>
+        <div style={styles.infoBox}>
+          <span style={styles.label}>Codi reserva</span>
+          <p style={styles.value}>{reservation.codi_reserva || "No disponible"}</p>
+        </div>
 
-              <div style={styles.infoBox}>
-                <span style={styles.label}>Data</span>
-                <p style={styles.value}>{formattedDate}</p>
-              </div>
+        <div style={styles.infoBox}>
+          <span style={styles.label}>Data</span>
+          <p style={styles.value}>{formattedDate}</p>
+        </div>
 
-              <div style={styles.infoBox}>
-                <span style={styles.label}>Hora</span>
-                <p style={styles.value}>
-                  {reservation.hora_inici} - {reservation.hora_fi}
-                </p>
-              </div>
+        <div style={styles.infoBox}>
+          <span style={styles.label}>Hora</span>
+          <p style={styles.value}>
+            {reservation.hora_inici} - {reservation.hora_fi}
+          </p>
+        </div>
 
-              <div style={styles.infoBox}>
-                <span style={styles.label}>Preu</span>
-                <p style={styles.value}>
-                  {reservation.preu_total != null
-                    ? `${Number(reservation.preu_total).toFixed(2)} €`
-                    : reservation.preu != null
-                    ? `${Number(reservation.preu).toFixed(2)} €`
-                    : "No disponible"}
-                </p>
-              </div>
+        <div style={styles.infoBox}>
+          <span style={styles.label}>Preu</span>
+          <p style={styles.value}>
+            {reservation.preu_total != null
+              ? `${Number(reservation.preu_total).toFixed(2)} €`
+              : reservation.preu != null
+              ? `${Number(reservation.preu).toFixed(2)} €`
+              : "No disponible"}
+          </p>
+        </div>
 
-              <div style={styles.infoBox}>
-                <span style={styles.label}>Pagament</span>
-                <p style={styles.value}>
-                  {reservation.metode_pagament || "No disponible"}
-                </p>
-              </div>
+        <div style={styles.infoBox}>
+          <span style={styles.label}>Pagament</span>
+          <p style={styles.value}>
+            {reservation.metode_pagament || "No disponible"}
+          </p>
+        </div>
 
-              <div style={styles.infoBox}>
-                <span style={styles.label}>Estat pagament</span>
-                <p style={styles.value}>
-                  {reservation.estat_pagament || "No disponible"}
-                </p>
-              </div>
-            </div>
+        <div style={styles.infoBox}>
+          <span style={styles.label}>Estat pagament</span>
+          <p style={styles.value}>
+            {reservation.estat_pagament || "No disponible"}
+          </p>
+        </div>
+      </div>
 
       {isActive && !confirmingCancel && (
         <div style={styles.footer}>
@@ -193,10 +215,10 @@ const styles = {
     transform: "scale(1.01)",
   },
   cardInactive: {
-    opacity: 0.94,
+    opacity: 0.96,
   },
-  cardCancelling: {
-    opacity: 0.85,
+  cardBusy: {
+    opacity: 0.78,
     pointerEvents: "none",
   },
   header: {
@@ -205,6 +227,12 @@ const styles = {
     alignItems: "flex-start",
     gap: "1rem",
     marginBottom: "1.15rem",
+    flexWrap: "wrap",
+  },
+  headerActions: {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.65rem",
     flexWrap: "wrap",
   },
   eyebrow: {
@@ -244,6 +272,26 @@ const styles = {
     background: "#fff1f2",
     color: "#be123c",
     border: "1px solid #fecdd3",
+  },
+  deleteIconButton: {
+    width: "42px",
+    height: "42px",
+    borderRadius: "50%",
+    border: "1px solid #fecaca",
+    background: "#fff1f2",
+    color: "#dc2626",
+    fontSize: "1.05rem",
+    fontWeight: "800",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    boxShadow: "0 10px 20px rgba(220,38,38,0.10)",
+    transition: "all 0.2s ease",
+  },
+  deleteIconButtonDisabled: {
+    opacity: 0.75,
+    cursor: "not-allowed",
   },
   infoGrid: {
     display: "grid",
