@@ -25,7 +25,7 @@ function AvailabilityPage() {
   const [showOnlyAvailable, setShowOnlyAvailable] = useState(false);
   const [showAuthHelp, setShowAuthHelp] = useState(false);
   const [recentlyReservedSlot, setRecentlyReservedSlot] = useState(null);
-  const [paymentMethod, setPaymentMethod] = useState("online");
+  const [paymentMethod, setPaymentMethod] = useState("online_simulat");
   const [reservationSummary, setReservationSummary] = useState(null);
 
   useEffect(() => {
@@ -497,8 +497,8 @@ function AvailabilityPage() {
               value={paymentMethod}
               onChange={(e) => setPaymentMethod(e.target.value)}
             >
-              <option value="online">Online</option>
-              <option value="club">Club</option>
+              <option value="online_simulat">Online</option>
+              <option value="al_club">Club</option>
             </select>
 
             <p style={styles.paymentHelp}>
