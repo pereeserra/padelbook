@@ -23,7 +23,7 @@ function CreateCourtForm({
     },
     {
       label: "Modalitat",
-      value: Number(newCourt.coberta) === 1 ? "Coberta" : "Exterior",
+      value: Number(newCourt.coberta) === 1 ? "Indoor" : "Outdoor",
     },
     {
       label: "Estat",
@@ -112,8 +112,8 @@ function CreateCourtForm({
             onChange={(e) => updateField("coberta", e.target.value)}
             style={styles.input}
           >
-            <option value={0}>Exterior</option>
-            <option value={1}>Coberta</option>
+            <option value={0}>Outdoor</option>
+            <option value={1}>Indoor</option>
           </select>
           <span style={styles.helperText}>
             Indica si està protegida o a l’aire lliure.
@@ -188,7 +188,7 @@ function CreateCourtForm({
                 : styles.previewBadgeOutdoor),
             }}
           >
-            {Number(newCourt.coberta) === 1 ? "Coberta" : "Exterior"}
+            {Number(newCourt.coberta) === 1 ? "Indoor" : "Outdoor"}
           </span>
         </div>
 

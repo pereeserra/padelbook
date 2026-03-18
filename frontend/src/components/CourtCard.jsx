@@ -11,7 +11,7 @@ function CourtCard({
   const isAvailable = court.estat === "disponible";
   const isCovered = Number(court.coberta) === 1;
   const courtTypeLabel = court.tipus === "dobles" ? "Dobles" : "Individual";
-  const courtModeLabel = isCovered ? "Coberta" : "Exterior";
+  const courtModeLabel = isCovered ? "Indoor" : "Outdoor";
   const statusLabel = isAvailable ? "Disponible" : "Manteniment";
 
   return (
