@@ -1,5 +1,6 @@
 const nodemailer = require("nodemailer");
 
+// Configuració del transportador de correu
 const transporter = nodemailer.createTransport({
   host: process.env.MAIL_HOST,
   port: Number(process.env.MAIL_PORT) || 587,
@@ -9,7 +10,7 @@ const transporter = nodemailer.createTransport({
     pass: process.env.MAIL_PASS,
   },
 });
-
+// Funció per enviar un correu electrònic
 const sendEmail = async ({ to, subject, html }) => {
   if (!to) return;
 
@@ -20,7 +21,7 @@ const sendEmail = async ({ to, subject, html }) => {
     html,
   });
 };
-
+// Funcions per construir el contingut dels correus electrònics de reserva
 const buildReservationCreatedEmail = ({
   nom,
   codi_reserva,
@@ -46,7 +47,7 @@ const buildReservationCreatedEmail = ({
     <p>Gràcies per confiar en PadelBook.</p>
   `;
 };
-
+// Funció per construir el contingut del correu electrònic de cancel·lació de reserva
 const buildReservationCancelledEmail = ({
   nom,
   codi_reserva,

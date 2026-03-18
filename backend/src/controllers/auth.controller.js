@@ -73,8 +73,6 @@ exports.register = async (req, res) => {
   }
 };
 
-
-
 // LOGIN
 exports.login = async (req, res) => {
   try {
@@ -132,8 +130,6 @@ exports.login = async (req, res) => {
   }
 };
 
-
-
 // OBTENIR DADES DE L'USUARI AUTENTICAT
 exports.getMe = async (req, res) => {
   try {
@@ -155,8 +151,6 @@ exports.getMe = async (req, res) => {
     return fail(res, "Error obtenint les dades de l'usuari");
   }
 };
-
-
 
 // ACTUALITZAR PERFIL
 exports.updateMe = async (req, res) => {
@@ -232,8 +226,6 @@ exports.updateMe = async (req, res) => {
     return fail(res, "Error actualitzant el perfil");
   }
 };
-
-
 
 // CANVIAR CONTRASENYA
 exports.changePassword = async (req, res) => {
