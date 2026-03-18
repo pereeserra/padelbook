@@ -201,52 +201,6 @@ exports.createReservation = async (req, res) => {
       }
     }
 
-    const [reservationRows] = await db.query(
-      `
-        SELECT
-          r.id,
-          r.codi_reserva,
-          r.user_id,
-          r.court_id,
-          r.time_slot_id,
-          r.data_reserva,
-          r.estat,
-          u.nom,
-          u.email,
-          c.nom_pista,
-          t.hora_inici,
-          t.hora_fi
-        FROM reservations r
-        JOIN users u ON r.user_id = u.id
-        JOIN courts c ON r.court_id = c.id
-        JOIN time_slots t ON r.time_slot_id = t.id
-        WHERE r.id = ?
-        LIMIT 1
-      `,
-      [reservationId]
-    );
-
-    const reservation = reservationRows[0];
-
-    if (reservation?.email) {
-      try {
-        await sendEmail({
-          to: reservation.email,
-          subject: `Reserva cancel·lada - ${reservation.codi_reserva}`,
-          html: buildReservationCancelledEmail({
-            nom: reservation.nom,
-            codi_reserva: reservation.codi_reserva,
-            nom_pista: reservation.nom_pista,
-            data_reserva: reservation.data_reserva,
-            hora_inici: reservation.hora_inici,
-            hora_fi: reservation.hora_fi,
-          }),
-        });
-      } catch (emailError) {
-        console.error("Error enviant email de cancel·lació:", emailError);
-      }
-    }
-
     return message(res, "Reserva creada correctament", 201, {
       id: reservationId,
       codi_reserva,
@@ -377,15 +331,15 @@ exports.deleteReservation = async (req, res) => {
       return fail(res, "Reserva no trobada", 404);
     }
 
-    const reservation = reservations[0];
+    const reservationBase = reservations[0];
 
     // 2. Si no és admin, només pot cancel·lar les seves reserves
-    if (userRole !== "admin" && reservation.user_id !== userId) {
+    if (userRole !== "admin" && reservationBase.user_id !== userId) {
       return fail(res, "No tens permís per cancel·lar aquesta reserva", 403);
     }
 
     // 3. Si la reserva ja està cancel·lada, informar-ho
-    if (reservation.estat === "cancel·lada") {
+    if (reservationBase.estat === "cancel·lada") {
       return fail(res, "Aquesta reserva ja està cancel·lada", 400);
     }
 
@@ -394,6 +348,53 @@ exports.deleteReservation = async (req, res) => {
       "UPDATE reservations SET estat = 'cancel·lada' WHERE id = ?",
       [reservationId]
     );
+
+    const [reservationRows] = await db.query(
+      `
+        SELECT
+          r.id,
+          r.codi_reserva,
+          r.user_id,
+          r.court_id,
+          r.time_slot_id,
+          r.data_reserva,
+          r.estat,
+          u.nom,
+          u.email,
+          c.nom_pista,
+          t.hora_inici,
+          t.hora_fi
+        FROM reservations r
+        JOIN users u ON r.user_id = u.id
+        JOIN courts c ON r.court_id = c.id
+        JOIN time_slots t ON r.time_slot_id = t.id
+        WHERE r.id = ?
+        LIMIT 1
+      `,
+      [reservationId]
+    );
+
+    const reservationDetails = reservationRows[0];
+
+    // Enviar email de cancel·lació de reserva
+    if (reservationDetails?.email) {
+      try {
+        await sendEmail({
+          to: reservationDetails.email,
+          subject: `Reserva cancel·lada - ${reservationDetails.codi_reserva}`,
+          html: buildReservationCancelledEmail({
+            nom: reservationDetails.nom,
+            codi_reserva: reservationDetails.codi_reserva,
+            nom_pista: reservationDetails.nom_pista,
+            data_reserva: reservationDetails.data_reserva,
+            hora_inici: reservationDetails.hora_inici,
+            hora_fi: reservationDetails.hora_fi,
+          }),
+        });
+      } catch (emailError) {
+        console.error("Error enviant email de cancel·lació:", emailError);
+      }
+    }
 
     return message(res, "Reserva cancel·lada correctament");
   } catch (error) {
