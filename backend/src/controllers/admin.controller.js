@@ -97,6 +97,7 @@ exports.getAllReservations = async (req, res) => {
         r.codi_reserva,
         r.data_reserva,
         r.estat,
+        r.preu_total,
         r.created_at,
         r.user_id,
         r.court_id,
@@ -146,13 +147,18 @@ exports.getAllReservations = async (req, res) => {
 // Controlador per crear una pista
 exports.createCourt = async (req, res) => {
   try {
-    let { nom_pista, tipus, coberta, estat, descripcio } = req.body;
+    let { nom_pista, tipus, coberta, estat, descripcio, preu_reserva } = req.body;
 
     nom_pista = normalizeText(nom_pista);
     tipus = normalizeText(tipus).toLowerCase();
     estat = normalizeText(estat).toLowerCase();
     descripcio = normalizeText(descripcio);
     coberta = parseBinaryFlag(coberta);
+    preu_reserva = Number(preu_reserva);
+
+    if (Number.isNaN(preu_reserva) || preu_reserva < 0) {
+      return res.status(400).json({ error: "El preu de reserva no és vàlid" });
+    }
 
     const allowedCourtStatuses = ["disponible", "manteniment"];
     const allowedCourtTypes = ["dobles", "individual"];
@@ -193,9 +199,9 @@ exports.createCourt = async (req, res) => {
     }
 
     const [result] = await db.query(
-      `INSERT INTO courts (nom_pista, tipus, coberta, estat, descripcio)
-       VALUES (?, ?, ?, ?, ?)`,
-      [nom_pista, tipus, coberta, estat, descripcio || null]
+      `INSERT INTO courts (nom_pista, tipus, coberta, estat, descripcio, preu_reserva)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [nom_pista, tipus, coberta, estat, descripcio, preu_reserva || null]
     );
 
     await db.query(
@@ -235,7 +241,7 @@ exports.createCourt = async (req, res) => {
 exports.updateCourt = async (req, res) => {
   try {
     const courtId = Number(req.params.id);
-    let { nom_pista, tipus, coberta, estat, descripcio } = req.body;
+    let { nom_pista, tipus, coberta, estat, descripcio, preu_reserva } = req.body;
 
     if (!Number.isInteger(courtId) || courtId <= 0) {
       return res.status(400).json({
@@ -248,6 +254,11 @@ exports.updateCourt = async (req, res) => {
     estat = normalizeText(estat).toLowerCase();
     descripcio = normalizeText(descripcio);
     coberta = parseBinaryFlag(coberta);
+    preu_reserva = Number(preu_reserva);
+
+    if (Number.isNaN(preu_reserva) || preu_reserva < 0) {
+      return res.status(400).json({ error: "El preu de reserva no és vàlid" });
+    }
 
     const allowedCourtStatuses = ["disponible", "manteniment"];
     const allowedCourtTypes = ["dobles", "individual"];
@@ -300,9 +311,9 @@ exports.updateCourt = async (req, res) => {
 
     await db.query(
       `UPDATE courts
-       SET nom_pista = ?, tipus = ?, coberta = ?, estat = ?, descripcio = ?
+       SET nom_pista = ?, tipus = ?, coberta = ?, estat = ?, descripcio = ?, preu_reserva = ?
        WHERE id = ?`,
-      [nom_pista, tipus, coberta, estat, descripcio || null, courtId]
+      [nom_pista, tipus, coberta, estat, descripcio, preu_reserva || null, courtId]
     );
 
     await db.query(
@@ -889,6 +900,7 @@ exports.getReservationByIdAdmin = async (req, res) => {
         r.codi_reserva,
         r.data_reserva,
         r.estat,
+        r.preu_total,
         r.created_at,
 
         r.user_id,

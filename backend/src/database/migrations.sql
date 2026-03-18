@@ -31,3 +31,17 @@
 -- NOTA:
 -- Actualment aquest camp ja forma part de schema.sql
 -- però es manté aquí com a documentació d’evolució del projecte
+
+-- ============================================
+-- MIGRATION - preu de pista i preu de reserva
+-- ============================================
+
+ALTER TABLE courts
+ADD COLUMN preu_reserva DECIMAL(10,2) NOT NULL DEFAULT 0.00;
+
+ALTER TABLE reservations
+ADD COLUMN preu_total DECIMAL(10,2) NOT NULL DEFAULT 0.00;
+
+UPDATE courts
+SET preu_reserva = 12.00
+WHERE preu_reserva = 0.00;

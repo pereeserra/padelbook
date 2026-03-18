@@ -34,7 +34,7 @@ exports.createReservation = async (req, res) => {
 
     // 1. Comprovar que la pista existeix i que sigui reservable
     const [courts] = await db.query(
-      "SELECT id, estat FROM courts WHERE id = ? LIMIT 1",
+      "SELECT id, estat, preu_reserva FROM courts WHERE id = ? LIMIT 1",
       [court_id]
     );
 
@@ -47,6 +47,8 @@ exports.createReservation = async (req, res) => {
     if (court.estat !== "disponible") {
       return fail(res, "Aquesta pista no està disponible per reservar", 400);
     }
+
+    const preu_total = Number(court.preu_reserva || 0);
 
     // 2. Comprovar que la franja existeix
     const [timeSlots] = await db.query(
@@ -104,9 +106,9 @@ exports.createReservation = async (req, res) => {
     const codiTemporal = `TEMP-${Date.now()}-${user_id}`;
 
     const [insertResult] = await db.query(
-      `INSERT INTO reservations (codi_reserva, user_id, court_id, time_slot_id, data_reserva, estat)
-      VALUES (?, ?, ?, ?, ?, 'activa')`,
-      [codiTemporal, user_id, court_id, time_slot_id, data_reserva]
+      `INSERT INTO reservations (codi_reserva, user_id, court_id, time_slot_id, data_reserva, estat, preu_total)
+      VALUES (?, ?, ?, ?, ?, 'activa', ?)`,
+      [codiTemporal, user_id, court_id, time_slot_id, data_reserva, preu_total]
     );
 
     const reservationId = insertResult.insertId;
@@ -123,6 +125,7 @@ exports.createReservation = async (req, res) => {
     return message(res, "Reserva creada correctament", 201, {
       id: reservationId,
       codi_reserva,
+      preu_total
     });
       } catch (error) {
         console.error("Error createReservation:", error);
@@ -168,6 +171,7 @@ exports.getReservations = async (req, res) => {
           r.codi_reserva,
           r.data_reserva,
           r.estat,
+          r.preu_total,
           r.created_at,
           u.nom AS usuari_nom,
           u.email AS usuari_email,
@@ -293,6 +297,7 @@ exports.getReservationByCode = async (req, res) => {
         r.time_slot_id,
         r.data_reserva,
         r.estat,
+        r.preu_total,
         r.created_at,
         c.nom_pista,
         t.hora_inici,
