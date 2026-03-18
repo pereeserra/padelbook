@@ -873,3 +873,57 @@ exports.getAdminLogs = async (req, res) => {
     });
   }
 };
+
+// Controlador per obtenir els detalls d'una reserva concreta (per a l'administrador)
+exports.getReservationByIdAdmin = async (req, res) => {
+  try {
+    const reservationId = parsePositiveInteger(req.params.id);
+
+    if (!reservationId) {
+      return res.status(400).json({ error: "ID de reserva no vàlid" });
+    }
+
+    const query = `
+      SELECT
+        r.id,
+        r.codi_reserva,
+        r.data_reserva,
+        r.estat,
+        r.created_at,
+
+        r.user_id,
+        u.nom AS usuari_nom,
+        u.email AS usuari_email,
+        u.telefon AS usuari_telefon,
+
+        r.court_id,
+        c.nom_pista,
+        c.tipus,
+        c.coberta,
+
+        r.time_slot_id,
+        t.hora_inici,
+        t.hora_fi
+
+      FROM reservations r
+      JOIN users u ON r.user_id = u.id
+      JOIN courts c ON r.court_id = c.id
+      JOIN time_slots t ON r.time_slot_id = t.id
+      WHERE r.id = ?
+      LIMIT 1
+    `;
+
+    const [results] = await db.query(query, [reservationId]);
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: "Reserva no trobada" });
+    }
+
+    return res.json({
+      data: results[0],
+    });
+  } catch (error) {
+    console.error("Error getReservationByIdAdmin:", error);
+    return res.status(500).json({ error: "Error obtenint la reserva" });
+  }
+};

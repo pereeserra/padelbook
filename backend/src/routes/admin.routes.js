@@ -13,6 +13,14 @@ router.get(
   adminController.getAllReservations
 );
 
+// Ruta protegida per a administradors per obtenir una reserva específica
+router.get(
+  "/reservations/:id",
+  authMiddleware,
+  isAdmin,
+  adminController.getReservationByIdAdmin
+);
+
 // Ruta protegida per a administradors per obtenir estadístiques generals
 router.get(
   "/stats/overview",
