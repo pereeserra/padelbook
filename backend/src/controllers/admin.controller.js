@@ -927,3 +927,124 @@ exports.getReservationByIdAdmin = async (req, res) => {
     return res.status(500).json({ error: "Error obtenint la reserva" });
   }
 };
+
+// Controlador per exportar les reserves a CSV segons els filtres aplicats
+exports.exportReservationsCsv = async (req, res) => {
+  try {
+    const estat =
+      typeof req.query.estat === "string" ? req.query.estat.trim() : "";
+
+    const data =
+      typeof req.query.data === "string" ? req.query.data.trim() : "";
+
+    const court_id = req.query.court_id ? Number(req.query.court_id) : null;
+    const user_id = req.query.user_id ? Number(req.query.user_id) : null;
+
+    const codi_reserva =
+      typeof req.query.codi_reserva === "string"
+        ? req.query.codi_reserva.trim().toUpperCase()
+        : "";
+
+    const whereClauses = [];
+    const params = [];
+
+    if (estat) {
+      whereClauses.push("r.estat = ?");
+      params.push(estat);
+    }
+
+    if (data) {
+      whereClauses.push("r.data_reserva = ?");
+      params.push(data);
+    }
+
+    if (court_id) {
+      whereClauses.push("r.court_id = ?");
+      params.push(court_id);
+    }
+
+    if (user_id) {
+      whereClauses.push("r.user_id = ?");
+      params.push(user_id);
+    }
+
+    if (codi_reserva) {
+      whereClauses.push("r.codi_reserva = ?");
+      params.push(codi_reserva);
+    }
+
+    const whereClause =
+      whereClauses.length > 0 ? `WHERE ${whereClauses.join(" AND ")}` : "";
+
+    const query = `
+      SELECT
+        r.id,
+        r.codi_reserva,
+        r.data_reserva,
+        r.estat,
+        r.created_at,
+        u.nom AS usuari_nom,
+        u.email AS usuari_email,
+        c.nom_pista,
+        t.hora_inici,
+        t.hora_fi
+      FROM reservations r
+      JOIN users u ON r.user_id = u.id
+      JOIN courts c ON r.court_id = c.id
+      JOIN time_slots t ON r.time_slot_id = t.id
+      ${whereClause}
+      ORDER BY r.created_at DESC
+    `;
+
+    const [reservations] = await db.query(query, params);
+
+    const escapeCsvValue = (value) => {
+      if (value === null || value === undefined) return "";
+      const stringValue = String(value).replace(/"/g, '""');
+      return `"${stringValue}"`;
+    };
+
+    const header = [
+      "id",
+      "codi_reserva",
+      "data_reserva",
+      "estat",
+      "created_at",
+      "usuari_nom",
+      "usuari_email",
+      "nom_pista",
+      "hora_inici",
+      "hora_fi",
+    ];
+
+    const rows = reservations.map((reservation) =>
+      [
+        reservation.id,
+        reservation.codi_reserva,
+        reservation.data_reserva,
+        reservation.estat,
+        reservation.created_at,
+        reservation.usuari_nom,
+        reservation.usuari_email,
+        reservation.nom_pista,
+        reservation.hora_inici,
+        reservation.hora_fi,
+      ]
+        .map(escapeCsvValue)
+        .join(",")
+    );
+
+    const csvContent = [header.join(","), ...rows].join("\n");
+
+    const timestamp = new Date().toISOString().slice(0, 10);
+    const fileName = `reservations-${timestamp}.csv`;
+
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
+
+    return res.status(200).send(csvContent);
+  } catch (error) {
+    console.error("Error exportReservationsCsv:", error);
+    return res.status(500).json({ error: "Error exportant reserves a CSV" });
+  }
+};
