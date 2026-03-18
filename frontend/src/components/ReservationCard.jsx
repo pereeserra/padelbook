@@ -48,6 +48,66 @@ function ReservationCard({
     }
   );
 
+  const paymentMethodLabel = (method) => {
+    if (!method) return "No disponible";
+
+    if (method === "online_simulat") return "Online";
+    if (method === "al_club") return "Al club";
+
+    return method;
+  };
+
+  const paymentStatusLabel = (status) => {
+    if (!status) return "No disponible";
+
+    if (status === "pagat") return "Pagat";
+    if (status === "pendent") return "Pendent";
+
+    return status;
+  };
+
+  const paymentMethodBadgeStyle = (method) => {
+    if (method === "online_simulat") {
+      return {
+        ...styles.valueBadge,
+        ...styles.valueBadgeBlue,
+      };
+    }
+
+    if (method === "al_club") {
+      return {
+        ...styles.valueBadge,
+        ...styles.valueBadgeAmber,
+      };
+    }
+
+    return {
+      ...styles.valueBadge,
+      ...styles.valueBadgeNeutral,
+    };
+  };
+
+  const paymentStatusBadgeStyle = (status) => {
+    if (status === "pagat") {
+      return {
+        ...styles.valueBadge,
+        ...styles.valueBadgeGreen,
+      };
+    }
+
+    if (status === "pendent") {
+      return {
+        ...styles.valueBadge,
+        ...styles.valueBadgeRose,
+      };
+    }
+
+    return {
+      ...styles.valueBadge,
+      ...styles.valueBadgeNeutral,
+    };
+  };
+
   return (
     <article
       ref={cardRef}
@@ -174,16 +234,20 @@ function ReservationCard({
 
         <div style={styles.infoBox}>
           <span style={styles.label}>Pagament</span>
-          <p style={styles.value}>
-            {reservation.metode_pagament || "No disponible"}
-          </p>
+          <div style={styles.valueBadgeRow}>
+            <span style={paymentMethodBadgeStyle(reservation.metode_pagament)}>
+              {paymentMethodLabel(reservation.metode_pagament)}
+            </span>
+          </div>
         </div>
 
         <div style={styles.infoBox}>
           <span style={styles.label}>Estat pagament</span>
-          <p style={styles.value}>
-            {reservation.estat_pagament || "No disponible"}
-          </p>
+          <div style={styles.valueBadgeRow}>
+            <span style={paymentStatusBadgeStyle(reservation.estat_pagament)}>
+              {paymentStatusLabel(reservation.estat_pagament)}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -406,6 +470,51 @@ const styles = {
     fontWeight: "700",
     lineHeight: 1.55,
     textTransform: "capitalize",
+  },
+  valueBadgeRow: {
+    display: "flex",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: "0.45rem",
+    minHeight: "28px",
+  },
+  valueBadge: {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: "30px",
+    padding: "0.35rem 0.72rem",
+    borderRadius: "999px",
+    fontSize: "0.82rem",
+    fontWeight: "800",
+    lineHeight: 1.2,
+    border: "1px solid transparent",
+    whiteSpace: "nowrap",
+  },
+  valueBadgeBlue: {
+    background: "#eff6ff",
+    color: "#1d4ed8",
+    borderColor: "#dbeafe",
+  },
+  valueBadgeAmber: {
+    background: "#fffbeb",
+    color: "#b45309",
+    borderColor: "#fde68a",
+  },
+  valueBadgeGreen: {
+    background: "#ecfdf5",
+    color: "#15803d",
+    borderColor: "#bbf7d0",
+  },
+  valueBadgeRose: {
+    background: "#fff1f2",
+    color: "#be123c",
+    borderColor: "#fecdd3",
+  },
+  valueBadgeNeutral: {
+    background: "#f8fafc",
+    color: "#475569",
+    borderColor: "#e2e8f0",
   },
   footer: {
     marginTop: "1.15rem",
