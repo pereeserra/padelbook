@@ -1,3 +1,4 @@
+// Funció per obtenir l'usuari des del token emmagatzemat al localStorage
 export function getUserFromToken() {
   const storedUser = localStorage.getItem("user");
 
@@ -22,12 +23,12 @@ export function getUserFromToken() {
     return null;
   }
 }
-
+// Funció per comprovar si l'usuari és admin
 export function isAdmin() {
   const user = getUserFromToken();
   return user?.rol === "admin";
 }
-
+// Funció per comprovar si l'usuari està autenticat
 export function isAuthenticated() {
   return !!localStorage.getItem("token");
 }
