@@ -61,7 +61,29 @@ function ReservationCard({
       <div style={styles.header}>
         <div>
           <span style={styles.eyebrow}>Reserva de pista</span>
-          <h3 style={styles.title}>{reservation.nom_pista}</h3>
+
+          <div style={styles.titleRow}>
+            <span style={styles.titleIcon} aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                width="18"
+                height="18"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="3" y="5" width="18" height="16" rx="3" />
+                <path d="M16 3v4" />
+                <path d="M8 3v4" />
+                <path d="M3 10h18" />
+              </svg>
+            </span>
+
+            <h3 style={styles.title}>{reservation.nom_pista}</h3>
+          </div>
+
           <p style={styles.subtitle}>
             Consulta el detall i gestiona la teva reserva
           </p>
@@ -80,7 +102,26 @@ function ReservationCard({
                 ...(isDeletingCancelled ? styles.deleteIconButtonDisabled : {}),
               }}
             >
-              {isDeletingCancelled ? "…" : "🗑"}
+              {isDeletingCancelled ? (
+                <span style={styles.deleteLoadingDots}>···</span>
+              ) : (
+                <svg
+                  viewBox="0 0 24 24"
+                  width="18"
+                  height="18"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M3 6h18" />
+                  <path d="M8 6V4h8v2" />
+                  <path d="M19 6l-1 14H6L5 6" />
+                  <path d="M10 11v6" />
+                  <path d="M14 11v6" />
+                </svg>
+              )}
             </button>
           )}
 
@@ -90,6 +131,13 @@ function ReservationCard({
               ...(isActive ? styles.badgeActive : styles.badgeInactive),
             }}
           >
+            <span
+              style={{
+                ...styles.badgeDot,
+                ...(isActive ? styles.badgeDotActive : styles.badgeDotInactive),
+              }}
+            />
+
             {reservation.estat}
           </span>
         </div>
@@ -200,11 +248,11 @@ function ReservationCard({
 
 const styles = {
   card: {
-    background: "rgba(255,255,255,0.86)",
-    borderRadius: "24px",
-    padding: "1.3rem",
-    boxShadow: "0 16px 34px rgba(15,23,42,0.05)",
-    border: "1px solid rgba(148,163,184,0.18)",
+    background: "rgba(255,255,255,0.9)",
+    borderRadius: "26px",
+    padding: "1.35rem",
+    boxShadow: "0 18px 36px rgba(15,23,42,0.06)",
+    border: "1px solid rgba(148,163,184,0.16)",
     transition: "all 0.25s ease",
     scrollMarginTop: "120px",
     backdropFilter: "blur(10px)",
@@ -215,10 +263,10 @@ const styles = {
     transform: "scale(1.01)",
   },
   cardInactive: {
-    opacity: 0.96,
+    opacity: 0.97,
   },
   cardBusy: {
-    opacity: 0.78,
+    opacity: 0.8,
     pointerEvents: "none",
   },
   header: {
@@ -237,31 +285,65 @@ const styles = {
   },
   eyebrow: {
     display: "inline-block",
-    marginBottom: "0.4rem",
-    fontSize: "0.78rem",
+    marginBottom: "0.45rem",
+    fontSize: "0.76rem",
     color: "#64748b",
     fontWeight: "800",
     textTransform: "uppercase",
-    letterSpacing: "0.04em",
+    letterSpacing: "0.05em",
+  },
+  titleRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.55rem",
+  },
+  titleIcon: {
+    width: "34px",
+    height: "34px",
+    borderRadius: "12px",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    background: "#eff6ff",
+    color: "#1d4ed8",
+    border: "1px solid #dbeafe",
+    flexShrink: 0,
   },
   title: {
     margin: 0,
     fontSize: "1.35rem",
     color: "#0f172a",
+    lineHeight: 1.15,
   },
   subtitle: {
-    marginTop: "0.35rem",
+    marginTop: "0.45rem",
     marginBottom: 0,
     color: "#64748b",
     fontSize: "0.95rem",
     lineHeight: 1.6,
   },
   badge: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.45rem",
     padding: "0.45rem 0.8rem",
     borderRadius: "999px",
     fontWeight: "800",
-    fontSize: "0.88rem",
+    fontSize: "0.85rem",
     textTransform: "capitalize",
+    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.35)",
+  },
+  badgeDot: {
+    width: "8px",
+    height: "8px",
+    borderRadius: "50%",
+    flexShrink: 0,
+  },
+  badgeDotActive: {
+    background: "#16a34a",
+  },
+  badgeDotInactive: {
+    background: "#dc2626",
   },
   badgeActive: {
     background: "#ecfdf5",
@@ -276,14 +358,12 @@ const styles = {
   deleteIconButton: {
     width: "42px",
     height: "42px",
-    borderRadius: "50%",
+    borderRadius: "14px",
     border: "1px solid #fecaca",
-    background: "#fff1f2",
+    background: "linear-gradient(180deg, #fff5f5, #ffe4e6)",
     color: "#dc2626",
-    fontSize: "1.05rem",
-    fontWeight: "800",
     cursor: "pointer",
-    display: "flex",
+    display: "inline-flex",
     alignItems: "center",
     justifyContent: "center",
     boxShadow: "0 10px 20px rgba(220,38,38,0.10)",
@@ -293,22 +373,29 @@ const styles = {
     opacity: 0.75,
     cursor: "not-allowed",
   },
+  deleteLoadingDots: {
+    fontWeight: "800",
+    letterSpacing: "0.08em",
+    fontSize: "0.95rem",
+    lineHeight: 1,
+  },
   infoGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-    gap: "0.85rem",
+    gap: "0.9rem",
   },
   infoBox: {
-    background: "rgba(248,250,252,0.95)",
+    background: "linear-gradient(180deg, rgba(248,250,252,0.96), #ffffff)",
     border: "1px solid #e2e8f0",
-    borderRadius: "18px",
-    padding: "0.95rem 1rem",
+    borderRadius: "20px",
+    padding: "1rem",
+    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.8)",
   },
   label: {
     display: "block",
-    marginBottom: "0.35rem",
+    marginBottom: "0.38rem",
     color: "#64748b",
-    fontSize: "0.82rem",
+    fontSize: "0.8rem",
     fontWeight: "800",
     textTransform: "uppercase",
     letterSpacing: "0.04em",
@@ -321,7 +408,7 @@ const styles = {
     textTransform: "capitalize",
   },
   footer: {
-    marginTop: "1.1rem",
+    marginTop: "1.15rem",
     display: "flex",
     justifyContent: "flex-end",
   },
