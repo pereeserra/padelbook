@@ -14,6 +14,7 @@ function AdminPage() {
     coberta: 0,
     estat: "disponible",
     descripcio: "",
+    preu_reserva: "",
   };
 
   const editSectionRef = useRef(null);
@@ -46,6 +47,7 @@ function AdminPage() {
   const [creatingCourt, setCreatingCourt] = useState(false);
   const [editingCourtId, setEditingCourtId] = useState(null);
   const [highlightedCourtId, setHighlightedCourtId] = useState(null);
+  const [activeTab, setActiveTab] = useState("dashboard");
 
   const [newCourt, setNewCourt] = useState(emptyCourt);
 
@@ -408,6 +410,7 @@ function AdminPage() {
   };
 
   const handleStartEditCourt = (court) => {
+    setActiveTab("courts");
     setEditingCourtId(court.id);
     setNewCourt({
       nom_pista: court.nom_pista || "",
@@ -415,6 +418,7 @@ function AdminPage() {
       coberta: Number(court.coberta) || 0,
       estat: court.estat || "disponible",
       descripcio: court.descripcio || "",
+      preu_reserva: court.preu_reserva || "",
     });
     setConfirmingCourtId(null);
 
@@ -661,34 +665,29 @@ function AdminPage() {
               >
                 <button
                   type="button"
-                  className="btn btn-light"
-                  onClick={() => scrollToElementWithOffset(dashboardSectionRef.current, 140)}
+                  className={`btn ${activeTab === "dashboard" ? "btn-primary" : "btn-light"}`}
+                  onClick={() => setActiveTab("dashboard")}
                 >
-                  Veure dashboard
+                  Dashboard
                 </button>
 
                 <button
                   type="button"
-                  className="btn btn-light"
-                  onClick={() => scrollToElementWithOffset(editSectionRef.current, 140)}
+                  className={`btn ${activeTab === "courts" ? "btn-primary" : "btn-light"}`}
+                  onClick={() => {
+                    setActiveTab("courts");
+                    setEditingCourtId(null);
+                  }}
                 >
-                  Crear o editar pista
+                  Gestió de pistes
                 </button>
 
                 <button
                   type="button"
-                  className="btn btn-light"
-                  onClick={() => scrollToElementWithOffset(reservationsSectionRef.current, 140)}
+                  className={`btn ${activeTab === "reservations" ? "btn-primary" : "btn-light"}`}
+                  onClick={() => setActiveTab("reservations")}
                 >
-                  Veure reserves
-                </button>
-
-                <button
-                  type="button"
-                  className="btn btn-light"
-                  onClick={() => scrollToElementWithOffset(courtsSectionRef.current, 140)}
-                >
-                  Gestionar pistes
+                  Reserves
                 </button>
               </div>
             </div>
@@ -782,10 +781,12 @@ function AdminPage() {
 
         {!error && (
           <>
-            <section
-              ref={dashboardSectionRef}
-              className="fade-in-up delay-1 admin__section"
-            >
+            {activeTab === "dashboard" && (
+              <>
+                <section
+                  ref={dashboardSectionRef}
+                  className="fade-in-up delay-1 admin__section"
+                >
               <div
                 className={`admin__section-header ${isMobileView ? "admin__section-header--mobile" : ""}`}
               >
@@ -1053,10 +1054,15 @@ function AdminPage() {
               </div>
             </section>
 
-            <section
-              ref={editSectionRef}
-              className="fade-in-up delay-1 admin__section"
-            >
+              </>
+            )}
+
+            {activeTab === "courts" && (
+              <>
+                <section
+                  ref={editSectionRef}
+                  className="fade-in-up delay-1 admin__section"
+                >
               <div
                 className={`admin__section-header ${isMobileView ? "admin__section-header--mobile" : ""}`}
               >
@@ -1093,10 +1099,15 @@ function AdminPage() {
               </div>
             </section>
 
-            <section
-              ref={reservationsSectionRef}
-              className="fade-in-up delay-2 admin__section"
-            >
+              </>
+            )}
+
+            {activeTab === "reservations" && (
+              <>
+                <section
+                  ref={reservationsSectionRef}
+                  className="fade-in-up delay-2 admin__section"
+                >
               <div
                 className={`admin__section-header ${isMobileView ? "admin__section-header--mobile" : ""}`}
               >
@@ -1124,10 +1135,15 @@ function AdminPage() {
               </div>
             </section>
 
-            <section
-              ref={courtsSectionRef}
-              className="fade-in-up delay-3 admin__section"
-            >
+              </>
+            )}
+
+            {activeTab === "courts" && (
+              <>
+                <section
+                  ref={courtsSectionRef}
+                  className="fade-in-up delay-3 admin__section"
+                >
               <div
                 className={`admin__section-header ${isMobileView ? "admin__section-header--mobile" : ""}`}
               >
@@ -1271,6 +1287,8 @@ function AdminPage() {
                 </div>
               )}
             </section>
+              </>
+            )}
           </>
         )}
       </div>

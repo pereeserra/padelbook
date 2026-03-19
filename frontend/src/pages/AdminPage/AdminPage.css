@@ -535,3 +535,23 @@
 .admin__full-width-button {
   width: 100%;
 }
+
+.admin__tabs-content {
+  position: relative;
+  min-height: 400px;
+}
+
+.admin__tab-pane {
+  animation: tabFadeIn 0.3s ease-out;
+}
+
+@keyframes tabFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

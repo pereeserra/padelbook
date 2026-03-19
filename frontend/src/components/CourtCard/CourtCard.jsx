@@ -84,10 +84,10 @@ function CourtCard({
         <div className="court-card__footer">
           <button
             type="button"
-            className="btn btn-light btn-sm"
+            className="btn btn-primary btn-sm"
             onClick={onEdit}
           >
-            Editar pista
+            Editar
           </button>
 
           <button
@@ -95,7 +95,7 @@ function CourtCard({
             className="btn btn-sm court-card__delete-button"
             onClick={onStartDelete}
           >
-            Eliminar pista
+            Eliminar
           </button>
         </div>
       )}

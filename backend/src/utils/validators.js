@@ -110,11 +110,14 @@ const validateCourtData = (data) => {
   estat = normalizeText(estat).toLowerCase();
   descripcio = normalizeText(descripcio);
   coberta = parseBinaryFlag(coberta);
-  preu_reserva = Number(preu_reserva);
-
-  if (Number.isNaN(preu_reserva) || preu_reserva < 0) {
-    return { error: "El preu de reserva no és vàlid" };
+  let parsedPreu = 0;
+  if (preu_reserva !== undefined && preu_reserva !== null && preu_reserva !== "") {
+    parsedPreu = Number(preu_reserva);
+    if (Number.isNaN(parsedPreu) || parsedPreu < 0) {
+      return { error: "El preu de reserva no és vàlid" };
+    }
   }
+  preu_reserva = parsedPreu;
 
   const allowedCourtStatuses = ["disponible", "manteniment"];
   const allowedCourtTypes = ["dobles", "individual"];

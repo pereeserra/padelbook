@@ -185,10 +185,15 @@
 }
 
 .court-card__delete-button {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  color: white;
-  border: none;
-  box-shadow: 0 12px 24px rgba(220, 38, 38, 0.16);
+  background: transparent;
+  color: #ef4444;
+  border: 1px solid #fee2e2;
+  box-shadow: none;
+}
+
+.court-card__delete-button:hover {
+  background: #fef2f2;
+  transform: translateY(-1px);
 }
 
 .court-card__confirm-box {

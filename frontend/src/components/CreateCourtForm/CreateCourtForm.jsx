@@ -139,6 +139,25 @@ function CreateCourtForm({
           </span>
         </div>
 
+        <div className="court-form__field">
+          <label htmlFor="preu_reserva" className="court-form__label">
+            Preu base (€)
+          </label>
+          <input
+            id="preu_reserva"
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="Ex: 15.00"
+            value={newCourt.preu_reserva || ""}
+            onChange={(e) => updateField("preu_reserva", e.target.value)}
+            className="court-form__input"
+          />
+          <span className="court-form__helper-text">
+            Opcional. Preu per defecte per a la pista.
+          </span>
+        </div>
+
         <div className="court-form__field court-form__field--full">
           <label htmlFor="descripcio" className="court-form__label">
             Descripció
