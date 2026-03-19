@@ -1,4 +1,4 @@
-const { parse } = require("dotenv");
+
 const db = require("../config/db");
 const {
   normalizeText,
