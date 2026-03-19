@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import heroImg from "../../assets/images/padelcourt1.jpg";
+import court2Img from "../../assets/images/padelcourt2.jpg";
+import court3Img from "../../assets/images/padelcourt3.jpg";
+import ballsImg from "../../assets/images/padelballs.webp";
 import "./HomePage.css";
 
 function HomePage() {
@@ -22,6 +26,11 @@ function HomePage() {
         <section
           className={`fade-in-up home__hero ${isMobileView ? "home__hero--mobile" : ""}`}
         >
+          <div className="home__hero-bg">
+            <img src={heroImg} alt="Padel court" />
+            <div className="home__hero-overlay" />
+          </div>
+
           <div
             className={`home__hero-grid ${isMobileView ? "home__hero-grid--mobile" : ""}`}
           >
@@ -196,7 +205,8 @@ function HomePage() {
           <div
             className={`home__gallery-grid ${isMobileView ? "home__single-column-grid" : ""}`}
           >
-            <article className="home__gallery-card home__gallery-card--blue">
+            <article className="home__gallery-card">
+              <img src={court2Img} alt="Consulta" className="home__gallery-img" />
               <div className="home__gallery-overlay" />
               <div className="home__gallery-content">
                 <span className="home__gallery-badge">Consulta</span>
@@ -207,7 +217,8 @@ function HomePage() {
               </div>
             </article>
 
-            <article className="home__gallery-card home__gallery-card--green">
+            <article className="home__gallery-card">
+              <img src={court3Img} alt="Reserva" className="home__gallery-img" />
               <div className="home__gallery-overlay" />
               <div className="home__gallery-content">
                 <span className="home__gallery-badge">Reserva</span>
@@ -218,7 +229,8 @@ function HomePage() {
               </div>
             </article>
 
-            <article className="home__gallery-card home__gallery-card--dark">
+            <article className="home__gallery-card">
+              <img src={ballsImg} alt="Compte" className="home__gallery-img" />
               <div className="home__gallery-overlay" />
               <div className="home__gallery-content">
                 <span className="home__gallery-badge">Compte</span>
@@ -277,7 +289,12 @@ function HomePage() {
           <div
             className={`home__cta-card ${isMobileView ? "home__cta-card--mobile" : ""}`}
           >
-            <div>
+            <div className="home__cta-bg">
+              <img src={heroImg} alt="" />
+              <div className="home__cta-overlay" />
+            </div>
+
+            <div className="home__cta-content">
               <span className="home__cta-kicker">Preparat per provar-ho?</span>
               <h2 className="home__cta-title">Entra i comença a explorar PadelBook</h2>
               <p className="home__cta-text">
