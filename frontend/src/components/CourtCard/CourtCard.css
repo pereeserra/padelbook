@@ -1,0 +1,229 @@
+.court-card {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 26px;
+  padding: 1.25rem;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 0.95rem;
+  min-height: 100%;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.court-card--confirming {
+  border-color: #fdba74;
+  box-shadow: 0 18px 42px rgba(249, 115, 22, 0.12);
+}
+
+.court-card--highlighted {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08), 0 20px 46px rgba(37, 99, 235, 0.14);
+  transform: translateY(-2px);
+}
+
+.court-card__top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.court-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.court-card__identity-block {
+  min-width: 0;
+}
+
+.court-card__eyebrow {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.court-card__title {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.court-card__subtitle {
+  margin: 0.4rem 0 0 0;
+  color: #64748b;
+  line-height: 1.6;
+  font-weight: 600;
+}
+
+.court-card__status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: capitalize;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.court-card__status-badge--available {
+  background: #ecfdf5;
+  color: #15803d;
+  border-color: #bbf7d0;
+}
+
+.court-card__status-badge--maintenance {
+  background: #fff7ed;
+  color: #c2410c;
+  border-color: #fdba74;
+}
+
+.court-card__summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.court-card__summary-item {
+  border-radius: 18px;
+  padding: 0.85rem 0.95rem;
+  background: linear-gradient(180deg, #f8fafc, #ffffff);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.court-card__summary-label {
+  display: block;
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.28rem;
+}
+
+.court-card__summary-value {
+  color: #0f172a;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.court-card__badges-row {
+  display: flex;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.court-card__info-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 33px;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #dbeafe;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.court-card__info-badge--covered {
+  background: #eefdf4;
+  color: #15803d;
+  border-color: #bbf7d0;
+}
+
+.court-card__info-badge--outdoor {
+  background: #fff7ed;
+  color: #c2410c;
+  border-color: #fdba74;
+}
+
+.court-card__description-box {
+  border-radius: 20px;
+  background: #f8fafc;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  padding: 1rem;
+}
+
+.court-card__description-label {
+  display: block;
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: #64748b;
+  margin-bottom: 0.38rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.court-card__description-text {
+  margin: 0;
+  color: #334155;
+  line-height: 1.7;
+}
+
+.court-card__footer {
+  margin-top: auto;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.court-card__delete-button {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  border: none;
+  box-shadow: 0 12px 24px rgba(220, 38, 38, 0.16);
+}
+
+.court-card__confirm-box {
+  margin-top: auto;
+  background: #fff7ed;
+  border: 1px solid #fdba74;
+  border-radius: 18px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.court-card__confirm-title {
+  margin: 0;
+  color: #9a3412;
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+.court-card__confirm-text {
+  margin: 0;
+  color: #7c2d12;
+  line-height: 1.65;
+  font-weight: 600;
+}
+
+.court-card__confirm-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.court-card__confirm-danger-button {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: white;
+  border: none;
+}

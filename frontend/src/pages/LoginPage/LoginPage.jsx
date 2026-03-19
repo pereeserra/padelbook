@@ -1,0 +1,255 @@
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import api from "../../api/axios";
+import "./LoginPage.css";
+
+function LoginPage() {
+  const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 900);
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [capsLock, setCapsLock] = useState(false);
+
+  const navigate = useNavigate();
+  const feedbackRef = useRef(null);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileView(window.innerWidth <= 900);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (!error || !feedbackRef.current) return;
+
+    const top =
+      feedbackRef.current.getBoundingClientRect().top + window.scrollY - 120;
+
+    window.scrollTo({
+      top,
+      behavior: "smooth",
+    });
+  }, [error]);
+
+  const handleCapsLock = (e) => {
+    setCapsLock(e.getModifierState("CapsLock"));
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    try {
+      setError("");
+      setLoading(true);
+
+      const response = await api.post("/auth/login", {
+        email: email.trim().toLowerCase(),
+        password,
+      });
+
+      const token = response?.data?.data?.token || "";
+      const user = response?.data?.data?.user || null;
+
+      if (!token) {
+        throw new Error("No s'ha rebut el token de sessió");
+      }
+
+      localStorage.setItem("token", token);
+
+      if (user) {
+        localStorage.setItem("user", JSON.stringify(user));
+      }
+
+      window.dispatchEvent(new Event("profile-updated"));
+      navigate("/availability");
+    } catch (err) {
+      console.error(err);
+
+      if (err.response?.data?.error) {
+        setError(err.response.data.error);
+      } else if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError("Error iniciant sessió.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="login__page">
+      <div
+        className={`login__wrapper ${isMobileView ? "login__wrapper--mobile" : ""}`}
+      >
+        <section
+          className={`fade-in-up login__visual-panel ${
+            isMobileView ? "login__visual-panel--mobile" : ""
+          }`}
+        >
+          <div className="login__visual-glow-one" />
+          <div className="login__visual-glow-two" />
+
+          <div className="login__visual-content">
+            <span className="login__badge">Accés segur</span>
+
+            <h1
+              className={`login__title ${isMobileView ? "login__title--mobile" : ""}`}
+            >
+              Torna a entrar i continua gestionant les teves reserves
+            </h1>
+
+            <p className="login__text">
+              Accedeix a PadelBook per consultar disponibilitat, reservar pistes i
+              revisar el teu historial amb una experiència més clara i agradable.
+            </p>
+
+            <div className="login__feature-stack">
+              <div className="login__feature-card">
+                <span className="login__feature-icon">🎾</span>
+                <div>
+                  <strong className="login__feature-title">Disponibilitat al moment</strong>
+                  <p className="login__feature-text">
+                    Consulta pistes i franges disponibles de manera ràpida.
+                  </p>
+                </div>
+              </div>
+
+              <div className="login__feature-card">
+                <span className="login__feature-icon">📅</span>
+                <div>
+                  <strong className="login__feature-title">Reserves sota control</strong>
+                  <p className="login__feature-text">
+                    Revisa, confirma o cancel·la les teves reserves des del mateix espai.
+                  </p>
+                </div>
+              </div>
+
+              <div className="login__feature-card">
+                <span className="login__feature-icon">✨</span>
+                <div>
+                  <strong className="login__feature-title">Experiència més cuidada</strong>
+                  <p className="login__feature-text">
+                    Navegació més neta, feedback visible i millor sensació general.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section
+          className={`scale-in delay-1 login__form-card ${
+            isMobileView ? "login__form-card--mobile" : ""
+          }`}
+        >
+          <div className="login__form-top">
+            <span className="login__form-kicker">Iniciar sessió</span>
+            <h2 className="login__form-title">Benvingut de nou</h2>
+            <p className="login__form-text">
+              Introdueix les teves credencials per accedir al teu compte.
+            </p>
+          </div>
+
+          <div ref={feedbackRef} />
+
+          {error && (
+            <div className="scale-in login__error-box">
+              <p className="login__error-text">{error}</p>
+            </div>
+          )}
+
+          <form onSubmit={handleLogin} className="login__form">
+            <div className="login__field">
+              <label htmlFor="email" className="login__label">
+                Correu electrònic
+              </label>
+
+              <input
+                id="email"
+                type="email"
+                placeholder="exemple@correu.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="login__input"
+                autoComplete="email"
+                required
+              />
+            </div>
+
+            <div className="login__field">
+              <label htmlFor="password" className="login__label">
+                Contrasenya
+              </label>
+
+              <div
+                className={`login__password-wrapper ${
+                  isMobileView ? "login__password-wrapper--mobile" : ""
+                }`}
+              >
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Introdueix la teva contrasenya"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onKeyDown={handleCapsLock}
+                  onKeyUp={handleCapsLock}
+                  className="login__input"
+                  autoComplete="current-password"
+                  required
+                />
+
+                <button
+                  type="button"
+                  className={`login__show-button ${
+                    isMobileView ? "login__show-button--mobile" : ""
+                  }`}
+                  onClick={() => setShowPassword((prev) => !prev)}
+                >
+                  {showPassword ? "Ocultar" : "Mostrar"}
+                </button>
+              </div>
+
+              {capsLock && (
+                <span className="login__caps-warning">
+                  ⚠️ Tens el bloqueig de majúscules activat
+                </span>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              className="btn btn-primary btn-full"
+              disabled={loading}
+            >
+              {loading ? "Iniciant sessió..." : "Entrar a PadelBook"}
+            </button>
+          </form>
+
+          <div className="login__separator">
+            <span className="login__separator-line" />
+            <span className="login__separator-text">o</span>
+            <span className="login__separator-line" />
+          </div>
+
+          <div className="login__footer-box">
+            <p className="login__footer-text">Encara no tens compte?</p>
+
+            <Link to="/register" className="btn btn-light btn-full">
+              Crear compte
+            </Link>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+export default LoginPage;

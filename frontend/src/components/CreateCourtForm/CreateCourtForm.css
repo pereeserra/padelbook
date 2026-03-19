@@ -1,0 +1,264 @@
+.court-form__wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.court-form__top-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #f8fafc, #eff6ff);
+  border: 1px solid #dbeafe;
+}
+
+.court-form__top-panel-content {
+  min-width: 0;
+}
+
+.court-form__mode-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  border: 1px solid transparent;
+}
+
+.court-form__mode-badge--create {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border-color: #bfdbfe;
+}
+
+.court-form__mode-badge--edit {
+  background: #fef3c7;
+  color: #b45309;
+  border-color: #fde68a;
+}
+
+.court-form__top-panel-title {
+  margin: 0.7rem 0 0 0;
+  color: #0f172a;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.court-form__top-panel-text {
+  margin: 0.5rem 0 0 0;
+  color: #475569;
+  line-height: 1.7;
+}
+
+.court-form__top-panel-summary {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.court-form__summary-item {
+  border-radius: 18px;
+  padding: 0.9rem 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+}
+
+.court-form__summary-label {
+  display: block;
+  color: #64748b;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.28rem;
+}
+
+.court-form__summary-value {
+  color: #0f172a;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.court-form__form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.court-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.court-form__field--full {
+  grid-column: 1 / -1;
+}
+
+.court-form__label {
+  font-size: 0.94rem;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.court-form__input {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 16px;
+  outline: none;
+  background: rgba(255, 255, 255, 0.96);
+  color: #0f172a;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.03);
+}
+
+.court-form__textarea {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 16px;
+  outline: none;
+  background: rgba(255, 255, 255, 0.96);
+  color: #0f172a;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.03);
+  resize: vertical;
+  font-family: "Inter", Arial, sans-serif;
+  line-height: 1.6;
+}
+
+.court-form__helper-text {
+  color: #64748b;
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.court-form__preview-panel {
+  border-radius: 22px;
+  padding: 1rem;
+  background: linear-gradient(180deg, #ffffff, #f8fafc);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+}
+
+.court-form__preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.court-form__preview-kicker {
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.court-form__preview-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  border: 1px solid transparent;
+}
+
+.court-form__preview-status--available {
+  background: #ecfdf5;
+  color: #15803d;
+  border-color: #bbf7d0;
+}
+
+.court-form__preview-status--maintenance {
+  background: #fff7ed;
+  color: #c2410c;
+  border-color: #fdba74;
+}
+
+.court-form__preview-title {
+  margin: 0.7rem 0 0 0;
+  color: #0f172a;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.court-form__preview-badges {
+  display: flex;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.court-form__preview-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #dbeafe;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.court-form__preview-badge--covered {
+  background: #eefdf4;
+  color: #15803d;
+  border-color: #bbf7d0;
+}
+
+.court-form__preview-badge--outdoor {
+  background: #fff7ed;
+  color: #c2410c;
+  border-color: #fdba74;
+}
+
+.court-form__preview-description {
+  margin: 0.85rem 0 0 0;
+  color: #475569;
+  line-height: 1.7;
+}
+
+.court-form__info-panel {
+  background: #f8fbff;
+  border: 1px solid #dbeafe;
+  border-radius: 18px;
+  padding: 1rem;
+}
+
+.court-form__info-panel-title {
+  display: block;
+  color: #1d4ed8;
+  font-weight: 800;
+  margin-bottom: 0.3rem;
+}
+
+.court-form__info-panel-text {
+  margin: 0;
+  color: #475569;
+  line-height: 1.65;
+}
+
+.court-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+  flex-wrap: wrap;
+}

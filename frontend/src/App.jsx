@@ -1,17 +1,17 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Navbar from "./components/Navbar";
-import ProtectedRoute from "./components/ProtectedRoute";
-import AdminRoute from "./components/AdminRoute";
-import ScrollToTop from "./components/ScrollToTop";
-import HomePage from "./pages/HomePage";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
-import AvailabilityPage from "./pages/AvailabilityPage";
-import MyReservationsPage from "./pages/MyReservationsPage";
-import AdminPage from "./pages/AdminPage";
-import ProfilePage from "./pages/ProfilePage";
-import BackToTopButton from "./components/BackToTopButton";
-import Footer from "./components/Footer";
+import Navbar from "./components/Navbar/Navbar";
+import ProtectedRoute from "./routes/ProtectedRoute";
+import AdminRoute from "./routes/AdminRoute";
+import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
+import HomePage from "./pages/HomePage/HomePage";
+import LoginPage from "./pages/LoginPage/LoginPage";
+import RegisterPage from "./pages/RegisterPage/RegisterPage";
+import AvailabilityPage from "./pages/AvailabilityPage/AvailabilityPage";
+import MyReservationsPage from "./pages/MyReservationsPage/MyReservationsPage";
+import AdminPage from "./pages/AdminPage/AdminPage";
+import ProfilePage from "./pages/ProfilePage/ProfilePage";
+import BackToTopButton from "./components/BackToTopButton/BackToTopButton";
+import Footer from "./components/Footer/Footer";
 
 function App() {
   return (
