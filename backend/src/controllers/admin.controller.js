@@ -5,19 +5,8 @@ const {
   parsePositiveInteger,
   isValidDateFormat,
   getTodayString,
+  validateCourtData,
 } = require("../utils/validators");
-
-const parseBinaryFlag = (value) => {
-  if (value === 1 || value === "1" || value === true || value === "true") {
-    return 1;
-  }
-
-  if (value === 0 || value === "0" || value === false || value === "false") {
-    return 0;
-  }
-
-  return null;
-};
 
 // Controlador per obtenir totes les reserves (per a l'administrador)
 exports.getAllReservations = async (req, res) => {
@@ -166,45 +155,13 @@ exports.getAllReservations = async (req, res) => {
 // Controlador per crear una pista
 exports.createCourt = async (req, res) => {
   try {
-    let { nom_pista, tipus, coberta, estat, descripcio, preu_reserva } = req.body;
+    const validation = validateCourtData(req.body);
 
-    nom_pista = normalizeText(nom_pista);
-    tipus = normalizeText(tipus).toLowerCase();
-    estat = normalizeText(estat).toLowerCase();
-    descripcio = normalizeText(descripcio);
-    coberta = parseBinaryFlag(coberta);
-    preu_reserva = Number(preu_reserva);
-
-    if (Number.isNaN(preu_reserva) || preu_reserva < 0) {
-      return res.status(400).json({ error: "El preu de reserva no és vàlid" });
+    if (validation.error) {
+      return res.status(400).json({ error: validation.error });
     }
 
-    const allowedCourtStatuses = ["disponible", "manteniment"];
-    const allowedCourtTypes = ["dobles", "individual"];
-
-    if (!nom_pista || !tipus || coberta === null || !estat) {
-      return res.status(400).json({
-        error: "Falten dades obligatòries per crear la pista",
-      });
-    }
-
-    if (nom_pista.length < 3) {
-      return res.status(400).json({
-        error: "El nom de la pista ha de tenir almenys 3 caràcters",
-      });
-    }
-
-    if (!allowedCourtTypes.includes(tipus)) {
-      return res.status(400).json({
-        error: `El tipus de pista no és vàlid. Valors permesos: ${allowedCourtTypes.join(", ")}`,
-      });
-    }
-
-    if (!allowedCourtStatuses.includes(estat)) {
-      return res.status(400).json({
-        error: `L'estat de la pista no és vàlid. Valors permesos: ${allowedCourtStatuses.join(", ")}`,
-      });
-    }
+    const { nom_pista, tipus, coberta, estat, descripcio, preu_reserva } = validation.data;
 
     const [existingName] = await db.query(
       "SELECT id FROM courts WHERE nom_pista = ? LIMIT 1",
@@ -260,51 +217,13 @@ exports.createCourt = async (req, res) => {
 exports.updateCourt = async (req, res) => {
   try {
     const courtId = parsePositiveInteger(req.params.id);
-    let { nom_pista, tipus, coberta, estat, descripcio, preu_reserva } = req.body;
+    const validation = validateCourtData(req.body);
 
-    if (!courtId) {
-      return res.status(400).json({
-        error: "L'identificador de la pista no és vàlid",
-      });
+    if (validation.error) {
+      return res.status(400).json({ error: validation.error });
     }
 
-    nom_pista = normalizeText(nom_pista);
-    tipus = normalizeText(tipus).toLowerCase();
-    estat = normalizeText(estat).toLowerCase();
-    descripcio = normalizeText(descripcio);
-    coberta = parseBinaryFlag(coberta);
-    preu_reserva = Number(preu_reserva);
-
-    if (Number.isNaN(preu_reserva) || preu_reserva < 0) {
-      return res.status(400).json({ error: "El preu de reserva no és vàlid" });
-    }
-
-    const allowedCourtStatuses = ["disponible", "manteniment"];
-    const allowedCourtTypes = ["dobles", "individual"];
-
-    if (!nom_pista || !tipus || coberta === null || !estat) {
-      return res.status(400).json({
-        error: "Falten dades obligatòries per actualitzar la pista",
-      });
-    }
-
-    if (nom_pista.length < 3) {
-      return res.status(400).json({
-        error: "El nom de la pista ha de tenir almenys 3 caràcters",
-      });
-    }
-
-    if (!allowedCourtTypes.includes(tipus)) {
-      return res.status(400).json({
-        error: `El tipus de pista no és vàlid. Valors permesos: ${allowedCourtTypes.join(", ")}`,
-      });
-    }
-
-    if (!allowedCourtStatuses.includes(estat)) {
-      return res.status(400).json({
-        error: `L'estat de la pista no és vàlid. Valors permesos: ${allowedCourtStatuses.join(", ")}`,
-      });
-    }
+    const { nom_pista, tipus, coberta, estat, descripcio, preu_reserva } = validation.data;
 
     const [existingCourt] = await db.query(
       "SELECT * FROM courts WHERE id = ?",

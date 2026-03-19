@@ -30,7 +30,7 @@ app.get("/test-db", async (req, res) => {
   }
 });
 
-// Rutes d'autenticació (sense protecció)
+// Rutes d'autenticació
 app.use("/auth", authRoutes);
 
 // Endpoint de prueba para verificar que el middleware de autenticación funciona
@@ -41,11 +41,11 @@ app.get("/private", authMiddleware, (req, res) => {
   });
 });
 
-// Ruta de pistes (protegida per autenticació)
+// Ruta de pistes
 app.use("/courts", courtsRoutes);
-// Rutas de franges horàries (protegides per autenticació)
+// Rutas de franges horàries
 app.use("/time-slots", timeslotsRoutes);
-// Rutas de reserves (protegides per autenticació)
+// Rutas de reserves
 app.use("/reservations", reservationsRoutes);
 // Ruta d'administració (protegides per autenticació i rol d'admin)
 app.use("/admin", adminRoutes);

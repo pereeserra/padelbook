@@ -4,6 +4,7 @@ import api from "../../api/axios";
 import AvailabilityTable from "../../components/AvailabilityTable/AvailabilityTable";
 import AvailabilitySummary from "../../components/AvailabilitySummary/AvailabilitySummary";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
+import { scrollToElementWithOffset } from "../../utils/helpers";
 import "./AvailabilityPage.css";
 
 function AvailabilityPage() {
@@ -73,18 +74,6 @@ function AvailabilityPage() {
         hiddenDateInputRef.current.click();
       }
     }
-  };
-
-  const scrollToElementWithOffset = (element, offset = 110) => {
-    if (!element) return;
-
-    const elementTop = element.getBoundingClientRect().top + window.scrollY;
-    const targetPosition = elementTop - offset;
-
-    window.scrollTo({
-      top: targetPosition,
-      behavior: "smooth",
-    });
   };
 
   const fetchAvailability = async (selectedDate) => {

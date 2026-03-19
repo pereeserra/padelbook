@@ -4,6 +4,7 @@ import CreateCourtForm from "../../components/CreateCourtForm/CreateCourtForm";
 import CourtCard from "../../components/CourtCard/CourtCard";
 import AdminReservationsTable from "../../components/AdminReservationsTable/AdminReservationsTable";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
+import { scrollToElementWithOffset, normalizeCollectionResponse } from "../../utils/helpers";
 import "./AdminPage.css";
 
 function AdminPage() {
@@ -61,17 +62,6 @@ function AdminPage() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const scrollToElementWithOffset = (element, offset = 110) => {
-    if (!element) return;
-
-    const targetTop = element.getBoundingClientRect().top + window.scrollY - offset;
-
-    window.scrollTo({
-      top: targetTop,
-      behavior: "smooth",
-    });
-  };
-
   const scrollToCourtCard = (courtId) => {
     const card = document.getElementById(`court-${courtId}`);
     if (!card) return;
@@ -82,17 +72,6 @@ function AdminPage() {
     setTimeout(() => {
       setHighlightedCourtId(null);
     }, 2500);
-  };
-
-  const normalizeCollectionResponse = (responseData) => {
-    if (Array.isArray(responseData)) return responseData;
-    if (Array.isArray(responseData?.data)) return responseData.data;
-    if (Array.isArray(responseData?.items)) return responseData.items;
-    if (Array.isArray(responseData?.results)) return responseData.results;
-    if (Array.isArray(responseData?.logs)) return responseData.logs;
-    if (Array.isArray(responseData?.reservations)) return responseData.reservations;
-    if (Array.isArray(responseData?.courts)) return responseData.courts;
-    return [];
   };
 
   const normalizeOverview = (data, reservationsSource = [], courtsSource = []) => {

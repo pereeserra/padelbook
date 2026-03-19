@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../api/axios";
+import { normalizeSpaces } from "../../utils/helpers";
 import "./RegisterPage.css";
 
 function RegisterPage() {
@@ -40,8 +41,6 @@ function RegisterPage() {
       behavior: "smooth",
     });
   }, [error]);
-
-  const normalizeSpaces = (value) => value.trim().replace(/\s+/g, " ");
 
   const passwordChecks = useMemo(() => {
     return {

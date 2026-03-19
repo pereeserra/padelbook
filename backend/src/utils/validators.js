@@ -92,6 +92,68 @@ const isValidReservationStatus = (estat) => {
   return estat === "activa" || estat === "cancel·lada";
 };
 
+const parseBinaryFlag = (value) => {
+  if (value === 1 || value === "1" || value === true || value === "true") {
+    return 1;
+  }
+  if (value === 0 || value === "0" || value === false || value === "false") {
+    return 0;
+  }
+  return null;
+};
+
+const validateCourtData = (data) => {
+  let { nom_pista, tipus, coberta, estat, descripcio, preu_reserva } = data;
+
+  nom_pista = normalizeText(nom_pista);
+  tipus = normalizeText(tipus).toLowerCase();
+  estat = normalizeText(estat).toLowerCase();
+  descripcio = normalizeText(descripcio);
+  coberta = parseBinaryFlag(coberta);
+  preu_reserva = Number(preu_reserva);
+
+  if (Number.isNaN(preu_reserva) || preu_reserva < 0) {
+    return { error: "El preu de reserva no és vàlid" };
+  }
+
+  const allowedCourtStatuses = ["disponible", "manteniment"];
+  const allowedCourtTypes = ["dobles", "individual"];
+
+  if (!nom_pista || !tipus || coberta === null || !estat) {
+    return { error: "Falten dades obligatòries per a la pista" };
+  }
+
+  if (nom_pista.length < 3) {
+    return { error: "El nom de la pista ha de tenir almenys 3 caràcters" };
+  }
+
+  if (!allowedCourtTypes.includes(tipus)) {
+    return { error: `El tipus de pista no és vàlid. Valors permesos: ${allowedCourtTypes.join(", ")}` };
+  }
+
+  if (!allowedCourtStatuses.includes(estat)) {
+    return { error: `L'estat de la pista no és vàlid. Valors permesos: ${allowedCourtStatuses.join(", ")}` };
+  }
+
+  return { error: null, data: { nom_pista, tipus, coberta, estat, descripcio, preu_reserva } };
+};
+
+const validateProfileData = (nom, email) => {
+  if (!nom || !email) {
+    return { error: "Has d'omplir nom i correu electrònic." };
+  }
+  if (!hasMinFullNameLength(nom)) {
+    return { error: "El nom complet ha de tenir almenys 5 caràcters." };
+  }
+  if (!hasNameAndSurname(nom)) {
+    return { error: "Has d'introduir com a mínim nom i llinatge." };
+  }
+  if (!isValidEmail(email)) {
+    return { error: "Introdueix un correu electrònic vàlid." };
+  }
+  return { error: null };
+};
+
 module.exports = {
   normalizeText,
   normalizeEmail,
@@ -105,4 +167,7 @@ module.exports = {
   hasNameAndSurname,
   validatePasswordStrength,
   isValidReservationStatus,
+  parseBinaryFlag,
+  validateCourtData,
+  validateProfileData,
 };

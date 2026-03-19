@@ -7,10 +7,8 @@ const { ok, message, fail } = require("../utils/response");
 const {
   normalizeEmail,
   normalizeFullName,
-  isValidEmail,
-  hasMinFullNameLength,
-  hasNameAndSurname,
   validatePasswordStrength,
+  validateProfileData,
 } = require("../utils/validators");
 
 
@@ -23,20 +21,9 @@ exports.register = async (req, res) => {
     email = normalizeEmail(email);
     password = typeof password === "string" ? password : "";
 
-    if (!nom || !email || !password) {
-      return fail(res, "Has d'omplir tots els camps.", 400);
-    }
-
-    if (!hasMinFullNameLength(nom)) {
-      return fail(res, "El nom complet ha de tenir almenys 5 caràcters.", 400);
-    }
-
-    if (!hasNameAndSurname(nom)) {
-      return fail(res, "Has d'introduir com a mínim nom i llinatge.", 400);
-    }
-
-    if (!isValidEmail(email)) {
-      return fail(res, "Introdueix un correu electrònic vàlid.", 400);
+    const profileValidation = validateProfileData(nom, email);
+    if (profileValidation.error) {
+      return fail(res, profileValidation.error, 400);
     }
 
     const passwordError = validatePasswordStrength(password);
@@ -162,20 +149,9 @@ exports.updateMe = async (req, res) => {
     nom = normalizeFullName(nom);
     email = normalizeEmail(email);
 
-    if (!nom || !email) {
-      return fail(res, "Has d'omplir nom i correu electrònic.", 400);
-    }
-
-    if (!hasMinFullNameLength(nom)) {
-      return fail(res, "El nom complet ha de tenir almenys 5 caràcters.", 400);
-    }
-
-    if (!hasNameAndSurname(nom)) {
-      return fail(res, "Has d'introduir com a mínim nom i llinatge.", 400);
-    }
-
-    if (!isValidEmail(email)) {
-      return fail(res, "Introdueix un correu electrònic vàlid.", 400);
+    const profileValidation = validateProfileData(nom, email);
+    if (profileValidation.error) {
+      return fail(res, profileValidation.error, 400);
     }
 
     const [currentUsers] = await db.query(

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import api from "../../api/axios";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
+import { scrollToElementWithOffset, normalizeSpaces } from "../../utils/helpers";
 import "./ProfilePage.css";
 
 function ProfilePage() {
@@ -56,18 +57,7 @@ function ProfilePage() {
     };
   }, []);
 
-  const normalizeSpaces = (value) => value.trim().replace(/\s+/g, " ");
 
-  const scrollToElementWithOffset = (element, offset = 120) => {
-    if (!element) return;
-
-    const targetTop = element.getBoundingClientRect().top + window.scrollY - offset;
-
-    window.scrollTo({
-      top: targetTop,
-      behavior: "smooth",
-    });
-  };
 
   const showFeedbackMessage = (message, type = "success") => {
     setFeedback(message);
