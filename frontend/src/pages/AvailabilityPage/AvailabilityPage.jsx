@@ -1,5 +1,3 @@
-// AvailabilityPage.jsx
-
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../api/axios";
@@ -54,12 +52,21 @@ function AvailabilityPage() {
   };
 
   const handleOpenDatePicker = () => {
-    if (hiddenDateInputRef.current) {
-      if (hiddenDateInputRef.current.showPicker) {
-        hiddenDateInputRef.current.showPicker();
-      } else {
-        hiddenDateInputRef.current.click();
+    const input = hiddenDateInputRef.current;
+    if (!input) return;
+
+    try {
+      input.focus();
+
+      if (typeof input.showPicker === "function") {
+        input.showPicker();
+        return;
       }
+
+      input.click();
+    } catch (error) {
+      input.focus();
+      input.click();
     }
   };
 
@@ -224,13 +231,15 @@ function AvailabilityPage() {
                  <span className="ap-day-num">📅</span>
                </button>
                <input
-                 ref={hiddenDateInputRef}
-                 type="date"
-                 value={date}
-                 min={getToday()}
-                 onChange={(e) => handleManualDateChange(e.target.value)}
-                 className="ap-hidden-date"
-               />
+                ref={hiddenDateInputRef}
+                type="date"
+                value={date}
+                min={getToday()}
+                onChange={(e) => handleManualDateChange(e.target.value)}
+                className="ap-hidden-date"
+                tabIndex={-1}
+                aria-hidden="true"
+              />
             </div>
           </div>
           <div className="ap-date-filters">
