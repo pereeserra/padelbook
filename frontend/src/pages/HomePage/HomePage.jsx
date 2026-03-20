@@ -6,7 +6,6 @@ import court3Img from "../../assets/images/padelcourt3.jpg";
 import ballsImg from "../../assets/images/padelballs.webp";
 import "./HomePage.css";
 import padelCourtMockup from "../../assets/images/padelcourt.png";
-import padelBg from "../../assets/images/padelfons.jpg";
 
 function HomePage() {
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 900);
@@ -21,12 +20,7 @@ function HomePage() {
   }, []);
 
   return (
-    <div
-      className="home__page"
-      style={{
-        backgroundImage: `linear-gradient(rgba(248, 250, 252, 0.55), rgba(248, 250, 252, 0.68)), url(${padelBg})`,
-      }}
-    >
+    <div className="home__page">
       <div
         className={`home__container ${isMobileView ? "home__container--mobile" : ""}`}
       >
