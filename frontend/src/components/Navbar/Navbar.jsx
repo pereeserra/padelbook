@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import api from "../../api/axios";
 import { getUserFromToken } from "../../utils/auth";
+import "./Navbar.css";
 
 function Navbar() {
   const navigate = useNavigate();
