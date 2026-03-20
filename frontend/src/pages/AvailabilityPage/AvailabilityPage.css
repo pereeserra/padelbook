@@ -412,6 +412,32 @@
   transform: translateY(-1px);
 }
 
+.ap-floating-close {
+  position: absolute;
+  top: -0.2rem;
+  right: 0;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.06);
+  color: #475569;
+  font-size: 1.1rem;
+  font-weight: 500;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.18s ease, transform 0.18s ease, color 0.18s ease;
+}
+
+.ap-floating-close:hover {
+  background: rgba(15, 23, 42, 0.12);
+  color: #0f172a;
+  transform: scale(1.04);
+}
+
 .ap-floating-action {
   position: fixed;
   bottom: 0;
@@ -432,6 +458,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 1.2rem;
+  position: relative;
 }
 
 .ap-floating-info {
@@ -459,6 +486,7 @@
   display: flex;
   align-items: flex-end;
   gap: 0.9rem;
+  padding-right: 2.4rem;
 }
 
 .ap-payment-field {
@@ -468,10 +496,10 @@
 }
 
 .ap-payment-label {
-  font-size: 0.72rem;
-  font-weight: 800;
+  font-size: 0.7rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   color: #64748b;
 }
 
@@ -479,14 +507,6 @@
   display: flex;
   flex-direction: column;
   gap: 0.45rem;
-}
-
-.ap-payment-label {
-  font-size: 0.72rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #64748b;
 }
 
 .ap-payment-toggle {
@@ -500,13 +520,13 @@
 }
 
 .ap-payment-option {
-  min-height: 44px;
-  padding: 0.72rem 1.05rem;
+  min-height: 42px;
+  padding: 0.6rem 1rem;
   border: none;
   background: transparent;
-  color: #47607f;
+  color: #475569;
   font-size: 0.94rem;
-  font-weight: 800;
+  font-weight: 600;
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.18s ease;
@@ -519,7 +539,8 @@
 .ap-payment-option.is-active {
   background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: #ffffff;
-  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22);
+  font-weight: 600;
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.18);
 }
 
 .ap-reserve-btn {

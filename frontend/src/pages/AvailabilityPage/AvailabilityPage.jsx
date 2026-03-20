@@ -479,6 +479,17 @@ function AvailabilityPage() {
       {selectedSlot && !success && (
         <div className="ap-floating-action slide-up">
           <div className="ap-floating-inner">
+            <button
+              type="button"
+              className="ap-floating-close"
+              onClick={() => {
+                setSelectedSlot(null);
+                setReservationSummary(null);
+              }}
+              aria-label="Tancar selecció"
+            >
+              ×
+            </button>
             <div className="ap-floating-info">
               <span className="ap-floating-court">{selectedSlot.nom_pista}</span>
 
