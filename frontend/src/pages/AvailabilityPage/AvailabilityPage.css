@@ -821,3 +821,15 @@
     height: 190px;
   }
 }
+
+.ap-court-meta--blue {
+  color: #1d4ed8;
+  background: #dbeafe;
+  border-color: #bfdbfe;
+}
+
+.ap-court-meta--purple {
+  color: #7c3aed;
+  background: #ede9fe;
+  border-color: #ddd6fe;
+}

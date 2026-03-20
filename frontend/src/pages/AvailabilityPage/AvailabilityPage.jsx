@@ -52,6 +52,20 @@ function AvailabilityPage() {
     return timeString.slice(0, 5);
   };
 
+  const formatCourtType = (tipus) => {
+    const normalized = String(tipus || "").trim().toLowerCase();
+
+    if (normalized === "individual" || normalized === "individuals") {
+      return "Individuals";
+    }
+
+    return "Dobles";
+  };
+
+  const formatCourtEnvironment = (coberta) => {
+    return Number(coberta) === 1 ? "Indoor" : "Outdoor";
+  };
+
   const isPastDate = (selectedDate) => {
     return selectedDate < getToday();
   };
@@ -438,8 +452,17 @@ function AvailabilityPage() {
 
                       <div className="ap-court-badges">
                         <span className="ap-court-meta">{availableCount} lliures</span>
+
                         <span className="ap-court-meta ap-court-meta--soft">
                           {occupiedCount} ocupades
+                        </span>
+
+                        <span className="ap-court-meta ap-court-meta--blue">
+                          {formatCourtType(court.slots[0]?.tipus)}
+                        </span>
+
+                        <span className="ap-court-meta ap-court-meta--purple">
+                          {formatCourtEnvironment(court.slots[0]?.coberta)}
                         </span>
                       </div>
                     </div>

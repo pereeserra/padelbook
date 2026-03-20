@@ -21,6 +21,8 @@ exports.getAvailability = async (req, res) => {
         c.id AS court_id,
         c.nom_pista,
         c.preu_reserva,
+        c.tipus,
+        c.coberta,
         t.id AS time_slot_id,
         t.hora_inici,
         t.hora_fi,
