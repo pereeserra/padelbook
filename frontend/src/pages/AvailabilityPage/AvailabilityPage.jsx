@@ -457,11 +457,23 @@ function AvailabilityPage() {
                           {occupiedCount} ocupades
                         </span>
 
-                        <span className="ap-court-meta ap-court-meta--blue">
+                        <span
+                          className={`ap-court-meta ${
+                            formatCourtType(court.slots[0]?.tipus) === "Individuals"
+                              ? "ap-court-meta--individual"
+                              : "ap-court-meta--dobles"
+                          }`}
+                        >
                           {formatCourtType(court.slots[0]?.tipus)}
                         </span>
 
-                        <span className="ap-court-meta ap-court-meta--purple">
+                        <span
+                          className={`ap-court-meta ${
+                            formatCourtEnvironment(court.slots[0]?.coberta) === "Indoor"
+                              ? "ap-court-meta--indoor"
+                              : "ap-court-meta--outdoor"
+                          }`}
+                        >
                           {formatCourtEnvironment(court.slots[0]?.coberta)}
                         </span>
                       </div>

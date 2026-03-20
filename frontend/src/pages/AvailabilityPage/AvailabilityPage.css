@@ -833,3 +833,27 @@
   background: #ede9fe;
   border-color: #ddd6fe;
 }
+
+/* 🎾 TIPUS DE PISTA */
+
+.ap-court-meta--dobles {
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
+
+.ap-court-meta--individual {
+  background-color: #ecfdf5;
+  color: #047857;
+}
+
+/* 🏟️ ENTORN */
+
+.ap-court-meta--indoor {
+  background-color: #ede9fe;
+  color: #6d28d9;
+}
+
+.ap-court-meta--outdoor {
+  background-color: #fef3c7;
+  color: #b45309;
+}
