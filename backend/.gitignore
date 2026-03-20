@@ -1,2 +1,21 @@
-node_modules
+# Node
+node_modules/
+
+# Env (IMPORTANT)
 .env
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+
+# Altres
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
