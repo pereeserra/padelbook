@@ -5,6 +5,7 @@ import court2Img from "../../assets/images/padelcourt2.jpg";
 import court3Img from "../../assets/images/padelcourt3.jpg";
 import ballsImg from "../../assets/images/padelballs.webp";
 import "./HomePage.css";
+import padelCourtMockup from "../../assets/images/padelcourt.png";
 
 function HomePage() {
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 900);
@@ -99,9 +100,7 @@ function HomePage() {
                 </div>
 
                 <div className="home__mockup-court">
-                  <div className="home__court-line-vertical" />
-                  <div className="home__court-line-horizontal" />
-                  <div className="home__court-circle" />
+                  <img src={padelCourtMockup} alt="Pista de pàdel" />
                 </div>
 
                 <div className="home__mockup-slots">
@@ -127,14 +126,6 @@ function HomePage() {
                     <h4 className="home__mockup-mini-title">Visual i intuïtiva</h4>
                     <p className="home__mockup-mini-text">
                       Tot més ordenat, més net i amb millor sensació d’ús.
-                    </p>
-                  </div>
-
-                  <div className="home__mockup-mini-card">
-                    <span className="home__mockup-mini-eyebrow">Gestió</span>
-                    <h4 className="home__mockup-mini-title">Control de reserves</h4>
-                    <p className="home__mockup-mini-text">
-                      Disponibilitat, historial i perfil dins un entorn coherent.
                     </p>
                   </div>
                 </div>
