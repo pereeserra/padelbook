@@ -412,11 +412,17 @@
 }
 
 .ap-slot-pill.is-booked {
-  background: #fef2f2;
-  color: #b91c1c;
+  background: #f8fafc;
+  color: #dc2626;
   cursor: not-allowed;
-  border: 1px solid #fca5a5;
-  opacity: 1;
+  border: 1px solid #e2e8f0;
+  opacity: 0.65;
+  filter: grayscale(15%);
+}
+
+.ap-slot-pill.is-booked:hover {
+  transform: none;
+  box-shadow: none;
 }
 
 .ap-slot-pill.is-selected {
