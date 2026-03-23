@@ -149,8 +149,9 @@
 
 .my-res__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 0.9rem;
+  align-items: start;
 }
 
 .my-res__recently-cancelled-wrapper {
