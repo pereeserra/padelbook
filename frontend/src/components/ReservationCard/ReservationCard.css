@@ -232,6 +232,31 @@
   text-align: right;
 }
 
+.res-card__payment-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 0.28rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.res-card__payment-badge--online {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #bfdbfe;
+}
+
+.res-card__payment-badge--club {
+  background: #fff7ed;
+  color: #c2410c;
+  border-color: #fdba74;
+}
+
 .res-card__footer {
   margin-top: 0.55rem;
   display: flex;

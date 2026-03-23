@@ -148,24 +148,41 @@ function ReservationCard({
         </div>
       </div>
 
-      <div className="res-card__main-info">
-        <div className="res-card__main-row">
-          <span className="res-card__main-label">Data</span>
-          <span className="res-card__main-value">{formattedDate}</span>
-        </div>
+            <div className="res-card__main-info">
+              <div className="res-card__main-row">
+                <span className="res-card__main-label">Data</span>
+                <span className="res-card__main-value">{formattedDate}</span>
+              </div>
 
-        <div className="res-card__main-row">
-          <span className="res-card__main-label">Hora</span>
-          <span className="res-card__main-value">
-            {reservation.hora_inici?.slice(0, 5)} - {reservation.hora_fi?.slice(0, 5)}
-          </span>
-        </div>
+              <div className="res-card__main-row">
+                <span className="res-card__main-label">Hora</span>
+                <span className="res-card__main-value">
+                  {reservation.hora_inici?.slice(0, 5)} - {reservation.hora_fi?.slice(0, 5)}
+                </span>
+              </div>
 
-        <div className="res-card__main-row res-card__main-row--price">
-          <span className="res-card__main-label">Import</span>
-          <span className="res-card__main-price">{reservationPrice}</span>
-        </div>
-      </div>
+              <div className="res-card__main-row">
+                <span className="res-card__main-label">Pagament</span>
+                <span
+                  className={`res-card__payment-badge ${
+                    reservation.metode_pagament === "online_simulat"
+                      ? "res-card__payment-badge--online"
+                      : "res-card__payment-badge--club"
+                  }`}
+                >
+                  {reservation.metode_pagament === "online_simulat"
+                    ? "Online"
+                    : reservation.metode_pagament === "al_club"
+                      ? "Al club"
+                      : "No disponible"}
+                </span>
+              </div>
+
+              <div className="res-card__main-row res-card__main-row--price">
+                <span className="res-card__main-label">Import</span>
+                <span className="res-card__main-price">{reservationPrice}</span>
+              </div>
+            </div>
 
       {isActive && !confirmingCancel && (
         <div className="res-card__footer">
