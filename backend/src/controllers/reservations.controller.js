@@ -16,6 +16,7 @@ const {
 exports.createReservation = async (req, res) => {
   try {
     const user_id = req.user.id;
+    const userRole = req.user.rol;
     let { court_id, time_slot_id, data_reserva } = req.body;
     let { metode_pagament } = req.body;
 
@@ -88,15 +89,18 @@ exports.createReservation = async (req, res) => {
     }
 
     // 3. Comprovar límit de reserves actives per usuari
-    const [userActiveReservations] = await db.query(
-      `SELECT COUNT(*) AS total
-       FROM reservations
-       WHERE user_id = ? AND estat = 'activa'`,
-      [user_id]
-    );
+    // L'administrador no té límit de reserves actives
+    if (userRole !== "admin") {
+      const [userActiveReservations] = await db.query(
+        `SELECT COUNT(*) AS total
+        FROM reservations
+        WHERE user_id = ? AND estat = 'activa'`,
+        [user_id]
+      );
 
-    if (userActiveReservations[0].total >= 3) {
-      return fail(res, "Has arribat al límit màxim de 3 reserves actives", 400);
+      if (userActiveReservations[0].total >= 3) {
+        return fail(res, "Has arribat al límit màxim de 3 reserves actives", 400);
+      }
     }
 
     // 4. Comprovar si ja existeix una reserva activa per aquesta pista, franja i data
