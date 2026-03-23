@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import api from "../../api/axios";
 import { getUserFromToken } from "../../utils/auth";
 import "./Navbar.css";
+import logo from "../../assets/images/padelbooklogo.png";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -194,12 +195,7 @@ function Navbar() {
             aria-label="Anar a l'inici"
             onClick={(event) => handleNavClick(event, "/")}
           >
-            <span className="pb-navbar__brand-mark">PB</span>
-
-            <span className="pb-navbar__brand-copy">
-              <span className="pb-navbar__brand-title">PadelBook</span>
-              <span className="pb-navbar__brand-subtitle">Reserves de pàdel</span>
-            </span>
+            <img src={logo} alt="PadelBook" className="pb-navbar__logo-img" />
           </Link>
         </div>
 
