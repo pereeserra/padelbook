@@ -226,15 +226,10 @@ exports.createReservation = async (req, res) => {
 exports.getReservations = async (req, res) => {
   try {
     const userId = req.user.id;
-    const userRole = req.user.rol;
     const estat =
       typeof req.query.estat === "string"
         ? req.query.estat.trim().toLowerCase()
         : "";
-
-    let query = "";
-    let params = [];
-    let whereClauses = [];
 
     if (estat && !isValidReservationStatus(estat)) {
       return fail(
@@ -244,62 +239,29 @@ exports.getReservations = async (req, res) => {
       );
     }
 
-    if (userRole === "admin") {
-      query = `
-        SELECT 
-          r.id,
-          r.codi_reserva,
-          r.data_reserva,
-          r.estat,
-          r.preu_total,
-          r.estat_pagament,
-          r.metode_pagament,
-          r.created_at,
-          u.nom AS nom_usuari,
-          u.email AS email,
-          c.nom_pista,
-          t.hora_inici,
-          t.hora_fi
-        FROM reservations r
-        JOIN users u ON r.user_id = u.id
-        JOIN courts c ON r.court_id = c.id
-        JOIN time_slots t ON r.time_slot_id = t.id
-      `;
+    const params = [userId];
+    let query = `
+      SELECT 
+        r.id,
+        r.codi_reserva,
+        r.data_reserva,
+        r.estat,
+        r.preu_total,
+        r.estat_pagament,
+        r.metode_pagament,
+        r.created_at,
+        c.nom_pista,
+        t.hora_inici,
+        t.hora_fi
+      FROM reservations r
+      JOIN courts c ON r.court_id = c.id
+      JOIN time_slots t ON r.time_slot_id = t.id
+      WHERE r.user_id = ?
+    `;
 
-      if (estat) {
-        whereClauses.push("r.estat = ?");
-        params.push(estat);
-      }
-    } else {
-      query = `
-        SELECT 
-          r.id,
-          r.codi_reserva,
-          r.data_reserva,
-          r.estat,
-          r.preu_total,
-          r.estat_pagament,
-          r.metode_pagament,
-          r.created_at,
-          c.nom_pista,
-          t.hora_inici,
-          t.hora_fi
-        FROM reservations r
-        JOIN courts c ON r.court_id = c.id
-        JOIN time_slots t ON r.time_slot_id = t.id
-      `;
-
-      whereClauses.push("r.user_id = ?");
-      params.push(userId);
-
-      if (estat) {
-        whereClauses.push("r.estat = ?");
-        params.push(estat);
-      }
-    }
-
-    if (whereClauses.length > 0) {
-      query += ` WHERE ${whereClauses.join(" AND ")}`;
+    if (estat) {
+      query += ` AND r.estat = ?`;
+      params.push(estat);
     }
 
     query += ` ORDER BY r.data_reserva, t.hora_inici`;
