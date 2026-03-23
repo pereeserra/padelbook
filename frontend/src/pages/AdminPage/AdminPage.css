@@ -497,10 +497,32 @@
   font-weight: 800;
 }
 
+.admin__court-tools-grid {
+  gap: 0.75rem;
+}
+
+.admin__court-quick-stats {
+  gap: 0.75rem;
+  margin-top: 0.85rem;
+}
+
+.admin__court-quick-stat {
+  border-radius: 16px;
+  padding: 0.8rem 0.9rem;
+}
+
+.admin__court-quick-stat-label {
+  margin-bottom: 0.22rem;
+}
+
+.admin__court-quick-stat-value {
+  font-size: 1.05rem;
+}
+
 .admin__cards {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.9rem;
   align-items: start;
 }
 
@@ -533,9 +555,12 @@
   .admin__hero-grid,
   .admin__analytics-grid,
   .admin__insights-grid,
-  .admin__dashboard-stats-grid,
-  .admin__cards {
+  .admin__dashboard-stats-grid {
     grid-template-columns: 1fr;
+  }
+
+  .admin__cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .admin__court-tools-grid {

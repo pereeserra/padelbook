@@ -1,12 +1,12 @@
 .court-card {
-  background: rgba(255, 255, 255, 0.94);
-  border-radius: 24px;
-  padding: 1.05rem;
-  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.05);
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 22px;
+  padding: 1rem;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.045);
   border: 1px solid rgba(148, 163, 184, 0.14);
   display: flex;
   flex-direction: column;
-  gap: 0.9rem;
+  gap: 0.8rem;
   min-height: 100%;
   transition:
     transform 0.18s ease,
@@ -15,8 +15,8 @@
 }
 
 .court-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.07);
 }
 
 .court-card--confirming {
@@ -26,7 +26,9 @@
 
 .court-card--highlighted {
   border-color: #93c5fd;
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08), 0 20px 46px rgba(37, 99, 235, 0.14);
+  box-shadow:
+    0 0 0 4px rgba(37, 99, 235, 0.08),
+    0 20px 46px rgba(37, 99, 235, 0.14);
   transform: translateY(-2px);
 }
 
@@ -34,7 +36,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.7rem;
   flex-wrap: wrap;
 }
 
@@ -42,7 +44,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 0.85rem;
 }
 
 .court-card__identity-block {
@@ -51,7 +53,7 @@
 
 .court-card__eyebrow {
   display: inline-block;
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 800;
   color: #64748b;
   text-transform: uppercase;
@@ -59,30 +61,30 @@
 }
 
 .court-card__title {
-  margin: 0.1rem 0 0 0;
+  margin: 0.12rem 0 0 0;
   color: #0f172a;
-  font-size: 1.2rem;
+  font-size: 1.05rem;
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1.2;
 }
 
 .court-card__subtitle {
-  margin: 0.35rem 0 0 0;
+  margin: 0.28rem 0 0 0;
   color: #64748b;
-  line-height: 1.55;
+  line-height: 1.45;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
 .court-card__status-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 34px;
-  padding: 0.35rem 0.8rem;
+  min-height: 31px;
+  padding: 0.3rem 0.72rem;
   border-radius: 999px;
-  font-size: 0.82rem;
+  font-size: 0.77rem;
   font-weight: 800;
   text-transform: capitalize;
   border: 1px solid transparent;
@@ -101,39 +103,39 @@
   border-color: #fdba74;
 }
 
-.court-card__summary-grid {
+.court-card__meta-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.7rem;
+  gap: 0.65rem;
 }
 
-.court-card__summary-item {
-  border-radius: 18px;
-  padding: 0.8rem 0.9rem;
+.court-card__meta-item {
+  border-radius: 16px;
+  padding: 0.72rem 0.82rem;
   background: linear-gradient(180deg, #f8fafc, #ffffff);
   border: 1px solid rgba(148, 163, 184, 0.14);
 }
 
-.court-card__summary-label {
+.court-card__meta-label {
   display: block;
   color: #64748b;
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  margin-bottom: 0.28rem;
+  margin-bottom: 0.2rem;
 }
 
-.court-card__summary-value {
+.court-card__meta-value {
   color: #0f172a;
   font-weight: 800;
-  line-height: 1.45;
-  font-size: 0.98rem;
+  line-height: 1.35;
+  font-size: 0.95rem;
 }
 
 .court-card__badges-row {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.45rem;
   flex-wrap: wrap;
 }
 
@@ -141,13 +143,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 33px;
-  padding: 0.34rem 0.75rem;
+  min-height: 30px;
+  padding: 0.3rem 0.68rem;
   border-radius: 999px;
   background: #eff6ff;
   color: #1d4ed8;
   border: 1px solid #dbeafe;
-  font-size: 0.8rem;
+  font-size: 0.77rem;
   font-weight: 800;
 }
 
@@ -164,18 +166,18 @@
 }
 
 .court-card__description-box {
-  border-radius: 18px;
+  border-radius: 16px;
   background: #f8fafc;
   border: 1px solid rgba(148, 163, 184, 0.14);
-  padding: 0.95rem;
+  padding: 0.82rem 0.9rem;
 }
 
 .court-card__description-label {
   display: block;
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 800;
   color: #64748b;
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.28rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -183,27 +185,31 @@
 .court-card__description-text {
   margin: 0;
   color: #334155;
-  line-height: 1.65;
+  line-height: 1.52;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .court-card__footer {
   margin-top: auto;
   display: flex;
   justify-content: flex-end;
-  gap: 0.7rem;
+  gap: 0.6rem;
   flex-wrap: wrap;
 }
 
 .court-card__footer .btn {
-  min-width: 108px;
+  min-width: 96px;
   border-radius: 999px;
   font-weight: 800;
 }
 
 .court-card__delete-button {
-  background: transparent;
+  background: #fff;
   color: #ef4444;
-  border: 1px solid #fee2e2;
+  border: 1px solid #fecaca;
   box-shadow: none;
 }
 
@@ -216,30 +222,31 @@
   margin-top: auto;
   background: #fff7ed;
   border: 1px solid #fdba74;
-  border-radius: 18px;
-  padding: 1rem;
+  border-radius: 16px;
+  padding: 0.95rem;
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 0.75rem;
 }
 
 .court-card__confirm-title {
   margin: 0;
   color: #9a3412;
   font-weight: 800;
-  font-size: 1rem;
+  font-size: 0.98rem;
 }
 
 .court-card__confirm-text {
   margin: 0;
   color: #7c2d12;
-  line-height: 1.65;
+  line-height: 1.55;
   font-weight: 600;
+  font-size: 0.92rem;
 }
 
 .court-card__confirm-actions {
   display: flex;
-  gap: 0.7rem;
+  gap: 0.65rem;
   flex-wrap: wrap;
 }
 
@@ -251,20 +258,18 @@
 
 @media (max-width: 768px) {
   .court-card {
-    padding: 0.95rem;
+    padding: 0.9rem;
   }
 
-  .court-card__summary-grid {
+  .court-card__meta-grid {
     grid-template-columns: 1fr;
   }
 
-  .court-card__footer,
-  .court-card__confirm-actions {
+  .court-card__footer {
     justify-content: stretch;
   }
 
-  .court-card__footer .btn,
-  .court-card__confirm-actions .btn {
-    width: 100%;
+  .court-card__footer .btn {
+    flex: 1 1 auto;
   }
 }

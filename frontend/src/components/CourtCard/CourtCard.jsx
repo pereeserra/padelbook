@@ -12,9 +12,13 @@ function CourtCard({
 }) {
   const isAvailable = court.estat === "disponible";
   const isCovered = Number(court.coberta) === 1;
+
   const courtTypeLabel = court.tipus === "dobles" ? "Dobles" : "Individual";
   const courtModeLabel = isCovered ? "Indoor" : "Outdoor";
   const statusLabel = isAvailable ? "Disponible" : "Manteniment";
+
+  const shortDescription = (court.descripcio || "").trim();
+  const fallbackDescription = "Sense descripció definida.";
 
   const cardClass = [
     "court-card",
@@ -43,19 +47,21 @@ function CourtCard({
       <div className="court-card__header">
         <div className="court-card__identity-block">
           <h3 className="court-card__title">{court.nom_pista}</h3>
-          <p className="court-card__subtitle">Gestió individual i estat actual de la pista</p>
+          <p className="court-card__subtitle">
+            Gestió ràpida de la pista i del seu estat actual.
+          </p>
         </div>
       </div>
 
-      <div className="court-card__summary-grid">
-        <div className="court-card__summary-item">
-          <span className="court-card__summary-label">Tipus</span>
-          <span className="court-card__summary-value">{courtTypeLabel}</span>
+      <div className="court-card__meta-grid">
+        <div className="court-card__meta-item">
+          <span className="court-card__meta-label">Tipus</span>
+          <span className="court-card__meta-value">{courtTypeLabel}</span>
         </div>
 
-        <div className="court-card__summary-item">
-          <span className="court-card__summary-label">Modalitat</span>
-          <span className="court-card__summary-value">{courtModeLabel}</span>
+        <div className="court-card__meta-item">
+          <span className="court-card__meta-label">Modalitat</span>
+          <span className="court-card__meta-value">{courtModeLabel}</span>
         </div>
       </div>
 
@@ -76,7 +82,7 @@ function CourtCard({
       <div className="court-card__description-box">
         <span className="court-card__description-label">Descripció</span>
         <p className="court-card__description-text">
-          {court.descripcio || "Sense descripció."}
+          {shortDescription || fallbackDescription}
         </p>
       </div>
 
