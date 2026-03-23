@@ -1,3 +1,5 @@
+const { RESERVATION_STATUS } = require("../config/reservationConstants");
+
 // Funciones de validación y normalización de datos
 const normalizeText = (value) => {
   return typeof value === "string" ? value.trim() : "";
@@ -87,9 +89,9 @@ const validatePasswordStrength = (password) => {
 
   return null;
 };
-// Función para validar que el estado de la reserva sea "activa" o "cancel·lada"
+// Función para validar que el estado de la reserva sea válido
 const isValidReservationStatus = (estat) => {
-  return estat === "activa" || estat === "cancel·lada";
+  return Object.values(RESERVATION_STATUS).includes(estat);
 };
 
 const parseBinaryFlag = (value) => {

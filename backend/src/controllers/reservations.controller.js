@@ -14,6 +14,11 @@ const {
 const {
   MAX_ACTIVE_RESERVATIONS_PER_USER,
 } = require("../config/reservationLimits");
+const {
+  RESERVATION_STATUS,
+  PAYMENT_STATUS,
+  PAYMENT_METHOD,
+} = require("../config/reservationConstants");
 
 // Crear reserva (amb comprovacions de disponibilitat i bloqueig)
 exports.createReservation = async (req, res) => {
@@ -50,17 +55,17 @@ exports.createReservation = async (req, res) => {
     }
 
     // Validar que el mètode de pagament és vàlid
-    const allowedMethods = ["online_simulat", "al_club"];
+    const allowedMethods = Object.values(PAYMENT_METHOD);
 
     if (!allowedMethods.includes(metode_pagament)) {
       return res.status(400).json({ error: "Mètode de pagament no vàlid" });
     }
 
     // Determinar l'estat del pagament en funció del mètode de pagament
-    let estat_pagament = "pendent";
+    let estat_pagament = PAYMENT_STATUS.PENDING;
 
-    if (metode_pagament === "online_simulat") {
-      estat_pagament = "pagat";
+    if (metode_pagament === PAYMENT_METHOD.ONLINE) {
+      estat_pagament = PAYMENT_STATUS.PAID;
     }
 
     // 1. Comprovar que la pista existeix i que sigui reservable
@@ -97,13 +102,11 @@ exports.createReservation = async (req, res) => {
       const [userActiveReservations] = await db.query(
         `SELECT COUNT(*) AS total
         FROM reservations
-        WHERE user_id = ? AND estat = 'activa'`,
-        [user_id]
+        WHERE user_id = ? AND estat = ?`,
+        [user_id, RESERVATION_STATUS.ACTIVE]
       );
 
-      if (
-        userActiveReservations[0].total >= MAX_ACTIVE_RESERVATIONS_PER_USER
-      ) {
+      if (userActiveReservations[0].total >= MAX_ACTIVE_RESERVATIONS_PER_USER) {
         return fail(
           res,
           `Has arribat al límit màxim de ${MAX_ACTIVE_RESERVATIONS_PER_USER} reserves actives`,
@@ -115,8 +118,8 @@ exports.createReservation = async (req, res) => {
     // 4. Comprovar si ja existeix una reserva activa per aquesta pista, franja i data
     const [existingReservations] = await db.query(
       `SELECT id FROM reservations
-       WHERE court_id = ? AND time_slot_id = ? AND data_reserva = ? AND estat = 'activa'`,
-      [court_id, time_slot_id, data_reserva]
+      WHERE court_id = ? AND time_slot_id = ? AND data_reserva = ? AND estat = ?`,
+      [court_id, time_slot_id, data_reserva, RESERVATION_STATUS.ACTIVE]
     );
 
     if (existingReservations.length > 0) {
@@ -157,8 +160,18 @@ exports.createReservation = async (req, res) => {
         estat_pagament,
         metode_pagament
         )
-      VALUES (?, ?, ?, ?, ?, 'activa', ?, ?, ?)`,
-      [codiTemporal, user_id, court_id, time_slot_id, data_reserva, preu_total, estat_pagament, metode_pagament]
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        codiTemporal,
+        user_id,
+        court_id,
+        time_slot_id,
+        data_reserva,
+        RESERVATION_STATUS.ACTIVE,
+        preu_total,
+        estat_pagament,
+        metode_pagament,
+      ]
     );
 
     const reservationId = insertResult.insertId;
@@ -317,14 +330,14 @@ exports.deleteReservation = async (req, res) => {
     }
 
     // 3. Si la reserva ja està cancel·lada, informar-ho
-    if (reservationBase.estat === "cancel·lada") {
+    if (reservationBase.estat === RESERVATION_STATUS.CANCELLED) {
       return fail(res, "Aquesta reserva ja està cancel·lada", 400);
     }
 
     // 4. Cancel·lació lògica
     await db.query(
-      "UPDATE reservations SET estat = 'cancel·lada' WHERE id = ?",
-      [reservationId]
+      "UPDATE reservations SET estat = ? WHERE id = ?",
+      [RESERVATION_STATUS.CANCELLED, reservationId]
     );
 
     const [reservationRows] = await db.query(
@@ -407,7 +420,7 @@ exports.deleteCancelledReservationPermanently = async (req, res) => {
       return fail(res, "No tens permís per eliminar aquesta reserva", 403);
     }
 
-    if (reservation.estat !== "cancel·lada") {
+    if (reservation.estat !== RESERVATION_STATUS.CANCELLED) {
       return fail(
         res,
         "Només es poden eliminar definitivament les reserves cancel·lades",
