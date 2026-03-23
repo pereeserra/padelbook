@@ -225,15 +225,15 @@ function AdminReservationsTable({ reservations = [] }) {
 
                     <div className="admin-res__user-row">
                       <span className="admin-res__user-avatar">
-                        {(reservation.nom_usuari || "U").charAt(0).toUpperCase()}
+                        {(reservation.nom_usuari || reservation.email || "U").charAt(0).toUpperCase()}
                       </span>
 
                       <div className="admin-res__user-meta">
                         <p className="admin-res__primary-text">
-                          {reservation.nom_usuari || "Usuari"}
+                          {reservation.nom_usuari || "Usuari sense nom"}
                         </p>
                         <p className="admin-res__secondary-text admin-res__secondary-text--compact">
-                          {reservation.email || "Sense correu"}
+                          {reservation.email || "Correu no disponible"}
                         </p>
                       </div>
                     </div>
@@ -278,9 +278,23 @@ function AdminReservationsTable({ reservations = [] }) {
                 </div>
 
                 <div className="admin-res__card-footer">
-                  <span className={getPaymentMethodClass(reservation.metode_pagament)}>
-                    {paymentMethodLabel(reservation.metode_pagament)}
-                  </span>
+                  <div className="admin-res__payment-block">
+                    <span className="admin-res__payment-label">Forma de pagament</span>
+
+                    <span
+                      className={`admin-res__payment-method ${
+                        reservation.metode_pagament === "online_simulat"
+                          ? "admin-res__payment-method--online"
+                          : "admin-res__payment-method--club"
+                      }`}
+                    >
+                      {reservation.metode_pagament === "online_simulat"
+                        ? "Pagament online"
+                        : reservation.metode_pagament === "al_club"
+                          ? "Pagament al club"
+                          : paymentMethodLabel(reservation.metode_pagament)}
+                    </span>
+                  </div>
                 </div>
               </article>
             );
