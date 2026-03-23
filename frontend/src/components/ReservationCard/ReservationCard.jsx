@@ -64,14 +64,26 @@ function ReservationCard({
   };
 
   const paymentMethodBadgeClass = (method) => {
-    if (method === "online_simulat") return "res-card__value-badge res-card__value-badge--blue";
-    if (method === "al_club") return "res-card__value-badge res-card__value-badge--amber";
+    if (method === "online_simulat") {
+      return "res-card__value-badge res-card__value-badge--blue";
+    }
+
+    if (method === "al_club") {
+      return "res-card__value-badge res-card__value-badge--amber";
+    }
+
     return "res-card__value-badge res-card__value-badge--neutral";
   };
 
   const paymentStatusBadgeClass = (status) => {
-    if (status === "pagat") return "res-card__value-badge res-card__value-badge--green";
-    if (status === "pendent") return "res-card__value-badge res-card__value-badge--rose";
+    if (status === "pagat") {
+      return "res-card__value-badge res-card__value-badge--green";
+    }
+
+    if (status === "pendent") {
+      return "res-card__value-badge res-card__value-badge--rose";
+    }
+
     return "res-card__value-badge res-card__value-badge--neutral";
   };
 
@@ -126,7 +138,9 @@ function ReservationCard({
               title="Eliminar reserva cancel·lada"
               aria-label="Eliminar reserva cancel·lada"
               className={`res-card__delete-icon-button ${
-                isDeletingCancelled ? "res-card__delete-icon-button--disabled" : ""
+                isDeletingCancelled
+                  ? "res-card__delete-icon-button--disabled"
+                  : ""
               }`}
             >
               {isDeletingCancelled ? (
@@ -159,10 +173,11 @@ function ReservationCard({
           >
             <span
               className={`res-card__badge-dot ${
-                isActive ? "res-card__badge-dot--active" : "res-card__badge-dot--inactive"
+                isActive
+                  ? "res-card__badge-dot--active"
+                  : "res-card__badge-dot--inactive"
               }`}
             />
-
             {reservation.estat}
           </span>
         </div>
@@ -187,33 +202,8 @@ function ReservationCard({
             {reservation.preu_total != null
               ? `${Number(reservation.preu_total).toFixed(2)} €`
               : reservation.preu != null
-              ? `${Number(reservation.preu).toFixed(2)} €`
-              : "No disponible"}
-          </span>
-        </div>
-      </div>
-
-      <div className="res-card__quick-meta">
-        <div className="res-card__quick-pill">
-          <span className="res-card__quick-label">Data</span>
-          <span className="res-card__quick-value">{formattedDate}</span>
-        </div>
-
-        <div className="res-card__quick-pill">
-          <span className="res-card__quick-label">Hora</span>
-          <span className="res-card__quick-value">
-            {reservation.hora_inici} - {reservation.hora_fi}
-          </span>
-        </div>
-
-        <div className="res-card__quick-pill res-card__quick-pill--price">
-          <span className="res-card__quick-label">Import</span>
-          <span className="res-card__quick-value">
-            {reservation.preu_total != null
-              ? `${Number(reservation.preu_total).toFixed(2)} €`
-              : reservation.preu != null
-              ? `${Number(reservation.preu).toFixed(2)} €`
-              : "No disponible"}
+                ? `${Number(reservation.preu).toFixed(2)} €`
+                : "No disponible"}
           </span>
         </div>
       </div>
@@ -221,7 +211,9 @@ function ReservationCard({
       <div className="res-card__info-grid res-card__info-grid--compact">
         <div className="res-card__info-box">
           <span className="res-card__label">Codi reserva</span>
-          <p className="res-card__value">{reservation.codi_reserva || "No disponible"}</p>
+          <p className="res-card__value">
+            {reservation.codi_reserva || "No disponible"}
+          </p>
         </div>
 
         <div className="res-card__info-box">
@@ -282,7 +274,9 @@ function ReservationCard({
             <button
               type="button"
               className={`btn btn-light btn-sm res-card__confirm-secondary-button ${
-                isCancelling ? "res-card__confirm-secondary-button--disabled" : ""
+                isCancelling
+                  ? "res-card__confirm-secondary-button--disabled"
+                  : ""
               }`}
               onClick={onAbortCancel}
               disabled={isCancelling}
