@@ -4,7 +4,10 @@ import CreateCourtForm from "../../components/CreateCourtForm/CreateCourtForm";
 import CourtCard from "../../components/CourtCard/CourtCard";
 import AdminReservationsTable from "../../components/AdminReservationsTable/AdminReservationsTable";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
-import { scrollToElementWithOffset, normalizeCollectionResponse } from "../../utils/helpers";
+import {
+  scrollToElementWithOffset,
+  normalizeCollectionResponse,
+} from "../../utils/helpers";
 import "./AdminPage.css";
 
 function AdminPage() {
@@ -54,6 +57,8 @@ function AdminPage() {
   const [courtSearch, setCourtSearch] = useState("");
   const [courtStatusFilter, setCourtStatusFilter] = useState("totes");
   const [courtTypeFilter, setCourtTypeFilter] = useState("tots");
+
+  const [showAllActivity, setShowAllActivity] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -248,7 +253,11 @@ function AdminPage() {
         ]);
 
       setOverviewStats(
-        normalizeOverview(overviewRes.data?.data || {}, reservationsSource, courtsSource)
+        normalizeOverview(
+          overviewRes.data?.data || {},
+          reservationsSource,
+          courtsSource
+        )
       );
       setStatsByCourt(
         normalizeCollectionResponse(byCourtRes.data).map(normalizeCourtStat)
@@ -259,7 +268,9 @@ function AdminPage() {
       setStatsByDate(
         normalizeCollectionResponse(byDateRes.data).map(normalizeDateStat)
       );
-      setAdminLogs(normalizeCollectionResponse(logsRes.data).map(normalizeLogItem));
+      setAdminLogs(
+        normalizeCollectionResponse(logsRes.data).map(normalizeLogItem)
+      );
     } catch (err) {
       console.error(err);
       showFeedbackMessage(
@@ -308,11 +319,9 @@ function AdminPage() {
     const safeReservations = Array.isArray(baseData?.reservations)
       ? baseData.reservations
       : [];
-
     const safeCourts = Array.isArray(baseData?.courts) ? baseData.courts : [];
 
     setOverviewStats(normalizeOverview({}, safeReservations, safeCourts));
-
     await fetchDashboardData(safeReservations, safeCourts);
   };
 
@@ -342,14 +351,10 @@ function AdminPage() {
         await api.put(`/admin/courts/${editingCourtId}`, payload);
         await refreshAllAdminData();
 
-        showFeedbackMessage(
-          "La pista s'ha actualitzat correctament.",
-          "success",
-          {
-            label: "Veure pista editada",
-            onClick: () => scrollToCourtCard(editingCourtId),
-          }
-        );
+        showFeedbackMessage("La pista s'ha actualitzat correctament.", "success", {
+          label: "Veure pista editada",
+          onClick: () => scrollToCourtCard(editingCourtId),
+        });
 
         resetCourtForm();
       } else {
@@ -360,14 +365,10 @@ function AdminPage() {
         await fetchDashboardData(refreshedData.reservations, refreshedData.courts);
 
         if (createdCourtId) {
-          showFeedbackMessage(
-            "La pista s'ha creat correctament.",
-            "success",
-            {
-              label: "Veure pista creada",
-              onClick: () => scrollToCourtCard(createdCourtId),
-            }
-          );
+          showFeedbackMessage("La pista s'ha creat correctament.", "success", {
+            label: "Veure pista creada",
+            onClick: () => scrollToCourtCard(createdCourtId),
+          });
         } else {
           const createdMatches = refreshedData.courts.filter(
             (court) => court.nom_pista === payload.nom_pista
@@ -379,14 +380,10 @@ function AdminPage() {
               : null;
 
           if (createdCourt) {
-            showFeedbackMessage(
-              "La pista s'ha creat correctament.",
-              "success",
-              {
-                label: "Veure pista creada",
-                onClick: () => scrollToCourtCard(createdCourt.id),
-              }
-            );
+            showFeedbackMessage("La pista s'ha creat correctament.", "success", {
+              label: "Veure pista creada",
+              onClick: () => scrollToCourtCard(createdCourt.id),
+            });
           } else {
             showFeedbackMessage("La pista s'ha creat correctament.", "success");
           }
@@ -440,7 +437,6 @@ function AdminPage() {
       }
 
       showFeedbackMessage("La pista s'ha eliminat correctament.", "success");
-
       await refreshAllAdminData();
     } catch (err) {
       console.error(err);
@@ -530,8 +526,7 @@ function AdminPage() {
       const matchesStatus =
         courtStatusFilter === "totes" || status === courtStatusFilter;
 
-      const matchesType =
-        courtTypeFilter === "tots" || type === courtTypeFilter;
+      const matchesType = courtTypeFilter === "tots" || type === courtTypeFilter;
 
       return matchesQuery && matchesStatus && matchesType;
     });
@@ -638,34 +633,46 @@ function AdminPage() {
   return (
     <div className="admin__page">
       <div
-        className={`admin__container ${isMobileView ? "admin__container--mobile" : ""}`}
+        className={`admin__container ${
+          isMobileView ? "admin__container--mobile" : ""
+        }`}
       >
         <section
-          className={`fade-in-up admin__hero ${isMobileView ? "admin__hero--mobile" : ""}`}
+          className={`fade-in-up admin__hero ${
+            isMobileView ? "admin__hero--mobile" : ""
+          }`}
         >
           <div
-            className={`admin__hero-grid ${isMobileView ? "admin__hero-grid--mobile" : ""}`}
+            className={`admin__hero-grid ${
+              isMobileView ? "admin__hero-grid--mobile" : ""
+            }`}
           >
             <div>
               <span className="pb-chip">Administració</span>
 
               <h1
-                className={`admin__title ${isMobileView ? "admin__title--mobile" : ""}`}
+                className={`admin__title ${
+                  isMobileView ? "admin__title--mobile" : ""
+                }`}
               >
                 Panell d’administració
               </h1>
 
               <p className="admin__subtitle">
-                Controla pistes, reserves, estadístiques i activitat recent des d’un
-                espai més complet, més ordenat i amb millor lectura visual.
+                Controla pistes, reserves, estadístiques i activitat recent des
+                d’un espai més complet, més ordenat i amb millor lectura visual.
               </p>
 
               <div
-                className={`admin__hero-actions ${isMobileView ? "admin__hero-actions--mobile" : ""}`}
+                className={`admin__hero-actions ${
+                  isMobileView ? "admin__hero-actions--mobile" : ""
+                }`}
               >
                 <button
                   type="button"
-                  className={`btn ${activeTab === "dashboard" ? "btn-primary" : "btn-light"}`}
+                  className={`btn ${
+                    activeTab === "dashboard" ? "btn-primary" : "btn-light"
+                  }`}
                   onClick={() => setActiveTab("dashboard")}
                 >
                   Dashboard
@@ -673,7 +680,9 @@ function AdminPage() {
 
                 <button
                   type="button"
-                  className={`btn ${activeTab === "courts" ? "btn-primary" : "btn-light"}`}
+                  className={`btn ${
+                    activeTab === "courts" ? "btn-primary" : "btn-light"
+                  }`}
                   onClick={() => {
                     setActiveTab("courts");
                     setEditingCourtId(null);
@@ -684,7 +693,9 @@ function AdminPage() {
 
                 <button
                   type="button"
-                  className={`btn ${activeTab === "reservations" ? "btn-primary" : "btn-light"}`}
+                  className={`btn ${
+                    activeTab === "reservations" ? "btn-primary" : "btn-light"
+                  }`}
                   onClick={() => setActiveTab("reservations")}
                 >
                   Reserves
@@ -698,23 +709,39 @@ function AdminPage() {
 
                 <div className="admin__hero-panel-grid">
                   <div className="admin__hero-panel-card">
-                    <span className="admin__hero-panel-card-label">Pistes totals</span>
-                    <span className="admin__hero-panel-card-value">{courts.length}</span>
+                    <span className="admin__hero-panel-card-label">
+                      Pistes totals
+                    </span>
+                    <span className="admin__hero-panel-card-value">
+                      {courts.length}
+                    </span>
                   </div>
 
                   <div className="admin__hero-panel-card">
-                    <span className="admin__hero-panel-card-label">Disponibles</span>
-                    <span className="admin__hero-panel-card-value">{availableCourts.length}</span>
+                    <span className="admin__hero-panel-card-label">
+                      Disponibles
+                    </span>
+                    <span className="admin__hero-panel-card-value">
+                      {availableCourts.length}
+                    </span>
                   </div>
 
                   <div className="admin__hero-panel-card">
-                    <span className="admin__hero-panel-card-label">Reserves</span>
-                    <span className="admin__hero-panel-card-value">{reservations.length}</span>
+                    <span className="admin__hero-panel-card-label">
+                      Reserves
+                    </span>
+                    <span className="admin__hero-panel-card-value">
+                      {reservations.length}
+                    </span>
                   </div>
 
                   <div className="admin__hero-panel-card">
-                    <span className="admin__hero-panel-card-label">Cobertes</span>
-                    <span className="admin__hero-panel-card-value">{coveredCourts.length}</span>
+                    <span className="admin__hero-panel-card-label">
+                      Cobertes
+                    </span>
+                    <span className="admin__hero-panel-card-value">
+                      {coveredCourts.length}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -734,7 +761,9 @@ function AdminPage() {
               }`}
             >
               <div
-                className={`admin__feedback-row ${isMobileView ? "admin__feedback-row--mobile" : ""}`}
+                className={`admin__feedback-row ${
+                  isMobileView ? "admin__feedback-row--mobile" : ""
+                }`}
               >
                 <p className="pb-feedback__text">{feedback}</p>
 
@@ -755,7 +784,9 @@ function AdminPage() {
         {loadingDashboard && (
           <section className="scale-in admin__feedback-section">
             <div className="pb-feedback pb-feedback--info">
-              <p className="pb-feedback__text">Actualitzant dashboard administratiu...</p>
+              <p className="pb-feedback__text">
+                Actualitzant dashboard administratiu...
+              </p>
             </div>
           </section>
         )}
@@ -787,274 +818,419 @@ function AdminPage() {
                   ref={dashboardSectionRef}
                   className="fade-in-up delay-1 admin__section"
                 >
-              <div
-                className={`admin__section-header ${isMobileView ? "admin__section-header--mobile" : ""}`}
-              >
-                <div>
-                  <span className="pb-kicker">Visió general</span>
-                  <h2
-                    className={`pb-panel-title ${isMobileView ? "admin__section-title--mobile" : ""}`}
+                  <div
+                    className={`admin__section-header ${
+                      isMobileView ? "admin__section-header--mobile" : ""
+                    }`}
                   >
-                    Dashboard administratiu
-                  </h2>
-                  <p className="pb-panel-text">
-                    Visió ràpida de l’estat del sistema, volum de reserves i pistes.
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  className="btn btn-light"
-                  onClick={() => fetchDashboardData()}
-                >
-                  Actualitzar dashboard
-                </button>
-              </div>
-
-              <div
-                className={`admin__dashboard-stats-grid ${isMobileView ? "admin__dashboard-stats-grid--mobile" : ""}`}
-              >
-                {dashboardCards.map((card) => (
-                  <article
-                    key={card.label}
-                    className={`pb-surface-card admin__dashboard-stat-card ${card.accentClass}`}
-                  >
-                    <div className="admin__dashboard-stat-top">
-                      <span className="admin__dashboard-stat-icon">{card.icon}</span>
-                      <span className="admin__dashboard-stat-label">{card.label}</span>
+                    <div>
+                      <span className="pb-kicker">Visió general</span>
+                      <h2
+                        className={`pb-panel-title ${
+                          isMobileView ? "admin__section-title--mobile" : ""
+                        }`}
+                      >
+                        Dashboard administratiu
+                      </h2>
+                      <p className="pb-panel-text">
+                        Visió ràpida de l’estat del sistema, volum de reserves i
+                        pistes.
+                      </p>
                     </div>
 
-                    <span
-                      className={`admin__dashboard-stat-value ${isMobileView ? "admin__dashboard-stat-value--mobile" : ""}`}
+                    <button
+                      type="button"
+                      className="btn btn-light"
+                      onClick={() => fetchDashboardData()}
                     >
-                      {card.value}
-                    </span>
-                  </article>
-                ))}
-              </div>
-            </section>
-
-            <section className="fade-in-up delay-2 admin__section">
-              <div className="pb-surface-card admin__section-card">
-                <div
-                  className={`admin__analytics-header ${isMobileView ? "admin__analytics-header--mobile" : ""}`}
-                >
-                  <div>
-                    <span className="pb-kicker">Resum ràpid</span>
-                    <h3 className="admin__analytics-title">Insights clau</h3>
+                      Actualitzar dashboard
+                    </button>
                   </div>
-                  <span className="pb-badge-pill pb-badge-pill--blue">Executiu</span>
-                </div>
 
-                <div
-                  className={`admin__insights-grid ${isMobileView ? "admin__insights-grid--mobile" : ""}`}
-                >
-                  {quickInsights.map((insight) => (
-                    <article
-                      className="pb-surface-card admin__insight-card"
-                      key={insight.label}
+                  <div
+                    className={`admin__dashboard-stats-grid ${
+                      isMobileView ? "admin__dashboard-stats-grid--mobile" : ""
+                    }`}
+                  >
+                    {dashboardCards.map((card) => (
+                      <article
+                        key={card.label}
+                        className={`pb-surface-card admin__dashboard-stat-card ${card.accentClass}`}
+                      >
+                        <div className="admin__dashboard-stat-top">
+                          <span className="admin__dashboard-stat-icon">
+                            {card.icon}
+                          </span>
+                          <span className="admin__dashboard-stat-label">
+                            {card.label}
+                          </span>
+                        </div>
+
+                        <span
+                          className={`admin__dashboard-stat-value ${
+                            isMobileView
+                              ? "admin__dashboard-stat-value--mobile"
+                              : ""
+                          }`}
+                        >
+                          {card.value}
+                        </span>
+                      </article>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="fade-in-up delay-2 admin__section">
+                  <div className="pb-surface-card admin__section-card">
+                    <div
+                      className={`admin__analytics-header ${
+                        isMobileView ? "admin__analytics-header--mobile" : ""
+                      }`}
                     >
-                      <span className="admin__insight-label">{insight.label}</span>
-                      <span className="admin__insight-value">{insight.value}</span>
-                    </article>
-                  ))}
-                </div>
-              </div>
-            </section>
-
-            <section className="fade-in-up delay-2 admin__section">
-              <div
-                className={`admin__analytics-grid ${isMobileView ? "admin__analytics-grid--mobile" : ""}`}
-              >
-                <div className="pb-surface-card admin__section-card">
-                  <div
-                    className={`admin__analytics-header ${isMobileView ? "admin__analytics-header--mobile" : ""}`}
-                  >
-                    <div>
-                      <span className="pb-kicker">Anàlisi</span>
-                      <h3 className="admin__analytics-title">Reserves per pista</h3>
+                      <div>
+                        <span className="pb-kicker">Resum ràpid</span>
+                        <h3 className="admin__analytics-title">Insights clau</h3>
+                      </div>
+                      <span className="pb-badge-pill pb-badge-pill--blue">
+                        Executiu
+                      </span>
                     </div>
-                    <span className="pb-badge-pill pb-badge-pill--blue">
-                      {statsByCourt.length} pistes
-                    </span>
-                  </div>
 
-                  {statsByCourt.length > 0 ? (
-                    <div className="admin__metric-list">
-                      {statsByCourt.map((item) => {
-                        const width =
-                          topCourtValue > 0
-                            ? `${(item.value / topCourtValue) * 100}%`
-                            : "0%";
-
-                        return (
-                          <div key={item.id} className="admin__metric-item">
-                            <div
-                              className={`admin__metric-top-row ${isMobileView ? "admin__metric-top-row--mobile" : ""}`}
-                            >
-                              <span className="admin__metric-label">{item.label}</span>
-                              <span className="admin__metric-value">{item.value}</span>
-                            </div>
-
-                            <div className="admin__metric-bar-track">
-                              <div className="admin__metric-bar-fill" style={{ width }} />
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <p className="admin__empty-analytics-text">
-                      Encara no hi ha dades disponibles per pista.
-                    </p>
-                  )}
-                </div>
-
-                <div className="pb-surface-card admin__section-card">
-                  <div
-                    className={`admin__analytics-header ${isMobileView ? "admin__analytics-header--mobile" : ""}`}
-                  >
-                    <div>
-                      <span className="pb-kicker">Demanda</span>
-                      <h3 className="admin__analytics-title">Franges més reservades</h3>
-                    </div>
-                    <span className="pb-badge-pill pb-badge-pill--green">
-                      {statsByTimeslot.length} franges
-                    </span>
-                  </div>
-
-                  {statsByTimeslot.length > 0 ? (
-                    <div className="admin__metric-list">
-                      {statsByTimeslot.map((item) => {
-                        const width =
-                          topTimeslotValue > 0
-                            ? `${(item.value / topTimeslotValue) * 100}%`
-                            : "0%";
-
-                        return (
-                          <div key={item.id} className="admin__metric-item">
-                            <div
-                              className={`admin__metric-top-row ${isMobileView ? "admin__metric-top-row--mobile" : ""}`}
-                            >
-                              <span className="admin__metric-label">{item.label}</span>
-                              <span className="admin__metric-value">{item.value}</span>
-                            </div>
-
-                            <div className="admin__metric-bar-track">
-                              <div className="admin__metric-bar-fill--secondary" style={{ width }} />
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <p className="admin__empty-analytics-text">
-                      Encara no hi ha dades disponibles per franja.
-                    </p>
-                  )}
-                </div>
-              </div>
-            </section>
-
-            <section className="fade-in-up delay-3 admin__section">
-              <div
-                className={`admin__analytics-grid ${isMobileView ? "admin__analytics-grid--mobile" : ""}`}
-              >
-                <div className="pb-surface-card admin__section-card">
-                  <div
-                    className={`admin__analytics-header ${isMobileView ? "admin__analytics-header--mobile" : ""}`}
-                  >
-                    <div>
-                      <span className="pb-kicker">Tendència</span>
-                      <h3 className="admin__analytics-title">Activitat per dates</h3>
-                    </div>
-                    <span className="pb-badge-pill pb-badge-pill--amber">
-                      {recentDateStats.length} registres
-                    </span>
-                  </div>
-
-                  {recentDateStats.length > 0 ? (
-                    <div className="admin__metric-list">
-                      {recentDateStats.map((item) => {
-                        const width =
-                          topDateValue > 0
-                            ? `${(item.value / topDateValue) * 100}%`
-                            : "0%";
-
-                        return (
-                          <div key={item.id} className="admin__metric-item">
-                            <div
-                              className={`admin__metric-top-row ${isMobileView ? "admin__metric-top-row--mobile" : ""}`}
-                            >
-                              <span className="admin__metric-label">{item.label}</span>
-                              <span className="admin__metric-value">{item.value}</span>
-                            </div>
-
-                            <div className="admin__metric-bar-track">
-                              <div className="admin__metric-bar-fill--tertiary" style={{ width }} />
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <p className="admin__empty-analytics-text">
-                      Encara no hi ha dades disponibles per dates.
-                    </p>
-                  )}
-                </div>
-
-                <div className="pb-surface-card admin__section-card">
-                  <div
-                    className={`admin__analytics-header ${isMobileView ? "admin__analytics-header--mobile" : ""}`}
-                  >
-                    <div>
-                      <span className="pb-kicker">Traçabilitat</span>
-                      <h3 className="admin__analytics-title">Activitat recent admin</h3>
-                    </div>
-                    <span className="pb-badge-pill pb-badge-pill--rose">
-                      {adminLogs.length} accions
-                    </span>
-                  </div>
-
-                  {adminLogs.length > 0 ? (
-                    <div className="admin__logs-list">
-                      {adminLogs.map((log) => (
-                        <article key={log.id} className="admin__log-item">
-                          <div
-                            className={`admin__log-top-row ${isMobileView ? "admin__log-top-row--mobile" : ""}`}
-                          >
-                            <span
-                              className="pb-badge-pill pb-badge-pill--blue admin__log-action-badge"
-                            >
-                              {formatActionLabel(log.action)}
-                            </span>
-                            <span className="admin__log-date">
-                              {formatDateTime(log.createdAt)}
-                            </span>
-                          </div>
-
-                          <p className="admin__log-admin">
-                            {log.adminName}
-                            {log.adminId ? ` · ID ${log.adminId}` : ""}
-                          </p>
-
-                          <p className="admin__log-details">
-                            {log.details || "Sense detalls addicionals."}
-                          </p>
+                    <div
+                      className={`admin__insights-grid ${
+                        isMobileView ? "admin__insights-grid--mobile" : ""
+                      }`}
+                    >
+                      {quickInsights.map((insight) => (
+                        <article
+                          className="pb-surface-card admin__insight-card"
+                          key={insight.label}
+                        >
+                          <span className="admin__insight-label">
+                            {insight.label}
+                          </span>
+                          <span className="admin__insight-value">
+                            {insight.value}
+                          </span>
                         </article>
                       ))}
                     </div>
-                  ) : (
-                    <p className="admin__empty-analytics-text">
-                      Encara no hi ha activitat recent registrada.
-                    </p>
-                  )}
-                </div>
-              </div>
-            </section>
+                  </div>
+                </section>
 
+                <section className="fade-in-up delay-2 admin__section">
+                  <div
+                    className={`admin__analytics-grid ${
+                      isMobileView ? "admin__analytics-grid--mobile" : ""
+                    }`}
+                  >
+                    <div className="pb-surface-card admin__section-card">
+                      <div
+                        className={`admin__analytics-header ${
+                          isMobileView ? "admin__analytics-header--mobile" : ""
+                        }`}
+                      >
+                        <div>
+                          <span className="pb-kicker">Anàlisi</span>
+                          <h3 className="admin__analytics-title">
+                            Reserves per pista
+                          </h3>
+                        </div>
+                        <span className="pb-badge-pill pb-badge-pill--blue">
+                          {statsByCourt.length} pistes
+                        </span>
+                      </div>
+
+                      {statsByCourt.length > 0 ? (
+                        <div className="admin__metric-list">
+                          {statsByCourt.map((item) => {
+                            const width =
+                              topCourtValue > 0
+                                ? `${(item.value / topCourtValue) * 100}%`
+                                : "0%";
+
+                            return (
+                              <div key={item.id} className="admin__metric-item">
+                                <div
+                                  className={`admin__metric-top-row ${
+                                    isMobileView
+                                      ? "admin__metric-top-row--mobile"
+                                      : ""
+                                  }`}
+                                >
+                                  <span className="admin__metric-label">
+                                    {item.label}
+                                  </span>
+                                  <span className="admin__metric-value">
+                                    {item.value}
+                                  </span>
+                                </div>
+
+                                <div className="admin__metric-bar-track">
+                                  <div
+                                    className="admin__metric-bar-fill"
+                                    style={{ width }}
+                                  />
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <p className="admin__empty-analytics-text">
+                          Encara no hi ha dades disponibles per pista.
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="pb-surface-card admin__section-card">
+                      <div
+                        className={`admin__analytics-header ${
+                          isMobileView ? "admin__analytics-header--mobile" : ""
+                        }`}
+                      >
+                        <div>
+                          <span className="pb-kicker">Demanda</span>
+                          <h3 className="admin__analytics-title">
+                            Franges més reservades
+                          </h3>
+                        </div>
+                        <span className="pb-badge-pill pb-badge-pill--green">
+                          {statsByTimeslot.length} franges
+                        </span>
+                      </div>
+
+                      {statsByTimeslot.length > 0 ? (
+                        <div className="admin__metric-list">
+                          {statsByTimeslot.map((item) => {
+                            const width =
+                              topTimeslotValue > 0
+                                ? `${(item.value / topTimeslotValue) * 100}%`
+                                : "0%";
+
+                            return (
+                              <div key={item.id} className="admin__metric-item">
+                                <div
+                                  className={`admin__metric-top-row ${
+                                    isMobileView
+                                      ? "admin__metric-top-row--mobile"
+                                      : ""
+                                  }`}
+                                >
+                                  <span className="admin__metric-label">
+                                    {item.label}
+                                  </span>
+                                  <span className="admin__metric-value">
+                                    {item.value}
+                                  </span>
+                                </div>
+
+                                <div className="admin__metric-bar-track">
+                                  <div
+                                    className="admin__metric-bar-fill--secondary"
+                                    style={{ width }}
+                                  />
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <p className="admin__empty-analytics-text">
+                          Encara no hi ha dades disponibles per franja.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </section>
+
+                <section className="fade-in-up delay-3 admin__section">
+                  <div
+                    className={`admin__analytics-grid ${
+                      isMobileView ? "admin__analytics-grid--mobile" : ""
+                    }`}
+                  >
+                    <div className="pb-surface-card admin__section-card">
+                      <div
+                        className={`admin__analytics-header ${
+                          isMobileView ? "admin__analytics-header--mobile" : ""
+                        }`}
+                      >
+                        <div>
+                          <span className="pb-kicker">Tendència</span>
+                          <h3 className="admin__analytics-title">
+                            Activitat per dates
+                          </h3>
+                        </div>
+                        <span className="pb-badge-pill pb-badge-pill--amber">
+                          {recentDateStats.length} registres
+                        </span>
+                      </div>
+
+                      {recentDateStats.length > 0 ? (
+                        <div className="admin__metric-list">
+                          {recentDateStats.map((item) => {
+                            const width =
+                              topDateValue > 0
+                                ? `${(item.value / topDateValue) * 100}%`
+                                : "0%";
+
+                            return (
+                              <div key={item.id} className="admin__metric-item">
+                                <div
+                                  className={`admin__metric-top-row ${
+                                    isMobileView
+                                      ? "admin__metric-top-row--mobile"
+                                      : ""
+                                  }`}
+                                >
+                                  <span className="admin__metric-label">
+                                    {item.label}
+                                  </span>
+                                  <span className="admin__metric-value">
+                                    {item.value}
+                                  </span>
+                                </div>
+
+                                <div className="admin__metric-bar-track">
+                                  <div
+                                    className="admin__metric-bar-fill--tertiary"
+                                    style={{ width }}
+                                  />
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <p className="admin__empty-analytics-text">
+                          Encara no hi ha dades disponibles per dates.
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="pb-surface-card admin__section-card">
+                      <div
+                        className={`admin__analytics-header ${
+                          isMobileView ? "admin__analytics-header--mobile" : ""
+                        }`}
+                      >
+                        <div>
+                          <span className="pb-kicker">Traçabilitat</span>
+                          <h3 className="admin__analytics-title">
+                            Activitat recent admin
+                          </h3>
+                        </div>
+
+                        <span className="pb-badge-pill pb-badge-pill--rose">
+                          {adminLogs.length} accions
+                        </span>
+                      </div>
+
+                      {adminLogs.length > 0 ? (
+                        <>
+                          <div className="admin__logs-list admin__logs-list--compact">
+                            {(showAllActivity
+                              ? adminLogs
+                              : adminLogs.slice(0, 4)
+                            ).map((log) => (
+                              <article
+                                key={log.id}
+                                className="admin__log-item admin__log-item--compact"
+                              >
+                                <div
+                                  className={`admin__log-top-row ${
+                                    isMobileView
+                                      ? "admin__log-top-row--mobile"
+                                      : ""
+                                  }`}
+                                >
+                                  <span className="pb-badge-pill pb-badge-pill--blue admin__log-action-badge">
+                                    {formatActionLabel(log.action)}
+                                  </span>
+
+                                  <span className="admin__log-date">
+                                    {formatDateTime(log.createdAt)}
+                                  </span>
+                                </div>
+
+                                <p className="admin__log-admin">
+                                  {log.adminName}
+                                  {log.adminId ? ` · ID ${log.adminId}` : ""}
+                                </p>
+
+                                <p className="admin__log-details">
+                                  {log.details ||
+                                    "Sense detalls addicionals."}
+                                </p>
+                              </article>
+                            ))}
+                          </div>
+
+                          {adminLogs.length > 4 && (
+                            <div className="admin__logs-toggle">
+                              <button
+                                type="button"
+                                className="btn btn-light"
+                                onClick={() =>
+                                  setShowAllActivity((prev) => !prev)
+                                }
+                              >
+                                {showAllActivity
+                                  ? "Mostrar menys"
+                                  : "Veure totes les accions"}
+                              </button>
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <p className="admin__empty-analytics-text">
+                          Encara no hi ha activitat recent registrada.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </section>
               </>
+            )}
+
+            {activeTab === "reservations" && (
+              <section
+                ref={reservationsSectionRef}
+                className="fade-in-up delay-2 admin__section"
+              >
+                <div
+                  className={`admin__section-header ${
+                    isMobileView ? "admin__section-header--mobile" : ""
+                  }`}
+                >
+                  <div>
+                    <span className="pb-kicker">Control operatiu</span>
+                    <h2
+                      className={`pb-panel-title ${
+                        isMobileView ? "admin__section-title--mobile" : ""
+                      }`}
+                    >
+                      Reserves del sistema
+                    </h2>
+                    <p className="pb-panel-text">
+                      Consulta, filtra i revisa totes les reserves registrades.
+                    </p>
+                  </div>
+
+                  <span className="pb-badge-pill pb-badge-pill--blue">
+                    {reservations.length} reserves
+                  </span>
+                </div>
+
+                <div
+                  className={`pb-surface-card admin__section-card ${
+                    isMobileView ? "admin__section-card--mobile" : ""
+                  }`}
+                >
+                  <AdminReservationsTable reservations={reservations} />
+                </div>
+              </section>
             )}
 
             {activeTab === "courts" && (
@@ -1063,230 +1239,231 @@ function AdminPage() {
                   ref={editSectionRef}
                   className="fade-in-up delay-1 admin__section"
                 >
-              <div
-                className={`admin__section-header ${isMobileView ? "admin__section-header--mobile" : ""}`}
-              >
-                <div>
-                  <span className="pb-kicker">
-                    {editingCourtId ? "Edició" : "Creació"}
-                  </span>
-                  <h2
-                    className={`pb-panel-title ${isMobileView ? "admin__section-title--mobile" : ""}`}
+                  <div
+                    className={`admin__section-header ${
+                      isMobileView ? "admin__section-header--mobile" : ""
+                    }`}
                   >
-                    {editingCourtId ? "Editar pista" : "Crear nova pista"}
-                  </h2>
-                  <p className="pb-panel-text">
-                    {editingCourtId
-                      ? "Modifica les dades de la pista seleccionada i guarda els canvis."
-                      : "Afegeix una pista nova al sistema i defineix-ne les dades principals."}
-                  </p>
-                </div>
+                    <div>
+                      <span className="pb-kicker">
+                        {editingCourtId ? "Edició" : "Creació"}
+                      </span>
+                      <h2
+                        className={`pb-panel-title ${
+                          isMobileView ? "admin__section-title--mobile" : ""
+                        }`}
+                      >
+                        {editingCourtId ? "Editar pista" : "Crear nova pista"}
+                      </h2>
+                      <p className="pb-panel-text">
+                        {editingCourtId
+                          ? "Modifica les dades de la pista seleccionada i guarda els canvis."
+                          : "Afegeix una pista nova al sistema i defineix-ne les dades principals."}
+                      </p>
+                    </div>
 
-                {editingCourtId && (
-                  <span className="pb-badge-pill pb-badge-pill--amber">Mode edició</span>
-                )}
-              </div>
+                    {editingCourtId && (
+                      <span className="pb-badge-pill pb-badge-pill--amber">
+                        Mode edició
+                      </span>
+                    )}
+                  </div>
 
-              <div className="pb-surface-card admin__section-card">
-                <CreateCourtForm
-                  newCourt={newCourt}
-                  setNewCourt={setNewCourt}
-                  onSubmit={handleCreateOrUpdateCourt}
-                  creatingCourt={creatingCourt}
-                  isEditing={!!editingCourtId}
-                  onCancelEdit={resetCourtForm}
-                />
-              </div>
-            </section>
+                  <div className="pb-surface-card admin__section-card">
+                    <CreateCourtForm
+                      newCourt={newCourt}
+                      setNewCourt={setNewCourt}
+                      onSubmit={handleCreateOrUpdateCourt}
+                      creatingCourt={creatingCourt}
+                      isEditing={!!editingCourtId}
+                      onCancelEdit={resetCourtForm}
+                    />
+                  </div>
+                </section>
 
-              </>
-            )}
-
-            {activeTab === "reservations" && (
-              <>
-                <section
-                  ref={reservationsSectionRef}
-                  className="fade-in-up delay-2 admin__section"
-                >
-              <div
-                className={`admin__section-header ${isMobileView ? "admin__section-header--mobile" : ""}`}
-              >
-                <div>
-                  <span className="pb-kicker">Control operatiu</span>
-                  <h2
-                    className={`pb-panel-title ${isMobileView ? "admin__section-title--mobile" : ""}`}
-                  >
-                    Reserves del sistema
-                  </h2>
-                  <p className="pb-panel-text">
-                    Consulta, filtra i revisa totes les reserves registrades.
-                  </p>
-                </div>
-
-                <span className="pb-badge-pill pb-badge-pill--blue">
-                  {reservations.length} reserves
-                </span>
-              </div>
-
-              <div
-                className={`pb-surface-card admin__section-card ${isMobileView ? "admin__section-card--mobile" : ""}`}
-              >
-                <AdminReservationsTable reservations={reservations} />
-              </div>
-            </section>
-
-              </>
-            )}
-
-            {activeTab === "courts" && (
-              <>
                 <section
                   ref={courtsSectionRef}
                   className="fade-in-up delay-3 admin__section"
                 >
-              <div
-                className={`admin__section-header ${isMobileView ? "admin__section-header--mobile" : ""}`}
-              >
-                <div>
-                  <span className="pb-kicker">Gestió d’espais</span>
-                  <h2
-                    className={`pb-panel-title ${isMobileView ? "admin__section-title--mobile" : ""}`}
+                  <div
+                    className={`admin__section-header ${
+                      isMobileView ? "admin__section-header--mobile" : ""
+                    }`}
                   >
-                    Pistes
-                  </h2>
-                  <p className="pb-panel-text">
-                    Cerca, filtra i gestiona les pistes existents amb més rapidesa.
-                  </p>
-                </div>
+                    <div>
+                      <span className="pb-kicker">Gestió d’espais</span>
+                      <h2
+                        className={`pb-panel-title ${
+                          isMobileView ? "admin__section-title--mobile" : ""
+                        }`}
+                      >
+                        Pistes
+                      </h2>
+                      <p className="pb-panel-text">
+                        Cerca, filtra i gestiona les pistes existents amb més
+                        rapidesa.
+                      </p>
+                    </div>
 
-                <span className="pb-badge-pill pb-badge-pill--green">
-                  {filteredCourts.length} visibles
-                </span>
-              </div>
-
-              <div className="pb-surface-card admin__section-card">
-                <div
-                  className={`admin__court-tools-grid ${isMobileView ? "admin__court-tools-grid--mobile" : ""}`}
-                >
-                  <div className="admin__court-filter-field">
-                    <label htmlFor="courtSearch" className="admin__filter-label">
-                      Cercar pista
-                    </label>
-                    <input
-                      id="courtSearch"
-                      type="text"
-                      value={courtSearch}
-                      onChange={(e) => setCourtSearch(e.target.value)}
-                      placeholder="Nom o descripció..."
-                      className="pb-input"
-                    />
+                    <span className="pb-badge-pill pb-badge-pill--green">
+                      {filteredCourts.length} visibles
+                    </span>
                   </div>
 
-                  <div className="admin__court-filter-field">
-                    <label htmlFor="courtStatusFilter" className="admin__filter-label">
-                      Estat
-                    </label>
-                    <select
-                      id="courtStatusFilter"
-                      value={courtStatusFilter}
-                      onChange={(e) => setCourtStatusFilter(e.target.value)}
-                      className="pb-input"
+                  <div className="pb-surface-card admin__section-card">
+                    <div
+                      className={`admin__court-tools-grid ${
+                        isMobileView ? "admin__court-tools-grid--mobile" : ""
+                      }`}
                     >
-                      <option value="totes">Totes</option>
-                      <option value="disponible">Disponibles</option>
-                      <option value="manteniment">Manteniment</option>
-                    </select>
-                  </div>
+                      <div className="admin__court-filter-field">
+                        <label
+                          htmlFor="courtSearch"
+                          className="admin__filter-label"
+                        >
+                          Cercar pista
+                        </label>
+                        <input
+                          id="courtSearch"
+                          type="text"
+                          value={courtSearch}
+                          onChange={(e) => setCourtSearch(e.target.value)}
+                          placeholder="Nom o descripció..."
+                          className="pb-input"
+                        />
+                      </div>
 
-                  <div className="admin__court-filter-field">
-                    <label htmlFor="courtTypeFilter" className="admin__filter-label">
-                      Tipus
-                    </label>
-                    <select
-                      id="courtTypeFilter"
-                      value={courtTypeFilter}
-                      onChange={(e) => setCourtTypeFilter(e.target.value)}
-                      className="pb-input"
+                      <div className="admin__court-filter-field">
+                        <label
+                          htmlFor="courtStatusFilter"
+                          className="admin__filter-label"
+                        >
+                          Estat
+                        </label>
+                        <select
+                          id="courtStatusFilter"
+                          value={courtStatusFilter}
+                          onChange={(e) => setCourtStatusFilter(e.target.value)}
+                          className="pb-input"
+                        >
+                          <option value="totes">Totes</option>
+                          <option value="disponible">Disponibles</option>
+                          <option value="manteniment">Manteniment</option>
+                        </select>
+                      </div>
+
+                      <div className="admin__court-filter-field">
+                        <label
+                          htmlFor="courtTypeFilter"
+                          className="admin__filter-label"
+                        >
+                          Tipus
+                        </label>
+                        <select
+                          id="courtTypeFilter"
+                          value={courtTypeFilter}
+                          onChange={(e) => setCourtTypeFilter(e.target.value)}
+                          className="pb-input"
+                        >
+                          <option value="tots">Tots</option>
+                          <option value="dobles">Dobles</option>
+                          <option value="individual">Individual</option>
+                        </select>
+                      </div>
+
+                      <div className="admin__court-filter-actions">
+                        <button
+                          type="button"
+                          className="btn btn-light"
+                          onClick={resetCourtFilters}
+                        >
+                          Netejar filtres
+                        </button>
+                      </div>
+                    </div>
+
+                    <div
+                      className={`admin__court-quick-stats ${
+                        isMobileView
+                          ? "admin__court-quick-stats--mobile"
+                          : ""
+                      }`}
                     >
-                      <option value="tots">Tots</option>
-                      <option value="dobles">Dobles</option>
-                      <option value="individual">Individual</option>
-                    </select>
+                      <div className="admin__court-quick-stat">
+                        <span className="admin__court-quick-stat-label">
+                          Mostrades
+                        </span>
+                        <span className="admin__court-quick-stat-value">
+                          {filteredCourts.length}
+                        </span>
+                      </div>
+
+                      <div className="admin__court-quick-stat">
+                        <span className="admin__court-quick-stat-label">
+                          Disponibles
+                        </span>
+                        <span className="admin__court-quick-stat-value">
+                          {filteredAvailableCourtsCount}
+                        </span>
+                      </div>
+
+                      <div className="admin__court-quick-stat">
+                        <span className="admin__court-quick-stat-label">
+                          Manteniment
+                        </span>
+                        <span className="admin__court-quick-stat-value">
+                          {filteredMaintenanceCourtsCount}
+                        </span>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="admin__court-filter-actions">
-                    <button
-                      type="button"
-                      className="btn btn-light"
-                      onClick={resetCourtFilters}
+                  {filteredCourts.length > 0 ? (
+                    <div
+                      className={`admin__cards ${
+                        isMobileView ? "admin__cards--mobile" : ""
+                      }`}
                     >
-                      Netejar filtres
-                    </button>
-                  </div>
-                </div>
+                      {filteredCourts.map((court) => (
+                        <CourtCard
+                          key={court.id}
+                          court={court}
+                          onEdit={() => handleStartEditCourt(court)}
+                          onStartDelete={() => {
+                            setConfirmingCourtId(court.id);
 
-                <div
-                  className={`admin__court-quick-stats ${isMobileView ? "admin__court-quick-stats--mobile" : ""}`}
-                >
-                  <div className="admin__court-quick-stat">
-                    <span className="admin__court-quick-stat-label">Mostrades</span>
-                    <span className="admin__court-quick-stat-value">{filteredCourts.length}</span>
-                  </div>
+                            setTimeout(() => {
+                              scrollToCourtCard(court.id);
+                            }, 150);
+                          }}
+                          onAbortDelete={() => setConfirmingCourtId(null)}
+                          onDelete={() => handleDeleteCourt(court.id)}
+                          confirmingDelete={confirmingCourtId === court.id}
+                          isDeleting={deletingCourtId === court.id}
+                          isHighlighted={highlightedCourtId === court.id}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="pb-surface-card admin__empty-filtered-state">
+                      <p className="admin__empty-filtered-title">
+                        No hi ha pistes que coincideixin
+                      </p>
+                      <p className="admin__empty-filtered-text">
+                        Revisa els filtres aplicats o neteja la cerca per tornar
+                        a veure totes les pistes.
+                      </p>
 
-                  <div className="admin__court-quick-stat">
-                    <span className="admin__court-quick-stat-label">Disponibles</span>
-                    <span className="admin__court-quick-stat-value">{filteredAvailableCourtsCount}</span>
-                  </div>
-
-                  <div className="admin__court-quick-stat">
-                    <span className="admin__court-quick-stat-label">Manteniment</span>
-                    <span className="admin__court-quick-stat-value">{filteredMaintenanceCourtsCount}</span>
-                  </div>
-                </div>
-              </div>
-
-              {filteredCourts.length > 0 ? (
-                <div
-                  className={`admin__cards ${isMobileView ? "admin__cards--mobile" : ""}`}
-                >
-                  {filteredCourts.map((court) => (
-                    <CourtCard
-                      key={court.id}
-                      court={court}
-                      onEdit={() => handleStartEditCourt(court)}
-                      onStartDelete={() => {
-                        setConfirmingCourtId(court.id);
-
-                        setTimeout(() => {
-                          scrollToCourtCard(court.id);
-                        }, 150);
-                      }}
-                      onAbortDelete={() => setConfirmingCourtId(null)}
-                      onDelete={() => handleDeleteCourt(court.id)}
-                      confirmingDelete={confirmingCourtId === court.id}
-                      isDeleting={deletingCourtId === court.id}
-                      isHighlighted={highlightedCourtId === court.id}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="pb-surface-card admin__empty-filtered-state">
-                  <p className="admin__empty-filtered-title">No hi ha pistes que coincideixin</p>
-                  <p className="admin__empty-filtered-text">
-                    Revisa els filtres aplicats o neteja la cerca per tornar a veure
-                    totes les pistes.
-                  </p>
-
-                  <button
-                    type="button"
-                    className="btn btn-light"
-                    onClick={resetCourtFilters}
-                  >
-                    Mostrar totes les pistes
-                  </button>
-                </div>
-              )}
-            </section>
+                      <button
+                        type="button"
+                        className="btn btn-light"
+                        onClick={resetCourtFilters}
+                      >
+                        Mostrar totes les pistes
+                      </button>
+                    </div>
+                  )}
+                </section>
               </>
             )}
           </>
