@@ -59,6 +59,9 @@ function AdminPage() {
   const [courtTypeFilter, setCourtTypeFilter] = useState("tots");
 
   const [showAllActivity, setShowAllActivity] = useState(false);
+  const [showAllCourtStats, setShowAllCourtStats] = useState(false);
+  const [showAllTimeslotStats, setShowAllTimeslotStats] = useState(false);
+  const [showAllDateStats, setShowAllDateStats] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -493,7 +496,7 @@ function AdminPage() {
   }, [statsByDate]);
 
   const recentDateStats = useMemo(() => {
-    return statsByDate.slice(0, 7);
+    return statsByDate.slice(0, 5);
   }, [statsByDate]);
 
   const topCourt = useMemo(() => {
@@ -510,6 +513,24 @@ function AdminPage() {
     if (!statsByDate.length) return null;
     return [...statsByDate].sort((a, b) => b.value - a.value)[0];
   }, [statsByDate]);
+
+  const visibleCourtStats = useMemo(() => {
+    return showAllCourtStats ? statsByCourt : statsByCourt.slice(0, 5);
+  }, [statsByCourt, showAllCourtStats]);
+
+  const visibleTimeslotStats = useMemo(() => {
+    return showAllTimeslotStats
+      ? statsByTimeslot
+      : statsByTimeslot.slice(0, 5);
+  }, [statsByTimeslot, showAllTimeslotStats]);
+
+  const visibleDateStats = useMemo(() => {
+    return showAllDateStats ? recentDateStats : recentDateStats.slice(0, 5);
+  }, [recentDateStats, showAllDateStats]);
+
+  const visibleAdminLogs = useMemo(() => {
+    return showAllActivity ? adminLogs : adminLogs.slice(0, 3);
+  }, [adminLogs, showAllActivity]);
 
   const filteredCourts = useMemo(() => {
     const query = courtSearch.trim().toLowerCase();
@@ -942,40 +963,43 @@ function AdminPage() {
                       </div>
 
                       {statsByCourt.length > 0 ? (
-                        <div className="admin__metric-list">
-                          {statsByCourt.map((item) => {
-                            const width =
-                              topCourtValue > 0
-                                ? `${(item.value / topCourtValue) * 100}%`
-                                : "0%";
+                        <>
+                          <div className="admin__metric-list">
+                            {visibleCourtStats.map((item) => {
+                              const width =
+                                topCourtValue > 0 ? `${(item.value / topCourtValue) * 100}%` : "0%";
 
-                            return (
-                              <div key={item.id} className="admin__metric-item">
-                                <div
-                                  className={`admin__metric-top-row ${
-                                    isMobileView
-                                      ? "admin__metric-top-row--mobile"
-                                      : ""
-                                  }`}
-                                >
-                                  <span className="admin__metric-label">
-                                    {item.label}
-                                  </span>
-                                  <span className="admin__metric-value">
-                                    {item.value}
-                                  </span>
-                                </div>
-
-                                <div className="admin__metric-bar-track">
+                              return (
+                                <div key={item.id} className="admin__metric-item">
                                   <div
-                                    className="admin__metric-bar-fill"
-                                    style={{ width }}
-                                  />
+                                    className={`admin__metric-top-row ${
+                                      isMobileView ? "admin__metric-top-row--mobile" : ""
+                                    }`}
+                                  >
+                                    <span className="admin__metric-label">{item.label}</span>
+                                    <span className="admin__metric-value">{item.value}</span>
+                                  </div>
+
+                                  <div className="admin__metric-bar-track">
+                                    <div className="admin__metric-bar-fill" style={{ width }} />
+                                  </div>
                                 </div>
-                              </div>
-                            );
-                          })}
-                        </div>
+                              );
+                            })}
+                          </div>
+
+                          {statsByCourt.length > 5 && (
+                            <div className="admin__metrics-toggle">
+                              <button
+                                type="button"
+                                className="btn btn-light btn-sm"
+                                onClick={() => setShowAllCourtStats((prev) => !prev)}
+                              >
+                                {showAllCourtStats ? "Mostrar menys" : "Veure més pistes"}
+                              </button>
+                            </div>
+                          )}
+                        </>
                       ) : (
                         <p className="admin__empty-analytics-text">
                           Encara no hi ha dades disponibles per pista.
@@ -1001,40 +1025,48 @@ function AdminPage() {
                       </div>
 
                       {statsByTimeslot.length > 0 ? (
-                        <div className="admin__metric-list">
-                          {statsByTimeslot.map((item) => {
-                            const width =
-                              topTimeslotValue > 0
-                                ? `${(item.value / topTimeslotValue) * 100}%`
-                                : "0%";
+                        <>
+                          <div className="admin__metric-list">
+                            {visibleTimeslotStats.map((item) => {
+                              const width =
+                                topTimeslotValue > 0
+                                  ? `${(item.value / topTimeslotValue) * 100}%`
+                                  : "0%";
 
-                            return (
-                              <div key={item.id} className="admin__metric-item">
-                                <div
-                                  className={`admin__metric-top-row ${
-                                    isMobileView
-                                      ? "admin__metric-top-row--mobile"
-                                      : ""
-                                  }`}
-                                >
-                                  <span className="admin__metric-label">
-                                    {item.label}
-                                  </span>
-                                  <span className="admin__metric-value">
-                                    {item.value}
-                                  </span>
-                                </div>
-
-                                <div className="admin__metric-bar-track">
+                              return (
+                                <div key={item.id} className="admin__metric-item">
                                   <div
-                                    className="admin__metric-bar-fill--secondary"
-                                    style={{ width }}
-                                  />
+                                    className={`admin__metric-top-row ${
+                                      isMobileView ? "admin__metric-top-row--mobile" : ""
+                                    }`}
+                                  >
+                                    <span className="admin__metric-label">{item.label}</span>
+                                    <span className="admin__metric-value">{item.value}</span>
+                                  </div>
+
+                                  <div className="admin__metric-bar-track">
+                                    <div
+                                      className="admin__metric-bar-fill--secondary"
+                                      style={{ width }}
+                                    />
+                                  </div>
                                 </div>
-                              </div>
-                            );
-                          })}
-                        </div>
+                              );
+                            })}
+                          </div>
+
+                          {statsByTimeslot.length > 5 && (
+                            <div className="admin__metrics-toggle">
+                              <button
+                                type="button"
+                                className="btn btn-light btn-sm"
+                                onClick={() => setShowAllTimeslotStats((prev) => !prev)}
+                              >
+                                {showAllTimeslotStats ? "Mostrar menys" : "Veure més franges"}
+                              </button>
+                            </div>
+                          )}
+                        </>
                       ) : (
                         <p className="admin__empty-analytics-text">
                           Encara no hi ha dades disponibles per franja.
@@ -1068,40 +1100,46 @@ function AdminPage() {
                       </div>
 
                       {recentDateStats.length > 0 ? (
-                        <div className="admin__metric-list">
-                          {recentDateStats.map((item) => {
-                            const width =
-                              topDateValue > 0
-                                ? `${(item.value / topDateValue) * 100}%`
-                                : "0%";
+                        <>
+                          <div className="admin__metric-list">
+                            {visibleDateStats.map((item) => {
+                              const width =
+                                topDateValue > 0 ? `${(item.value / topDateValue) * 100}%` : "0%";
 
-                            return (
-                              <div key={item.id} className="admin__metric-item">
-                                <div
-                                  className={`admin__metric-top-row ${
-                                    isMobileView
-                                      ? "admin__metric-top-row--mobile"
-                                      : ""
-                                  }`}
-                                >
-                                  <span className="admin__metric-label">
-                                    {item.label}
-                                  </span>
-                                  <span className="admin__metric-value">
-                                    {item.value}
-                                  </span>
-                                </div>
-
-                                <div className="admin__metric-bar-track">
+                              return (
+                                <div key={item.id} className="admin__metric-item">
                                   <div
-                                    className="admin__metric-bar-fill--tertiary"
-                                    style={{ width }}
-                                  />
+                                    className={`admin__metric-top-row ${
+                                      isMobileView ? "admin__metric-top-row--mobile" : ""
+                                    }`}
+                                  >
+                                    <span className="admin__metric-label">{item.label}</span>
+                                    <span className="admin__metric-value">{item.value}</span>
+                                  </div>
+
+                                  <div className="admin__metric-bar-track">
+                                    <div
+                                      className="admin__metric-bar-fill--tertiary"
+                                      style={{ width }}
+                                    />
+                                  </div>
                                 </div>
-                              </div>
-                            );
-                          })}
-                        </div>
+                              );
+                            })}
+                          </div>
+
+                          {recentDateStats.length > 5 && (
+                            <div className="admin__metrics-toggle">
+                              <button
+                                type="button"
+                                className="btn btn-light btn-sm"
+                                onClick={() => setShowAllDateStats((prev) => !prev)}
+                              >
+                                {showAllDateStats ? "Mostrar menys" : "Veure més dates"}
+                              </button>
+                            </div>
+                          )}
+                        </>
                       ) : (
                         <p className="admin__empty-analytics-text">
                           Encara no hi ha dades disponibles per dates.
@@ -1130,10 +1168,7 @@ function AdminPage() {
                       {adminLogs.length > 0 ? (
                         <>
                           <div className="admin__logs-list admin__logs-list--compact">
-                            {(showAllActivity
-                              ? adminLogs
-                              : adminLogs.slice(0, 4)
-                            ).map((log) => (
+                            {visibleAdminLogs.map((log) => (
                               <article
                                 key={log.id}
                                 className="admin__log-item admin__log-item--compact"
@@ -1167,7 +1202,7 @@ function AdminPage() {
                             ))}
                           </div>
 
-                          {adminLogs.length > 4 && (
+                          {adminLogs.length > 3 && (
                             <div className="admin__logs-toggle">
                               <button
                                 type="button"
@@ -1178,7 +1213,7 @@ function AdminPage() {
                               >
                                 {showAllActivity
                                   ? "Mostrar menys"
-                                  : "Veure totes les accions"}
+                                  : "Veure més activitat"}
                               </button>
                             </div>
                           )}

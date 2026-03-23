@@ -642,3 +642,63 @@
   display: flex;
   justify-content: flex-start;
 }
+
+.admin__section-card {
+  padding: 1rem;
+}
+
+.admin__metric-list {
+  gap: 0.75rem;
+}
+
+.admin__metric-item {
+  padding: 0.8rem 0.9rem;
+  border-radius: 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.admin__metric-top-row {
+  margin-bottom: 0.35rem;
+}
+
+.admin__metric-label {
+  font-size: 0.92rem;
+}
+
+.admin__metric-value {
+  font-size: 0.92rem;
+}
+
+.admin__metric-bar-track {
+  height: 8px;
+}
+
+.admin__metrics-toggle {
+  margin-top: 0.9rem;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.admin__logs-list--compact {
+  gap: 0.65rem;
+}
+
+.admin__log-item--compact {
+  padding: 0.8rem 0.9rem;
+}
+
+.admin__log-top-row {
+  margin-bottom: 0.45rem;
+}
+
+.admin__log-admin {
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+.admin__log-details {
+  margin-top: 0.3rem;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
