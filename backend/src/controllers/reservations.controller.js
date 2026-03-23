@@ -11,6 +11,9 @@ const {
   buildReservationCreatedEmail,
   buildReservationCancelledEmail,
 } = require("../services/email.service");
+const {
+  MAX_ACTIVE_RESERVATIONS_PER_USER,
+} = require("../config/reservationLimits");
 
 // Crear reserva (amb comprovacions de disponibilitat i bloqueig)
 exports.createReservation = async (req, res) => {
@@ -98,8 +101,14 @@ exports.createReservation = async (req, res) => {
         [user_id]
       );
 
-      if (userActiveReservations[0].total >= 3) {
-        return fail(res, "Has arribat al límit màxim de 3 reserves actives", 400);
+      if (
+        userActiveReservations[0].total >= MAX_ACTIVE_RESERVATIONS_PER_USER
+      ) {
+        return fail(
+          res,
+          `Has arribat al límit màxim de ${MAX_ACTIVE_RESERVATIONS_PER_USER} reserves actives`,
+          400
+        );
       }
     }
 
