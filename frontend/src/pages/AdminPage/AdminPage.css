@@ -524,6 +524,7 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.9rem;
   align-items: start;
+  margin-top: 1.25rem;
 }
 
 .admin__cards--mobile {
