@@ -60,6 +60,60 @@ function AdminReservationsTable({ reservations = [] }) {
     setStatusFilter("totes");
   };
 
+  const formatDate = (value) => {
+    if (!value) return "Data no disponible";
+
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return value;
+
+    return parsed.toLocaleDateString("ca-ES", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  const formatTime = (value) => {
+    if (!value) return "--:--";
+    return String(value).slice(0, 5);
+  };
+
+  const paymentMethodLabel = (value) => {
+    if (!value) return "No indicat";
+    if (value === "online_simulat") return "Online";
+    if (value === "al_club") return "Al club";
+    return value.replaceAll("_", " ");
+  };
+
+  const paymentStatusLabel = (value) => {
+    if (!value) return "No indicat";
+    if (value === "pagat") return "Pagat";
+    if (value === "pendent") return "Pendent";
+    return value.replaceAll("_", " ");
+  };
+
+  const getReservationStatusClass = (value) => {
+    const normalized = (value || "").toLowerCase();
+    return normalized === "activa" || normalized === "active"
+      ? "admin-res__pill admin-res__pill--active"
+      : "admin-res__pill admin-res__pill--cancelled";
+  };
+
+  const getPaymentStatusClass = (value) => {
+    const normalized = (value || "").toLowerCase();
+    return normalized === "pagat"
+      ? "admin-res__pill admin-res__pill--paid"
+      : "admin-res__pill admin-res__pill--pending";
+  };
+
+  const getPaymentMethodClass = (value) => {
+    const normalized = (value || "").toLowerCase();
+    return normalized === "online_simulat"
+      ? "admin-res__pill admin-res__pill--info"
+      : "admin-res__pill admin-res__pill--neutral";
+  };
+
   if (!reservations.length) {
     return (
       <div className="admin-res__empty-state">
@@ -75,13 +129,13 @@ function AdminReservationsTable({ reservations = [] }) {
 
   return (
     <div className="admin-res__wrapper">
-      <div className="admin-res__table-header">
+      <div className="admin-res__header">
         <div>
           <span className="admin-res__eyebrow">Control administratiu</span>
           <h3 className="admin-res__title">Reserves registrades</h3>
           <p className="admin-res__subtitle">
-            Vista general de totes les reserves creades al sistema, amb filtres
-            ràpids per revisar-les millor.
+            Vista clara de les reserves del sistema, amb filtres simples i una
+            lectura molt més ràpida.
           </p>
         </div>
 
@@ -113,7 +167,7 @@ function AdminReservationsTable({ reservations = [] }) {
       </div>
 
       <div className="admin-res__tools-grid">
-        <div className="admin-res__field">
+        <div className="admin-res__field admin-res__field--search">
           <label htmlFor="reservationSearch" className="admin-res__label">
             Cercar reserva
           </label>
@@ -144,150 +198,102 @@ function AdminReservationsTable({ reservations = [] }) {
         </div>
 
         <div className="admin-res__field-action">
-          <button
-            type="button"
-            className="btn btn-light"
-            onClick={clearFilters}
-          >
+          <button type="button" className="btn btn-light" onClick={clearFilters}>
             Netejar filtres
           </button>
         </div>
       </div>
 
       {filteredReservations.length > 0 ? (
-        <div className="admin-res__table-container">
-          <table className="admin-res__table">
-            <thead>
-              <tr>
-                <th className="admin-res__th">Codi</th>
-                <th className="admin-res__th">Usuari</th>
-                <th className="admin-res__th">Correu</th>
-                <th className="admin-res__th">Pista</th>
-                <th className="admin-res__th">Data</th>
-                <th className="admin-res__th">Hora</th>
-                <th className="admin-res__th">Preu</th>
-                <th className="admin-res__th">Pagament</th>
-                <th className="admin-res__th">Estat pagament</th>
-                <th className="admin-res__th">Estat</th>
-              </tr>
-            </thead>
+        <div className="admin-res__list">
+          {filteredReservations.map((reservation) => {
+            const formattedDate = formatDate(reservation.data_reserva);
+            const reservationPrice =
+              reservation.preu_total != null
+                ? `${Number(reservation.preu_total).toFixed(2)} €`
+                : reservation.preu != null
+                  ? `${Number(reservation.preu).toFixed(2)} €`
+                  : "-";
 
-            <tbody>
-              {filteredReservations.map((reservation, index) => {
-                const formattedDate = new Date(
-                  reservation.data_reserva
-                ).toLocaleDateString("ca-ES", {
-                  weekday: "short",
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                });
+            return (
+              <article key={reservation.id} className="admin-res__card">
+                <div className="admin-res__card-top">
+                  <div className="admin-res__identity-block">
+                    <span className="admin-res__code-badge">
+                      {reservation.codi_reserva || "Sense codi"}
+                    </span>
 
-                const isActive =
-                  (reservation.estat || "").toLowerCase() === "activa" ||
-                  (reservation.estat || "").toLowerCase() === "active";
-
-                return (
-                  <tr
-                    key={reservation.id}
-                    className={`admin-res__row ${
-                      index % 2 === 0 ? "admin-res__row--even" : "admin-res__row--odd"
-                    }`}
-                  >
-                    <td className="admin-res__td">
-                      <span className="admin-res__code-badge">
-                        {reservation.codi_reserva || "-"}
+                    <div className="admin-res__user-row">
+                      <span className="admin-res__user-avatar">
+                        {(reservation.nom_usuari || "U").charAt(0).toUpperCase()}
                       </span>
-                    </td>
 
-                    <td className="admin-res__td">
-                      <div className="admin-res__user-cell">
-                        <span className="admin-res__user-avatar">
-                          {(reservation.nom_usuari || "U")
-                            .charAt(0)
-                            .toUpperCase()}
-                        </span>
-                        <div>
-                          <p className="admin-res__primary-text">
-                            {reservation.nom_usuari || "Usuari"}
-                          </p>
-                        </div>
+                      <div className="admin-res__user-meta">
+                        <p className="admin-res__primary-text">
+                          {reservation.nom_usuari || "Usuari"}
+                        </p>
+                        <p className="admin-res__secondary-text admin-res__secondary-text--compact">
+                          {reservation.email || "Sense correu"}
+                        </p>
                       </div>
-                    </td>
+                    </div>
+                  </div>
 
-                    <td className="admin-res__td">
-                      <span className="admin-res__secondary-text">
-                        {reservation.email || "-"}
-                      </span>
-                    </td>
+                  <div className="admin-res__status-stack">
+                    <span className={getReservationStatusClass(reservation.estat)}>
+                      {reservation.estat || "Sense estat"}
+                    </span>
+                    <span className={getPaymentStatusClass(reservation.estat_pagament)}>
+                      {paymentStatusLabel(reservation.estat_pagament)}
+                    </span>
+                  </div>
+                </div>
 
-                    <td className="admin-res__td">
-                      <span className="admin-res__primary-text">
-                        {reservation.nom_pista || "-"}
-                      </span>
-                    </td>
+                <div className="admin-res__details-grid">
+                  <div className="admin-res__detail-item">
+                    <span className="admin-res__detail-label">Pista</span>
+                    <span className="admin-res__detail-value">
+                      {reservation.nom_pista || "No indicada"}
+                    </span>
+                  </div>
 
-                    <td className="admin-res__td">
-                      <span className="admin-res__secondary-text">{formattedDate}</span>
-                    </td>
+                  <div className="admin-res__detail-item">
+                    <span className="admin-res__detail-label">Data</span>
+                    <span className="admin-res__detail-value">{formattedDate}</span>
+                  </div>
 
-                    <td className="admin-res__td">
-                      <span className="admin-res__time-badge">
-                        {reservation.hora_inici} - {reservation.hora_fi}
-                      </span>
-                    </td>
+                  <div className="admin-res__detail-item">
+                    <span className="admin-res__detail-label">Hora</span>
+                    <span className="admin-res__time-badge">
+                      {formatTime(reservation.hora_inici)} - {formatTime(reservation.hora_fi)}
+                    </span>
+                  </div>
 
-                    <td className="admin-res__td">
-                      <span className="admin-res__primary-text">
-                        {reservation.preu_total != null
-                          ? `${Number(reservation.preu_total).toFixed(2)} €`
-                          : reservation.preu != null
-                          ? `${Number(reservation.preu).toFixed(2)} €`
-                          : "-"}
-                      </span>
-                    </td>
+                  <div className="admin-res__detail-item">
+                    <span className="admin-res__detail-label">Import</span>
+                    <span className="admin-res__detail-value admin-res__detail-value--price">
+                      {reservationPrice}
+                    </span>
+                  </div>
+                </div>
 
-                    <td className="admin-res__td">
-                      <span className="admin-res__secondary-text">
-                        {reservation.metode_pagament || "-"}
-                      </span>
-                    </td>
-
-                    <td className="admin-res__td">
-                      <span className="admin-res__secondary-text">
-                        {reservation.estat_pagament || "-"}
-                      </span>
-                    </td>
-
-                    <td className="admin-res__td">
-                      <span
-                        className={`admin-res__status-badge ${
-                          isActive
-                            ? "admin-res__status-badge--active"
-                            : "admin-res__status-badge--inactive"
-                        }`}
-                      >
-                        {reservation.estat}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                <div className="admin-res__card-footer">
+                  <span className={getPaymentMethodClass(reservation.metode_pagament)}>
+                    {paymentMethodLabel(reservation.metode_pagament)}
+                  </span>
+                </div>
+              </article>
+            );
+          })}
         </div>
       ) : (
         <div className="admin-res__empty-filtered-state">
           <p className="admin-res__empty-filtered-title">No s&apos;ha trobat cap reserva</p>
           <p className="admin-res__empty-filtered-text">
-            Ajusta la cerca o l'estat seleccionat per tornar a veure resultats.
+            Ajusta la cerca o l&apos;estat seleccionat per tornar a veure resultats.
           </p>
 
-          <button
-            type="button"
-            className="btn btn-light"
-            onClick={clearFilters}
-          >
+          <button type="button" className="btn btn-light" onClick={clearFilters}>
             Mostrar totes les reserves
           </button>
         </div>
