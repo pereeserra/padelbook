@@ -110,8 +110,8 @@ exports.getAllReservations = async (req, res) => {
         r.user_id,
         r.court_id,
         r.time_slot_id,
-        u.nom AS usuari_nom,
-        u.email AS usuari_email,
+        u.nom AS nom_usuari,
+        u.email AS email,
         c.nom_pista,
         t.hora_inici,
         t.hora_fi

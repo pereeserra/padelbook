@@ -255,8 +255,8 @@ exports.getReservations = async (req, res) => {
           r.estat_pagament,
           r.metode_pagament,
           r.created_at,
-          u.nom AS usuari_nom,
-          u.email AS usuari_email,
+          u.nom AS nom_usuari,
+          u.email AS email,
           c.nom_pista,
           t.hora_inici,
           t.hora_fi
