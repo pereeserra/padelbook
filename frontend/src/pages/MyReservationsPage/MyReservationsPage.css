@@ -78,9 +78,11 @@
 }
 
 .my-res__stat-number {
-  font-size: 1.6rem;
+  font-size: 1.95rem;
   font-weight: 800;
   color: white;
+  letter-spacing: -0.03em;
+  line-height: 1;
 }
 
 .my-res__stat-label {
@@ -224,4 +226,105 @@
 .my-res__empty-actions--mobile {
   flex-direction: column;
   align-items: stretch;
+}
+
+.my-res__segmented {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem;
+  border-radius: 22px;
+  background: rgba(248, 250, 252, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 10px 24px rgba(15, 23, 42, 0.05);
+}
+
+.my-res__segmented--mobile {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.my-res__segmented-btn {
+  border: none;
+  background: transparent;
+  color: #475569;
+  min-height: 52px;
+  padding: 0.8rem 1rem;
+  border-radius: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.my-res__segmented-btn:hover {
+  background: rgba(255, 255, 255, 0.9);
+  color: #0f172a;
+  transform: translateY(-1px);
+}
+
+.my-res__segmented-btn.is-active {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  box-shadow: 0 14px 28px rgba(37, 99, 235, 0.22);
+}
+
+.my-res__segmented-label {
+  font-size: 0.94rem;
+  letter-spacing: -0.01em;
+}
+
+.my-res__segmented-count {
+  min-width: 30px;
+  height: 30px;
+  padding: 0 0.5rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.07);
+  color: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.my-res__segmented-btn.is-active .my-res__segmented-count {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+@media (max-width: 768px) {
+  .my-res__segmented,
+  .my-res__segmented--mobile {
+    width: 100%;
+  }
+
+  .my-res__segmented-btn {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+.my-res__stat-card {
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.my-res__stat-card:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.12);
 }

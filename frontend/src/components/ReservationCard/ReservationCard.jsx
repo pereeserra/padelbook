@@ -168,33 +168,35 @@ function ReservationCard({
         </div>
       </div>
 
-      <div className="res-card__info-grid">
-        <div className="res-card__info-box">
-          <span className="res-card__label">Codi reserva</span>
-          <p className="res-card__value">{reservation.codi_reserva || "No disponible"}</p>
+      <div className="res-card__quick-meta">
+        <div className="res-card__quick-pill">
+          <span className="res-card__quick-label">Data</span>
+          <span className="res-card__quick-value">{formattedDate}</span>
         </div>
 
-        <div className="res-card__info-box">
-          <span className="res-card__label">Data</span>
-          <p className="res-card__value">{formattedDate}</p>
-        </div>
-
-        <div className="res-card__info-box">
-          <span className="res-card__label">Hora</span>
-          <p className="res-card__value">
+        <div className="res-card__quick-pill">
+          <span className="res-card__quick-label">Hora</span>
+          <span className="res-card__quick-value">
             {reservation.hora_inici} - {reservation.hora_fi}
-          </p>
+          </span>
         </div>
 
-        <div className="res-card__info-box">
-          <span className="res-card__label">Preu</span>
-          <p className="res-card__value">
+        <div className="res-card__quick-pill res-card__quick-pill--price">
+          <span className="res-card__quick-label">Import</span>
+          <span className="res-card__quick-value">
             {reservation.preu_total != null
               ? `${Number(reservation.preu_total).toFixed(2)} €`
               : reservation.preu != null
               ? `${Number(reservation.preu).toFixed(2)} €`
               : "No disponible"}
-          </p>
+          </span>
+        </div>
+      </div>
+
+      <div className="res-card__info-grid">
+        <div className="res-card__info-box">
+          <span className="res-card__label">Codi reserva</span>
+          <p className="res-card__value">{reservation.codi_reserva || "No disponible"}</p>
         </div>
 
         <div className="res-card__info-box">

@@ -328,36 +328,39 @@ function MyReservationsPage() {
               </div>
 
               <div
-                className={`my-res__filters-row ${isMobileView ? "my-res__filters-row--mobile" : ""}`}
+                className={`my-res__segmented ${isMobileView ? "my-res__segmented--mobile" : ""}`}
               >
                 <button
                   type="button"
-                  className={`btn ${
-                    activeFilter === "all" ? "btn-primary" : "btn-light"
+                  className={`my-res__segmented-btn ${
+                    activeFilter === "all" ? "is-active" : ""
                   }`}
                   onClick={() => handleFilterChange("all")}
                 >
-                  Totes ({reservations.length})
+                  <span className="my-res__segmented-label">Totes</span>
+                  <span className="my-res__segmented-count">{reservations.length}</span>
                 </button>
 
                 <button
                   type="button"
-                  className={`btn ${
-                    activeFilter === "active" ? "btn-primary" : "btn-light"
+                  className={`my-res__segmented-btn ${
+                    activeFilter === "active" ? "is-active" : ""
                   }`}
                   onClick={() => handleFilterChange("active")}
                 >
-                  Actives ({activeReservations.length})
+                  <span className="my-res__segmented-label">Actives</span>
+                  <span className="my-res__segmented-count">{activeReservations.length}</span>
                 </button>
 
                 <button
                   type="button"
-                  className={`btn ${
-                    activeFilter === "cancelled" ? "btn-primary" : "btn-light"
+                  className={`my-res__segmented-btn ${
+                    activeFilter === "cancelled" ? "is-active" : ""
                   }`}
                   onClick={() => handleFilterChange("cancelled")}
                 >
-                  Cancel·lades ({cancelledReservations.length})
+                  <span className="my-res__segmented-label">Cancel·lades</span>
+                  <span className="my-res__segmented-count">{cancelledReservations.length}</span>
                 </button>
               </div>
             </section>
