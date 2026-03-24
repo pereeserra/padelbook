@@ -12,6 +12,7 @@ const availabilityRoutes = require("./routes/availability.routes");
 
 const app = express();
 
+// Limiter per a rutes d'autenticació, ja que són més sensibles a intents de força bruta
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 10,
@@ -23,6 +24,7 @@ const authLimiter = rateLimit({
   },
 });
 
+// Limiter específic per a rutes de registre, ja que són més sensibles a abusos
 const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: 5,
@@ -93,6 +95,7 @@ app.use("/admin", adminRoutes);
 // Ruta per obtenir la disponibilitat de pistes i franges horàries per a una data concreta (protegida per autenticació)
 app.use("/availability", availabilityRoutes);
 
+// Limiter per a rutes d'autenticació i registre
 app.locals.authLimiter = authLimiter;
 app.locals.registerLimiter = registerLimiter;
 

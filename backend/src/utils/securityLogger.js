@@ -1,3 +1,4 @@
+// Funció per obtenir la IP del client, tenint en compte proxies
 const getClientIp = (req) => {
   const forwardedFor = req.headers["x-forwarded-for"];
 
@@ -8,6 +9,7 @@ const getClientIp = (req) => {
   return req.ip || req.socket?.remoteAddress || "IP desconeguda";
 };
 
+// Funció per registrar esdeveniments de seguretat
 const logSecurityEvent = (req, event, details = {}) => {
   const payload = {
     timestamp: new Date().toISOString(),

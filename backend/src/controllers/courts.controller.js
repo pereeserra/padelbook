@@ -1,7 +1,7 @@
 const db = require("../config/db");
 const { ok, fail } = require("../utils/response");
 
-// Controlador de pistes
+// Controlador per obtenir les pistes amb filtres opcionals: tipus, estat i coberta
 exports.getCourts = async (req, res) => {
   try {
     const tipus =

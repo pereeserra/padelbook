@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const { logSecurityEvent } = require("../utils/securityLogger");
 
+// Middleware d'autenticació que verifica el token JWT en les sol·licituds entrants
 module.exports = (req, res, next) => {
   const authHeader = req.headers.authorization;
 

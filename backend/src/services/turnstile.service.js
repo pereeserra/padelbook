@@ -1,6 +1,7 @@
 const TURNSTILE_VERIFY_URL =
   "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 
+  // Funció per verificar el token de Turnstile
 const verifyTurnstileToken = async ({ token, remoteip }) => {
   const secret = process.env.TURNSTILE_SECRET_KEY;
 

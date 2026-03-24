@@ -1,15 +1,18 @@
 const { RESERVATION_STATUS } = require("../config/reservationConstants");
 
+// Función para eliminar etiquetas HTML de un string
 const stripHtmlTags = (value) => {
   if (typeof value !== "string") return "";
   return value.replace(/<[^>]*>/g, "");
 };
 
+// Función para eliminar caracteres peligrosos como < y > para prevenir inyecciones de código
 const removeDangerousCharacters = (value) => {
   if (typeof value !== "string") return "";
   return value.replace(/[<>]/g, "");
 };
 
+// Función para sanitizar texto plano (strip HTML, eliminar caracteres peligrosos y trim)
 const sanitizePlainText = (value) => {
   if (typeof value !== "string") return "";
   return removeDangerousCharacters(stripHtmlTags(value)).trim();
@@ -19,23 +22,28 @@ const sanitizePlainText = (value) => {
 const normalizeText = (value) => {
   return sanitizePlainText(value).replace(/\s+/g, " ");
 };
+
 // Función para normalizar correos electrónicos (trim y lowercase)
 const normalizeEmail = (value) => {
   return typeof value === "string" ? value.trim().toLowerCase() : "";
 };
+
 // Función para normalizar nombres completos (strip HTML, eliminar caracteres peligrosos, trim y reemplazo de múltiples espacios por uno)
 const normalizeFullName = (value) => {
   return sanitizePlainText(value).replace(/\s+/g, " ");
 };
+
 // Función para verificar si un valor es un entero positivo
 const isPositiveInteger = (value) => {
   return Number.isInteger(value) && value > 0;
 };
+
 // Función para convertir un valor a un entero positivo o devolver null si no es válido
 const parsePositiveInteger = (value) => {
   const parsed = Number(value);
   return isPositiveInteger(parsed) ? parsed : null;
 };
+
 // Función para validar el formato de fecha YYYY-MM-DD y que sea una fecha válida
 const isValidDateFormat = (dateString) => {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return false;
@@ -51,6 +59,7 @@ const isValidDateFormat = (dateString) => {
     date.getUTCDate() === day
   );
 };
+
 // Función para obtener la fecha actual en formato YYYY-MM-DD
 const getTodayString = () => {
   const today = new Date();
@@ -59,21 +68,25 @@ const getTodayString = () => {
   const day = String(today.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
+
 // Función para validar el formato de correo electrónico
 const isValidEmail = (email) => {
   const emailRegex = /^[^\s@]{2,}@[^\s@]{2,}\.[A-Za-z]{2,}$/;
   return emailRegex.test(email);
 };
+
 // Función para validar que el nombre completo tenga al menos una longitud mínima
 const hasMinFullNameLength = (nom, minLength = 5) => {
   return typeof nom === "string" && nom.length >= minLength;
 };
+
 // Función para validar que el nombre completo contenga al menos un nombre y un apellido
 const hasNameAndSurname = (nom) => {
   if (typeof nom !== "string") return false;
   const parts = nom.split(" ").filter(Boolean);
   return parts.length >= 2;
 };
+
 // Función para validar la fortaleza de la contraseña
 const validatePasswordStrength = (password) => {
   if (typeof password !== "string" || password.length === 0) {
@@ -102,11 +115,13 @@ const validatePasswordStrength = (password) => {
 
   return null;
 };
+
 // Función para validar que el estado de la reserva sea válido
 const isValidReservationStatus = (estat) => {
   return Object.values(RESERVATION_STATUS).includes(estat);
 };
 
+// Función para convertir valores comunes a un formato binario (1 o 0) o devolver null si no es válido
 const parseBinaryFlag = (value) => {
   if (value === 1 || value === "1" || value === true || value === "true") {
     return 1;
@@ -117,6 +132,7 @@ const parseBinaryFlag = (value) => {
   return null;
 };
 
+// Función para validar los datos de una pista de pádel
 const validateCourtData = (data) => {
   let { nom_pista, tipus, coberta, estat, descripcio, preu_reserva } = data;
 
@@ -164,6 +180,7 @@ const validateCourtData = (data) => {
   return { error: null, data: { nom_pista, tipus, coberta, estat, descripcio, preu_reserva } };
 };
 
+// Función para validar los datos del perfil de usuario
 const validateProfileData = (nom, email) => {
   if (!nom || !email) {
     return { error: "Has d'omplir nom i correu electrònic." };
