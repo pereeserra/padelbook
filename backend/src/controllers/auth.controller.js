@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const { ok, message, fail } = require("../utils/response");
+const { verifyTurnstileToken } = require("../services/turnstile.service");
 
 const {
   normalizeEmail,
@@ -15,7 +16,7 @@ const {
 // REGISTRE D'USUARI
 exports.register = async (req, res) => {
   try {
-    let { nom, email, password } = req.body;
+    let { nom, email, password, turnstileToken } = req.body;
 
     nom = normalizeFullName(nom);
     email = normalizeEmail(email);
@@ -29,6 +30,15 @@ exports.register = async (req, res) => {
     const passwordError = validatePasswordStrength(password);
     if (passwordError) {
       return fail(res, passwordError, 400);
+    }
+
+    const turnstileResult = await verifyTurnstileToken({
+      token: turnstileToken,
+      remoteip: req.ip,
+    });
+
+    if (!turnstileResult.success) {
+      return fail(res, turnstileResult.message, 400);
     }
 
     const [existingUsers] = await db.query(
@@ -56,20 +66,31 @@ exports.register = async (req, res) => {
       return fail(res, "Aquest correu electrònic ja està registrat.", 409);
     }
 
-    return fail(res, "Error intern del servidor durant el registre.");
+    return fail(res, "Error intern del servidor durant el registre.", 500);
   }
 };
 
 // LOGIN
 exports.login = async (req, res) => {
   try {
-    let { email, password } = req.body;
+    let { email, password, turnstileToken } = req.body;
 
     email = normalizeEmail(email);
     password = typeof password === "string" ? password : "";
 
     if (!email || !password) {
       return fail(res, "Has d'introduir email i contrasenya.", 400);
+    }
+
+    if (turnstileToken) {
+      const turnstileResult = await verifyTurnstileToken({
+        token: turnstileToken,
+        remoteip: req.ip,
+      });
+
+      if (!turnstileResult.success) {
+        return fail(res, turnstileResult.message, 400);
+      }
     }
 
     const [rows] = await db.query(
