@@ -292,12 +292,20 @@ function HomePage() {
             </div>
 
             <div className="home__cta-content">
-              <span className="home__cta-kicker">Preparat per provar-ho?</span>
-              <h2 className="home__cta-title">Entra i comença a explorar PadelBook</h2>
+              <span className="home__cta-kicker">
+                {isLoggedIn ? "Benvingut de nou" : "Preparat per provar-ho?"}
+              </span>
+
+              <h2 className="home__cta-title">
+                {isLoggedIn
+                  ? "Continua gestionant les teves reserves"
+                  : "Entra i comença a explorar PadelBook"}
+              </h2>
+
               <p className="home__cta-text">
-                Aquesta és només la primera passa del canvi visual. A partir
-                d’aquí podem dur aquest mateix estil a login, register,
-                disponibilitat, reserves i admin.
+                {isLoggedIn
+                  ? "Accedeix a les teves reserves, consulta disponibilitat i gestiona-ho tot de forma ràpida i clara."
+                  : "Aquesta és només la primera passa del canvi visual. A partir d’aquí podem dur aquest mateix estil a login, register, disponibilitat, reserves i admin."}
               </p>
             </div>
 
