@@ -3,10 +3,19 @@ const router = express.Router();
 const authController = require("../controllers/auth.controller");
 const authMiddleware = require("../middleware/auth.middleware");
 
-// Ruta per al registre de nous usuaris
-router.post("/register", authController.register);
-// Ruta per al login d'usuaris
-router.post("/login", authController.login);
+// Rate limiters definits a app.js
+router.post(
+  "/register",
+  (req, res, next) => req.app.locals.registerLimiter(req, res, next),
+  authController.register
+);
+
+router.post(
+  "/login",
+  (req, res, next) => req.app.locals.authLimiter(req, res, next),
+  authController.login
+);
+
 // Ruta protegida per obtenir les dades de l'usuari autenticat
 router.get("/me", authMiddleware, authController.getMe);
 // Ruta protegida per actualitzar les dades d'un usuari autenticat

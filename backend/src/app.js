@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const rateLimit = require("express-rate-limit");
 const db = require("./config/db");
 const authRoutes = require("./routes/auth.routes");
 const authMiddleware = require("./middleware/auth.middleware");
@@ -10,6 +11,28 @@ const adminRoutes = require("./routes/admin.routes");
 const availabilityRoutes = require("./routes/availability.routes");
 
 const app = express();
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    error:
+      "Massa intents d'autenticació. Torna-ho a provar d'aquí a uns minuts.",
+  },
+});
+
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    error:
+      "Has superat el límit de registres permesos temporalment. Torna-ho a provar més tard.",
+  },
+});
 
 // Middleware para permitir solicitudes desde el frontend
 app.use(cors());
@@ -51,5 +74,8 @@ app.use("/reservations", reservationsRoutes);
 app.use("/admin", adminRoutes);
 // Ruta per obtenir la disponibilitat de pistes i franges horàries per a una data concreta (protegida per autenticació)
 app.use("/availability", availabilityRoutes);
+
+app.locals.authLimiter = authLimiter;
+app.locals.registerLimiter = registerLimiter;
 
 module.exports = app;
