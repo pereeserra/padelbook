@@ -377,6 +377,12 @@ exports.createMaintenanceBlock = async (req, res) => {
       });
     }
 
+    if (motiu.length > 300) {
+      return res.status(400).json({
+        error: "El motiu del manteniment és massa llarg",
+      });
+    }
+
     const [court] = await db.query(
       "SELECT * FROM courts WHERE id = ?",
       [court_id]

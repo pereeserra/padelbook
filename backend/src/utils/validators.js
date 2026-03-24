@@ -1,18 +1,31 @@
 const { RESERVATION_STATUS } = require("../config/reservationConstants");
 
-// Funciones de validación y normalización de datos
+const stripHtmlTags = (value) => {
+  if (typeof value !== "string") return "";
+  return value.replace(/<[^>]*>/g, "");
+};
+
+const removeDangerousCharacters = (value) => {
+  if (typeof value !== "string") return "";
+  return value.replace(/[<>]/g, "");
+};
+
+const sanitizePlainText = (value) => {
+  if (typeof value !== "string") return "";
+  return removeDangerousCharacters(stripHtmlTags(value)).trim();
+};
+
+// Función para normalizar texto (strip HTML, eliminar caracteres peligrosos, trim y reemplazo de múltiples espacios por uno)
 const normalizeText = (value) => {
-  return typeof value === "string" ? value.trim() : "";
+  return sanitizePlainText(value).replace(/\s+/g, " ");
 };
 // Función para normalizar correos electrónicos (trim y lowercase)
 const normalizeEmail = (value) => {
   return typeof value === "string" ? value.trim().toLowerCase() : "";
 };
-// Función para normalizar nombres completos (trim y reemplazo de múltiples espacios por uno)
+// Función para normalizar nombres completos (strip HTML, eliminar caracteres peligrosos, trim y reemplazo de múltiples espacios por uno)
 const normalizeFullName = (value) => {
-  return typeof value === "string"
-    ? value.trim().replace(/\s+/g, " ")
-    : "";
+  return sanitizePlainText(value).replace(/\s+/g, " ");
 };
 // Función para verificar si un valor es un entero positivo
 const isPositiveInteger = (value) => {
@@ -132,6 +145,14 @@ const validateCourtData = (data) => {
     return { error: "El nom de la pista ha de tenir almenys 3 caràcters" };
   }
 
+  if (nom_pista.length > 80) {
+    return { error: "El nom de la pista és massa llarg" };
+  }
+
+  if (descripcio && descripcio.length > 500) {
+    return { error: "La descripció és massa llarga" };
+  }
+
   if (!allowedCourtTypes.includes(tipus)) {
     return { error: `El tipus de pista no és vàlid. Valors permesos: ${allowedCourtTypes.join(", ")}` };
   }
@@ -144,24 +165,30 @@ const validateCourtData = (data) => {
 };
 
 const validateProfileData = (nom, email) => {
-  if (nom.length > 100) {
-    return { error: "El nom és massa llarg." };
-  }
-  if (email.length > 150) {
-    return { error: "El correu és massa llarg." };
-  }
   if (!nom || !email) {
     return { error: "Has d'omplir nom i correu electrònic." };
   }
+
+  if (nom.length > 100) {
+    return { error: "El nom complet és massa llarg." };
+  }
+
+  if (email.length > 150) {
+    return { error: "El correu electrònic és massa llarg." };
+  }
+
   if (!hasMinFullNameLength(nom)) {
     return { error: "El nom complet ha de tenir almenys 5 caràcters." };
   }
+
   if (!hasNameAndSurname(nom)) {
     return { error: "Has d'introduir com a mínim nom i llinatge." };
   }
+
   if (!isValidEmail(email)) {
     return { error: "Introdueix un correu electrònic vàlid." };
   }
+
   return { error: null };
 };
 
