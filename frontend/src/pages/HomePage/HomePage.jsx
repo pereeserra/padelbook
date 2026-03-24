@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import heroImg from "../../assets/images/padelcourt1.jpg";
 import court2Img from "../../assets/images/padelcourt2.jpg";
@@ -9,6 +9,10 @@ import padelCourtMockup from "../../assets/images/padelcourt.png";
 
 function HomePage() {
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 900);
+
+  const isLoggedIn = useMemo(() => {
+    return Boolean(localStorage.getItem("token"));
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -64,12 +68,14 @@ function HomePage() {
                   Explorar disponibilitat
                 </Link>
 
-                <Link
-                  to="/register"
-                  className={`btn btn-light ${isMobileView ? "home__full-width-button" : ""}`}
-                >
-                  Crear compte
-                </Link>
+                {!isLoggedIn && (
+                  <Link
+                    to="/register"
+                    className={`btn btn-light ${isMobileView ? "home__full-width-button" : ""}`}
+                  >
+                    Crear compte
+                  </Link>
+                )}
               </div>
 
               <div
@@ -305,12 +311,14 @@ function HomePage() {
                 Veure disponibilitat
               </Link>
 
-              <Link
-                to="/login"
-                className={`btn btn-light ${isMobileView ? "home__full-width-button" : ""}`}
-              >
-                Iniciar sessió
-              </Link>
+              {!isLoggedIn && (
+                <Link
+                  to="/login"
+                  className={`btn btn-light ${isMobileView ? "home__full-width-button" : ""}`}
+                >
+                  Iniciar sessió
+                </Link>
+              )}
             </div>
           </div>
         </section>
