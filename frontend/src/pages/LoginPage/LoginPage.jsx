@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 import "./LoginPage.css";
@@ -12,9 +12,13 @@ function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [capsLock, setCapsLock] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileReady, setTurnstileReady] = useState(false);
 
   const navigate = useNavigate();
   const feedbackRef = useRef(null);
+  const turnstileContainerRef = useRef(null);
+  const turnstileWidgetIdRef = useRef(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -41,6 +45,91 @@ function LoginPage() {
     setCapsLock(e.getModifierState("CapsLock"));
   };
 
+  const resetTurnstile = useCallback(() => {
+    if (
+      typeof window !== "undefined" &&
+      window.turnstile &&
+      turnstileWidgetIdRef.current !== null
+    ) {
+      window.turnstile.reset(turnstileWidgetIdRef.current);
+    }
+
+    setTurnstileToken("");
+  }, []);
+
+  useEffect(() => {
+    const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
+
+    if (!siteKey || !turnstileContainerRef.current) return;
+
+    let attempts = 0;
+    let intervalId = null;
+
+    const renderWidget = () => {
+      if (
+        typeof window === "undefined" ||
+        !window.turnstile ||
+        turnstileWidgetIdRef.current !== null
+      ) {
+        return;
+      }
+
+      turnstileWidgetIdRef.current = window.turnstile.render(
+        turnstileContainerRef.current,
+        {
+          sitekey: siteKey,
+          theme: "light",
+          callback: (token) => {
+            setTurnstileToken(token || "");
+            setError("");
+          },
+          "expired-callback": () => {
+            setTurnstileToken("");
+          },
+          "error-callback": () => {
+            setTurnstileToken("");
+            setError("No s'ha pogut validar el captcha. Torna-ho a provar.");
+          },
+        }
+      );
+
+      setTurnstileReady(true);
+    };
+
+    if (window.turnstile) {
+      renderWidget();
+      return;
+    }
+
+    intervalId = window.setInterval(() => {
+      attempts += 1;
+
+      if (window.turnstile) {
+        renderWidget();
+        window.clearInterval(intervalId);
+      }
+
+      if (attempts > 50) {
+        window.clearInterval(intervalId);
+      }
+    }, 200);
+
+    return () => {
+      if (intervalId) {
+        window.clearInterval(intervalId);
+      }
+
+      if (
+        typeof window !== "undefined" &&
+        window.turnstile &&
+        turnstileWidgetIdRef.current !== null
+      ) {
+        window.turnstile.remove(turnstileWidgetIdRef.current);
+        turnstileWidgetIdRef.current = null;
+      }
+    };
+  }, []);
+
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -48,9 +137,16 @@ function LoginPage() {
       setError("");
       setLoading(true);
 
+      if (!turnstileToken) {
+        setError("Has de completar la verificació de seguretat.");
+        setLoading(false);
+        return;
+      }
+
       const response = await api.post("/auth/login", {
         email: email.trim().toLowerCase(),
         password,
+        turnstileToken,
       });
 
       const token = response?.data?.data?.token || "";
@@ -78,6 +174,8 @@ function LoginPage() {
       } else {
         setError("Error iniciant sessió.");
       }
+
+      resetTurnstile();
     } finally {
       setLoading(false);
     }
@@ -224,10 +322,24 @@ function LoginPage() {
               )}
             </div>
 
+            <div className="login__field">
+              <label className="login__label">Verificació de seguretat</label>
+
+              <div className="login__turnstile-box">
+                <div ref={turnstileContainerRef} />
+              </div>
+
+              {!turnstileReady && (
+                <span className="login__turnstile-help">
+                  Carregant verificació...
+                </span>
+              )}
+            </div>
+
             <button
               type="submit"
               className="btn btn-primary btn-full"
-              disabled={loading}
+              disabled={loading || !turnstileToken}
             >
               {loading ? "Iniciant sessió..." : "Entrar a PadelBook"}
             </button>
