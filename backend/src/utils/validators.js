@@ -144,6 +144,12 @@ const validateCourtData = (data) => {
 };
 
 const validateProfileData = (nom, email) => {
+  if (nom.length > 100) {
+    return { error: "El nom és massa llarg." };
+  }
+  if (email.length > 150) {
+    return { error: "El correu és massa llarg." };
+  }
   if (!nom || !email) {
     return { error: "Has d'omplir nom i correu electrònic." };
   }

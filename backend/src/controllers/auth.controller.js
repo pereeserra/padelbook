@@ -99,7 +99,7 @@ exports.login = async (req, res) => {
     );
 
     if (rows.length === 0) {
-      return fail(res, "Usuari no trobat", 401);
+      return fail(res, "Credencials incorrectes", 401);
     }
 
     const user = rows[0];
@@ -107,18 +107,16 @@ exports.login = async (req, res) => {
     const match = await bcrypt.compare(password, user.password_hash);
 
     if (!match) {
-      return fail(res, "Contrasenya incorrecta", 401);
+      return fail(res, "Credencials incorrectes", 401);
     }
 
     const token = jwt.sign(
       {
         id: user.id,
-        rol: user.rol,
-        nom: user.nom,
-        email: user.email
+        role: user.rol,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "24h" }
+      { expiresIn: "2h" }
     );
 
     return message(res, "Login correcte", 200, {
@@ -127,7 +125,7 @@ exports.login = async (req, res) => {
         id: user.id,
         nom: user.nom,
         email: user.email,
-        rol: user.rol,
+        role: user.rol,
         created_at: user.created_at
       }
     });
