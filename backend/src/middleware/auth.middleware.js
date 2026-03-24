@@ -7,6 +7,10 @@ module.exports = (req, res, next) => {
     return res.status(401).json({ error: "Token no proporcionat" });
   }
 
+  if (!authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Format de token invàlid" });
+  }
+
   const token = authHeader.split(" ")[1];
 
   try {
