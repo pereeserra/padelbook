@@ -4,6 +4,7 @@ import "./Footer.css";
 function Footer() {
   const location = useLocation();
 
+  // Funció per desplaçar-se suaument a la part superior de la pàgina
   const scrollToTopSmooth = () => {
     window.scrollTo({
       top: 0,
@@ -11,6 +12,7 @@ function Footer() {
     });
   };
 
+  // Maneja el clic en els enllaços del footer
   const handleFooterLinkClick = (event, path) => {
     if (location.pathname === path) {
       event.preventDefault();

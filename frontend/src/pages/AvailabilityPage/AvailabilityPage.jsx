@@ -24,11 +24,13 @@ function AvailabilityPage() {
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [reserving, setReserving] = useState(false);
 
+  // Funció per formatar el preu, mostrant "Preu no disponible" si no hi ha valor vàlid
   const formatPrice = (value) => {
     if (value == null || value === "") return "Preu no disponible";
     return `${Number(value).toFixed(2)} €`;
   };
 
+  // Funció per formatar la data de visualització, mostrant "Cap data" si no hi ha valor vàlid
   const formatDisplayDate = (dateString) => {
     if (!dateString) return "Cap data";
 
@@ -42,16 +44,19 @@ function AvailabilityPage() {
     return formatted.charAt(0).toUpperCase() + formatted.slice(1);
   };
 
+  // Funció per obtenir el nom del dia de la setmana en format curt, amb la primera lletra en majúscula
   const formatShortWeekday = (dateObj) => {
     const formatted = dateObj.toLocaleDateString("ca-ES", { weekday: "short" });
     return formatted.charAt(0).toUpperCase() + formatted.slice(1);
   };
 
+  // Funció per formatar l'hora, mostrant només les hores i minuts (HH:MM)
   const formatTimeShort = (timeString) => {
     if (!timeString) return "";
     return timeString.slice(0, 5);
   };
 
+  // Funció per formatar el tipus de pista, normalitzant les variants d'"individual" i mostrant "Dobles" per qualsevol altre valor
   const formatCourtType = (tipus) => {
     const normalized = String(tipus || "").trim().toLowerCase();
 
@@ -62,14 +67,17 @@ function AvailabilityPage() {
     return "Dobles";
   };
 
+  // Funció per formatar el tipus d'entorn de la pista, mostrant "Indoor" per coberta i "Outdoor" per descoberta
   const formatCourtEnvironment = (coberta) => {
     return Number(coberta) === 1 ? "Indoor" : "Outdoor";
   };
 
+  // Funció per determinar si la data seleccionada és anterior a la data actual
   const isPastDate = (selectedDate) => {
     return selectedDate < getToday();
   };
 
+  // Funció per netejar missatges d'error i èxit, i restablir l'estat relacionat amb la reserva
   const clearMessages = () => {
     setError("");
     setSuccess("");
@@ -77,6 +85,7 @@ function AvailabilityPage() {
     setReservationSummary(null);
   };
 
+  // Funció per obrir el selector de data ocult, amb maneig de compatibilitat per diferents navegadors
   const handleOpenDatePicker = () => {
     const input = hiddenDateInputRef.current;
     if (!input) return;
@@ -96,6 +105,7 @@ function AvailabilityPage() {
     }
   };
 
+  // Funció per obtenir la disponibilitat de pistes per a la data seleccionada, amb validació i maneig d'errors
   const fetchAvailability = async (selectedDate) => {
     try {
       if (!selectedDate) {
@@ -127,6 +137,7 @@ function AvailabilityPage() {
     }
   };
 
+  // Funció per manejar el canvi de data manualment, amb validació per dates passades i actualització de l'estat
   const handleManualDateChange = (newDate) => {
     if (!newDate) return;
 
@@ -139,6 +150,7 @@ function AvailabilityPage() {
     setDate(newDate);
   };
 
+  // Funció per manejar la reserva d'una pista, amb validació d'autenticació, maneig d'errors i actualització de l'estat de la reserva
   const handleReserve = async () => {
     if (!selectedSlot) return;
 
@@ -197,15 +209,18 @@ function AvailabilityPage() {
     }
   };
 
+  // Efecte per obtenir la disponibilitat cada vegada que canvia la data seleccionada
   useEffect(() => {
     fetchAvailability(date);
   }, [date]);
 
+  // Memorització de la disponibilitat filtrada segons l'estat de "Només disponibles"
   const filteredAvailability = useMemo(() => {
     if (!showOnlyAvailable) return availability;
     return availability.filter((slot) => slot.disponible);
   }, [availability, showOnlyAvailable]);
 
+  // Memorització dels propers 7 dies per a la selecció ràpida, amb formatació de la data i identificació del dia actual
   const quickDays = useMemo(() => {
     const start = new Date(getToday());
 
@@ -222,6 +237,7 @@ function AvailabilityPage() {
     });
   }, []);
 
+  // Memorització de les pistes agrupades per nom, amb ordenació dels horaris i de les pistes
   const courtsData = useMemo(() => {
     const map = new Map();
 
@@ -246,6 +262,7 @@ function AvailabilityPage() {
     return courtsList.sort((a, b) => a.nom_pista.localeCompare(b.nom_pista));
   }, [filteredAvailability]);
 
+  // Memorització de les estadístiques de disponibilitat, calculant el total de franges, franges disponibles, franges ocupades i total de pistes
   const availabilityStats = useMemo(() => {
     const totalSlots = availability.length;
     const availableSlots = availability.filter((slot) => slot.disponible).length;

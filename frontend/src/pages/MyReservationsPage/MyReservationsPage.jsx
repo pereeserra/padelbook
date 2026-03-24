@@ -24,6 +24,7 @@ function MyReservationsPage() {
   const [recentlyCancelledReservationId, setRecentlyCancelledReservationId] =
     useState(null);
 
+  // Detectar canvis en la mida de la finestra per adaptar la vista a dispositius mòbils
   useEffect(() => {
     const handleResize = () => {
       setIsMobileView(window.innerWidth <= 768);
@@ -33,6 +34,7 @@ function MyReservationsPage() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Funcions per fer scroll suau cap a feedback i resum després d'interaccions
   const scrollToFeedback = () => {
     if (!topFeedbackRef.current) return;
 

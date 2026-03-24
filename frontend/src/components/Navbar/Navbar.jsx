@@ -17,6 +17,7 @@ function Navbar() {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileView, setIsMobileView] = useState(() => window.innerWidth <= 920);
 
+  // Funció per obtenir l'usuari actual des del backend
   const fetchCurrentUser = async ({ silent = false } = {}) => {
     const currentToken = localStorage.getItem("token");
 
@@ -41,10 +42,12 @@ function Navbar() {
     }
   };
 
+  // Obtenir l'usuari actual quan el component es monta i quan canvia la ruta
   useEffect(() => {
     fetchCurrentUser({ silent: true });
   }, [location.pathname]);
 
+  // Escoltar esdeveniments personalitzats i canvis d'emmagatzematge per actualitzar l'usuari
   useEffect(() => {
     const handleProfileUpdated = () => {
       fetchCurrentUser({ silent: true });
@@ -63,11 +66,13 @@ function Navbar() {
     };
   }, []);
 
+  // Tancar menús quan canvia la ruta
   useEffect(() => {
     setIsMobileMenuOpen(false);
     setIsUserMenuOpen(false);
   }, [location.pathname]);
 
+  // Gestionar canvis de mida de pantalla per mostrar la versió mòbil
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth <= 920;
@@ -85,6 +90,7 @@ function Navbar() {
     };
   }, []);
 
+  // Tancar el menú d'usuari quan es fa clic fora o es prem Escape
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
@@ -108,6 +114,7 @@ function Navbar() {
     };
   }, []);
 
+  // Funció per desplaçar-se suaument a la part superior de la pàgina
   const scrollToTopSmooth = () => {
     window.scrollTo({
       top: 0,
@@ -115,6 +122,7 @@ function Navbar() {
     });
   };
 
+  // Gestionar clics a enllaços de navegació per evitar recarregar la pàgina si ja estem a la ruta
   const handleNavClick = (event, path) => {
     if (location.pathname === path) {
       event.preventDefault();
@@ -124,6 +132,7 @@ function Navbar() {
     }
   };
 
+  // Gestionar navegació des del menú d'usuari i assegurar-se que es desplaça a la part superior
   const handleNavigateWithTop = (path) => {
     setIsMobileMenuOpen(false);
     setIsUserMenuOpen(false);
@@ -136,6 +145,7 @@ function Navbar() {
     navigate(path);
   };
 
+  // Gestionar tancament de sessió eliminant dades d'autenticació i redirigint a la pàgina de login
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -145,13 +155,16 @@ function Navbar() {
     navigate("/login");
   };
 
+  // Comprovar si una ruta és activa per aplicar estils d'enllaç actiu
   const isActive = (path) => location.pathname === path;
 
+  // Funcions auxiliars per obtenir el nom d'usuari i les inicials per l'avatar
   const getDisplayName = (fullName) => {
     if (!fullName) return "Usuari";
     return fullName.split(" ")[0];
   };
 
+  // Funció per obtenir les inicials d'un nom complet (fins a 2 lletres)
   const getInitials = (fullName) => {
     if (!fullName) return "U";
 
@@ -164,10 +177,12 @@ function Navbar() {
     return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
   };
 
+  // Obtenir el nom d'usuari per mostrar al menú d'usuari i les inicials per l'avatar
   const userName = getDisplayName(user?.nom);
   const userEmail = user?.email || "";
   const userRoleLabel = user?.rol === "admin" ? "Administrador" : "Usuari";
 
+  // Definir els enllaços de navegació basats en l'estat d'autenticació i el rol de l'usuari
   const navLinks = useMemo(() => {
     const links = [
       { to: "/", label: "Inici" },

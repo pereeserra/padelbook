@@ -7,6 +7,7 @@ function BackToTopButton() {
   useEffect(() => {
     let lastScrollY = window.scrollY;
 
+    // Funció per manejar l'esdeveniment de desplaçament
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
 
@@ -23,6 +24,7 @@ function BackToTopButton() {
     };
   }, []);
 
+  // Funció per desplaçar-se a la part superior de manera suau
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,

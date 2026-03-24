@@ -3,6 +3,7 @@ import "./AvailabilitySummary.css";
 function AvailabilitySummary({ availability }) {
   if (!availability.length) return null;
 
+  // Agrupa les franges per pista i calcula els totals, lliures i ocupades
   const groupedCourts = availability.reduce((acc, slot) => {
     const courtName = slot.nom_pista;
 
@@ -26,11 +27,13 @@ function AvailabilitySummary({ availability }) {
     return acc;
   }, {});
 
+  // Funció per extreure el número de la pista per ordenar correctament
   const extractCourtNumber = (name) => {
     const match = name.match(/\d+/);
     return match ? Number(match[0]) : Number.MAX_SAFE_INTEGER;
   };
 
+  // Ordena les pistes primer per número i després alfabèticament
   const courts = Object.values(groupedCourts).sort((a, b) => {
     const numberA = extractCourtNumber(a.name);
     const numberB = extractCourtNumber(b.name);

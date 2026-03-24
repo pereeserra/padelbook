@@ -10,10 +10,12 @@ import padelCourtMockup from "../../assets/images/padelcourt.png";
 function HomePage() {
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 900);
 
+  // Comprovem si l'usuari està loguejat només una vegada al carregar la pàgina
   const isLoggedIn = useMemo(() => {
     return Boolean(localStorage.getItem("token"));
   }, []);
 
+  // Afegim un event listener per actualitzar l'estat quan la finestra es redimensiona
   useEffect(() => {
     const handleResize = () => {
       setIsMobileView(window.innerWidth <= 900);

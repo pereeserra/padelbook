@@ -18,6 +18,7 @@ function CreateCourtForm({
   const cleanName = (newCourt.nom_pista || "").trim();
   const cleanDescription = (newCourt.descripcio || "").trim();
 
+  // Resum de les dades clau per mostrar a la part superior del formulari i reforçar la informació principal de la pista
   const formSummary = [
     {
       label: "Tipus",

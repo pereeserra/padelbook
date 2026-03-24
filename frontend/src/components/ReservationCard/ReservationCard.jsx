@@ -14,6 +14,7 @@ function ReservationCard({
   const isActive = reservation.estat === "activa";
   const cardRef = useRef(null);
 
+  // Funció per fer scroll suau cap a la targeta quan s'està confirmant la cancel·lació
   const slowScrollToCard = () => {
     if (!cardRef.current) return;
 
@@ -29,6 +30,7 @@ function ReservationCard({
     });
   };
 
+  // Quan comenci la confirmació de cancel·lació, fem scroll suau cap a la targeta després
   useEffect(() => {
     if (!confirmingCancel) return;
 
@@ -39,6 +41,7 @@ function ReservationCard({
     return () => clearTimeout(timeout);
   }, [confirmingCancel]);
 
+  // Formatejar la data de reserva en un format llegible en català
   const formattedDate = new Date(reservation.data_reserva).toLocaleDateString(
     "ca-ES",
     {
@@ -49,6 +52,7 @@ function ReservationCard({
     }
   );
 
+  // Construir la classe CSS de la targeta en funció de l'estat i les accions en curs
   const cardClass = [
     "res-card",
     confirmingCancel ? "res-card--confirming" : "",
@@ -58,6 +62,7 @@ function ReservationCard({
     .filter(Boolean)
     .join(" ");
 
+  // Determinar el preu a mostrar, prioritzant preu_total sobre preu, i formatar-lo correctament
   const reservationPrice =
     reservation.preu_total != null
       ? `${Number(reservation.preu_total).toFixed(2)} €`

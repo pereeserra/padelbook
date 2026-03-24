@@ -4,6 +4,8 @@ import { useLocation } from "react-router-dom";
 function ScrollToTop() {
   const { pathname } = useLocation();
 
+  // Este efecto se ejecuta cada vez que cambia la ruta (pathname). 
+  // Utiliza requestAnimationFrame para asegurarse de que el scroll se restablezca después de que la nueva página se haya renderizado.
   useEffect(() => {
     const resetScroll = () => {
       window.scrollTo({

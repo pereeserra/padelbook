@@ -5,6 +5,7 @@ function AdminReservationsTable({ reservations = [] }) {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("totes");
 
+  // Normalitza i ordena les reserves per data i hora de forma descendente
   const normalizedReservations = useMemo(() => {
     return [...reservations].sort((a, b) => {
       const dateA = new Date(
@@ -18,18 +19,21 @@ function AdminReservationsTable({ reservations = [] }) {
   }, [reservations]);
 
 
+// Funcions auxiliars per formatar i etiquetar dades de manera consistent
  function paymentMethodLabel(method) {
   if (method === "online_simulat") return "Pagament online";
   if (method === "al_club") return "Pagament al club";
   return "No definit";
 }
 
+// Funció per convertir l'estat de pagament a una etiqueta llegible
 function paymentStatusLabel(status) {
   if (status === "pagat") return "Pagat";
   if (status === "pendent") return "Pendent";
   return "No definit";
 }
 
+// Funció per formatar la data en un format llegible i consistent
 function formatDate(date) {
   if (!date) return "-";
 
@@ -45,11 +49,13 @@ function formatDate(date) {
   });
 }
 
+// Funció per formatar l'hora en format HH:mm, assumint que el valor d'entrada és una cadena "HH:mm:ss" o similar
 function formatTime(time) {
   if (!time) return "-";
   return String(time).slice(0, 5);
 }
 
+  // Filtra les reserves basant-se en la cerca i l'estat seleccionat, combinant múltiples camps per una cerca més completa
   const filteredReservations = useMemo(() => {
     const query = search.trim().toLowerCase();
 
@@ -107,6 +113,7 @@ function formatTime(time) {
     });
   }, [normalizedReservations, search, statusFilter]);
 
+  // Comptabilitza el nombre de reserves actives i cancel·lades per mostrar un resum a l'usuari
   const activeCount = useMemo(() => {
     return reservations.filter((reservation) => {
       const status = (reservation.estat || "").toLowerCase();
@@ -114,6 +121,7 @@ function formatTime(time) {
     }).length;
   }, [reservations]);
 
+  // Comptabilitza el nombre de reserves cancel·lades basant-se en l'estat de la reserva, assumint que qualsevol estat que no sigui "activa" o "active" es considera cancel·lat
   const cancelledCount = useMemo(() => {
     return reservations.filter((reservation) => {
       const status = (reservation.estat || "").toLowerCase();
@@ -121,11 +129,13 @@ function formatTime(time) {
     }).length;
   }, [reservations]);
 
+  // Funció per restablir els filtres a les seves condicions inicials, facilitant a l'usuari tornar a la vista completa de les reserves
   const clearFilters = () => {
     setSearch("");
     setStatusFilter("totes");
   };
 
+  // Funcions per determinar les classes CSS basades en els valors dels camps, permetent una estilització condicional que millora la llegibilitat i l'impacte visual de la informació mostrada
   const getReservationStatusClass = (value) => {
     const normalized = (value || "").toLowerCase();
     return normalized === "activa" || normalized === "active"
@@ -133,6 +143,7 @@ function formatTime(time) {
       : "admin-res__pill admin-res__pill--cancelled";
   };
 
+  // Funció per determinar la classe CSS de l'estat de pagament, destacant visualment les reserves pagades i pendents
   const getPaymentStatusClass = (value) => {
     const normalized = (value || "").toLowerCase();
     return normalized === "pagat"
@@ -140,6 +151,7 @@ function formatTime(time) {
       : "admin-res__pill admin-res__pill--pending";
   };
 
+  // Funció per determinar la classe CSS de la forma de pagament, diferenciant visualment entre pagaments online i al club
   const getPaymentMethodClass = (value) => {
     const normalized = (value || "").toLowerCase();
     return normalized === "online_simulat"
@@ -147,6 +159,7 @@ function formatTime(time) {
       : "admin-res__pill admin-res__pill--neutral";
   };
 
+  // Si no hi ha reserves, mostra un estat buit amb un missatge informatiu i una icona, animant a l'usuari a esperar que arribin les reserves o a revisar la configuració del sistema
   if (!reservations.length) {
     return (
       <div className="admin-res__empty-state">

@@ -9,6 +9,7 @@ function AvailabilityTable({
 }) {
   if (!availability.length) return null;
 
+  // Agrupar les franges per pista
   const groupedCourts = availability.reduce((acc, slot) => {
     const courtName = slot.nom_pista;
 
@@ -20,6 +21,7 @@ function AvailabilityTable({
     return acc;
   }, {});
 
+  // Funció per determinar si una franja és la que s'ha reservat recentment
   const isRecentlyReserved = (slot) => {
     if (!recentlyReservedSlot) return false;
 
@@ -30,6 +32,7 @@ function AvailabilityTable({
     );
   };
 
+  // Funció per renderitzar cada fila de franja
   const renderSlotRow = (slot, index) => {
     const justReserved = isRecentlyReserved(slot);
     const slotKey = `${slot.court_id}-${slot.time_slot_id}`;

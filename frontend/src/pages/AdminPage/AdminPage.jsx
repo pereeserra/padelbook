@@ -63,6 +63,7 @@ function AdminPage() {
   const [showAllTimeslotStats, setShowAllTimeslotStats] = useState(false);
   const [showAllDateStats, setShowAllDateStats] = useState(false);
 
+  // Detectar canvis en la mida de la finestra per adaptar la vista
   useEffect(() => {
     const handleResize = () => {
       setIsMobileView(window.innerWidth <= 768);
@@ -72,6 +73,7 @@ function AdminPage() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Funció per desplaçar-se a una targeta de pista específica i destacar-la temporalment
   const scrollToCourtCard = (courtId) => {
     const card = document.getElementById(`court-${courtId}`);
     if (!card) return;
@@ -84,6 +86,7 @@ function AdminPage() {
     }, 2500);
   };
 
+  // Funció per normalitzar les dades de visió general del dashboard, amb suport per diferents formats de resposta
   const normalizeOverview = (data, reservationsSource = [], courtsSource = []) => {
     return {
       totalReservations:
@@ -135,6 +138,7 @@ function AdminPage() {
     };
   };
 
+  // Funcions per normalitzar les dades de les estadístiques per pista, franja i data, amb suport per diferents formats de resposta
   const normalizeCourtStat = (item, index) => ({
     id: item?.id ?? item?.court_id ?? item?.pista_id ?? `court-${index}`,
     label:
@@ -155,6 +159,7 @@ function AdminPage() {
       ) || 0,
   });
 
+  // Normalització de les estadístiques per franja horària, amb suport per diferents formats de resposta
   const normalizeTimeslotStat = (item, index) => ({
     id:
       item?.id ??
@@ -180,6 +185,7 @@ function AdminPage() {
       ) || 0,
   });
 
+  // Normalització de les estadístiques per data, amb suport per diferents formats de resposta
   const normalizeDateStat = (item, index) => ({
     id: item?.id ?? item?.date ?? item?.data ?? `date-${index}`,
     label: item?.data ?? item?.date ?? item?.label ?? `Data ${index + 1}`,
@@ -194,6 +200,7 @@ function AdminPage() {
       ) || 0,
   });
 
+  // Funció per normalitzar les entrades del registre d'activitat recent, amb suport per diferents formats de resposta i estructures de dades
   const normalizeLogItem = (log, index) => ({
     id: log?.id ?? `log-${index}`,
     action:
@@ -224,6 +231,7 @@ function AdminPage() {
       null,
   });
 
+  // Funció per mostrar missatges de feedback a l'usuari, amb opcions de tipus i accions associades, i desplaçament automàtic al missatge
   const showFeedbackMessage = (message, type = "success", action = null) => {
     setFeedback(message);
     setFeedbackType(type);
@@ -239,6 +247,7 @@ function AdminPage() {
     }, 60);
   };
 
+  // Funció per carregar les dades del dashboard administratiu, incloent estadístiques i registre d'activitat recent, amb suport per diferents formats de resposta i opcions de dades personalitzades
   const fetchDashboardData = async (
     reservationsSource = reservations,
     courtsSource = courts
@@ -285,6 +294,7 @@ function AdminPage() {
     }
   };
 
+  // Funció per carregar les dades d'administració inicials, incloent reserves i pistes, amb suport per diferents formats de resposta i normalització de dades
   const fetchAdminData = async () => {
     try {
       setLoading(true);
@@ -316,6 +326,7 @@ function AdminPage() {
     }
   };
 
+  // Funció per refrescar totes les dades d'administració i actualitzar el dashboard, utilitzada després de canvis en pistes o reserves per garantir que les dades mostrades estiguin actualitzades i consistents
   const refreshAllAdminData = async () => {
     const baseData = await fetchAdminData();
 
@@ -328,17 +339,20 @@ function AdminPage() {
     await fetchDashboardData(safeReservations, safeCourts);
   };
 
+  // Funció per reiniciar el formulari de creació/edició de pista a l'estat inicial, netejant les dades i sortint del mode d'edició si s'estava editant una pista
   const resetCourtForm = () => {
     setNewCourt(emptyCourt);
     setEditingCourtId(null);
   };
 
+  // Funció per reiniciar els filtres de cerca i filtrat de pistes a l'estat inicial, mostrant totes les pistes sense cap filtre aplicat
   const resetCourtFilters = () => {
     setCourtSearch("");
     setCourtStatusFilter("totes");
     setCourtTypeFilter("tots");
   };
 
+  // Funció per gestionar la creació o actualització d'una pista, enviant les dades al backend i actualitzant la vista en conseqüència, amb suport per diferents formats de resposta i missatges de feedback contextuals
   const handleCreateOrUpdateCourt = async (e) => {
     e.preventDefault();
 
@@ -409,6 +423,7 @@ function AdminPage() {
     }
   };
 
+  // Funció per iniciar el procés d'edició d'una pista, carregant les dades de la pista al formulari i desplaçant-se a la secció d'edició per facilitar la modificació, amb suport per diferents formats de dades de pista
   const handleStartEditCourt = (court) => {
     setActiveTab("courts");
     setEditingCourtId(court.id);
@@ -427,6 +442,7 @@ function AdminPage() {
     }, 80);
   };
 
+  // Funció per gestionar l'eliminació d'una pista, enviant la sol·licitud al backend i actualitzant la vista en conseqüència, amb suport per diferents formats de resposta i missatges de feedback contextuals
   const handleDeleteCourt = async (courtId) => {
     try {
       setDeletingCourtId(courtId);
@@ -454,18 +470,22 @@ function AdminPage() {
     }
   };
 
+  // Carregar les dades d'administració inicials en muntar el component i configurar el dashboard, assegurant que les dades mostrades estiguin actualitzades i consistents des del principi
   useEffect(() => {
     refreshAllAdminData();
   }, []);
 
+  // Memoritzar les pistes disponibles i cobertes per optimitzar el rendiment en la renderització i càlculs relacionats, evitant càlculs innecessaris en cada renderitzat
   const availableCourts = useMemo(() => {
     return courts.filter((court) => court.estat === "disponible");
   }, [courts]);
 
+  // Memoritzar les pistes cobertes per optimitzar el rendiment en la renderització i càlculs relacionats, evitant càlculs innecessaris en cada renderitzat
   const coveredCourts = useMemo(() => {
     return courts.filter((court) => Number(court.coberta) === 1);
   }, [courts]);
 
+  // Memoritzar el nombre de reserves actives i cancel·lades per optimitzar el rendiment en la renderització i càlculs relacionats, evitant càlculs innecessaris en cada renderitzat i assegurant que els valors estiguin actualitzats quan les dades de reserves canviïn
   const activeReservationsCount = useMemo(() => {
     return reservations.filter((reservation) => {
       const status = (reservation.estat || "").toLowerCase();
@@ -473,6 +493,7 @@ function AdminPage() {
     }).length;
   }, [reservations]);
 
+  // Memoritzar el nombre de reserves cancel·lades per optimitzar el rendiment en la renderització i càlculs relacionats, evitant càlculs innecessaris en cada renderitzat i assegurant que els valors estiguin actualitzats quan les dades de reserves canviïn
   const cancelledReservationsCount = useMemo(() => {
     return reservations.filter((reservation) => {
       const status = (reservation.estat || "").toLowerCase();
@@ -480,58 +501,70 @@ function AdminPage() {
     }).length;
   }, [reservations]);
 
+  // Memoritzar el valor màxim de les estadístiques per pista, franja i data per optimitzar la renderització dels gràfics i assegurar que els valors estiguin actualitzats quan les dades de les estadístiques canviïn, evitant càlculs innecessaris en cada renderitzat
   const topCourtValue = useMemo(() => {
     if (!statsByCourt.length) return 0;
     return Math.max(...statsByCourt.map((item) => item.value), 0);
   }, [statsByCourt]);
 
+  // Memoritzar el valor màxim de les estadístiques per franja horària per optimitzar la renderització dels gràfics i assegurar que els valors estiguin actualitzats quan les dades de les estadístiques canviïn, evitant càlculs innecessaris en cada renderitzat
   const topTimeslotValue = useMemo(() => {
     if (!statsByTimeslot.length) return 0;
     return Math.max(...statsByTimeslot.map((item) => item.value), 0);
   }, [statsByTimeslot]);
 
+  // Memoritzar el valor màxim de les estadístiques per data per optimitzar la renderització dels gràfics i assegurar que els valors estiguin actualitzats quan les dades de les estadístiques canviïn, evitant càlculs innecessaris en cada renderitzat
   const topDateValue = useMemo(() => {
     if (!statsByDate.length) return 0;
     return Math.max(...statsByDate.map((item) => item.value), 0);
   }, [statsByDate]);
 
+  // Memoritzar les estadístiques més recents per data per mostrar-les de manera destacada al dashboard, assegurant que els valors estiguin actualitzats quan les dades de les estadístiques canviïn i evitant càlculs innecessaris en cada renderitzat
   const recentDateStats = useMemo(() => {
     return statsByDate.slice(0, 5);
   }, [statsByDate]);
 
+  // Memoritzar la pista, franja horària i data amb més reserves per mostrar-les com a insights clau al dashboard, assegurant que els valors estiguin actualitzats quan les dades de les estadístiques canviïn i evitant càlculs innecessaris en cada renderitzat
   const topCourt = useMemo(() => {
     if (!statsByCourt.length) return null;
     return [...statsByCourt].sort((a, b) => b.value - a.value)[0];
   }, [statsByCourt]);
 
+  // Memoritzar la franja horària amb més reserves per mostrar-la com a insight clau al dashboard, assegurant que els valors estiguin actualitzats quan les dades de les estadístiques canviïn i evitant càlculs innecessaris en cada renderitzat
   const topTimeslot = useMemo(() => {
     if (!statsByTimeslot.length) return null;
     return [...statsByTimeslot].sort((a, b) => b.value - a.value)[0];
   }, [statsByTimeslot]);
 
+  // Memoritzar el dia amb més reserves per mostrar-lo com a insight clau al dashboard, assegurant que els valors estiguin actualitzats quan les dades de les estadístiques canviïn i evitant càlculs innecessaris en cada renderitzat
   const busiestDate = useMemo(() => {
     if (!statsByDate.length) return null;
     return [...statsByDate].sort((a, b) => b.value - a.value)[0];
   }, [statsByDate]);
 
+  // Memoritzar les estadístiques per pista, franja horària i data que seran visibles al dashboard segons si s'ha seleccionat mostrar totes les dades o només les més recents, assegurant que els valors estiguin actualitzats quan les dades de les estadístiques o les opcions de visualització canviïn i evitant càlculs innecessaris en cada renderitzat
   const visibleCourtStats = useMemo(() => {
     return showAllCourtStats ? statsByCourt : statsByCourt.slice(0, 5);
   }, [statsByCourt, showAllCourtStats]);
 
+  // Memoritzar les estadístiques per franja horària que seran visibles al dashboard segons si s'ha seleccionat mostrar totes les dades o només les més recents, assegurant que els valors estiguin actualitzats quan les dades de les estadístiques o les opcions de visualització canviïn i evitant càlculs innecessaris en cada renderitzat
   const visibleTimeslotStats = useMemo(() => {
     return showAllTimeslotStats
       ? statsByTimeslot
       : statsByTimeslot.slice(0, 5);
   }, [statsByTimeslot, showAllTimeslotStats]);
 
+  // Memoritzar les estadístiques per data que seran visibles al dashboard segons si s'ha seleccionat mostrar totes les dades o només les més recents, assegurant que els valors estiguin actualitzats quan les dades de les estadístiques o les opcions de visualització canviïn i evitant càlculs innecessaris en cada renderitzat
   const visibleDateStats = useMemo(() => {
     return showAllDateStats ? recentDateStats : recentDateStats.slice(0, 5);
   }, [recentDateStats, showAllDateStats]);
 
+  // Memoritzar les entrades del registre d'activitat recent que seran visibles al dashboard segons si s'ha seleccionat mostrar totes les dades o només les més recents, assegurant que els valors estiguin actualitzats quan les dades del registre o les opcions de visualització canviïn i evitant càlculs innecessaris en cada renderitzat
   const visibleAdminLogs = useMemo(() => {
     return showAllActivity ? adminLogs : adminLogs.slice(0, 3);
   }, [adminLogs, showAllActivity]);
 
+  // Memoritzar les pistes filtrades segons els criteris de cerca i filtrat seleccionats, assegurant que els valors estiguin actualitzats quan les dades de les pistes o els criteris de filtrat canviïn i evitant càlculs innecessaris en cada renderitzat
   const filteredCourts = useMemo(() => {
     const query = courtSearch.trim().toLowerCase();
 
@@ -553,14 +586,17 @@ function AdminPage() {
     });
   }, [courts, courtSearch, courtStatusFilter, courtTypeFilter]);
 
+  // Memoritzar el nombre de pistes disponibles després d'aplicar els filtres de cerca i filtrat, assegurant que els valors estiguin actualitzats quan les dades de les pistes o els criteris de filtrat canviïn i evitant càlculs innecessaris en cada renderitzat
   const filteredAvailableCourtsCount = useMemo(() => {
     return filteredCourts.filter((court) => court.estat === "disponible").length;
   }, [filteredCourts]);
 
+  // Memoritzar el nombre de pistes cobertes després d'aplicar els filtres de cerca i filtrat, assegurant que els valors estiguin actualitzats quan les dades de les pistes o els criteris de filtrat canviïn i evitant càlculs innecessaris en cada renderitzat
   const filteredMaintenanceCourtsCount = useMemo(() => {
     return filteredCourts.filter((court) => court.estat === "manteniment").length;
   }, [filteredCourts]);
 
+  // Funció per formatar les dates i hores de manera llegible al dashboard, amb suport per diferents formats d'entrada i gestió de valors no vàlids o absents
   const formatDateTime = (value) => {
     if (!value) return "Data no disponible";
 
@@ -573,6 +609,7 @@ function AdminPage() {
     });
   };
 
+  // Funció per formatar les accions del registre d'activitat recent de manera més amigable i llegible al dashboard, amb suport per diferents formats d'entrada i gestió de valors no reconeguts
   const formatActionLabel = (action) => {
     const actionMap = {
       CREATE_COURT: "Crear pista",
@@ -584,6 +621,7 @@ function AdminPage() {
     return actionMap[action] || action?.replaceAll("_", " ") || "Acció";
   };
 
+  // Definir les targetes de resum del dashboard amb les dades normalitzades i calculades, assegurant que els valors mostrats estiguin actualitzats i siguin consistents amb les dades carregades, i proporcionant icones i classes d'estil per a una millor presentació visual
   const dashboardCards = [
     {
       label: "Reserves totals",
@@ -623,6 +661,7 @@ function AdminPage() {
     },
   ];
 
+  // Definir els insights clau del dashboard basats en les estadístiques més recents, assegurant que els valors mostrats estiguin actualitzats i siguin consistents amb les dades carregades, i proporcionant missatges per a casos sense dades disponibles
   const quickInsights = [
     {
       label: "Pista amb més reserves",
@@ -642,6 +681,7 @@ function AdminPage() {
     },
   ];
 
+  // Mostrar un spinner de càrrega mentre es carreguen les dades d'administració inicials, assegurant que l'usuari tingui feedback visual sobre l'estat de càrrega i evitant mostrar una pantalla buida o incompleta
   if (loading && !feedback) {
     return (
       <LoadingSpinner

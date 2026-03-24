@@ -20,6 +20,7 @@ function CourtCard({
   const shortDescription = (court.descripcio || "").trim();
   const fallbackDescription = "Sense descripció definida.";
 
+  // Construir la classe del card amb condicions per estils especials
   const cardClass = [
     "court-card",
     confirmingDelete ? "court-card--confirming" : "",

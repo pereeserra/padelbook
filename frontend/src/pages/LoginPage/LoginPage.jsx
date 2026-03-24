@@ -20,6 +20,7 @@ function LoginPage() {
   const turnstileContainerRef = useRef(null);
   const turnstileWidgetIdRef = useRef(null);
 
+  // Detectar cambios en el tamaño de la ventana para adaptar el diseño
   useEffect(() => {
     const handleResize = () => {
       setIsMobileView(window.innerWidth <= 900);
@@ -29,6 +30,7 @@ function LoginPage() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Hacer scroll suave hacia el mensaje de error cuando se actualice el estado de error
   useEffect(() => {
     if (!error || !feedbackRef.current) return;
 
@@ -41,10 +43,12 @@ function LoginPage() {
     });
   }, [error]);
 
+  // Detectar el estado de Caps Lock para mostrar una advertencia al usuario
   const handleCapsLock = (e) => {
     setCapsLock(e.getModifierState("CapsLock"));
   };
 
+  // Función para resetear el widget de Turnstile en caso de error o al desmontar el componente
   const resetTurnstile = useCallback(() => {
     if (
       typeof window !== "undefined" &&
@@ -57,6 +61,7 @@ function LoginPage() {
     setTurnstileToken("");
   }, []);
 
+  // Inicializar el widget de Turnstile al montar el componente y limpiar al desmontar
   useEffect(() => {
     const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
 
@@ -130,6 +135,7 @@ function LoginPage() {
     };
   }, []);
 
+  // Función para manejar el envío del formulario de login
   const handleLogin = async (e) => {
     e.preventDefault();
 
