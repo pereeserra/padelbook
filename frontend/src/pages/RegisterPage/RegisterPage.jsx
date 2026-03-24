@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 import { normalizeSpaces } from "../../utils/helpers";
@@ -7,6 +7,9 @@ import "./RegisterPage.css";
 function RegisterPage() {
   const navigate = useNavigate();
   const feedbackRef = useRef(null);
+
+  const turnstileContainerRef = useRef(null);
+  const turnstileWidgetIdRef = useRef(null);
 
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 900);
 
@@ -20,6 +23,9 @@ function RegisterPage() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [capsLock, setCapsLock] = useState(false);
+
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileReady, setTurnstileReady] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -60,6 +66,91 @@ function RegisterPage() {
       : completedPasswordChecks <= 4
       ? "Mitjana"
       : "Alta";
+
+  const resetTurnstile = useCallback(() => {
+    if (
+      typeof window !== "undefined" &&
+      window.turnstile &&
+      turnstileWidgetIdRef.current !== null
+    ) {
+      window.turnstile.reset(turnstileWidgetIdRef.current);
+    }
+
+    setTurnstileToken("");
+  }, []);
+
+  useEffect(() => {
+    const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
+
+    if (!siteKey || !turnstileContainerRef.current) return;
+
+    let attempts = 0;
+    let intervalId = null;
+
+    const renderWidget = () => {
+      if (
+        typeof window === "undefined" ||
+        !window.turnstile ||
+        turnstileWidgetIdRef.current !== null
+      ) {
+        return;
+      }
+
+      turnstileWidgetIdRef.current = window.turnstile.render(
+        turnstileContainerRef.current,
+        {
+          sitekey: siteKey,
+          theme: "light",
+          callback: (token) => {
+            setTurnstileToken(token || "");
+            setError("");
+          },
+          "expired-callback": () => {
+            setTurnstileToken("");
+          },
+          "error-callback": () => {
+            setTurnstileToken("");
+            setError("No s'ha pogut validar el captcha. Torna-ho a provar.");
+          },
+        }
+      );
+
+      setTurnstileReady(true);
+    };
+
+    if (window.turnstile) {
+      renderWidget();
+      return;
+    }
+
+    intervalId = window.setInterval(() => {
+      attempts += 1;
+
+      if (window.turnstile) {
+        renderWidget();
+        window.clearInterval(intervalId);
+      }
+
+      if (attempts > 50) {
+        window.clearInterval(intervalId);
+      }
+    }, 200);
+
+    return () => {
+      if (intervalId) {
+        window.clearInterval(intervalId);
+      }
+
+      if (
+        typeof window !== "undefined" &&
+        window.turnstile &&
+        turnstileWidgetIdRef.current !== null
+      ) {
+        window.turnstile.remove(turnstileWidgetIdRef.current);
+        turnstileWidgetIdRef.current = null;
+      }
+    };
+  }, []);
 
   const validateForm = () => {
     const cleanNom = normalizeSpaces(nom);
@@ -107,6 +198,10 @@ function RegisterPage() {
       return "Les contrasenyes no coincideixen.";
     }
 
+    if (!turnstileToken) {
+      return "Has de completar la verificació de seguretat.";
+    }
+
     return "";
   };
 
@@ -130,6 +225,7 @@ function RegisterPage() {
         nom: cleanNom,
         email: cleanEmail,
         password,
+        turnstileToken,
       });
 
       navigate("/login");
@@ -156,9 +252,17 @@ function RegisterPage() {
         normalizedError.includes("usuari ja existeix")
       ) {
         setError("Aquest correu electrònic ja està registrat.");
+      } else if (
+        normalizedError.includes("captcha") ||
+        normalizedError.includes("turnstile") ||
+        normalizedError.includes("token")
+      ) {
+        setError("La verificació de seguretat no és vàlida o ha caducat. Torna-ho a provar.");
       } else {
         setError("No s'ha pogut crear el compte. Revisa les dades o prova amb un altre correu.");
       }
+
+      resetTurnstile();
     } finally {
       setLoading(false);
     }
@@ -395,10 +499,24 @@ function RegisterPage() {
               </div>
             </div>
 
+            <div className="register__field">
+              <label className="register__label">Verificació de seguretat</label>
+
+              <div className="register__turnstile-box">
+                <div ref={turnstileContainerRef} />
+              </div>
+
+              {!turnstileReady && (
+                <span className="register__turnstile-help">
+                  Carregant verificació...
+                </span>
+              )}
+            </div>
+
             <button
               type="submit"
               className="btn btn-primary btn-full"
-              disabled={loading}
+              disabled={loading || !turnstileToken}
             >
               {loading ? "Creant compte..." : "Crear compte"}
             </button>
