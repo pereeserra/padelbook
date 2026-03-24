@@ -1,14 +1,12 @@
 const jwt = require("jsonwebtoken");
-// Middleware para verificar el token JWT en las rutas protegidas
+// Middleware d'autenticació per protegir rutes
 module.exports = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
-  if (!authHeader) {
-    return res.status(401).json({ error: "Token no proporcionat" });
-  }
-
-  if (!authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Format de token invàlid" });
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({
+      error: "No autoritzat",
+    });
   }
 
   const token = authHeader.split(" ")[1];
@@ -18,6 +16,8 @@ module.exports = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (error) {
-    return res.status(401).json({ error: "Token invàlid" });
+    return res.status(401).json({
+      error: "No autoritzat",
+    });
   }
 };

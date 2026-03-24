@@ -34,7 +34,7 @@ const registerLimiter = rateLimit({
   },
 });
 
-// Middleware para permitir solicitudes desde el frontend
+// Configuració de CORS per permetre només el frontend de Vite
 const allowedOrigins = [
   "http://localhost:5173"
 ];
