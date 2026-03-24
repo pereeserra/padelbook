@@ -17,6 +17,39 @@ function AdminReservationsTable({ reservations = [] }) {
     });
   }, [reservations]);
 
+
+ function paymentMethodLabel(method) {
+  if (method === "online_simulat") return "Pagament online";
+  if (method === "al_club") return "Pagament al club";
+  return "No definit";
+}
+
+function paymentStatusLabel(status) {
+  if (status === "pagat") return "Pagat";
+  if (status === "pendent") return "Pendent";
+  return "No definit";
+}
+
+function formatDate(date) {
+  if (!date) return "-";
+
+  const parsedDate = new Date(date);
+
+  if (Number.isNaN(parsedDate.getTime())) return "-";
+
+  return parsedDate.toLocaleDateString("ca-ES", {
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+function formatTime(time) {
+  if (!time) return "-";
+  return String(time).slice(0, 5);
+}
+
   const filteredReservations = useMemo(() => {
     const query = search.trim().toLowerCase();
 
@@ -26,13 +59,46 @@ function AdminReservationsTable({ reservations = [] }) {
       const courtName = (reservation.nom_pista || "").toLowerCase();
       const reservationCode = (reservation.codi_reserva || "").toLowerCase();
       const status = (reservation.estat || "").toLowerCase();
+      const paymentStatus = (reservation.estat_pagament || "").toLowerCase();
+      const paymentMethod = (reservation.metode_pagament || "").toLowerCase();
+      const formattedPaymentMethod = paymentMethodLabel(
+        reservation.metode_pagament
+      ).toLowerCase();
+      const formattedPaymentStatus = paymentStatusLabel(
+        reservation.estat_pagament
+      ).toLowerCase();
+      const formattedDate = formatDate(reservation.data_reserva).toLowerCase();
+      const startTime = formatTime(reservation.hora_inici).toLowerCase();
+      const endTime = formatTime(reservation.hora_fi).toLowerCase();
+      const fullTimeRange = `${startTime} - ${endTime}`.toLowerCase();
 
-      const matchesSearch =
-        !query ||
-        userName.includes(query) ||
-        email.includes(query) ||
-        courtName.includes(query) ||
-        reservationCode.includes(query);
+      const reservationPrice =
+        reservation.preu_total != null
+          ? `${Number(reservation.preu_total).toFixed(2)} €`
+          : reservation.preu != null
+            ? `${Number(reservation.preu).toFixed(2)} €`
+            : "-";
+
+      const priceText = reservationPrice.toLowerCase();
+
+      const searchableText = [
+        userName,
+        email,
+        courtName,
+        reservationCode,
+        status,
+        paymentStatus,
+        paymentMethod,
+        formattedPaymentMethod,
+        formattedPaymentStatus,
+        formattedDate,
+        startTime,
+        endTime,
+        fullTimeRange,
+        priceText,
+      ].join(" ");
+
+      const matchesSearch = !query || searchableText.includes(query);
 
       const matchesStatus =
         statusFilter === "totes" || status === statusFilter;
@@ -58,39 +124,6 @@ function AdminReservationsTable({ reservations = [] }) {
   const clearFilters = () => {
     setSearch("");
     setStatusFilter("totes");
-  };
-
-  const formatDate = (value) => {
-    if (!value) return "Data no disponible";
-
-    const parsed = new Date(value);
-    if (Number.isNaN(parsed.getTime())) return value;
-
-    return parsed.toLocaleDateString("ca-ES", {
-      weekday: "short",
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-  };
-
-  const formatTime = (value) => {
-    if (!value) return "--:--";
-    return String(value).slice(0, 5);
-  };
-
-  const paymentMethodLabel = (value) => {
-    if (!value) return "No indicat";
-    if (value === "online_simulat") return "Online";
-    if (value === "al_club") return "Al club";
-    return value.replaceAll("_", " ");
-  };
-
-  const paymentStatusLabel = (value) => {
-    if (!value) return "No indicat";
-    if (value === "pagat") return "Pagat";
-    if (value === "pendent") return "Pendent";
-    return value.replaceAll("_", " ");
   };
 
   const getReservationStatusClass = (value) => {
@@ -193,7 +226,7 @@ function AdminReservationsTable({ reservations = [] }) {
           >
             <option value="totes">Totes</option>
             <option value="activa">Actives</option>
-            <option value="cancelada">Cancel·lades</option>
+            <option value="cancel·lada">Cancel·lades</option>
           </select>
         </div>
 
