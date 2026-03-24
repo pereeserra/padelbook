@@ -57,8 +57,6 @@ function ProfilePage() {
     };
   }, []);
 
-
-
   const showFeedbackMessage = (message, type = "success") => {
     setFeedback(message);
     setFeedbackType(type);

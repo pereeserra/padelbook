@@ -1,7 +1,3 @@
-/**
- * Shared utility functions for the frontend.
- */
-
 export const scrollToElementWithOffset = (element, offset = 120) => {
   if (!element) return;
 
