@@ -35,7 +35,25 @@ const registerLimiter = rateLimit({
 });
 
 // Middleware para permitir solicitudes desde el frontend
-app.use(cors());
+const allowedOrigins = [
+  "http://localhost:5173"
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // permet requests sense origin (Postman, curl)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("Origen no permès per CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 // Endpoint de prueba para verificar que el servidor funciona
