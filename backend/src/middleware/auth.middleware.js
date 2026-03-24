@@ -1,9 +1,12 @@
 const jwt = require("jsonwebtoken");
-// Middleware d'autenticació per protegir rutes
+const { logSecurityEvent } = require("../utils/securityLogger");
+
 module.exports = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    logSecurityEvent(req, "AUTH_HEADER_INVALID");
+
     return res.status(401).json({
       error: "No autoritzat",
     });
@@ -16,6 +19,10 @@ module.exports = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (error) {
+    logSecurityEvent(req, "AUTH_TOKEN_INVALID", {
+      errorMessage: error.message,
+    });
+
     return res.status(401).json({
       error: "No autoritzat",
     });

@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 
 const { ok, message, fail } = require("../utils/response");
 const { verifyTurnstileToken } = require("../services/turnstile.service");
+const { logSecurityEvent } = require("../utils/securityLogger");
 
 const {
   normalizeEmail,
@@ -38,6 +39,11 @@ exports.register = async (req, res) => {
     });
 
     if (!turnstileResult.success) {
+      logSecurityEvent(req, "REGISTER_TURNSTILE_FAILED", {
+        email,
+        reason: turnstileResult.message,
+      });
+
       return fail(res, turnstileResult.message, 400);
     }
 
@@ -47,20 +53,34 @@ exports.register = async (req, res) => {
     );
 
     if (existingUsers.length > 0) {
+      logSecurityEvent(req, "REGISTER_DUPLICATE_EMAIL", {
+        email,
+      });
+
       return fail(res, "Aquest correu electrònic ja està registrat.", 409);
     }
 
     const hash = await bcrypt.hash(password, 10);
 
-    await db.query(
+    const [insertResult] = await db.query(
       "INSERT INTO users (nom, email, password_hash, rol) VALUES (?, ?, ?, 'usuari')",
       [nom, email, hash]
     );
+
+    logSecurityEvent(req, "REGISTER_SUCCESS", {
+      createdUserId: insertResult.insertId,
+      email,
+    });
 
     return message(res, "Usuari registrat correctament", 201);
 
   } catch (error) {
     console.error("Error al registre:", error);
+
+    logSecurityEvent(req, "REGISTER_SERVER_ERROR", {
+      email: typeof req.body?.email === "string" ? req.body.email.trim().toLowerCase() : null,
+      errorMessage: error.message,
+    });
 
     if (error.code === "ER_DUP_ENTRY") {
       return fail(res, "Aquest correu electrònic ja està registrat.", 409);
@@ -89,6 +109,11 @@ exports.login = async (req, res) => {
       });
 
       if (!turnstileResult.success) {
+        logSecurityEvent(req, "LOGIN_TURNSTILE_FAILED", {
+          email,
+          reason: turnstileResult.message,
+        });
+
         return fail(res, turnstileResult.message, 400);
       }
     }
@@ -99,6 +124,11 @@ exports.login = async (req, res) => {
     );
 
     if (rows.length === 0) {
+      logSecurityEvent(req, "LOGIN_FAILED", {
+        email,
+        reason: "invalid_credentials",
+      });
+
       return fail(res, "Credencials incorrectes", 401);
     }
 
@@ -107,6 +137,12 @@ exports.login = async (req, res) => {
     const match = await bcrypt.compare(password, user.password_hash);
 
     if (!match) {
+      logSecurityEvent(req, "LOGIN_FAILED", {
+        email,
+        attemptedUserId: user.id,
+        reason: "invalid_credentials",
+      });
+
       return fail(res, "Credencials incorrectes", 401);
     }
 
@@ -118,6 +154,12 @@ exports.login = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "2h" }
     );
+
+    logSecurityEvent(req, "LOGIN_SUCCESS", {
+      userId: user.id,
+      role: user.rol,
+      email,
+    });
 
     return message(res, "Login correcte", 200, {
       token,
@@ -132,8 +174,14 @@ exports.login = async (req, res) => {
 
   } catch (error) {
     console.error("Error al login:", error);
+
+    logSecurityEvent(req, "LOGIN_SERVER_ERROR", {
+      email: typeof req.body?.email === "string" ? req.body.email.trim().toLowerCase() : null,
+      errorMessage: error.message,
+    });
+
     return fail(res, "No s'ha pogut iniciar sessió", 500);
-  }
+    }
 };
 
 // OBTENIR DADES DE L'USUARI AUTENTICAT
