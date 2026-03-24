@@ -132,7 +132,7 @@ exports.login = async (req, res) => {
 
   } catch (error) {
     console.error("Error al login:", error);
-    return fail(res, "Error login");
+    return fail(res, "No s'ha pogut iniciar sessió", 500);
   }
 };
 
