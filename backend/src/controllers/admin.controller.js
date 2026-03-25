@@ -468,6 +468,151 @@ exports.getAllMaintenanceBlocks = async (req, res) => {
   }
 };
 
+// Controlador per actualitzar un bloqueig de manteniment
+exports.updateMaintenanceBlock = async (req, res) => {
+  try {
+    const blockId = parsePositiveInteger(req.params.id);
+    let { court_id, time_slot_id, data_bloqueig, motiu } = req.body;
+
+    if (!blockId) {
+      return res.status(400).json({
+        error: "ID de manteniment no vàlid",
+      });
+    }
+
+    court_id = parsePositiveInteger(court_id);
+    time_slot_id = parsePositiveInteger(time_slot_id);
+    data_bloqueig =
+      typeof data_bloqueig === "string" ? data_bloqueig.trim() : "";
+    motiu = normalizeText(motiu);
+
+    if (!court_id || !time_slot_id || !data_bloqueig || !motiu) {
+      return res.status(400).json({
+        error: "Falten dades obligatòries per actualitzar el bloqueig",
+      });
+    }
+
+    if (!Number.isInteger(court_id) || court_id <= 0) {
+      return res.status(400).json({
+        error: "La pista indicada no és vàlida",
+      });
+    }
+
+    if (!Number.isInteger(time_slot_id) || time_slot_id <= 0) {
+      return res.status(400).json({
+        error: "La franja horària indicada no és vàlida",
+      });
+    }
+
+    if (!isValidDateFormat(data_bloqueig)) {
+      return res.status(400).json({
+        error: "La data del bloqueig ha de tenir format YYYY-MM-DD",
+      });
+    }
+
+    if (data_bloqueig < getTodayString()) {
+      return res.status(400).json({
+        error: "No es poden guardar bloquejos en dates passades",
+      });
+    }
+
+    if (motiu.length < 5) {
+      return res.status(400).json({
+        error: "El motiu del manteniment ha de tenir almenys 5 caràcters",
+      });
+    }
+
+    if (motiu.length > 300) {
+      return res.status(400).json({
+        error: "El motiu del manteniment és massa llarg",
+      });
+    }
+
+    const [existingBlock] = await db.query(
+      "SELECT * FROM maintenance_blocks WHERE id = ?",
+      [blockId]
+    );
+
+    if (existingBlock.length === 0) {
+      return res.status(404).json({
+        error: "Manteniment no trobat",
+      });
+    }
+
+    const [court] = await db.query(
+      "SELECT * FROM courts WHERE id = ?",
+      [court_id]
+    );
+
+    if (court.length === 0) {
+      return res.status(404).json({
+        error: "Pista no trobada",
+      });
+    }
+
+    const [timeSlot] = await db.query(
+      "SELECT * FROM time_slots WHERE id = ?",
+      [time_slot_id]
+    );
+
+    if (timeSlot.length === 0) {
+      return res.status(404).json({
+        error: "Franja horària no trobada",
+      });
+    }
+
+    const [duplicated] = await db.query(
+      `SELECT id
+       FROM maintenance_blocks
+       WHERE court_id = ?
+         AND time_slot_id = ?
+         AND data_bloqueig = ?
+         AND id <> ?
+       LIMIT 1`,
+      [court_id, time_slot_id, data_bloqueig, blockId]
+    );
+
+    if (duplicated.length > 0) {
+      return res.status(400).json({
+        error: "Ja existeix un bloqueig per aquesta pista, franja i data",
+      });
+    }
+
+    await db.query(
+      `UPDATE maintenance_blocks
+       SET court_id = ?, time_slot_id = ?, data_bloqueig = ?, motiu = ?
+       WHERE id = ?`,
+      [court_id, time_slot_id, data_bloqueig, motiu, blockId]
+    );
+
+    const courtName = court[0].nom_pista;
+    const horaInici = timeSlot[0].hora_inici;
+    const horaFi = timeSlot[0].hora_fi;
+
+    await db.query(
+      `INSERT INTO admin_logs (admin_id, accio, entitat, entitat_id, descripcio)
+       VALUES (?, ?, ?, ?, ?)`,
+      [
+        req.user.id,
+        "UPDATE_MAINTENANCE",
+        "maintenance_block",
+        blockId,
+        `L'admin ha actualitzat el bloqueig de manteniment de la pista "${courtName}" per al dia ${data_bloqueig} de ${horaInici} a ${horaFi}. Motiu: ${motiu}`,
+      ]
+    );
+
+    return res.json({
+      message: "Bloqueig de manteniment actualitzat correctament",
+    });
+  } catch (error) {
+    console.error("Error updateMaintenanceBlock:", error);
+
+    return res.status(500).json({
+      error: "Error actualitzant el bloqueig de manteniment",
+    });
+  }
+};
+
 // Controlador per crear un bloqueig de manteniment
 exports.createMaintenanceBlock = async (req, res) => {
   try {
