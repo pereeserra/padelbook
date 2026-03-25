@@ -10,7 +10,13 @@ function AvailabilityPage() {
   const hiddenDateInputRef = useRef(null);
   const topFeedbackRef = useRef(null);
 
-  const getToday = () => new Date().toISOString().split("T")[0];
+  const getToday = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
 
   const [date, setDate] = useState(getToday());
   const [availability, setAvailability] = useState([]);
@@ -222,14 +228,19 @@ function AvailabilityPage() {
 
   // Memorització dels propers 7 dies per a la selecció ràpida, amb formatació de la data i identificació del dia actual
   const quickDays = useMemo(() => {
-    const start = new Date(getToday());
+    const start = new Date();
+    start.setHours(12, 0, 0, 0);
 
     return Array.from({ length: 7 }, (_, index) => {
       const current = new Date(start);
       current.setDate(start.getDate() + index);
 
+      const year = current.getFullYear();
+      const month = String(current.getMonth() + 1).padStart(2, "0");
+      const day = String(current.getDate()).padStart(2, "0");
+
       return {
-        iso: current.toISOString().split("T")[0],
+        iso: `${year}-${month}-${day}`,
         dayNumber: current.getDate(),
         weekday: formatShortWeekday(current),
         isToday: index === 0,
