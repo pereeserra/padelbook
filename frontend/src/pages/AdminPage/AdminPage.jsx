@@ -51,9 +51,19 @@ function AdminPage() {
   const [creatingCourt, setCreatingCourt] = useState(false);
   const [editingCourtId, setEditingCourtId] = useState(null);
   const [highlightedCourtId, setHighlightedCourtId] = useState(null);
+  const [updatingUserRoleId, setUpdatingUserRoleId] = useState(null);
   const [activeTab, setActiveTab] = useState("dashboard");
 
   const [newCourt, setNewCourt] = useState(emptyCourt);
+
+  const storedUser = useMemo(() => {
+    try {
+      const rawUser = localStorage.getItem("user");
+      return rawUser ? JSON.parse(rawUser) : null;
+    } catch (error) {
+      return null;
+    }
+  }, []);
 
   const [userSearch, setUserSearch] = useState("");
   const [userRoleFilter, setUserRoleFilter] = useState("tots");
@@ -66,6 +76,27 @@ function AdminPage() {
   const [showAllCourtStats, setShowAllCourtStats] = useState(false);
   const [showAllTimeslotStats, setShowAllTimeslotStats] = useState(false);
   const [showAllDateStats, setShowAllDateStats] = useState(false);
+
+  const handleToggleRole = async (user) => {
+    try {
+      const newRole = user.rol === "admin" ? "usuari" : "admin";
+
+      await api.put(`/admin/users/${user.id}/role`, {
+        rol: newRole,
+      });
+
+      showFeedbackMessage("Rol actualitzat correctament");
+
+      await refreshAllAdminData();
+    } catch (err) {
+      console.error(err);
+
+      const errorMsg =
+        err.response?.data?.error || "Error canviant rol";
+
+      showFeedbackMessage(errorMsg, "error");
+    }
+  };
 
   // Detectar canvis en la mida de la finestra per adaptar la vista
   useEffect(() => {
@@ -464,6 +495,40 @@ function AdminPage() {
     setTimeout(() => {
       scrollToElementWithOffset(editSectionRef.current, 90);
     }, 80);
+  };
+
+  const handleToggleUserRole = async (user) => {
+    try {
+      setUpdatingUserRoleId(user.id);
+
+      const currentRole = (user.rol || "").toLowerCase();
+      const nextRole = currentRole === "admin" ? "usuari" : "admin";
+
+      await api.put(`/admin/users/${user.id}/role`, {
+        rol: nextRole,
+      });
+
+      showFeedbackMessage(
+        `El rol de ${user.nom} s'ha actualitzat correctament a "${nextRole}".`,
+        "success"
+      );
+
+      await refreshAllAdminData();
+    } catch (err) {
+      console.error(err);
+
+      if (isSessionExpiredError(err)) {
+        return;
+      }
+
+      const backendError =
+        err.response?.data?.error ||
+        "No s'ha pogut actualitzar el rol de l'usuari.";
+
+      showFeedbackMessage(backendError, "error");
+    } finally {
+      setUpdatingUserRoleId(null);
+    }
   };
 
   // Funció per gestionar l'eliminació d'una pista, enviant la sol·licitud al backend i actualitzant la vista en conseqüència, amb suport per diferents formats de resposta i missatges de feedback contextuals
@@ -1468,28 +1533,54 @@ function AdminPage() {
                             <th>Email</th>
                             <th>Rol</th>
                             <th>Data de registre</th>
+                            <th>Acció</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {filteredUsers.map((user) => (
-                            <tr key={user.id}>
-                              <td>{user.id}</td>
-                              <td>{user.nom}</td>
-                              <td>{user.email}</td>
-                              <td>
-                                <span
-                                  className={`admin__role-badge ${
-                                    (user.rol || "").toLowerCase() === "admin"
-                                      ? "admin__role-badge--admin"
-                                      : "admin__role-badge--user"
-                                  }`}
-                                >
-                                  {user.rol}
-                                </span>
-                              </td>
-                              <td>{formatDateTime(user.created_at)}</td>
-                            </tr>
-                          ))}
+                          {filteredUsers.map((user) => {
+                            const isCurrentUser =
+                              Number(user.id) === Number(storedUser?.id);
+
+                            return (
+                              <tr key={user.id}>
+                                <td>{user.id}</td>
+                                <td>{user.nom}</td>
+                                <td>{user.email}</td>
+                                <td>
+                                  <span
+                                    className={`admin__role-badge ${
+                                      (user.rol || "").toLowerCase() === "admin"
+                                        ? "admin__role-badge--admin"
+                                        : "admin__role-badge--user"
+                                    }`}
+                                  >
+                                    {user.rol}
+                                  </span>
+                                </td>
+                                <td>{formatDateTime(user.created_at)}</td>
+                                <td>
+                                  <button
+                                    type="button"
+                                    className="btn btn-light btn-sm admin__user-role-button"
+                                    onClick={() => handleToggleUserRole(user)}
+                                    disabled={
+                                      updatingUserRoleId === user.id ||
+                                      isCurrentUser
+                                    }
+                                    title={
+                                      isCurrentUser
+                                        ? "No es pot canviar aquest rol des del panell"
+                                        : "Canviar rol"
+                                    }
+                                  >
+                                    {updatingUserRoleId === user.id
+                                      ? "Canviant..."
+                                      : "Canviar rol"}
+                                  </button>
+                                </td>
+                              </tr>
+                            );
+                          })}
                         </tbody>
                       </table>
                     </div>

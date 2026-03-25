@@ -845,3 +845,38 @@
   color: #64748b;
   font-size: 13px;
 }
+
+.admin__user-role-button {
+  white-space: nowrap;
+  min-width: 120px;
+}
+
+.admin__user-role-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.admin__role-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin__role-action {
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+
+  background: #f1f5f9;
+  color: #334155;
+
+  transition: all 0.2s ease;
+}
+
+.admin__role-action:hover {
+  background: #2563eb;
+  color: white;
+}

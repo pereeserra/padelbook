@@ -13,6 +13,14 @@ router.get(
   adminController.getAllUsers
 );
 
+// Ruta protegida per a administradors per actualitzar el rol d'un usuari
+router.put(
+  "/users/:id/role",
+  authMiddleware,
+  roleMiddleware("admin"),
+  adminController.updateUserRole
+);
+
 // Ruta protegida per a administradors per obtenir totes les reserves
 router.get(
   "/reservations",
@@ -107,6 +115,14 @@ router.post(
   authMiddleware,
   roleMiddleware("admin"),
   adminController.createMaintenanceBlock
+);
+
+// Ruta per canviar el rol d’un usuari
+router.put(
+  "/users/:id/role",
+  authMiddleware,
+  roleMiddleware("admin"),
+  adminController.updateUserRole
 );
 
 module.exports = router;
