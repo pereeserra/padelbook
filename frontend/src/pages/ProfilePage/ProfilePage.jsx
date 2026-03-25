@@ -78,6 +78,8 @@ function ProfilePage() {
     setFeedback("");
   };
 
+  const isSessionExpiredError = (err) => err?.response?.status === 401;
+
   const fetchProfile = async () => {
     try {
       setLoadingProfile(true);
@@ -98,18 +100,22 @@ function ProfilePage() {
       });
 
       localStorage.setItem("user", JSON.stringify(userData));
-    } catch (err) {
-      console.error(err);
+      } catch (err) {
+        console.error(err);
 
-      const errorMessage =
-        err.response?.data?.error ||
-        "No s'han pogut carregar les dades del compte.";
+        if (isSessionExpiredError(err)) {
+          return;
+        }
 
-      setLoadError(errorMessage);
-      showFeedbackMessage(errorMessage, "error");
-    } finally {
-      setLoadingProfile(false);
-    }
+        const errorMessage =
+          err.response?.data?.error ||
+          "No s'han pogut carregar les dades del compte.";
+
+        setLoadError(errorMessage);
+        showFeedbackMessage(errorMessage, "error");
+      } finally {
+        setLoadingProfile(false);
+      }
   };
 
   const roleLabel = useMemo(() => {
@@ -374,6 +380,10 @@ function ProfilePage() {
     } catch (err) {
       console.error(err);
 
+      if (isSessionExpiredError(err)) {
+        return;
+      }
+
       const backendError =
         err.response?.data?.error ||
         err.response?.data?.message ||
@@ -416,6 +426,10 @@ function ProfilePage() {
       showFeedbackMessage("Contrasenya canviada correctament.", "success");
     } catch (err) {
       console.error(err);
+
+      if (isSessionExpiredError(err)) {
+        return;
+      }
 
       const backendError =
         err.response?.data?.error ||

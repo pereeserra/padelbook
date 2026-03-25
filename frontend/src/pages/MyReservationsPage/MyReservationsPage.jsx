@@ -72,6 +72,8 @@ function MyReservationsPage() {
     setActiveFilter(filter);
   };
 
+  const isSessionExpiredError = (err) => err?.response?.status === 401;
+
   const fetchReservations = async () => {
     try {
       setLoading(true);
@@ -83,6 +85,11 @@ function MyReservationsPage() {
       setReservations(Array.isArray(reservationsData) ? reservationsData : []);
     } catch (err) {
       console.error(err);
+
+      if (isSessionExpiredError(err)) {
+        return;
+      }
+
       setError("Error obtenint les reserves.");
     } finally {
       setLoading(false);
@@ -119,18 +126,22 @@ function MyReservationsPage() {
       setTimeout(() => {
         setRecentlyCancelledReservationId(null);
       }, 2500);
-    } catch (err) {
-      console.error(err);
+        } catch (err) {
+          console.error(err);
 
-      const backendError =
-        err.response?.data?.error ||
-        "No s'ha pogut cancel·lar la reserva. Torna-ho a provar.";
+          if (isSessionExpiredError(err)) {
+            return;
+          }
 
-      showFeedbackMessage(backendError, "error");
-      scrollToFeedback();
-    } finally {
-      setCancellingReservationId(null);
-    }
+          const backendError =
+            err.response?.data?.error ||
+            "No s'ha pogut cancel·lar la reserva. Torna-ho a provar.";
+
+          showFeedbackMessage(backendError, "error");
+          scrollToFeedback();
+        } finally {
+          setCancellingReservationId(null);
+        }
   };
 
   const handleDeleteCancelled = async (id) => {
@@ -152,18 +163,22 @@ function MyReservationsPage() {
       );
 
       scrollToFeedback();
-    } catch (err) {
-      console.error(err);
+        } catch (err) {
+          console.error(err);
 
-      const backendError =
-        err.response?.data?.error ||
-        "No s'ha pogut eliminar la reserva cancel·lada.";
+          if (isSessionExpiredError(err)) {
+            return;
+          }
 
-      showFeedbackMessage(backendError, "error");
-      scrollToFeedback();
-    } finally {
-      setDeletingCancelledReservationId(null);
-    }
+          const backendError =
+            err.response?.data?.error ||
+            "No s'ha pogut eliminar la reserva cancel·lada.";
+
+          showFeedbackMessage(backendError, "error");
+          scrollToFeedback();
+        } finally {
+          setDeletingCancelledReservationId(null);
+        }
   };
 
   useEffect(() => {

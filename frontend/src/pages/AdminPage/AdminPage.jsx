@@ -247,6 +247,8 @@ function AdminPage() {
     }, 60);
   };
 
+  const isSessionExpiredError = (err) => err?.response?.status === 401;
+
   // Funció per carregar les dades del dashboard administratiu, incloent estadístiques i registre d'activitat recent, amb suport per diferents formats de resposta i opcions de dades personalitzades
   const fetchDashboardData = async (
     reservationsSource = reservations,
@@ -285,6 +287,11 @@ function AdminPage() {
       );
     } catch (err) {
       console.error(err);
+
+      if (isSessionExpiredError(err)) {
+        return;
+      }
+
       showFeedbackMessage(
         "No s'han pogut carregar algunes dades del dashboard administratiu.",
         "error"
@@ -319,6 +326,11 @@ function AdminPage() {
       };
     } catch (err) {
       console.error(err);
+
+      if (isSessionExpiredError(err)) {
+        return { reservations: [], courts: [] };
+      }
+
       setError("Error carregant dades d'administració");
       return { reservations: [], courts: [] };
     } finally {
@@ -411,6 +423,10 @@ function AdminPage() {
     } catch (err) {
       console.error(err);
 
+      if (isSessionExpiredError(err)) {
+        return;
+      }
+
       const backendError =
         err.response?.data?.error ||
         (editingCourtId
@@ -459,6 +475,10 @@ function AdminPage() {
       await refreshAllAdminData();
     } catch (err) {
       console.error(err);
+
+      if (isSessionExpiredError(err)) {
+        return;
+      }
 
       const backendError =
         err.response?.data?.error ||
