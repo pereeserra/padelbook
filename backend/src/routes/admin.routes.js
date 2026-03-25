@@ -5,6 +5,14 @@ const adminController = require("../controllers/admin.controller");
 const authMiddleware = require("../middleware/auth.middleware");
 const roleMiddleware = require("../middleware/role.middleware");
 
+// Ruta protegida per a administradors per obtenir tots els usuaris
+router.get(
+  "/users",
+  authMiddleware,
+  roleMiddleware("admin"),
+  adminController.getAllUsers
+);
+
 // Ruta protegida per a administradors per obtenir totes les reserves
 router.get(
   "/reservations",

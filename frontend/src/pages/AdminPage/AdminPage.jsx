@@ -28,6 +28,7 @@ function AdminPage() {
 
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
 
+  const [users, setUsers] = useState([]);
   const [reservations, setReservations] = useState([]);
   const [courts, setCourts] = useState([]);
 
@@ -307,20 +308,24 @@ function AdminPage() {
       setLoading(true);
       setError("");
 
-      const [reservationsRes, courtsRes] = await Promise.all([
+      const [usersRes, reservationsRes, courtsRes] = await Promise.all([
+        api.get("/admin/users"),
         api.get("/admin/reservations"),
         api.get("/courts"),
       ]);
 
+      const normalizedUsers = normalizeCollectionResponse(usersRes.data);
       const normalizedReservations = normalizeCollectionResponse(
         reservationsRes.data
       );
       const normalizedCourts = normalizeCollectionResponse(courtsRes.data);
 
+      setUsers(normalizedUsers);
       setReservations(normalizedReservations);
       setCourts(normalizedCourts);
 
       return {
+        users: normalizedUsers,
         reservations: normalizedReservations,
         courts: normalizedCourts,
       };
@@ -328,11 +333,11 @@ function AdminPage() {
       console.error(err);
 
       if (isSessionExpiredError(err)) {
-        return { reservations: [], courts: [] };
+        return { users: [], reservations: [], courts: [] };
       }
 
       setError("Error carregant dades d'administració");
-      return { reservations: [], courts: [] };
+      return { users: [], reservations: [], courts: [] };
     } finally {
       setLoading(false);
     }
@@ -781,6 +786,16 @@ function AdminPage() {
                 >
                   Reserves
                 </button>
+
+                <button
+                  type="button"
+                  className={`btn ${
+                    activeTab === "users" ? "btn-primary" : "btn-light"
+                  }`}
+                  onClick={() => setActiveTab("users")}
+                >
+                  Usuaris
+                </button>
               </div>
             </div>
 
@@ -822,6 +837,15 @@ function AdminPage() {
                     </span>
                     <span className="admin__hero-panel-card-value">
                       {coveredCourts.length}
+                    </span>
+                  </div>
+
+                  <div className="admin__hero-panel-card">
+                    <span className="admin__hero-panel-card-label">
+                      Usuaris
+                    </span>
+                    <span className="admin__hero-panel-card-value">
+                      {users.length}
                     </span>
                   </div>
                 </div>
@@ -1324,6 +1348,77 @@ function AdminPage() {
                   }`}
                 >
                   <AdminReservationsTable reservations={reservations} />
+                </div>
+              </section>
+            )}
+
+            {activeTab === "users" && (
+              <section className="fade-in-up delay-2 admin__section">
+                <div
+                  className={`admin__section-header ${
+                    isMobileView ? "admin__section-header--mobile" : ""
+                  }`}
+                >
+                  <div>
+                    <span className="pb-kicker">Gestió d'usuaris</span>
+                    <h2
+                      className={`pb-panel-title ${
+                        isMobileView ? "admin__section-title--mobile" : ""
+                      }`}
+                    >
+                      Usuaris registrats
+                    </h2>
+                    <p className="pb-panel-text">
+                      Consulta els usuaris registrats actualment al sistema.
+                    </p>
+                  </div>
+
+                  <span className="pb-badge-pill pb-badge-pill--blue">
+                    {users.length} usuaris
+                  </span>
+                </div>
+
+                <div
+                  className={`pb-surface-card admin__section-card ${
+                    isMobileView ? "admin__section-card--mobile" : ""
+                  }`}
+                >
+                  {users.length > 0 ? (
+                    <div className="admin__table-wrapper">
+                      <table className="admin__table">
+                        <thead>
+                          <tr>
+                            <th>ID</th>
+                            <th>Nom</th>
+                            <th>Email</th>
+                            <th>Rol</th>
+                            <th>Data de registre</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {users.map((user) => (
+                            <tr key={user.id}>
+                              <td>{user.id}</td>
+                              <td>{user.nom}</td>
+                              <td>{user.email}</td>
+                              <td>{user.rol}</td>
+                              <td>{formatDateTime(user.created_at)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="pb-surface-card admin__empty-filtered-state">
+                      <p className="admin__empty-filtered-title">
+                        No hi ha usuaris registrats
+                      </p>
+                      <p className="admin__empty-filtered-text">
+                        Encara no s'han trobat usuaris per mostrar dins el panell
+                        d'administració.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </section>
             )}

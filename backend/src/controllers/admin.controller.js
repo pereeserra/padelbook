@@ -7,6 +7,31 @@ const {
   validateCourtData,
 } = require("../utils/validators");
 
+// Controlador per obtenir tots els usuaris (per a l'administrador)
+exports.getAllUsers = async (req, res) => {
+  try {
+    const [users] = await db.query(`
+      SELECT
+        id,
+        nom,
+        email,
+        rol,
+        created_at
+      FROM users
+      ORDER BY created_at DESC, id DESC
+    `);
+
+    return res.json({
+      data: users,
+    });
+  } catch (error) {
+    console.error("Error getAllUsers:", error);
+    return res.status(500).json({
+      error: "Error obtenint usuaris",
+    });
+  }
+};
+
 // Controlador per obtenir totes les reserves (per a l'administrador)
 exports.getAllReservations = async (req, res) => {
   try {
