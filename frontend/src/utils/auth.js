@@ -4,7 +4,12 @@ export function getUserFromToken() {
 
   if (storedUser) {
     try {
-      return JSON.parse(storedUser);
+      const parsedUser = JSON.parse(storedUser);
+
+      return {
+        ...parsedUser,
+        rol: parsedUser.rol || parsedUser.role || null,
+      };
     } catch {
       localStorage.removeItem("user");
     }
@@ -17,7 +22,11 @@ export function getUserFromToken() {
   try {
     const payload = token.split(".")[1];
     const decodedPayload = JSON.parse(atob(payload));
-    return decodedPayload;
+
+    return {
+      ...decodedPayload,
+      rol: decodedPayload.rol || decodedPayload.role || null,
+    };
   } catch (error) {
     console.error("Error decodificant el token:", error);
     return null;

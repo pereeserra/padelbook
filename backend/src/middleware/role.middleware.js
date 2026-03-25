@@ -7,7 +7,7 @@ module.exports = (requiredRole) => {
       });
     }
 
-    if (req.user.role !== requiredRole) {
+    if (req.user.rol !== requiredRole) {
       return res.status(403).json({
         error: "No tens permisos per accedir a aquesta ruta",
       });

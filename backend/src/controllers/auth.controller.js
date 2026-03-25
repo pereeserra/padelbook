@@ -149,7 +149,7 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       {
         id: user.id,
-        role: user.rol,
+        rol: user.rol,
       },
       process.env.JWT_SECRET,
       { expiresIn: "2h" }
@@ -157,7 +157,7 @@ exports.login = async (req, res) => {
 
     logSecurityEvent(req, "LOGIN_SUCCESS", {
       userId: user.id,
-      role: user.rol,
+      rol: user.rol,
       email,
     });
 
@@ -167,7 +167,7 @@ exports.login = async (req, res) => {
         id: user.id,
         nom: user.nom,
         email: user.email,
-        role: user.rol,
+        rol: user.rol,
         created_at: user.created_at
       }
     });

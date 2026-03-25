@@ -24,7 +24,7 @@ const {
 exports.createReservation = async (req, res) => {
   try {
     const user_id = req.user.id;
-    const userRole = req.user.role;
+    const userRole = req.user.rol;
     let { court_id, time_slot_id, data_reserva } = req.body;
     let { metode_pagament } = req.body;
 
@@ -306,7 +306,7 @@ exports.deleteReservation = async (req, res) => {
   try {
     const reservationId = parsePositiveInteger(req.params.id);
     const userId = req.user.id;
-    const userRole = req.user.role;
+    const userRole = req.user.rol;
 
     if (!reservationId) {
       return fail(res, "L'identificador de la reserva no és vàlid", 400);
@@ -399,7 +399,7 @@ exports.deleteCancelledReservationPermanently = async (req, res) => {
   try {
     const reservationId = parsePositiveInteger(req.params.id);
     const userId = req.user.id;
-    const userRole = req.user.role;
+    const userRole = req.user.rol;
 
     if (!reservationId) {
       return fail(res, "L'identificador de la reserva no és vàlid", 400);
@@ -441,7 +441,7 @@ exports.deleteCancelledReservationPermanently = async (req, res) => {
 exports.getReservationByCode = async (req, res) => {
   try {
     const userId = req.user.id;
-    const userRole = req.user.role;
+    const userRole = req.user.rol;
     const codi_reserva =
       typeof req.params.codi_reserva === "string"
         ? req.params.codi_reserva.trim().toUpperCase()

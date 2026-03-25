@@ -18,7 +18,7 @@ const logSecurityEvent = (req, event, details = {}) => {
     method: req.method,
     path: req.originalUrl,
     userId: req.user?.id || null,
-    role: req.user?.role || null,
+    role: req.user?.rol || null,
     ...details,
   };
 

@@ -17,7 +17,12 @@ module.exports = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
+
+    req.user = {
+      ...decoded,
+      rol: decoded.rol || decoded.role || null,
+    };
+
     next();
   } catch (error) {
     logSecurityEvent(req, "AUTH_TOKEN_INVALID", {
