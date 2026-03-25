@@ -13,6 +13,13 @@ router.get(
   adminController.getAllUsers
 );
 
+router.get(
+  "/users/:id",
+  authMiddleware,
+  roleMiddleware("admin"),
+  adminController.getUserById
+);
+
 // Ruta protegida per a administradors per actualitzar el rol d'un usuari
 router.put(
   "/users/:id/role",

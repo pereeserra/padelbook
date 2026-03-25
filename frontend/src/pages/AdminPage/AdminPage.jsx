@@ -29,6 +29,8 @@ function AdminPage() {
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
 
   const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [loadingUserDetail, setLoadingUserDetail] = useState(false);
   const [reservations, setReservations] = useState([]);
   const [courts, setCourts] = useState([]);
 
@@ -95,6 +97,25 @@ function AdminPage() {
         err.response?.data?.error || "Error canviant rol";
 
       showFeedbackMessage(errorMsg, "error");
+    }
+  };
+
+  const handleViewUserDetail = async (userId) => {
+    try {
+      setLoadingUserDetail(true);
+
+      const res = await api.get(`/admin/users/${userId}`);
+
+      setSelectedUser(res.data.data);
+    } catch (err) {
+      console.error(err);
+
+      const errorMsg =
+        err.response?.data?.error || "Error carregant detall d'usuari";
+
+      showFeedbackMessage(errorMsg, "error");
+    } finally {
+      setLoadingUserDetail(false);
     }
   };
 
@@ -1533,7 +1554,7 @@ function AdminPage() {
                             <th>Email</th>
                             <th>Rol</th>
                             <th>Data de registre</th>
-                            <th>Acció</th>
+                            <th>Accions</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -1559,28 +1580,61 @@ function AdminPage() {
                                 </td>
                                 <td>{formatDateTime(user.created_at)}</td>
                                 <td>
-                                  <button
-                                    type="button"
-                                    className="btn btn-light btn-sm admin__user-role-button"
-                                    onClick={() => handleToggleUserRole(user)}
-                                    disabled={
-                                      updatingUserRoleId === user.id ||
-                                      isCurrentUser
-                                    }
-                                    title={
-                                      isCurrentUser
-                                        ? "No es pot canviar aquest rol des del panell"
-                                        : "Canviar rol"
-                                    }
-                                  >
-                                    {updatingUserRoleId === user.id
-                                      ? "Canviant..."
-                                      : "Canviar rol"}
-                                  </button>
+                                  <div style={{ display: "flex", gap: "8px" }}>
+                                    <button
+                                      type="button"
+                                      className="btn btn-light btn-sm"
+                                      onClick={() => handleViewUserDetail(user.id)}
+                                    >
+                                      Veure
+                                    </button>
+
+                                    <button
+                                      type="button"
+                                      className="btn btn-light btn-sm admin__user-role-button"
+                                      onClick={() => handleToggleUserRole(user)}
+                                      disabled={
+                                        updatingUserRoleId === user.id ||
+                                        isCurrentUser
+                                      }
+                                    >
+                                      {updatingUserRoleId === user.id
+                                        ? "Canviant..."
+                                        : "Canviar rol"}
+                                    </button>
+                                  </div>
                                 </td>
                               </tr>
                             );
                           })}
+
+                          {selectedUser && (
+                            <div className="pb-surface-card" style={{ marginTop: "1.5rem", padding: "1.2rem" }}>
+                              <h3 style={{ marginBottom: "1rem" }}>Detall d'usuari</h3>
+
+                              {loadingUserDetail ? (
+                                <p>Carregant...</p>
+                              ) : (
+                                <div style={{ display: "grid", gap: "0.5rem" }}>
+                                  <p><strong>ID:</strong> {selectedUser.id}</p>
+                                  <p><strong>Nom:</strong> {selectedUser.nom}</p>
+                                  <p><strong>Email:</strong> {selectedUser.email}</p>
+                                  <p><strong>Telèfon:</strong> {selectedUser.telefon || "—"}</p>
+                                  <p><strong>Rol:</strong> {selectedUser.rol}</p>
+                                  <p><strong>Registre:</strong> {formatDateTime(selectedUser.created_at)}</p>
+                                  <p><strong>Total reserves:</strong> {selectedUser.total_reserves}</p>
+                                </div>
+                              )}
+
+                              <button
+                                className="btn btn-light"
+                                style={{ marginTop: "1rem" }}
+                                onClick={() => setSelectedUser(null)}
+                              >
+                                Tancar
+                              </button>
+                            </div>
+                          )}
                         </tbody>
                       </table>
                     </div>

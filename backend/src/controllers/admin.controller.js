@@ -1155,3 +1155,50 @@ exports.updateUserRole = async (req, res) => {
     res.status(500).json({ error: "Error actualitzant rol" });
   }
 };
+
+// Controlador per obtenir el detall d'un usuari (admin)
+exports.getUserById = async (req, res) => {
+  try {
+    const userId = parsePositiveInteger(req.params.id);
+
+    if (!userId) {
+      return res.status(400).json({
+        error: "ID d'usuari no vàlid",
+      });
+    }
+
+    const [users] = await db.query(
+      `
+      SELECT
+        u.id,
+        u.nom,
+        u.email,
+        u.telefon,
+        u.rol,
+        u.created_at,
+        COUNT(r.id) AS total_reserves
+      FROM users u
+      LEFT JOIN reservations r ON r.user_id = u.id
+      WHERE u.id = ?
+      GROUP BY u.id
+      LIMIT 1
+      `,
+      [userId]
+    );
+
+    if (users.length === 0) {
+      return res.status(404).json({
+        error: "Usuari no trobat",
+      });
+    }
+
+    return res.json({
+      data: users[0],
+    });
+  } catch (error) {
+    console.error("Error getUserById:", error);
+    return res.status(500).json({
+      error: "Error obtenint detall d'usuari",
+    });
+  }
+};
