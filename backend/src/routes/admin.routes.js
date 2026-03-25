@@ -132,6 +132,14 @@ router.post(
   adminController.createMaintenanceBlock
 );
 
+// Ruta per eliminar un bloqueig de manteniment
+router.delete(
+  "/maintenance/:id",
+  authMiddleware,
+  roleMiddleware("admin"),
+  adminController.deleteMaintenanceBlock
+);
+
 // Ruta per canviar el rol d’un usuari
 router.put(
   "/users/:id/role",

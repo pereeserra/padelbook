@@ -586,6 +586,58 @@ exports.createMaintenanceBlock = async (req, res) => {
   }
 };
 
+// Eliminar bloqueig de manteniment
+exports.deleteMaintenanceBlock = async (req, res) => {
+  try {
+    const blockId = parsePositiveInteger(req.params.id);
+
+    if (!blockId) {
+      return res.status(400).json({
+        error: "ID de manteniment no vàlid",
+      });
+    }
+
+    const [existing] = await db.query(
+      "SELECT * FROM maintenance_blocks WHERE id = ?",
+      [blockId]
+    );
+
+    if (existing.length === 0) {
+      return res.status(404).json({
+        error: "Manteniment no trobat",
+      });
+    }
+
+    const block = existing[0];
+
+    await db.query(
+      "DELETE FROM maintenance_blocks WHERE id = ?",
+      [blockId]
+    );
+
+    await db.query(
+      `INSERT INTO admin_logs (admin_id, accio, entitat, entitat_id, descripcio)
+       VALUES (?, ?, ?, ?, ?)`,
+      [
+        req.user.id,
+        "DELETE_MAINTENANCE",
+        "maintenance_block",
+        blockId,
+        `Eliminat manteniment pista ID ${block.court_id} dia ${block.data_bloqueig}`,
+      ]
+    );
+
+    res.json({
+      message: "Manteniment eliminat correctament",
+    });
+  } catch (error) {
+    console.error("Error deleteMaintenanceBlock:", error);
+    res.status(500).json({
+      error: "Error eliminant el manteniment",
+    });
+  }
+};
+
 // Controlador per obtenir estadístiques generals del sistema
 exports.getOverviewStats = async (req, res) => {
   try {

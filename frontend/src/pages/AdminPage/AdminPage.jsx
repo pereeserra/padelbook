@@ -123,6 +123,24 @@ function AdminPage() {
     }
   };
 
+  const handleDeleteMaintenance = async (id) => {
+    if (!window.confirm("Segur que vols eliminar aquest manteniment?")) return;
+
+    try {
+      await api.delete(`/admin/maintenance/${id}`);
+
+      showFeedbackMessage("Manteniment eliminat correctament");
+      await refreshAllAdminData();
+    } catch (err) {
+      console.error(err);
+
+      const errorMsg =
+        err.response?.data?.error || "Error eliminant manteniment";
+
+      showFeedbackMessage(errorMsg, "error");
+    }
+  };
+
   // Detectar canvis en la mida de la finestra per adaptar la vista
   useEffect(() => {
     const handleResize = () => {
@@ -2133,13 +2151,23 @@ function AdminPage() {
                                 Creat: {formatDateTime(block.createdAt)}
                               </span>
 
-                              <button
-                                type="button"
-                                className="btn btn-light"
-                                onClick={() => scrollToCourtCard(block.courtId)}
-                              >
-                                Veure pista
-                              </button>
+                              <div style={{ display: "flex", gap: "8px" }}>
+                                <button
+                                  type="button"
+                                  className="btn btn-light"
+                                  onClick={() => scrollToCourtCard(block.courtId)}
+                                >
+                                  Veure pista
+                                </button>
+
+                                <button
+                                  type="button"
+                                  className="btn btn-danger"
+                                  onClick={() => handleDeleteMaintenance(block.id)}
+                                >
+                                  Eliminar
+                                </button>
+                              </div>
                             </div>
                           </article>
                         ))}
