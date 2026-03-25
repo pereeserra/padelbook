@@ -1545,99 +1545,159 @@ function AdminPage() {
                   </div>
 
                   {filteredUsers.length > 0 ? (
-                    <div className="admin__table-wrapper">
-                      <table className="admin__table">
-                        <thead>
-                          <tr>
-                            <th>ID</th>
-                            <th>Nom</th>
-                            <th>Email</th>
-                            <th>Rol</th>
-                            <th>Data de registre</th>
-                            <th>Accions</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {filteredUsers.map((user) => {
-                            const isCurrentUser =
-                              Number(user.id) === Number(storedUser?.id);
+                    <>
+                      <div className="admin__table-wrapper">
+                        <table className="admin__table">
+                          <thead>
+                            <tr>
+                              <th>ID</th>
+                              <th>Nom</th>
+                              <th>Email</th>
+                              <th>Rol</th>
+                              <th>Data de registre</th>
+                              <th>Accions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {filteredUsers.map((user) => {
+                              const isCurrentUser =
+                                Number(user.id) === Number(storedUser?.id);
 
-                            return (
-                              <tr key={user.id}>
-                                <td>{user.id}</td>
-                                <td>{user.nom}</td>
-                                <td>{user.email}</td>
-                                <td>
-                                  <span
-                                    className={`admin__role-badge ${
-                                      (user.rol || "").toLowerCase() === "admin"
-                                        ? "admin__role-badge--admin"
-                                        : "admin__role-badge--user"
-                                    }`}
-                                  >
-                                    {user.rol}
-                                  </span>
-                                </td>
-                                <td>{formatDateTime(user.created_at)}</td>
-                                <td>
-                                  <div style={{ display: "flex", gap: "8px" }}>
-                                    <button
-                                      type="button"
-                                      className="btn btn-light btn-sm"
-                                      onClick={() => handleViewUserDetail(user.id)}
+                              return (
+                                <tr key={user.id}>
+                                  <td>{user.id}</td>
+                                  <td>{user.nom}</td>
+                                  <td>{user.email}</td>
+                                  <td>
+                                    <span
+                                      className={`admin__role-badge ${
+                                        (user.rol || "").toLowerCase() === "admin"
+                                          ? "admin__role-badge--admin"
+                                          : "admin__role-badge--user"
+                                      }`}
                                     >
-                                      Veure
-                                    </button>
+                                      {user.rol}
+                                    </span>
+                                  </td>
+                                  <td>{formatDateTime(user.created_at)}</td>
+                                  <td>
+                                    <div style={{ display: "flex", gap: "8px" }}>
+                                      <button
+                                        type="button"
+                                        className="btn btn-light btn-sm"
+                                        onClick={() => handleViewUserDetail(user.id)}
+                                      >
+                                        Veure
+                                      </button>
 
-                                    <button
-                                      type="button"
-                                      className="btn btn-light btn-sm admin__user-role-button"
-                                      onClick={() => handleToggleUserRole(user)}
-                                      disabled={
-                                        updatingUserRoleId === user.id ||
-                                        isCurrentUser
-                                      }
-                                    >
-                                      {updatingUserRoleId === user.id
-                                        ? "Canviant..."
-                                        : "Canviar rol"}
-                                    </button>
-                                  </div>
-                                </td>
-                              </tr>
-                            );
-                          })}
+                                      <button
+                                        type="button"
+                                        className="btn btn-light btn-sm admin__user-role-button"
+                                        onClick={() => handleToggleUserRole(user)}
+                                        disabled={
+                                          updatingUserRoleId === user.id ||
+                                          isCurrentUser
+                                        }
+                                      >
+                                        {updatingUserRoleId === user.id
+                                          ? "Canviant..."
+                                          : "Canviar rol"}
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
 
-                          {selectedUser && (
-                            <div className="pb-surface-card" style={{ marginTop: "1.5rem", padding: "1.2rem" }}>
-                              <h3 style={{ marginBottom: "1rem" }}>Detall d'usuari</h3>
+                      {selectedUser && (
+                        <div className="admin__user-detail-card">
+                          <div className="admin__user-detail-header">
+                            <div>
+                              <span className="pb-kicker">Detall d'usuari</span>
+                              <h3 className="admin__analytics-title">
+                                {selectedUser.nom}
+                              </h3>
+                            </div>
 
-                              {loadingUserDetail ? (
-                                <p>Carregant...</p>
-                              ) : (
-                                <div style={{ display: "grid", gap: "0.5rem" }}>
-                                  <p><strong>ID:</strong> {selectedUser.id}</p>
-                                  <p><strong>Nom:</strong> {selectedUser.nom}</p>
-                                  <p><strong>Email:</strong> {selectedUser.email}</p>
-                                  <p><strong>Telèfon:</strong> {selectedUser.telefon || "—"}</p>
-                                  <p><strong>Rol:</strong> {selectedUser.rol}</p>
-                                  <p><strong>Registre:</strong> {formatDateTime(selectedUser.created_at)}</p>
-                                  <p><strong>Total reserves:</strong> {selectedUser.total_reserves}</p>
-                                </div>
-                              )}
+                            <button
+                              type="button"
+                              className="btn btn-light btn-sm"
+                              onClick={() => setSelectedUser(null)}
+                            >
+                              Tancar
+                            </button>
+                          </div>
 
-                              <button
-                                className="btn btn-light"
-                                style={{ marginTop: "1rem" }}
-                                onClick={() => setSelectedUser(null)}
-                              >
-                                Tancar
-                              </button>
+                          {loadingUserDetail ? (
+                            <p className="admin__user-detail-loading">
+                              Carregant detall d'usuari...
+                            </p>
+                          ) : (
+                            <div className="admin__user-detail-grid">
+                              <div className="admin__user-detail-item">
+                                <span className="admin__user-detail-label">ID</span>
+                                <strong className="admin__user-detail-value">
+                                  {selectedUser.id}
+                                </strong>
+                              </div>
+
+                              <div className="admin__user-detail-item">
+                                <span className="admin__user-detail-label">Nom</span>
+                                <strong className="admin__user-detail-value">
+                                  {selectedUser.nom}
+                                </strong>
+                              </div>
+
+                              <div className="admin__user-detail-item">
+                                <span className="admin__user-detail-label">Email</span>
+                                <strong className="admin__user-detail-value">
+                                  {selectedUser.email}
+                                </strong>
+                              </div>
+
+                              <div className="admin__user-detail-item">
+                                <span className="admin__user-detail-label">Telèfon</span>
+                                <strong className="admin__user-detail-value">
+                                  {selectedUser.telefon || "—"}
+                                </strong>
+                              </div>
+
+                              <div className="admin__user-detail-item">
+                                <span className="admin__user-detail-label">Rol</span>
+                                <span
+                                  className={`admin__role-badge ${
+                                    (selectedUser.rol || "").toLowerCase() === "admin"
+                                      ? "admin__role-badge--admin"
+                                      : "admin__role-badge--user"
+                                  }`}
+                                >
+                                  {selectedUser.rol}
+                                </span>
+                              </div>
+
+                              <div className="admin__user-detail-item">
+                                <span className="admin__user-detail-label">Registre</span>
+                                <strong className="admin__user-detail-value">
+                                  {formatDateTime(selectedUser.created_at)}
+                                </strong>
+                              </div>
+
+                              <div className="admin__user-detail-item admin__user-detail-item--full">
+                                <span className="admin__user-detail-label">
+                                  Total reserves
+                                </span>
+                                <strong className="admin__user-detail-value">
+                                  {selectedUser.total_reserves}
+                                </strong>
+                              </div>
                             </div>
                           )}
-                        </tbody>
-                      </table>
-                    </div>
+                        </div>
+                      )}
+                    </>
                   ) : (
                     <div className="pb-surface-card admin__empty-filtered-state">
                       <p className="admin__empty-filtered-title">
