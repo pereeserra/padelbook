@@ -439,16 +439,20 @@ exports.getAllMaintenanceBlocks = async (req, res) => {
         m.time_slot_id,
         m.data_bloqueig,
         m.motiu,
-        m.created_at,
         c.nom_pista,
         c.tipus,
         c.coberta,
         c.estat AS estat_pista,
         t.hora_inici,
-        t.hora_fi
+        t.hora_fi,
+        al.created_at
       FROM maintenance_blocks m
       JOIN courts c ON m.court_id = c.id
       JOIN time_slots t ON m.time_slot_id = t.id
+      LEFT JOIN admin_logs al
+        ON al.entitat = 'maintenance_block'
+        AND al.entitat_id = m.id
+        AND al.accio = 'CREATE_MAINTENANCE'
       ORDER BY m.data_bloqueig ASC, t.hora_inici ASC, m.id DESC
     `);
 
@@ -561,7 +565,7 @@ exports.createMaintenanceBlock = async (req, res) => {
       ]
     );
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Bloqueig de manteniment creat correctament",
       data: {
         id: result.insertId,
@@ -576,7 +580,7 @@ exports.createMaintenanceBlock = async (req, res) => {
       });
     }
 
-    res.status(500).json({
+    return res.status(500).json({
       error: "Error creant el bloqueig de manteniment",
     });
   }
