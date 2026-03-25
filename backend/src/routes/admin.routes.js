@@ -116,6 +116,14 @@ router.delete(
   adminController.deleteCourt
 );
 
+// Ruta per obtenir tots els bloquejos de manteniment
+router.get(
+  "/maintenance",
+  authMiddleware,
+  roleMiddleware("admin"),
+  adminController.getAllMaintenanceBlocks
+);
+
 // Ruta per crear un bloqueig de manteniment
 router.post(
   "/maintenance",

@@ -429,6 +429,41 @@ exports.deleteCourt = async (req, res) => {
   }
 };
 
+// Controlador per obtenir tots els bloquejos de manteniment
+exports.getAllMaintenanceBlocks = async (req, res) => {
+  try {
+    const [maintenanceBlocks] = await db.query(`
+      SELECT
+        m.id,
+        m.court_id,
+        m.time_slot_id,
+        m.data_bloqueig,
+        m.motiu,
+        m.created_at,
+        c.nom_pista,
+        c.tipus,
+        c.coberta,
+        c.estat AS estat_pista,
+        t.hora_inici,
+        t.hora_fi
+      FROM maintenance_blocks m
+      JOIN courts c ON m.court_id = c.id
+      JOIN time_slots t ON m.time_slot_id = t.id
+      ORDER BY m.data_bloqueig ASC, t.hora_inici ASC, m.id DESC
+    `);
+
+    return res.json({
+      data: maintenanceBlocks,
+    });
+  } catch (error) {
+    console.error("Error getAllMaintenanceBlocks:", error);
+
+    return res.status(500).json({
+      error: "Error obtenint bloquejos de manteniment",
+    });
+  }
+};
+
 // Controlador per crear un bloqueig de manteniment
 exports.createMaintenanceBlock = async (req, res) => {
   try {

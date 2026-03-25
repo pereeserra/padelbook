@@ -953,3 +953,151 @@
     grid-column: auto;
   }
 }
+
+.admin__maintenance-panel {
+  margin-bottom: 1.25rem;
+}
+
+.admin__maintenance-title {
+  margin: 0.35rem 0 0 0;
+}
+
+.admin__maintenance-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.admin__maintenance-stats--mobile {
+  grid-template-columns: 1fr;
+}
+
+.admin__maintenance-stat {
+  padding: 0.95rem 1rem;
+  border-radius: 18px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.admin__maintenance-stat-label {
+  display: block;
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.35rem;
+}
+
+.admin__maintenance-stat-value {
+  color: #0f172a;
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.admin__maintenance-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.admin__maintenance-card {
+  padding: 1rem 1.05rem;
+  border-radius: 20px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: linear-gradient(180deg, #ffffff, #f8fbff);
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.05);
+}
+
+.admin__maintenance-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.85rem;
+}
+
+.admin__maintenance-card-kicker {
+  margin: 0 0 0.2rem 0;
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.admin__maintenance-card-title {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.admin__maintenance-slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+  font-size: 0.82rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.admin__maintenance-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-bottom: 0.85rem;
+}
+
+.admin__maintenance-meta-item {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.38rem 0.7rem;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.admin__maintenance-reason {
+  margin: 0 0 0.95rem 0;
+  color: #334155;
+  line-height: 1.65;
+}
+
+.admin__maintenance-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin__maintenance-created-at {
+  color: #64748b;
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.admin__maintenance-empty-state {
+  margin-top: 0.75rem;
+}
+
+@media (max-width: 768px) {
+  .admin__maintenance-card-top,
+  .admin__maintenance-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin__maintenance-slot {
+    width: fit-content;
+  }
+}

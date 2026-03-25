@@ -33,6 +33,7 @@ function AdminPage() {
   const [loadingUserDetail, setLoadingUserDetail] = useState(false);
   const [reservations, setReservations] = useState([]);
   const [courts, setCourts] = useState([]);
+  const [maintenanceBlocks, setMaintenanceBlocks] = useState([]);
 
   const [overviewStats, setOverviewStats] = useState({});
   const [statsByCourt, setStatsByCourt] = useState([]);
@@ -73,6 +74,9 @@ function AdminPage() {
   const [courtSearch, setCourtSearch] = useState("");
   const [courtStatusFilter, setCourtStatusFilter] = useState("totes");
   const [courtTypeFilter, setCourtTypeFilter] = useState("tots");
+
+  const [maintenanceSearch, setMaintenanceSearch] = useState("");
+  const [maintenancePeriodFilter, setMaintenancePeriodFilter] = useState("futurs");
 
   const [showAllActivity, setShowAllActivity] = useState(false);
   const [showAllCourtStats, setShowAllCourtStats] = useState(false);
@@ -287,6 +291,21 @@ function AdminPage() {
       null,
   });
 
+  const normalizeMaintenanceBlock = (item, index) => ({
+    id: item?.id ?? `maintenance-${index}`,
+    courtId: item?.court_id ?? item?.courtId ?? null,
+    timeSlotId: item?.time_slot_id ?? item?.timeSlotId ?? null,
+    date: item?.data_bloqueig ?? item?.date ?? "",
+    reason: item?.motiu ?? item?.reason ?? "",
+    createdAt: item?.created_at ?? item?.createdAt ?? null,
+    courtName: item?.nom_pista ?? item?.court_name ?? item?.courtName ?? "Pista",
+    courtType: item?.tipus ?? item?.court_type ?? item?.courtType ?? "",
+    covered: Number(item?.coberta ?? item?.covered ?? 0) === 1,
+    courtStatus: item?.estat_pista ?? item?.court_status ?? item?.courtStatus ?? "",
+    startTime: item?.hora_inici ?? item?.start_time ?? item?.startTime ?? "",
+    endTime: item?.hora_fi ?? item?.end_time ?? item?.endTime ?? "",
+  });
+
   // Funció per mostrar missatges de feedback a l'usuari, amb opcions de tipus i accions associades, i desplaçament automàtic al missatge
   const showFeedbackMessage = (message, type = "success", action = null) => {
     setFeedback(message);
@@ -363,10 +382,11 @@ function AdminPage() {
       setLoading(true);
       setError("");
 
-      const [usersRes, reservationsRes, courtsRes] = await Promise.all([
+      const [usersRes, reservationsRes, courtsRes, maintenanceRes] = await Promise.all([
         api.get("/admin/users"),
         api.get("/admin/reservations"),
         api.get("/courts"),
+        api.get("/admin/maintenance"),
       ]);
 
       const normalizedUsers = normalizeCollectionResponse(usersRes.data);
@@ -374,25 +394,30 @@ function AdminPage() {
         reservationsRes.data
       );
       const normalizedCourts = normalizeCollectionResponse(courtsRes.data);
+      const normalizedMaintenance = normalizeCollectionResponse(
+        maintenanceRes.data
+      ).map(normalizeMaintenanceBlock);
 
       setUsers(normalizedUsers);
       setReservations(normalizedReservations);
       setCourts(normalizedCourts);
+      setMaintenanceBlocks(normalizedMaintenance);
 
       return {
         users: normalizedUsers,
         reservations: normalizedReservations,
         courts: normalizedCourts,
+        maintenanceBlocks: normalizedMaintenance,
       };
     } catch (err) {
       console.error(err);
 
       if (isSessionExpiredError(err)) {
-        return { users: [], reservations: [], courts: [] };
+        return { users: [], reservations: [], courts: [], maintenanceBlocks: [] };
       }
 
       setError("Error carregant dades d'administració");
-      return { users: [], reservations: [], courts: [] };
+      return { users: [], reservations: [], courts: [], maintenanceBlocks: [] };
     } finally {
       setLoading(false);
     }
@@ -422,6 +447,11 @@ function AdminPage() {
     setCourtSearch("");
     setCourtStatusFilter("totes");
     setCourtTypeFilter("tots");
+  };
+
+  const resetMaintenanceFilters = () => {
+    setMaintenanceSearch("");
+    setMaintenancePeriodFilter("futurs");
   };
 
   // Funció per gestionar la creació o actualització d'una pista, enviant les dades al backend i actualitzant la vista en conseqüència, amb suport per diferents formats de resposta i missatges de feedback contextuals
@@ -725,6 +755,39 @@ function AdminPage() {
     return filteredCourts.filter((court) => court.estat === "manteniment").length;
   }, [filteredCourts]);
 
+  const todayString = useMemo(() => {
+    return new Date().toISOString().slice(0, 10);
+  }, []);
+
+  const filteredMaintenanceBlocks = useMemo(() => {
+    const query = maintenanceSearch.trim().toLowerCase();
+
+    return maintenanceBlocks.filter((block) => {
+      const courtName = (block.courtName || "").toLowerCase();
+      const reason = (block.reason || "").toLowerCase();
+      const date = block.date || "";
+
+      const matchesQuery =
+        !query || courtName.includes(query) || reason.includes(query);
+
+      const matchesPeriod =
+        maintenancePeriodFilter === "tots" ||
+        (maintenancePeriodFilter === "futurs" && date >= todayString) ||
+        (maintenancePeriodFilter === "passats" && date < todayString) ||
+        (maintenancePeriodFilter === "avui" && date === todayString);
+
+      return matchesQuery && matchesPeriod;
+    });
+  }, [maintenanceBlocks, maintenanceSearch, maintenancePeriodFilter, todayString]);
+
+  const maintenanceTodayCount = useMemo(() => {
+    return maintenanceBlocks.filter((block) => block.date === todayString).length;
+  }, [maintenanceBlocks, todayString]);
+
+  const maintenanceFutureCount = useMemo(() => {
+    return maintenanceBlocks.filter((block) => block.date >= todayString).length;
+  }, [maintenanceBlocks, todayString]);
+
   const resetUserFilters = () => {
     setUserSearch("");
     setUserRoleFilter("tots");
@@ -740,6 +803,17 @@ function AdminPage() {
     return parsed.toLocaleString("ca-ES", {
       dateStyle: "medium",
       timeStyle: "short",
+    });
+  };
+
+  const formatDateOnly = (value) => {
+    if (!value) return "Data no disponible";
+
+    const parsed = new Date(`${value}T00:00:00`);
+    if (Number.isNaN(parsed.getTime())) return value;
+
+    return parsed.toLocaleDateString("ca-ES", {
+      dateStyle: "medium",
     });
   };
 
@@ -1904,6 +1978,191 @@ function AdminPage() {
                         </span>
                       </div>
                     </div>
+                  </div>
+
+                  <div className="pb-surface-card admin__section-card admin__maintenance-panel">
+                    <div
+                      className={`admin__section-header ${
+                        isMobileView ? "admin__section-header--mobile" : ""
+                      }`}
+                    >
+                      <div>
+                        <span className="pb-kicker">Control existent</span>
+                        <h3 className="pb-panel-title admin__maintenance-title">
+                          Manteniments creats
+                        </h3>
+                        <p className="pb-panel-text">
+                          Consulta els bloquejos registrats i localitza ràpidament
+                          la pista afectada.
+                        </p>
+                      </div>
+
+                      <span className="pb-badge-pill pb-badge-pill--amber">
+                        {filteredMaintenanceBlocks.length} visibles
+                      </span>
+                    </div>
+
+                    <div
+                      className={`admin__court-tools-grid ${
+                        isMobileView ? "admin__court-tools-grid--mobile" : ""
+                      }`}
+                    >
+                      <div className="admin__court-filter-field">
+                        <label
+                          htmlFor="maintenanceSearch"
+                          className="admin__filter-label"
+                        >
+                          Cercar manteniment
+                        </label>
+                        <input
+                          id="maintenanceSearch"
+                          type="text"
+                          value={maintenanceSearch}
+                          onChange={(e) => setMaintenanceSearch(e.target.value)}
+                          placeholder="Pista o motiu..."
+                          className="pb-input"
+                        />
+                      </div>
+
+                      <div className="admin__court-filter-field">
+                        <label
+                          htmlFor="maintenancePeriodFilter"
+                          className="admin__filter-label"
+                        >
+                          Període
+                        </label>
+                        <select
+                          id="maintenancePeriodFilter"
+                          value={maintenancePeriodFilter}
+                          onChange={(e) =>
+                            setMaintenancePeriodFilter(e.target.value)
+                          }
+                          className="pb-input"
+                        >
+                          <option value="futurs">Avui i futurs</option>
+                          <option value="avui">Només avui</option>
+                          <option value="passats">Passats</option>
+                          <option value="tots">Tots</option>
+                        </select>
+                      </div>
+
+                      <div className="admin__court-filter-actions">
+                        <button
+                          type="button"
+                          className="btn btn-light"
+                          onClick={resetMaintenanceFilters}
+                        >
+                          Netejar filtres
+                        </button>
+                      </div>
+                    </div>
+
+                    <div
+                      className={`admin__maintenance-stats ${
+                        isMobileView ? "admin__maintenance-stats--mobile" : ""
+                      }`}
+                    >
+                      <div className="admin__maintenance-stat">
+                        <span className="admin__maintenance-stat-label">
+                          Totals
+                        </span>
+                        <span className="admin__maintenance-stat-value">
+                          {maintenanceBlocks.length}
+                        </span>
+                      </div>
+
+                      <div className="admin__maintenance-stat">
+                        <span className="admin__maintenance-stat-label">
+                          Avui
+                        </span>
+                        <span className="admin__maintenance-stat-value">
+                          {maintenanceTodayCount}
+                        </span>
+                      </div>
+
+                      <div className="admin__maintenance-stat">
+                        <span className="admin__maintenance-stat-label">
+                          Pendents
+                        </span>
+                        <span className="admin__maintenance-stat-value">
+                          {maintenanceFutureCount}
+                        </span>
+                      </div>
+                    </div>
+
+                    {filteredMaintenanceBlocks.length > 0 ? (
+                      <div className="admin__maintenance-list">
+                        {filteredMaintenanceBlocks.map((block) => (
+                          <article
+                            key={block.id}
+                            className="admin__maintenance-card"
+                          >
+                            <div className="admin__maintenance-card-top">
+                              <div>
+                                <p className="admin__maintenance-card-kicker">
+                                  {formatDateOnly(block.date)}
+                                </p>
+                                <h4 className="admin__maintenance-card-title">
+                                  {block.courtName}
+                                </h4>
+                              </div>
+
+                              <span className="admin__maintenance-slot">
+                                {block.startTime} - {block.endTime}
+                              </span>
+                            </div>
+
+                            <div className="admin__maintenance-meta">
+                              <span className="admin__maintenance-meta-item">
+                                Tipus: {block.courtType || "No definit"}
+                              </span>
+                              <span className="admin__maintenance-meta-item">
+                                Coberta: {block.covered ? "Sí" : "No"}
+                              </span>
+                              <span className="admin__maintenance-meta-item">
+                                Estat pista: {block.courtStatus || "No disponible"}
+                              </span>
+                            </div>
+
+                            <p className="admin__maintenance-reason">
+                              {block.reason}
+                            </p>
+
+                            <div className="admin__maintenance-footer">
+                              <span className="admin__maintenance-created-at">
+                                Creat: {formatDateTime(block.createdAt)}
+                              </span>
+
+                              <button
+                                type="button"
+                                className="btn btn-light"
+                                onClick={() => scrollToCourtCard(block.courtId)}
+                              >
+                                Veure pista
+                              </button>
+                            </div>
+                          </article>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="admin__empty-filtered-state admin__maintenance-empty-state">
+                        <p className="admin__empty-filtered-title">
+                          No hi ha manteniments que coincideixin
+                        </p>
+                        <p className="admin__empty-filtered-text">
+                          Revisa els filtres aplicats o neteja la cerca per tornar
+                          a veure tots els bloquejos disponibles.
+                        </p>
+
+                        <button
+                          type="button"
+                          className="btn btn-light"
+                          onClick={resetMaintenanceFilters}
+                        >
+                          Mostrar tots els manteniments
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   {filteredCourts.length > 0 ? (
