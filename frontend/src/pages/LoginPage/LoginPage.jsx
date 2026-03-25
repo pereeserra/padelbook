@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import api from "../../api/axios";
 import "./LoginPage.css";
 
@@ -16,9 +16,13 @@ function LoginPage() {
   const [turnstileReady, setTurnstileReady] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
   const feedbackRef = useRef(null);
   const turnstileContainerRef = useRef(null);
   const turnstileWidgetIdRef = useRef(null);
+
+  const searchParams = new URLSearchParams(location.search);
+  const sessionExpired = searchParams.get("session") === "expired";
 
   // Detectar cambios en el tamaño de la ventana para adaptar el diseño
   useEffect(() => {
@@ -262,6 +266,14 @@ function LoginPage() {
           </div>
 
           <div ref={feedbackRef} />
+
+          {sessionExpired && !error && (
+            <div className="scale-in login__error-box">
+              <p className="login__error-text">
+                La teva sessió ha caducat. Torna a iniciar sessió.
+              </p>
+            </div>
+          )}
 
           {error && (
             <div className="scale-in login__error-box">
