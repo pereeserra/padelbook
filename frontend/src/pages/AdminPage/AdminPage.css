@@ -728,3 +728,100 @@
   font-size: 0.92rem;
   line-height: 1.55;
 }
+
+/* =========================
+   TAULA USUARIS ADMIN
+========================= */
+
+.admin__table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.admin__table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+/* HEADER */
+.admin__table thead {
+  background: #f1f5f9;
+}
+
+.admin__table th {
+  text-align: left;
+  padding: 14px 16px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #334155;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* FILES */
+.admin__table td {
+  padding: 14px 16px;
+  font-size: 14px;
+  color: #1e293b;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+/* HOVER */
+.admin__table tbody tr {
+  transition: all 0.2s ease;
+}
+
+.admin__table tbody tr:hover {
+  background: #f8fafc;
+}
+
+/* ID columna més discreta */
+.admin__table td:first-child {
+  font-weight: 700;
+  color: #64748b;
+}
+
+/* EMAIL estil */
+.admin__table td:nth-child(3) {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+/* ROL badge */
+.admin__table td:nth-child(4) {
+  font-weight: 700;
+}
+
+.admin__role-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 88px;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: capitalize;
+  border: 1px solid transparent;
+}
+
+.admin__role-badge--user {
+  background: #dcfce7;
+  color: #15803d;
+  border-color: #86efac;
+}
+
+.admin__role-badge--admin {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border-color: #93c5fd;
+}
+
+/* DATA */
+.admin__table td:nth-child(5) {
+  color: #64748b;
+  font-size: 13px;
+}

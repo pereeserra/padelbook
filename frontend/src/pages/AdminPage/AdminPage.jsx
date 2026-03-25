@@ -1401,7 +1401,17 @@ function AdminPage() {
                               <td>{user.id}</td>
                               <td>{user.nom}</td>
                               <td>{user.email}</td>
-                              <td>{user.rol}</td>
+                              <td>
+                                <span
+                                  className={`admin__role-badge ${
+                                    (user.rol || "").toLowerCase() === "admin"
+                                      ? "admin__role-badge--admin"
+                                      : "admin__role-badge--user"
+                                  }`}
+                                >
+                                  {user.rol}
+                                </span>
+                              </td>
                               <td>{formatDateTime(user.created_at)}</td>
                             </tr>
                           ))}
