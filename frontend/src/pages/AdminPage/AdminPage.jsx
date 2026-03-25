@@ -55,6 +55,9 @@ function AdminPage() {
 
   const [newCourt, setNewCourt] = useState(emptyCourt);
 
+  const [userSearch, setUserSearch] = useState("");
+  const [userRoleFilter, setUserRoleFilter] = useState("tots");
+
   const [courtSearch, setCourtSearch] = useState("");
   const [courtStatusFilter, setCourtStatusFilter] = useState("totes");
   const [courtTypeFilter, setCourtTypeFilter] = useState("tots");
@@ -589,6 +592,21 @@ function AdminPage() {
     return showAllActivity ? adminLogs : adminLogs.slice(0, 3);
   }, [adminLogs, showAllActivity]);
 
+  const filteredUsers = useMemo(() => {
+    const query = userSearch.trim().toLowerCase();
+
+    return users.filter((user) => {
+      const name = (user.nom || "").toLowerCase();
+      const email = (user.email || "").toLowerCase();
+      const role = (user.rol || "").toLowerCase();
+
+      const matchesQuery = !query || name.includes(query) || email.includes(query);
+      const matchesRole = userRoleFilter === "tots" || role === userRoleFilter;
+
+      return matchesQuery && matchesRole;
+    });
+  }, [users, userSearch, userRoleFilter]);
+
   // Memoritzar les pistes filtrades segons els criteris de cerca i filtrat seleccionats, assegurant que els valors estiguin actualitzats quan les dades de les pistes o els criteris de filtrat canviïn i evitant càlculs innecessaris en cada renderitzat
   const filteredCourts = useMemo(() => {
     const query = courtSearch.trim().toLowerCase();
@@ -620,6 +638,11 @@ function AdminPage() {
   const filteredMaintenanceCourtsCount = useMemo(() => {
     return filteredCourts.filter((court) => court.estat === "manteniment").length;
   }, [filteredCourts]);
+
+  const resetUserFilters = () => {
+    setUserSearch("");
+    setUserRoleFilter("tots");
+  };
 
   // Funció per formatar les dates i hores de manera llegible al dashboard, amb suport per diferents formats d'entrada i gestió de valors no vàlids o absents
   const formatDateTime = (value) => {
@@ -1374,7 +1397,7 @@ function AdminPage() {
                   </div>
 
                   <span className="pb-badge-pill pb-badge-pill--blue">
-                    {users.length} usuaris
+                    {filteredUsers.length} usuaris
                   </span>
                 </div>
 
@@ -1383,7 +1406,59 @@ function AdminPage() {
                     isMobileView ? "admin__section-card--mobile" : ""
                   }`}
                 >
-                  {users.length > 0 ? (
+                  <div
+                    className={`admin__users-tools-grid ${
+                      isMobileView ? "admin__users-tools-grid--mobile" : ""
+                    }`}
+                  >
+                    <div className="admin__court-filter-field">
+                      <label
+                        htmlFor="userSearch"
+                        className="admin__filter-label"
+                      >
+                        Cercar usuari
+                      </label>
+                      <input
+                        id="userSearch"
+                        type="text"
+                        value={userSearch}
+                        onChange={(e) => setUserSearch(e.target.value)}
+                        placeholder="Nom o correu electrònic..."
+                        className="pb-input"
+                      />
+                    </div>
+
+                    <div className="admin__court-filter-field">
+                      <label
+                        htmlFor="userRoleFilter"
+                        className="admin__filter-label"
+                      >
+                        Rol
+                      </label>
+                      <select
+                        id="userRoleFilter"
+                        value={userRoleFilter}
+                        onChange={(e) => setUserRoleFilter(e.target.value)}
+                        className="pb-input"
+                      >
+                        <option value="tots">Tots</option>
+                        <option value="usuari">Usuari</option>
+                        <option value="admin">Admin</option>
+                      </select>
+                    </div>
+
+                    <div className="admin__court-filter-actions">
+                      <button
+                        type="button"
+                        className="btn btn-light"
+                        onClick={resetUserFilters}
+                      >
+                        Netejar filtres
+                      </button>
+                    </div>
+                  </div>
+
+                  {filteredUsers.length > 0 ? (
                     <div className="admin__table-wrapper">
                       <table className="admin__table">
                         <thead>
@@ -1396,7 +1471,7 @@ function AdminPage() {
                           </tr>
                         </thead>
                         <tbody>
-                          {users.map((user) => (
+                          {filteredUsers.map((user) => (
                             <tr key={user.id}>
                               <td>{user.id}</td>
                               <td>{user.nom}</td>
@@ -1421,12 +1496,20 @@ function AdminPage() {
                   ) : (
                     <div className="pb-surface-card admin__empty-filtered-state">
                       <p className="admin__empty-filtered-title">
-                        No hi ha usuaris registrats
+                        No hi ha usuaris que coincideixin
                       </p>
                       <p className="admin__empty-filtered-text">
-                        Encara no s'han trobat usuaris per mostrar dins el panell
-                        d'administració.
+                        Revisa els filtres aplicats o neteja la cerca per tornar
+                        a veure tots els usuaris registrats.
                       </p>
+
+                      <button
+                        type="button"
+                        className="btn btn-light"
+                        onClick={resetUserFilters}
+                      >
+                        Mostrar tots els usuaris
+                      </button>
                     </div>
                   )}
                 </div>
