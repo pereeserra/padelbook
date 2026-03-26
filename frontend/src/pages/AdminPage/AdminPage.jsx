@@ -1965,7 +1965,9 @@ function AdminPage() {
                   </div>
 
                   <span className="pb-badge-pill pb-badge-pill--blue">
-                    {filteredUsers.length} usuaris
+                    {filteredUsers.length === users.length
+                      ? `${filteredUsers.length} usuaris`
+                      : `${filteredUsers.length} de ${users.length} usuaris`}
                   </span>
                 </div>
 
@@ -2025,6 +2027,12 @@ function AdminPage() {
                       </button>
                     </div>
                   </div>
+
+                  {(userSearch || userRoleFilter !== "tots") && (
+                    <p style={{ fontSize: "13px", color: "#64748b", marginBottom: "10px" }}>
+                      🔎 Filtres actius
+                    </p>
+                  )}
 
                   {filteredUsers.length > 0 ? (
                     <>
