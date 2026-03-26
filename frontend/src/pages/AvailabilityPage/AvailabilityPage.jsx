@@ -25,6 +25,7 @@ function AvailabilityPage() {
   const [success, setSuccess] = useState("");
   const [showOnlyAvailable, setShowOnlyAvailable] = useState(false);
   const [courtTypeFilter, setCourtTypeFilter] = useState("tots");
+  const [courtEnvironmentFilter, setCourtEnvironmentFilter] = useState("totes");
   const [showAuthHelp, setShowAuthHelp] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("online_simulat");
   const [reservationSummary, setReservationSummary] = useState(null);
@@ -225,6 +226,8 @@ function AvailabilityPage() {
   const filteredAvailability = useMemo(() => {
     return availability.filter((slot) => {
       const normalizedType = String(slot.tipus || "").trim().toLowerCase();
+      const normalizedEnvironment =
+        Number(slot.coberta) === 1 ? "indoor" : "outdoor";
 
       const matchesAvailability =
         !showOnlyAvailable || slot.disponible;
@@ -233,9 +236,17 @@ function AvailabilityPage() {
         courtTypeFilter === "tots" ||
         normalizedType === courtTypeFilter;
 
-      return matchesAvailability && matchesCourtType;
+      const matchesCourtEnvironment =
+        courtEnvironmentFilter === "totes" ||
+        normalizedEnvironment === courtEnvironmentFilter;
+
+      return (
+        matchesAvailability &&
+        matchesCourtType &&
+        matchesCourtEnvironment
+      );
     });
-  }, [availability, showOnlyAvailable, courtTypeFilter]);
+  }, [availability, showOnlyAvailable, courtTypeFilter, courtEnvironmentFilter]);
 
   // Memorització dels propers 7 dies per a la selecció ràpida, amb formatació de la data i identificació del dia actual
   const quickDays = useMemo(() => {
@@ -400,6 +411,26 @@ function AvailabilityPage() {
                   <option value="tots">Totes</option>
                   <option value="dobles">Dobles</option>
                   <option value="individual">Individuals</option>
+                </select>
+              </div>
+
+              <div className="ap-type-filter">
+                <label
+                  htmlFor="courtEnvironmentFilter"
+                  className="ap-type-filter__label"
+                >
+                  Entorn
+                </label>
+
+                <select
+                  id="courtEnvironmentFilter"
+                  className="ap-type-filter__select"
+                  value={courtEnvironmentFilter}
+                  onChange={(e) => setCourtEnvironmentFilter(e.target.value)}
+                >
+                  <option value="totes">Totes</option>
+                  <option value="indoor">Indoor</option>
+                  <option value="outdoor">Outdoor</option>
                 </select>
               </div>
 
