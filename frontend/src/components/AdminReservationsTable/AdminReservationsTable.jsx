@@ -289,7 +289,7 @@ function formatTime(time) {
             </div>
           </div>
 
-          <div className="admin-res__modal-item">
+          <div className="admin-res__modal-item admin-res__modal-item--full">
             <span className="admin-res__modal-label">Telèfon</span>
             <span>{r.usuari_telefon || "-"}</span>
           </div>
