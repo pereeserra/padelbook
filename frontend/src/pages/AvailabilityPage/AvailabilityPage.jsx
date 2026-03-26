@@ -24,6 +24,7 @@ function AvailabilityPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [showOnlyAvailable, setShowOnlyAvailable] = useState(false);
+  const [courtTypeFilter, setCourtTypeFilter] = useState("tots");
   const [showAuthHelp, setShowAuthHelp] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("online_simulat");
   const [reservationSummary, setReservationSummary] = useState(null);
@@ -222,9 +223,19 @@ function AvailabilityPage() {
 
   // Memorització de la disponibilitat filtrada segons l'estat de "Només disponibles"
   const filteredAvailability = useMemo(() => {
-    if (!showOnlyAvailable) return availability;
-    return availability.filter((slot) => slot.disponible);
-  }, [availability, showOnlyAvailable]);
+    return availability.filter((slot) => {
+      const normalizedType = String(slot.tipus || "").trim().toLowerCase();
+
+      const matchesAvailability =
+        !showOnlyAvailable || slot.disponible;
+
+      const matchesCourtType =
+        courtTypeFilter === "tots" ||
+        normalizedType === courtTypeFilter;
+
+      return matchesAvailability && matchesCourtType;
+    });
+  }, [availability, showOnlyAvailable, courtTypeFilter]);
 
   // Memorització dels propers 7 dies per a la selecció ràpida, amb formatació de la data i identificació del dia actual
   const quickDays = useMemo(() => {
@@ -374,14 +385,33 @@ function AvailabilityPage() {
               <span className="ap-selected-date-text">{formatDisplayDate(date)}</span>
             </div>
 
-            <label className="ap-filter-label">
-              <input
-                type="checkbox"
-                checked={showOnlyAvailable}
-                onChange={(e) => setShowOnlyAvailable(e.target.checked)}
-              />
-              Només disponibles
-            </label>
+            <div className="ap-filters-inline">
+              <div className="ap-type-filter">
+                <label htmlFor="courtTypeFilter" className="ap-type-filter__label">
+                  Tipus de pista
+                </label>
+
+                <select
+                  id="courtTypeFilter"
+                  className="ap-type-filter__select"
+                  value={courtTypeFilter}
+                  onChange={(e) => setCourtTypeFilter(e.target.value)}
+                >
+                  <option value="tots">Totes</option>
+                  <option value="dobles">Dobles</option>
+                  <option value="individual">Individuals</option>
+                </select>
+              </div>
+
+              <label className="ap-filter-label">
+                <input
+                  type="checkbox"
+                  checked={showOnlyAvailable}
+                  onChange={(e) => setShowOnlyAvailable(e.target.checked)}
+                />
+                Només disponibles
+              </label>
+            </div>
           </div>
         </section>
 
