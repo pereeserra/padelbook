@@ -219,12 +219,12 @@ function formatTime(time) {
 
             <div className="admin-res__modal-item">
               <span className="admin-res__modal-label">Usuari</span>
-              <span>{r.nom_usuari}</span>
+              <span>{r.usuari_nom}</span>
             </div>
 
             <div className="admin-res__modal-item">
               <span className="admin-res__modal-label">Email</span>
-              <span>{r.email}</span>
+              <span>{r.usuari_email}</span>
             </div>
 
             <div className="admin-res__modal-item">
@@ -287,6 +287,11 @@ function formatTime(time) {
                   : "-"}
               </span>
             </div>
+          </div>
+
+          <div className="admin-res__modal-item">
+            <span className="admin-res__modal-label">Telèfon</span>
+            <span>{r.usuari_telefon || "-"}</span>
           </div>
 
           <div className="admin-res__modal-actions">
