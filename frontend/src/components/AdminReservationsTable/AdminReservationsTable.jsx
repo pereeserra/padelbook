@@ -5,6 +5,9 @@ function AdminReservationsTable({ reservations = [] }) {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("totes");
 
+  const [selectedReservation, setSelectedReservation] = useState(null);
+  const [loadingDetail, setLoadingDetail] = useState(false);
+
   // Normalitza i ordena les reserves per data i hora de forma descendente
   const normalizedReservations = useMemo(() => {
     return [...reservations].sort((a, b) => {
@@ -135,6 +138,25 @@ function formatTime(time) {
     setStatusFilter("totes");
   };
 
+  const handleViewReservationDetail = async (id) => {
+    try {
+      setLoadingDetail(true);
+
+      const res = await api.get(`/admin/reservations/${id}`);
+
+      setSelectedReservation(res.data?.data || res.data);
+    } catch (err) {
+      console.error(err);
+      alert("Error carregant el detall de la reserva");
+    } finally {
+      setLoadingDetail(false);
+    }
+  };
+
+  const closeReservationDetail = () => {
+    setSelectedReservation(null);
+  };
+
   // Funcions per determinar les classes CSS basades en els valors dels camps, permetent una estilització condicional que millora la llegibilitat i l'impacte visual de la informació mostrada
   const getReservationStatusClass = (value) => {
     const normalized = (value || "").toLowerCase();
@@ -173,7 +195,38 @@ function formatTime(time) {
     );
   }
 
+  const DetailModal = () => {
+    if (!selectedReservation) return null;
+
+    const r = selectedReservation;
+
+    return (
+      <div className="admin-res__modal-overlay">
+        <div className="admin-res__modal">
+          <h3>Detall de reserva</h3>
+
+          <p><strong>Codi:</strong> {r.codi_reserva}</p>
+          <p><strong>Usuari:</strong> {r.nom_usuari}</p>
+          <p><strong>Email:</strong> {r.email}</p>
+          <p><strong>Pista:</strong> {r.nom_pista}</p>
+          <p><strong>Data:</strong> {formatDate(r.data_reserva)}</p>
+          <p><strong>Hora:</strong> {formatTime(r.hora_inici)} - {formatTime(r.hora_fi)}</p>
+          <p><strong>Estat:</strong> {r.estat}</p>
+          <p><strong>Pagament:</strong> {paymentStatusLabel(r.estat_pagament)}</p>
+          <p><strong>Mètode:</strong> {paymentMethodLabel(r.metode_pagament)}</p>
+          <p><strong>Import:</strong> {r.preu_total} €</p>
+
+          <button className="btn btn-light" onClick={closeReservationDetail}>
+            Tancar
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   return (
+    <>
+      <DetailModal />
     <div className="admin-res__wrapper">
       <div className="admin-res__header">
         <div>
@@ -324,22 +377,32 @@ function formatTime(time) {
                 </div>
 
                 <div className="admin-res__card-footer">
-                  <div className="admin-res__payment-block">
-                    <span className="admin-res__payment-label">Forma de pagament</span>
-
-                    <span
-                      className={`admin-res__payment-method ${
-                        reservation.metode_pagament === "online_simulat"
-                          ? "admin-res__payment-method--online"
-                          : "admin-res__payment-method--club"
-                      }`}
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <button
+                      type="button"
+                      className="btn btn-light"
+                      onClick={() => handleViewReservationDetail(reservation.id)}
                     >
-                      {reservation.metode_pagament === "online_simulat"
-                        ? "Pagament online"
-                        : reservation.metode_pagament === "al_club"
-                          ? "Pagament al club"
-                          : paymentMethodLabel(reservation.metode_pagament)}
-                    </span>
+                      Veure detall
+                    </button>
+
+                    <div className="admin-res__payment-block">
+                      <span className="admin-res__payment-label">Forma de pagament</span>
+
+                      <span
+                        className={`admin-res__payment-method ${
+                          reservation.metode_pagament === "online_simulat"
+                            ? "admin-res__payment-method--online"
+                            : "admin-res__payment-method--club"
+                        }`}
+                      >
+                        {reservation.metode_pagament === "online_simulat"
+                          ? "Pagament online"
+                          : reservation.metode_pagament === "al_club"
+                            ? "Pagament al club"
+                            : paymentMethodLabel(reservation.metode_pagament)}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </article>
@@ -359,6 +422,7 @@ function formatTime(time) {
         </div>
       )}
     </div>
+    </>
   );
 }
 
