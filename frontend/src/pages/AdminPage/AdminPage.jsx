@@ -317,6 +317,27 @@ function AdminPage() {
       null,
   });
 
+  const formatLogDescription = (log) => {
+    const action = log?.accio || log?.action;
+
+    switch (action) {
+      case "CREATE_COURT":
+        return `Ha creat una nova pista`;
+
+      case "UPDATE_COURT":
+        return `Ha editat una pista`;
+
+      case "DELETE_COURT":
+        return `Ha eliminat una pista`;
+
+      case "CREATE_MAINTENANCE":
+        return `Ha creat un bloqueig de manteniment`;
+
+      default:
+        return log?.detalls || "Acció administrativa";
+    }
+  };
+
   const normalizeMaintenanceBlock = (item, index) => ({
     id: item?.id ?? `maintenance-${index}`,
     courtId: item?.court_id ?? item?.courtId ?? null,
@@ -941,10 +962,23 @@ function AdminPage() {
       UPDATE_COURT: "Editar pista",
       DELETE_COURT: "Eliminar pista",
       CREATE_MAINTENANCE: "Crear manteniment",
+      UPDATE_MAINTENANCE: "Editar manteniment",
+      DELETE_MAINTENANCE: "Eliminar manteniment",
+      UPDATE_USER_ROLE: "Canviar rol usuari",
     };
 
     return actionMap[action] || action?.replaceAll("_", " ") || "Acció";
   };
+
+    const getLogActionType = (action) => {
+      const normalizedAction = (action || "").toUpperCase();
+
+      if (normalizedAction.startsWith("CREATE")) return "create";
+      if (normalizedAction.startsWith("UPDATE")) return "update";
+      if (normalizedAction.startsWith("DELETE")) return "delete";
+
+      return "";
+    };
 
   // Definir les targetes de resum del dashboard amb les dades normalitzades i calculades, assegurant que els valors mostrats estiguin actualitzats i siguin consistents amb les dades carregades, i proporcionant icones i classes d'estil per a una millor presentació visual
   const dashboardCards = [
@@ -1564,7 +1598,11 @@ function AdminPage() {
                                       : ""
                                   }`}
                                 >
-                                  <span className="pb-badge-pill pb-badge-pill--blue admin__log-action-badge">
+                                  <span
+                                    className={`activity-type ${getLogActionType(
+                                      log.action
+                                    )}`}
+                                  >
                                     {formatActionLabel(log.action)}
                                   </span>
 
