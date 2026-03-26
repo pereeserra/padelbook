@@ -1723,87 +1723,87 @@ function AdminPage() {
                         </span>
                       </div>
 
+                      <div
+                        className={`admin__logs-filters-grid ${
+                          isMobileView ? "admin__logs-filters-grid--mobile" : ""
+                        }`}
+                      >
+                        <div className="admin__court-filter-field">
+                          <label
+                            htmlFor="logSearch"
+                            className="admin__filter-label"
+                          >
+                            Cercar al log
+                          </label>
+                          <input
+                            id="logSearch"
+                            type="text"
+                            value={logSearch}
+                            onChange={(e) => setLogSearch(e.target.value)}
+                            placeholder="Acció, admin, detall o entitat..."
+                            className="pb-input"
+                          />
+                        </div>
+
+                        <div className="admin__court-filter-field">
+                          <label
+                            htmlFor="logActionFilter"
+                            className="admin__filter-label"
+                          >
+                            Acció
+                          </label>
+                          <select
+                            id="logActionFilter"
+                            value={logActionFilter}
+                            onChange={(e) => setLogActionFilter(e.target.value)}
+                            className="pb-input"
+                          >
+                            <option value="totes">Totes</option>
+                            <option value="CREATE_COURT">Crear pista</option>
+                            <option value="UPDATE_COURT">Editar pista</option>
+                            <option value="DELETE_COURT">Eliminar pista</option>
+                            <option value="CREATE_MAINTENANCE">Crear manteniment</option>
+                            <option value="UPDATE_MAINTENANCE">Editar manteniment</option>
+                            <option value="DELETE_MAINTENANCE">Eliminar manteniment</option>
+                            <option value="UPDATE_USER_ROLE">Canviar rol usuari</option>
+                          </select>
+                        </div>
+
+                        <div className="admin__court-filter-field">
+                          <label
+                            htmlFor="logAdminFilter"
+                            className="admin__filter-label"
+                          >
+                            Administrador
+                          </label>
+                          <select
+                            id="logAdminFilter"
+                            value={logAdminFilter}
+                            onChange={(e) => setLogAdminFilter(e.target.value)}
+                            className="pb-input"
+                          >
+                            <option value="tots">Tots</option>
+                            {availableLogAdmins.map((admin) => (
+                              <option key={admin.id} value={admin.id}>
+                                {admin.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div className="admin__court-filter-actions">
+                          <button
+                            type="button"
+                            className="btn btn-light"
+                            onClick={resetLogFilters}
+                          >
+                            Netejar filtres
+                          </button>
+                        </div>
+                      </div>
+
                       {filteredAdminLogs.length > 0 ? (
                         <>
-                          <div
-                            className={`admin__logs-filters-grid ${
-                              isMobileView ? "admin__logs-filters-grid--mobile" : ""
-                            }`}
-                          >
-                            <div className="admin__court-filter-field">
-                              <label
-                                htmlFor="logSearch"
-                                className="admin__filter-label"
-                              >
-                                Cercar al log
-                              </label>
-                              <input
-                                id="logSearch"
-                                type="text"
-                                value={logSearch}
-                                onChange={(e) => setLogSearch(e.target.value)}
-                                placeholder="Acció, admin, detall o entitat..."
-                                className="pb-input"
-                              />
-                            </div>
-
-                            <div className="admin__court-filter-field">
-                              <label
-                                htmlFor="logActionFilter"
-                                className="admin__filter-label"
-                              >
-                                Acció
-                              </label>
-                              <select
-                                id="logActionFilter"
-                                value={logActionFilter}
-                                onChange={(e) => setLogActionFilter(e.target.value)}
-                                className="pb-input"
-                              >
-                                <option value="totes">Totes</option>
-                                <option value="CREATE_COURT">Crear pista</option>
-                                <option value="UPDATE_COURT">Editar pista</option>
-                                <option value="DELETE_COURT">Eliminar pista</option>
-                                <option value="CREATE_MAINTENANCE">Crear manteniment</option>
-                                <option value="UPDATE_MAINTENANCE">Editar manteniment</option>
-                                <option value="DELETE_MAINTENANCE">Eliminar manteniment</option>
-                                <option value="UPDATE_USER_ROLE">Canviar rol usuari</option>
-                              </select>
-                            </div>
-
-                            <div className="admin__court-filter-field">
-                              <label
-                                htmlFor="logAdminFilter"
-                                className="admin__filter-label"
-                              >
-                                Administrador
-                              </label>
-                              <select
-                                id="logAdminFilter"
-                                value={logAdminFilter}
-                                onChange={(e) => setLogAdminFilter(e.target.value)}
-                                className="pb-input"
-                              >
-                                <option value="tots">Tots</option>
-                                {availableLogAdmins.map((admin) => (
-                                  <option key={admin.id} value={admin.id}>
-                                    {admin.name}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-
-                            <div className="admin__court-filter-actions">
-                              <button
-                                type="button"
-                                className="btn btn-light"
-                                onClick={resetLogFilters}
-                              >
-                                Netejar filtres
-                              </button>
-                            </div>
-                          </div>
-
                           <div className="admin__logs-list admin__logs-list--compact">
                             {visibleAdminLogs.map((log) => (
                               <article
@@ -1888,7 +1888,7 @@ function AdminPage() {
                           )}
                         </>
                       ) : (
-                        <div className="admin__empty-filtered-state">
+                        <div className="admin__empty-filtered-state admin__logs-empty-state">
                           <p className="admin__empty-filtered-title">
                             No hi ha logs que coincideixin
                           </p>
@@ -1896,14 +1896,6 @@ function AdminPage() {
                             Revisa els filtres aplicats o neteja la cerca per tornar
                             a veure tota l'activitat administrativa.
                           </p>
-
-                          <button
-                            type="button"
-                            className="btn btn-light"
-                            onClick={resetLogFilters}
-                          >
-                            Mostrar tots els logs
-                          </button>
                         </div>
                       )}
                     </div>
