@@ -1094,12 +1094,15 @@ exports.getAdminLogs = async (req, res) => {
       "UPDATE_COURT",
       "DELETE_COURT",
       "CREATE_MAINTENANCE",
+      "UPDATE_MAINTENANCE",
+      "DELETE_MAINTENANCE",
+      "UPDATE_USER_ROLE",
     ];
 
     if (accio && !allowedActions.includes(accio)) {
       return res.status(400).json({
         error:
-          "L'acció indicada no és vàlida. Valors permesos: CREATE_COURT, UPDATE_COURT, DELETE_COURT, CREATE_MAINTENANCE",
+          "L'acció indicada no és vàlida. Valors permesos: CREATE_COURT, UPDATE_COURT, DELETE_COURT, CREATE_MAINTENANCE, UPDATE_MAINTENANCE, DELETE_MAINTENANCE, UPDATE_USER_ROLE",
       });
     }
 

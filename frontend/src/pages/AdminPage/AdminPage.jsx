@@ -91,6 +91,10 @@ function AdminPage() {
   const [showAllTimeslotStats, setShowAllTimeslotStats] = useState(false);
   const [showAllDateStats, setShowAllDateStats] = useState(false);
 
+  const [logActionFilter, setLogActionFilter] = useState("totes");
+  const [logAdminFilter, setLogAdminFilter] = useState("tots");
+  const [logSearch, setLogSearch] = useState("");
+
   const handleToggleRole = async (user) => {
     try {
       const newRole = user.rol === "admin" ? "usuari" : "admin";
@@ -858,9 +862,57 @@ function AdminPage() {
   }, [recentDateStats, showAllDateStats]);
 
   // Memoritzar les entrades del registre d'activitat recent que seran visibles al dashboard segons si s'ha seleccionat mostrar totes les dades o només les més recents, assegurant que els valors estiguin actualitzats quan les dades del registre o les opcions de visualització canviïn i evitant càlculs innecessaris en cada renderitzat
+  const filteredAdminLogs = useMemo(() => {
+    const query = logSearch.trim().toLowerCase();
+
+    return adminLogs.filter((log) => {
+      const action = (log.action || "").toLowerCase();
+      const adminName = (log.adminName || "").toLowerCase();
+      const details = (log.details || "").toLowerCase();
+      const entity = (log.entity || "").toLowerCase();
+      const entityId = String(log.entityId || "").toLowerCase();
+
+      const matchesAction =
+        logActionFilter === "totes" || log.action === logActionFilter;
+
+      const matchesAdmin =
+        logAdminFilter === "tots" ||
+        String(log.adminId) === String(logAdminFilter);
+
+      const matchesSearch =
+        !query ||
+        action.includes(query) ||
+        adminName.includes(query) ||
+        details.includes(query) ||
+        entity.includes(query) ||
+        entityId.includes(query);
+
+      return matchesAction && matchesAdmin && matchesSearch;
+    });
+  }, [adminLogs, logActionFilter, logAdminFilter, logSearch]);
+
   const visibleAdminLogs = useMemo(() => {
-    return showAllActivity ? adminLogs : adminLogs.slice(0, 3);
-  }, [adminLogs, showAllActivity]);
+    return showAllActivity ? filteredAdminLogs : filteredAdminLogs.slice(0, 3);
+  }, [filteredAdminLogs, showAllActivity]);
+
+  const availableLogAdmins = useMemo(() => {
+    const uniqueAdmins = new Map();
+
+    adminLogs.forEach((log) => {
+      if (!log.adminId) return;
+
+      if (!uniqueAdmins.has(log.adminId)) {
+        uniqueAdmins.set(log.adminId, {
+          id: log.adminId,
+          name: log.adminName || `Admin ${log.adminId}`,
+        });
+      }
+    });
+
+    return Array.from(uniqueAdmins.values()).sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+  }, [adminLogs]);
 
   const filteredUsers = useMemo(() => {
     const query = userSearch.trim().toLowerCase();
@@ -971,6 +1023,12 @@ function AdminPage() {
   const resetUserFilters = () => {
     setUserSearch("");
     setUserRoleFilter("tots");
+  };
+
+  const resetLogFilters = () => {
+    setLogActionFilter("totes");
+    setLogAdminFilter("tots");
+    setLogSearch("");
   };
 
   // Funció per formatar les dates i hores de manera llegible al dashboard, amb suport per diferents formats d'entrada i gestió de valors no vàlids o absents
@@ -1661,12 +1719,91 @@ function AdminPage() {
                         </div>
 
                         <span className="pb-badge-pill pb-badge-pill--rose">
-                          {adminLogs.length} accions
+                          {filteredAdminLogs.length} accions
                         </span>
                       </div>
 
-                      {adminLogs.length > 0 ? (
+                      {filteredAdminLogs.length > 0 ? (
                         <>
+                          <div
+                            className={`admin__logs-filters-grid ${
+                              isMobileView ? "admin__logs-filters-grid--mobile" : ""
+                            }`}
+                          >
+                            <div className="admin__court-filter-field">
+                              <label
+                                htmlFor="logSearch"
+                                className="admin__filter-label"
+                              >
+                                Cercar al log
+                              </label>
+                              <input
+                                id="logSearch"
+                                type="text"
+                                value={logSearch}
+                                onChange={(e) => setLogSearch(e.target.value)}
+                                placeholder="Acció, admin, detall o entitat..."
+                                className="pb-input"
+                              />
+                            </div>
+
+                            <div className="admin__court-filter-field">
+                              <label
+                                htmlFor="logActionFilter"
+                                className="admin__filter-label"
+                              >
+                                Acció
+                              </label>
+                              <select
+                                id="logActionFilter"
+                                value={logActionFilter}
+                                onChange={(e) => setLogActionFilter(e.target.value)}
+                                className="pb-input"
+                              >
+                                <option value="totes">Totes</option>
+                                <option value="CREATE_COURT">Crear pista</option>
+                                <option value="UPDATE_COURT">Editar pista</option>
+                                <option value="DELETE_COURT">Eliminar pista</option>
+                                <option value="CREATE_MAINTENANCE">Crear manteniment</option>
+                                <option value="UPDATE_MAINTENANCE">Editar manteniment</option>
+                                <option value="DELETE_MAINTENANCE">Eliminar manteniment</option>
+                                <option value="UPDATE_USER_ROLE">Canviar rol usuari</option>
+                              </select>
+                            </div>
+
+                            <div className="admin__court-filter-field">
+                              <label
+                                htmlFor="logAdminFilter"
+                                className="admin__filter-label"
+                              >
+                                Administrador
+                              </label>
+                              <select
+                                id="logAdminFilter"
+                                value={logAdminFilter}
+                                onChange={(e) => setLogAdminFilter(e.target.value)}
+                                className="pb-input"
+                              >
+                                <option value="tots">Tots</option>
+                                {availableLogAdmins.map((admin) => (
+                                  <option key={admin.id} value={admin.id}>
+                                    {admin.name}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+
+                            <div className="admin__court-filter-actions">
+                              <button
+                                type="button"
+                                className="btn btn-light"
+                                onClick={resetLogFilters}
+                              >
+                                Netejar filtres
+                              </button>
+                            </div>
+                          </div>
+
                           <div className="admin__logs-list admin__logs-list--compact">
                             {visibleAdminLogs.map((log) => (
                               <article
@@ -1734,7 +1871,7 @@ function AdminPage() {
                             ))}
                           </div>
 
-                          {adminLogs.length > 3 && (
+                          {filteredAdminLogs.length > 3 && (
                             <div className="admin__logs-toggle">
                               <button
                                 type="button"
@@ -1751,9 +1888,23 @@ function AdminPage() {
                           )}
                         </>
                       ) : (
-                        <p className="admin__empty-analytics-text">
-                          Encara no hi ha activitat recent registrada.
-                        </p>
+                        <div className="admin__empty-filtered-state">
+                          <p className="admin__empty-filtered-title">
+                            No hi ha logs que coincideixin
+                          </p>
+                          <p className="admin__empty-filtered-text">
+                            Revisa els filtres aplicats o neteja la cerca per tornar
+                            a veure tota l'activitat administrativa.
+                          </p>
+
+                          <button
+                            type="button"
+                            className="btn btn-light"
+                            onClick={resetLogFilters}
+                          >
+                            Mostrar tots els logs
+                          </button>
+                        </div>
                       )}
                     </div>
                   </div>

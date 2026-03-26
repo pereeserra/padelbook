@@ -1177,3 +1177,15 @@
   display: flex;
   justify-content: flex-start;
 }
+
+.admin__logs-filters-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(190px, 0.8fr) minmax(190px, 0.8fr) auto;
+  gap: 0.85rem;
+  align-items: end;
+  margin-bottom: 1rem;
+}
+
+.admin__logs-filters-grid--mobile {
+  grid-template-columns: 1fr;
+}
