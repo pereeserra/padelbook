@@ -295,6 +295,7 @@ function AdminPage() {
       log?.tipus ??
       log?.type ??
       "ACCIO_DESCONEGUDA",
+
     adminName:
       log?.admin_nom ??
       log?.adminName ??
@@ -302,13 +303,26 @@ function AdminPage() {
       log?.nom_admin ??
       log?.user_name ??
       "Administrador",
+
     adminId: log?.admin_id ?? log?.adminId ?? log?.user_id ?? null,
+
     details:
       log?.detalls ??
       log?.details ??
       log?.descripcio ??
       log?.description ??
       "",
+
+    entity:
+      log?.entitat ??
+      log?.entity ??
+      null,
+
+    entityId:
+      log?.entitat_id ??
+      log?.entityId ??
+      null,
+
     createdAt:
       log?.created_at ??
       log?.createdAt ??
@@ -726,6 +740,34 @@ function AdminPage() {
     }
   };
 
+  const handleLogActionClick = (log) => {
+    if (!log) return;
+
+    if (log.entity === "court" && log.entityId) {
+      setActiveTab("courts");
+
+      setTimeout(() => {
+        scrollToCourtCard(log.entityId);
+      }, 120);
+
+      return;
+    }
+
+    if (log.entity === "user" && log.entityId) {
+      setActiveTab("users");
+
+      setTimeout(() => {
+        handleViewUserDetail(log.entityId);
+      }, 120);
+
+      return;
+    }
+
+    if (log.entity === "maintenance_block") {
+      setActiveTab("courts");
+    }
+  };
+
   // Carregar les dades d'administració inicials en muntar el component i configurar el dashboard, assegurant que les dades mostrades estiguin actualitzades i consistents des del principi
   useEffect(() => {
     refreshAllAdminData();
@@ -970,15 +1012,55 @@ function AdminPage() {
     return actionMap[action] || action?.replaceAll("_", " ") || "Acció";
   };
 
-    const getLogActionType = (action) => {
-      const normalizedAction = (action || "").toUpperCase();
+  const getLogActionType = (action) => {
+    const normalizedAction = (action || "").toUpperCase();
 
-      if (normalizedAction.startsWith("CREATE")) return "create";
-      if (normalizedAction.startsWith("UPDATE")) return "update";
-      if (normalizedAction.startsWith("DELETE")) return "delete";
+    if (normalizedAction.startsWith("CREATE")) return "create";
+    if (normalizedAction.startsWith("UPDATE")) return "update";
+    if (normalizedAction.startsWith("DELETE")) return "delete";
 
-      return "";
+    return "";
+  };
+
+  const formatLogEntityLabel = (entity) => {
+    const entityMap = {
+      court: "Pista",
+      maintenance_block: "Manteniment",
+      user: "Usuari",
     };
+
+    return entityMap[entity] || entity || "Element";
+  };
+
+  const getLogSummary = (log) => {
+    const action = (log?.action || "").toUpperCase();
+
+    switch (action) {
+      case "CREATE_COURT":
+        return "Nova pista creada";
+
+      case "UPDATE_COURT":
+        return "Pista actualitzada";
+
+      case "DELETE_COURT":
+        return "Pista eliminada";
+
+      case "CREATE_MAINTENANCE":
+        return "Bloqueig de manteniment creat";
+
+      case "UPDATE_MAINTENANCE":
+        return "Bloqueig de manteniment actualitzat";
+
+      case "DELETE_MAINTENANCE":
+        return "Bloqueig de manteniment eliminat";
+
+      case "UPDATE_USER_ROLE":
+        return "Rol d'usuari actualitzat";
+
+      default:
+        return formatActionLabel(log?.action);
+    }
+  };
 
   // Definir les targetes de resum del dashboard amb les dades normalitzades i calculades, assegurant que els valors mostrats estiguin actualitzats i siguin consistents amb les dades carregades, i proporcionant icones i classes d'estil per a una millor presentació visual
   const dashboardCards = [
@@ -1611,15 +1693,43 @@ function AdminPage() {
                                   </span>
                                 </div>
 
+                                <div className="admin__log-summary-row">
+                                  <p className="admin__log-summary">
+                                    {getLogSummary(log)}
+                                  </p>
+
+                                  {log.entity && (
+                                    <span className="admin__log-entity-pill">
+                                      {formatLogEntityLabel(log.entity)}
+                                      {log.entityId ? ` · ID ${log.entityId}` : ""}
+                                    </span>
+                                  )}
+                                </div>
+
                                 <p className="admin__log-admin">
                                   {log.adminName}
-                                  {log.adminId ? ` · ID ${log.adminId}` : ""}
+                                  {log.adminId ? ` · Admin ID ${log.adminId}` : ""}
                                 </p>
 
                                 <p className="admin__log-details">
-                                  {log.details ||
-                                    "Sense detalls addicionals."}
+                                  {log.details || "Sense detalls addicionals."}
                                 </p>
+
+                                {(log.entity === "court" || log.entity === "user" || log.entity === "maintenance_block") && (
+                                  <div className="admin__log-actions">
+                                    <button
+                                      type="button"
+                                      className="btn btn-light btn-sm"
+                                      onClick={() => handleLogActionClick(log)}
+                                    >
+                                      {log.entity === "court"
+                                        ? "Anar a la pista"
+                                        : log.entity === "user"
+                                          ? "Veure usuari"
+                                          : "Obrir gestió de pistes"}
+                                    </button>
+                                  </div>
+                                )}
                               </article>
                             ))}
                           </div>
