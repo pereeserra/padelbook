@@ -31,7 +31,13 @@ exports.getAvailability = async (req, res) => {
           WHEN r.id IS NOT NULL THEN false
           WHEN m.id IS NOT NULL THEN false
           ELSE true
-        END AS disponible
+        END AS disponible,
+
+        CASE
+          WHEN r.id IS NOT NULL THEN 'reserva'
+          WHEN m.id IS NOT NULL THEN 'manteniment'
+          ELSE NULL
+        END AS motiu_no_disponible
 
       FROM courts c
       CROSS JOIN time_slots t

@@ -71,7 +71,9 @@ function AvailabilityTable({
             <span className="avail-table__slot-subtext">
               {slot.disponible
                 ? "Reserva disponible ara mateix"
-                : "Aquesta franja ja està ocupada"}
+                : slot.motiu_no_disponible === "manteniment"
+                  ? "Franja bloquejada per manteniment"
+                  : "Aquesta franja ja està ocupada"}
             </span>
           </div>
 
@@ -80,10 +82,16 @@ function AvailabilityTable({
               className={`avail-table__badge ${
                 slot.disponible
                   ? "avail-table__badge--available"
-                  : "avail-table__badge--occupied"
+                  : slot.motiu_no_disponible === "manteniment"
+                    ? "avail-table__badge--maintenance"
+                    : "avail-table__badge--occupied"
               }`}
             >
-              {slot.disponible ? "Disponible" : "Ocupada"}
+              {slot.disponible
+                ? "Disponible"
+                : slot.motiu_no_disponible === "manteniment"
+                  ? "Manteniment"
+                  : "Ocupada"}
             </span>
 
             {justReserved && (

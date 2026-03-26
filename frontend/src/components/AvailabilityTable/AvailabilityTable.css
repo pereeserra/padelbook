@@ -303,3 +303,9 @@
   line-height: 1.6;
   font-weight: 600;
 }
+
+.avail-table__badge--maintenance {
+  background: #fff7ed;
+  color: #c2410c;
+  border-color: #fdba74;
+}
