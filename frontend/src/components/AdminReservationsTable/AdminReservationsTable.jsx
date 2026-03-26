@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import api from "../../api/axios";
 import "./AdminReservationsTable.css";
 
 function AdminReservationsTable({ reservations = [] }) {
