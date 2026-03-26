@@ -204,22 +204,96 @@ function formatTime(time) {
     return (
       <div className="admin-res__modal-overlay">
         <div className="admin-res__modal">
-          <h3>Detall de reserva</h3>
+          <div className="admin-res__modal-header">
+            <h3>Detall de reserva</h3>
+            <span className="admin-res__code-badge">
+              {r.codi_reserva || "Sense codi"}
+            </span>
+          </div>
 
-          <p><strong>Codi:</strong> {r.codi_reserva}</p>
-          <p><strong>Usuari:</strong> {r.nom_usuari}</p>
-          <p><strong>Email:</strong> {r.email}</p>
-          <p><strong>Pista:</strong> {r.nom_pista}</p>
-          <p><strong>Data:</strong> {formatDate(r.data_reserva)}</p>
-          <p><strong>Hora:</strong> {formatTime(r.hora_inici)} - {formatTime(r.hora_fi)}</p>
-          <p><strong>Estat:</strong> {r.estat}</p>
-          <p><strong>Pagament:</strong> {paymentStatusLabel(r.estat_pagament)}</p>
-          <p><strong>Mètode:</strong> {paymentMethodLabel(r.metode_pagament)}</p>
-          <p><strong>Import:</strong> {r.preu_total} €</p>
+          <div className="admin-res__modal-grid">
+            <div className="admin-res__modal-item">
+              <span className="admin-res__modal-label">ID reserva</span>
+              <span>{r.id}</span>
+            </div>
 
-          <button className="btn btn-light" onClick={closeReservationDetail}>
-            Tancar
-          </button>
+            <div className="admin-res__modal-item">
+              <span className="admin-res__modal-label">Usuari</span>
+              <span>{r.nom_usuari}</span>
+            </div>
+
+            <div className="admin-res__modal-item">
+              <span className="admin-res__modal-label">Email</span>
+              <span>{r.email}</span>
+            </div>
+
+            <div className="admin-res__modal-item">
+              <span className="admin-res__modal-label">ID usuari</span>
+              <span>{r.user_id}</span>
+            </div>
+
+            <div className="admin-res__modal-item">
+              <span className="admin-res__modal-label">Pista</span>
+              <span>{r.nom_pista}</span>
+            </div>
+
+            <div className="admin-res__modal-item">
+              <span className="admin-res__modal-label">ID pista</span>
+              <span>{r.court_id}</span>
+            </div>
+
+            <div className="admin-res__modal-item">
+              <span className="admin-res__modal-label">Franja</span>
+              <span>
+                {formatTime(r.hora_inici)} - {formatTime(r.hora_fi)}
+              </span>
+            </div>
+
+            <div className="admin-res__modal-item">
+              <span className="admin-res__modal-label">ID franja</span>
+              <span>{r.time_slot_id}</span>
+            </div>
+
+            <div className="admin-res__modal-item">
+              <span className="admin-res__modal-label">Data</span>
+              <span>{formatDate(r.data_reserva)}</span>
+            </div>
+
+            <div className="admin-res__modal-item">
+              <span className="admin-res__modal-label">Estat</span>
+              <span>{r.estat}</span>
+            </div>
+
+            <div className="admin-res__modal-item">
+              <span className="admin-res__modal-label">Pagament</span>
+              <span>{paymentStatusLabel(r.estat_pagament)}</span>
+            </div>
+
+            <div className="admin-res__modal-item">
+              <span className="admin-res__modal-label">Mètode</span>
+              <span>{paymentMethodLabel(r.metode_pagament)}</span>
+            </div>
+
+            <div className="admin-res__modal-item">
+              <span className="admin-res__modal-label">Import</span>
+              <span>{r.preu_total} €</span>
+            </div>
+
+            <div className="admin-res__modal-item">
+              <span className="admin-res__modal-label">Creat</span>
+              <span>
+                {r.created_at
+                  ? new Date(r.created_at).toLocaleString("ca-ES")
+                  : "-"}
+              </span>
+            </div>
+          </div>
+
+          <div className="admin-res__modal-actions">
+            <button className="btn btn-light" onClick={closeReservationDetail}>
+              Tancar
+            </button>
+          </div>
         </div>
       </div>
     );
