@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import api from "../../api/axios";
 import "./LoginPage.css";
+import { getErrorMessage } from "../../utils/errorHandler"; 
 
 function LoginPage() {
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 900);
@@ -181,13 +182,7 @@ function LoginPage() {
     } catch (err) {
       console.error(err);
 
-      if (err.response?.data?.error) {
-        setError(err.response.data.error);
-      } else if (err.response?.data?.message) {
-        setError(err.response.data.message);
-      } else {
-        setError("Error iniciant sessió.");
-      }
+      setError(getErrorMessage(err, "No s'ha pogut iniciar sessió."));
 
       resetTurnstile();
     } finally {

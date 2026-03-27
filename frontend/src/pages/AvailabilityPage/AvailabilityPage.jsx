@@ -5,6 +5,7 @@ import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 import { scrollToElementWithOffset } from "../../utils/helpers";
 import heroImg from "../../assets/images/padelballs.webp";
 import "./AvailabilityPage.css";
+import { getErrorMessage } from "../../utils/errorHandler";
 
 function AvailabilityPage() {
   const hiddenDateInputRef = useRef(null);
@@ -138,7 +139,7 @@ function AvailabilityPage() {
       setAvailability(Array.isArray(availabilityData) ? availabilityData : []);
     } catch (err) {
       console.error(err);
-      setError("No hem pogut carregar la disponibilitat. Torna-ho a intentar.");
+      setError(getErrorMessage(err, "No s'ha pogut carregar la disponibilitat."));
       setAvailability([]);
     } finally {
       setLoading(false);
@@ -210,7 +211,7 @@ function AvailabilityPage() {
       scrollToElementWithOffset(topFeedbackRef.current, 120);
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.error || "Error creant la reserva.");
+      setError(getErrorMessage(err, "No s'ha pogut crear la reserva."));
       scrollToElementWithOffset(topFeedbackRef.current, 120);
     } finally {
       setReserving(false);

@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 import { normalizeSpaces } from "../../utils/helpers";
 import "./RegisterPage.css";
+import { getErrorMessage } from "../../utils/errorHandler";
 
 function RegisterPage() {
   const navigate = useNavigate();
@@ -232,11 +233,7 @@ function RegisterPage() {
     } catch (err) {
       console.error(err);
 
-      const backendError =
-        err.response?.data?.error ||
-        err.response?.data?.message ||
-        err.message ||
-        "";
+      const backendError = getErrorMessage(err, "");
 
       const normalizedError = backendError.toString().toLowerCase();
 

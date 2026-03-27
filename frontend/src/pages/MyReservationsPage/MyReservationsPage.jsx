@@ -4,6 +4,7 @@ import api from "../../api/axios";
 import ReservationCard from "../../components/ReservationCard/ReservationCard";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 import "./MyReservationsPage.css";
+import { getErrorMessage } from "../../utils/errorHandler";
 
 function MyReservationsPage() {
   const topFeedbackRef = useRef(null);
@@ -92,7 +93,7 @@ function MyReservationsPage() {
         return;
       }
 
-      setError("Error obtenint les reserves.");
+      setError(getErrorMessage(err, "No s'han pogut carregar les reserves."));
     } finally {
       setLoading(false);
     }
@@ -135,9 +136,10 @@ function MyReservationsPage() {
             return;
           }
 
-          const backendError =
-            err.response?.data?.error ||
-            "No s'ha pogut cancel·lar la reserva. Torna-ho a provar.";
+          const backendError = getErrorMessage(
+            err,
+            "No s'ha pogut cancel·lar la reserva."
+          );
 
           showFeedbackMessage(backendError, "error");
           scrollToFeedback();
@@ -172,9 +174,10 @@ function MyReservationsPage() {
             return;
           }
 
-          const backendError =
-            err.response?.data?.error ||
-            "No s'ha pogut eliminar la reserva cancel·lada.";
+          const backendError = getErrorMessage(
+            err,
+            "No s'ha pogut eliminar la reserva cancel·lada."
+          );
 
           showFeedbackMessage(backendError, "error");
           scrollToFeedback();
