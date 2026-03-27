@@ -21,6 +21,7 @@ function MyReservationsPage() {
   const [deletingCancelledReservationId, setDeletingCancelledReservationId] =
     useState(null);
   const [activeFilter, setActiveFilter] = useState("all");
+  const [selectedDate, setSelectedDate] = useState("");
   const [recentlyCancelledReservationId, setRecentlyCancelledReservationId] =
     useState(null);
 
@@ -217,11 +218,27 @@ function MyReservationsPage() {
   }, [reservations]);
 
   const filteredReservations = useMemo(() => {
-    if (activeFilter === "active") return activeReservations;
-    if (activeFilter === "past") return pastReservations;
-    if (activeFilter === "cancelled") return cancelledReservations;
-    return reservations;
-  }, [activeFilter, reservations, activeReservations, cancelledReservations]);
+    let baseList = reservations;
+
+    if (activeFilter === "active") baseList = activeReservations;
+    else if (activeFilter === "past") baseList = pastReservations;
+    else if (activeFilter === "cancelled") baseList = cancelledReservations;
+
+    if (selectedDate) {
+      baseList = baseList.filter(
+        (reservation) => reservation.data_reserva === selectedDate
+      );
+    }
+
+    return baseList;
+  }, [
+    activeFilter,
+    reservations,
+    activeReservations,
+    pastReservations,
+    cancelledReservations,
+    selectedDate,
+  ]);
 
   const filterLabel = useMemo(() => {
     if (activeFilter === "active") return "actives";
@@ -342,6 +359,25 @@ function MyReservationsPage() {
                 <span className="pb-badge-pill pb-badge-pill--blue">
                   {filteredReservations.length} {filterLabel}
                 </span>
+              </div>
+
+              <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginTop: "0.75rem", flexWrap: "wrap" }}>
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="my-res__date-filter"
+                />
+
+                {selectedDate && (
+                  <button
+                    type="button"
+                    className="btn btn-light"
+                    onClick={() => setSelectedDate("")}
+                  >
+                    Netejar
+                  </button>
+                )}
               </div>
 
               <div
