@@ -1,10 +1,11 @@
 import { Navigate } from "react-router-dom";
+import { getUserFromToken } from "../utils/auth";
 
 // Protege una ruta para usuarios autenticados, sin importar su rol
 function ProtectedRoute({ children }) {
-  const token = localStorage.getItem("token");
+  const user = getUserFromToken();
 
-  if (!token) {
+  if (!user) {
     return <Navigate to="/login" replace />;
   }
 
