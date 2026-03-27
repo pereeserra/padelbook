@@ -303,12 +303,12 @@ function MyReservationsPage() {
                   <span className="my-res__stat-number">
                     {cancelledReservations.length}
                   </span>
-                  <div className="my-res__stat-card">
+                  <span className="my-res__stat-label">Cancel·lades</span>
+                </div>
+                <div className="my-res__stat-card">
                     <span className="my-res__stat-number">{pastReservations.length}</span>
                     <span className="my-res__stat-label">Finalitzades</span>
                   </div>
-                  <span className="my-res__stat-label">Cancel·lades</span>
-                </div>
               </div>
             )}
           </div>
@@ -484,22 +484,39 @@ function MyReservationsPage() {
               </section>
             ) : (
               <section className="scale-in pb-surface-card my-res__filtered-empty-state">
-                <span className="my-res__filtered-empty-icon">🔎</span>
+                <span className="my-res__filtered-empty-icon">
+                  {searchTerm ? "🔍" : selectedDate ? "📅" : "📭"}
+                </span>
                 <h3 className="my-res__filtered-empty-title">
-                  No hi ha reserves en aquest filtre
+                  No s'han trobat resultats
                 </h3>
                 <p className="my-res__filtered-empty-text">
-                  No hi ha reserves que coincideixin amb els filtres, la data o la cerca aplicada.
+                  {searchTerm
+                    ? `No hi ha cap reserva que coincideixi amb "${searchTerm}".`
+                    : selectedDate
+                    ? "No tens reserves per aquesta data."
+                    : activeFilter !== "all"
+                    ? "No tens reserves en aquest estat."
+                    : "No hi ha resultats amb els filtres aplicats."}
                 </p>
 
                 <div className="my-res__filtered-empty-actions">
                   <button
                     type="button"
                     className="btn btn-primary"
-                    onClick={() => handleFilterChange("all")}
+                    onClick={() => {
+                      setSearchTerm("");
+                      setSelectedDate("");
+                      handleFilterChange("all");
+                    }}
                   >
-                    Veure totes les reserves
+                    Netejar filtres
                   </button>
+                </div>
+                <div style={{ marginTop: "0.75rem" }}>
+                  <Link to="/availability" className="btn btn-light">
+                    Fer una nova reserva
+                  </Link>
                 </div>
               </section>
             )}
@@ -509,10 +526,12 @@ function MyReservationsPage() {
         {!loading && !error && reservations.length === 0 && (
           <section className="scale-in pb-surface-card my-res__empty-state">
             <span className="my-res__empty-icon">📅</span>
-            <h3 className="my-res__empty-title">Encara no tens cap reserva</h3>
+            <h3 className="my-res__empty-title">
+              Encara no has fet cap reserva
+            </h3>
             <p className="my-res__empty-text">
-              Quan reservis una pista, aquí podràs veure l’historial, consultar
-              la informació i cancel·lar-la si és necessari.
+              Quan facis la teva primera reserva, aquí podràs veure tot l’historial,
+              consultar la informació i gestionar-la fàcilment.
             </p>
 
             <div
