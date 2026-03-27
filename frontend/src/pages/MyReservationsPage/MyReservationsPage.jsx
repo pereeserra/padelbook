@@ -196,22 +196,36 @@ function MyReservationsPage() {
     return () => clearTimeout(timeout);
   }, [activeFilter, hasInteractedWithFilter]);
 
+  const now = new Date();
+
   const activeReservations = useMemo(() => {
-    return reservations.filter((reservation) => reservation.estat === "activa");
+    return reservations.filter((reservation) => {
+      const endDate = new Date(`${reservation.data_reserva}T${reservation.hora_fi}`);
+      return reservation.estat === "activa" && endDate >= now;
+    });
+  }, [reservations]);
+
+  const pastReservations = useMemo(() => {
+    return reservations.filter((reservation) => {
+      const endDate = new Date(`${reservation.data_reserva}T${reservation.hora_fi}`);
+      return reservation.estat === "activa" && endDate < now;
+    });
   }, [reservations]);
 
   const cancelledReservations = useMemo(() => {
-    return reservations.filter((reservation) => reservation.estat !== "activa");
+    return reservations.filter((reservation) => reservation.estat === "cancel·lada");
   }, [reservations]);
 
   const filteredReservations = useMemo(() => {
     if (activeFilter === "active") return activeReservations;
+    if (activeFilter === "past") return pastReservations;
     if (activeFilter === "cancelled") return cancelledReservations;
     return reservations;
   }, [activeFilter, reservations, activeReservations, cancelledReservations]);
 
   const filterLabel = useMemo(() => {
     if (activeFilter === "active") return "actives";
+    if (activeFilter === "past") return "finalitzades";
     if (activeFilter === "cancelled") return "cancel·lades";
     return "totals";
   }, [activeFilter]);
@@ -256,6 +270,10 @@ function MyReservationsPage() {
                   <span className="my-res__stat-number">
                     {cancelledReservations.length}
                   </span>
+                  <div className="my-res__stat-card">
+                    <span className="my-res__stat-number">{pastReservations.length}</span>
+                    <span className="my-res__stat-label">Finalitzades</span>
+                  </div>
                   <span className="my-res__stat-label">Cancel·lades</span>
                 </div>
               </div>
@@ -358,6 +376,16 @@ function MyReservationsPage() {
                   }`}
                   onClick={() => handleFilterChange("cancelled")}
                 >
+                  <button
+                    type="button"
+                    className={`my-res__segmented-btn ${
+                      activeFilter === "past" ? "is-active" : ""
+                    }`}
+                    onClick={() => handleFilterChange("past")}
+                  >
+                    <span className="my-res__segmented-label">Finalitzades</span>
+                    <span className="my-res__segmented-count">{pastReservations.length}</span>
+                  </button>
                   <span className="my-res__segmented-label">Cancel·lades</span>
                   <span className="my-res__segmented-count">{cancelledReservations.length}</span>
                 </button>
