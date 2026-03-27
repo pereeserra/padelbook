@@ -660,6 +660,14 @@
   margin: 0;
 }
 
+.ap-empty-state small {
+  display: block;
+  margin-top: 0.7rem;
+  color: #64748b;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
 .ap-alert {
   padding: 1.25rem 1.5rem;
   border-radius: 18px;

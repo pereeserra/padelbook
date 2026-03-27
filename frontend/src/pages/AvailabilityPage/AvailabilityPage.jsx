@@ -123,7 +123,7 @@ function AvailabilityPage() {
       }
 
       if (isPastDate(selectedDate)) {
-        setError("No pots consultar disponibilitat de dies anteriors a avui.");
+        setError("No pots consultar disponibilitat en dates passades.");
         setAvailability([]);
         return;
       }
@@ -138,7 +138,7 @@ function AvailabilityPage() {
       setAvailability(Array.isArray(availabilityData) ? availabilityData : []);
     } catch (err) {
       console.error(err);
-      setError("Error obtenint la disponibilitat.");
+      setError("No hem pogut carregar la disponibilitat. Torna-ho a intentar.");
       setAvailability([]);
     } finally {
       setLoading(false);
@@ -521,7 +521,29 @@ function AvailabilityPage() {
             {courtsData.length === 0 && !error && !success ? (
               <div className="ap-empty-state">
                 <span>🎾</span>
-                <p>No hi ha franges disponibles per aquest dia.</p>
+
+                {availability.length > 0 && filteredAvailability.length === 0 ? (
+                  <>
+                    <p>No hi ha resultats amb els filtres seleccionats.</p>
+                    <small>
+                      Prova de llevar filtres o desactivar “Només disponibles”.
+                    </small>
+                  </>
+                ) : availability.length > 0 && availabilityStats.occupiedSlots > 0 ? (
+                  <>
+                    <p>No hi ha cap franja reservable per aquest dia.</p>
+                    <small>
+                      Totes les franges estan ocupades o bloquejades.
+                    </small>
+                  </>
+                ) : (
+                  <>
+                    <p>No hi ha dades de disponibilitat per aquest dia.</p>
+                    <small>
+                      Prova una altra data o torna-ho a intentar més tard.
+                    </small>
+                  </>
+                )}
               </div>
             ) : (
               courtsData.map((court, courtIndex) => {
