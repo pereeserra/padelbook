@@ -339,3 +339,44 @@
   color: #0f172a;
   font-weight: 600;
 }
+
+.my-res__tools-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.my-res__search-input,
+.my-res__date-filter {
+  min-height: 44px;
+  padding: 0.6rem 0.8rem;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  background: white;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.my-res__search-input {
+  min-width: 240px;
+  flex: 1 1 260px;
+}
+
+.my-res__date-filter {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 768px) {
+  .my-res__tools-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .my-res__search-input,
+  .my-res__date-filter {
+    width: 100%;
+    min-width: 0;
+  }
+}

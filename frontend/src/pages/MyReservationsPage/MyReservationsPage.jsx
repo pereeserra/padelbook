@@ -22,6 +22,7 @@ function MyReservationsPage() {
     useState(null);
   const [activeFilter, setActiveFilter] = useState("all");
   const [selectedDate, setSelectedDate] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [recentlyCancelledReservationId, setRecentlyCancelledReservationId] =
     useState(null);
 
@@ -230,6 +231,20 @@ function MyReservationsPage() {
       );
     }
 
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+
+    if (normalizedSearch) {
+      baseList = baseList.filter((reservation) => {
+        const normalizedCourt = String(reservation.nom_pista || "").toLowerCase();
+        const normalizedCode = String(reservation.codi_reserva || "").toLowerCase();
+
+        return (
+          normalizedCourt.includes(normalizedSearch) ||
+          normalizedCode.includes(normalizedSearch)
+        );
+      });
+    }
+
     return baseList;
   }, [
     activeFilter,
@@ -238,6 +253,7 @@ function MyReservationsPage() {
     pastReservations,
     cancelledReservations,
     selectedDate,
+    searchTerm,
   ]);
 
   const filterLabel = useMemo(() => {
@@ -361,7 +377,15 @@ function MyReservationsPage() {
                 </span>
               </div>
 
-              <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginTop: "0.75rem", flexWrap: "wrap" }}>
+              <div className="my-res__tools-row">
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Cercar per codi o pista"
+                  className="my-res__search-input"
+                />
+
                 <input
                   type="date"
                   value={selectedDate}
@@ -369,11 +393,14 @@ function MyReservationsPage() {
                   className="my-res__date-filter"
                 />
 
-                {selectedDate && (
+                {(selectedDate || searchTerm) && (
                   <button
                     type="button"
                     className="btn btn-light"
-                    onClick={() => setSelectedDate("")}
+                    onClick={() => {
+                      setSelectedDate("");
+                      setSearchTerm("");
+                    }}
                   >
                     Netejar
                   </button>
@@ -462,7 +489,7 @@ function MyReservationsPage() {
                   No hi ha reserves en aquest filtre
                 </h3>
                 <p className="my-res__filtered-empty-text">
-                  Canvia el filtre per veure altres reserves del teu historial.
+                  No hi ha reserves que coincideixin amb els filtres, la data o la cerca aplicada.
                 </p>
 
                 <div className="my-res__filtered-empty-actions">
