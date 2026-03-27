@@ -69,6 +69,10 @@ function LoginPage() {
   useEffect(() => {
     const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
 
+    if (!siteKey) {
+      console.error("❌ Falta VITE_TURNSTILE_SITE_KEY al frontend");
+    }
+
     if (!siteKey || !turnstileContainerRef.current) return;
 
     let attempts = 0;

@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Configuració de l'instància d'axios amb la URL base de l'API
 const api = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000",
 });
 
 // Interceptor per afegir el token d'autenticació a les peticions
