@@ -105,6 +105,26 @@
   border: 1px solid #fecdd3;
 }
 
+.avail-table__maintenance-count {
+  background: #fff7ed;
+  color: #c2410c;
+  padding: 0.38rem 0.72rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  border: 1px solid #fdba74;
+}
+
+.avail-table__reservation-count {
+  background: #fdf2f8;
+  color: #be185d;
+  padding: 0.38rem 0.72rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  border: 1px solid #fbcfe8;
+}
+
 .avail-table__progress-track {
   width: 100%;
   height: 11px;

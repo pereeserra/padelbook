@@ -37,7 +37,15 @@ exports.getAvailability = async (req, res) => {
           WHEN r.id IS NOT NULL THEN 'reserva'
           WHEN m.id IS NOT NULL THEN 'manteniment'
           ELSE NULL
-        END AS motiu_no_disponible
+        END AS motiu_no_disponible,
+
+        CASE
+          WHEN r.id IS NOT NULL THEN 'Ja hi ha una reserva activa en aquesta franja'
+          WHEN m.id IS NOT NULL AND m.motiu IS NOT NULL AND TRIM(m.motiu) <> ''
+            THEN CONCAT('Pista bloquejada per manteniment: ', m.motiu)
+          WHEN m.id IS NOT NULL THEN 'Pista bloquejada per manteniment'
+          ELSE NULL
+        END AS detall_no_disponible
 
       FROM courts c
       CROSS JOIN time_slots t

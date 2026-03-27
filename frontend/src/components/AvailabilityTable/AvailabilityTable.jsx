@@ -32,6 +32,36 @@ function AvailabilityTable({
     );
   };
 
+  // Funció per obtenir una etiqueta curta del motiu de no disponibilitat
+  const getUnavailableLabel = (slot) => {
+    if (slot.motiu_no_disponible === "manteniment") {
+      return "Manteniment";
+    }
+
+    if (slot.motiu_no_disponible === "reserva") {
+      return "Ocupada";
+    }
+
+    return "No disponible";
+  };
+
+  // Funció per obtenir el detall complet del motiu de no disponibilitat
+  const getUnavailableDetail = (slot) => {
+    if (slot.detall_no_disponible) {
+      return slot.detall_no_disponible;
+    }
+
+    if (slot.motiu_no_disponible === "manteniment") {
+      return "Pista bloquejada per manteniment";
+    }
+
+    if (slot.motiu_no_disponible === "reserva") {
+      return "Aquesta franja ja està ocupada";
+    }
+
+    return "Aquesta franja no està disponible";
+  };
+
   // Funció per renderitzar cada fila de franja
   const renderSlotRow = (slot, index) => {
     const justReserved = isRecentlyReserved(slot);
@@ -71,9 +101,7 @@ function AvailabilityTable({
             <span className="avail-table__slot-subtext">
               {slot.disponible
                 ? "Reserva disponible ara mateix"
-                : slot.motiu_no_disponible === "manteniment"
-                  ? "Franja bloquejada per manteniment"
-                  : "Aquesta franja ja està ocupada"}
+                : getUnavailableDetail(slot)}
             </span>
           </div>
 
@@ -87,11 +115,7 @@ function AvailabilityTable({
                     : "avail-table__badge--occupied"
               }`}
             >
-              {slot.disponible
-                ? "Disponible"
-                : slot.motiu_no_disponible === "manteniment"
-                  ? "Manteniment"
-                  : "Ocupada"}
+              {slot.disponible ? "Disponible" : getUnavailableLabel(slot)}
             </span>
 
             {justReserved && (
@@ -104,6 +128,7 @@ function AvailabilityTable({
           type="button"
           onClick={() => onReserve(slot)}
           disabled={!slot.disponible || isReserving}
+          title={!slot.disponible ? getUnavailableDetail(slot) : "Reservar aquesta franja"}
           className={buttonClass}
         >
           {!slot.disponible
@@ -122,6 +147,12 @@ function AvailabilityTable({
         {Object.entries(groupedCourts).map(([courtName, slots]) => {
           const availableSlots = slots.filter((slot) => slot.disponible);
           const occupiedSlots = slots.filter((slot) => !slot.disponible);
+          const occupiedByReservation = slots.filter(
+            (slot) => !slot.disponible && slot.motiu_no_disponible === "reserva"
+          );
+          const occupiedByMaintenance = slots.filter(
+            (slot) => !slot.disponible && slot.motiu_no_disponible === "manteniment"
+          );
           const availabilityPercentage = slots.length
             ? Math.round((availableSlots.length / slots.length) * 100)
             : 0;
@@ -150,6 +181,12 @@ function AvailabilityTable({
                     </span>
                     <span className="avail-table__occupied-count">
                       {occupiedSlots.length} ocupades
+                    </span>
+                    <span className="avail-table__maintenance-count">
+                      {occupiedByMaintenance.length} manteniment
+                    </span>
+                    <span className="avail-table__reservation-count">
+                      {occupiedByReservation.length} reserva
                     </span>
                   </div>
                 </div>
