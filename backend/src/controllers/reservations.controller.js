@@ -290,7 +290,7 @@ exports.getReservations = async (req, res) => {
       params.push(estat);
     }
 
-    query += ` ORDER BY r.data_reserva, t.hora_inici`;
+    query += `ORDER BY r.data_reserva DESC, t.hora_inici DESC`;
 
     const [reservations] = await db.query(query, params);
 

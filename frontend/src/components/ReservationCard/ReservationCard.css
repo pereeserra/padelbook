@@ -379,3 +379,9 @@
     width: 100%;
   }
 }
+
+.res-card__badge--past {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5f5;
+}

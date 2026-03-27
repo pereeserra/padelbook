@@ -12,6 +12,9 @@ function ReservationCard({
   onAbortCancel,
 }) {
   const isActive = reservation.estat === "activa";
+
+  const isPastReservation =
+    new Date(`${reservation.data_reserva}T${reservation.hora_fi}`) < new Date();
   const cardRef = useRef(null);
 
   // Funció per fer scroll suau cap a la targeta quan s'està confirmant la cancel·lació
@@ -138,7 +141,11 @@ function ReservationCard({
 
           <span
             className={`res-card__badge ${
-              isActive ? "res-card__badge--active" : "res-card__badge--inactive"
+              isPastReservation
+                ? "res-card__badge--past"
+                : isActive
+                  ? "res-card__badge--active"
+                  : "res-card__badge--inactive"
             }`}
           >
             <span
@@ -148,7 +155,7 @@ function ReservationCard({
                   : "res-card__badge-dot--inactive"
               }`}
             />
-            {reservation.estat}
+            {isPastReservation ? "finalitzada" : reservation.estat}
           </span>
         </div>
       </div>
@@ -189,7 +196,7 @@ function ReservationCard({
               </div>
             </div>
 
-      {isActive && !confirmingCancel && (
+      {isActive && !confirmingCancel && !isPastReservation && (
         <div className="res-card__footer">
           <button
             type="button"
