@@ -370,13 +370,6 @@ function MyReservationsPage() {
                 </button>
 
                 <button
-                  type="button"
-                  className={`my-res__segmented-btn ${
-                    activeFilter === "cancelled" ? "is-active" : ""
-                  }`}
-                  onClick={() => handleFilterChange("cancelled")}
-                >
-                  <button
                     type="button"
                     className={`my-res__segmented-btn ${
                       activeFilter === "past" ? "is-active" : ""
@@ -386,6 +379,14 @@ function MyReservationsPage() {
                     <span className="my-res__segmented-label">Finalitzades</span>
                     <span className="my-res__segmented-count">{pastReservations.length}</span>
                   </button>
+
+                <button
+                  type="button"
+                  className={`my-res__segmented-btn ${
+                    activeFilter === "cancelled" ? "is-active" : ""
+                  }`}
+                  onClick={() => handleFilterChange("cancelled")}
+                >
                   <span className="my-res__segmented-label">Cancel·lades</span>
                   <span className="my-res__segmented-count">{cancelledReservations.length}</span>
                 </button>
