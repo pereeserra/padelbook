@@ -291,7 +291,7 @@ function MyReservationsPage() {
     if (activeFilter === "active") return "actives";
     if (activeFilter === "past") return "finalitzades";
     if (activeFilter === "cancelled") return "cancel·lades";
-    return "totals";
+    return "Totals";
   }, [activeFilter]);
 
   const currentSectionTitle = useMemo(() => {
