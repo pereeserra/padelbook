@@ -60,6 +60,7 @@ function ReservationCard({
     "res-card",
     confirmingCancel ? "res-card--confirming" : "",
     !isActive ? "res-card--inactive" : "",
+    isPastReservation ? "res-card--past" : "",
     isCancelling || isDeletingCancelled ? "res-card--busy" : "",
   ]
     .filter(Boolean)
@@ -103,7 +104,7 @@ function ReservationCard({
         </div>
 
         <div className="res-card__header-actions">
-          {!isActive && (
+          {(!isActive || isPastReservation) && (
             <button
               type="button"
               onClick={() => onDeleteCancelled(reservation.id)}

@@ -45,6 +45,12 @@
   opacity: 0.97;
 }
 
+.res-card--past {
+  opacity: 0.92;
+  background: rgba(248, 250, 252, 0.9);
+  border: 1px solid #e2e8f0;
+}
+
 .res-card--busy {
   opacity: 0.8;
   pointer-events: none;
