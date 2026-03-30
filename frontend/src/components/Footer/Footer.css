@@ -6,7 +6,7 @@
 }
 
 .footer__container {
-  max-width: 1240px;
+  max-width: var(--container);
   margin: 0 auto;
   padding: 0 1.5rem;
   display: grid;
