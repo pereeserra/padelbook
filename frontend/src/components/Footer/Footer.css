@@ -69,3 +69,35 @@
   font-size: 0.8rem;
   color: #94a3b8;
 }
+
+@media (max-width: 768px) {
+  .footer {
+    padding: 1.5rem 0;
+  }
+
+  .footer__container {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0 1rem;
+    text-align: center;
+  }
+
+  .footer__left,
+  .footer__center,
+  .footer__right {
+    align-items: center;
+    justify-content: center;
+  }
+
+  .footer__brand-link {
+    width: auto;
+  }
+
+  .footer__center {
+    gap: 0.85rem;
+  }
+
+  .footer__right {
+    align-items: center;
+  }
+}
