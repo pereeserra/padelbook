@@ -273,8 +273,17 @@ function LoginPage() {
           <div ref={feedbackRef} />
 
           {sessionExpired && !error && (
-            <div className="scale-in login__error-box">
-              <p className="login__error-text">
+            <div
+              className="scale-in login__error-box"
+              style={{
+                background: "#eff6ff",
+                border: "1px solid #bfdbfe",
+              }}
+            >
+              <p
+                className="login__error-text"
+                style={{ color: "#1e3a8a" }}
+              >
                 La teva sessió ha caducat. Torna a iniciar sessió.
               </p>
             </div>
