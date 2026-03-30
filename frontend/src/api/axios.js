@@ -24,11 +24,22 @@ api.interceptors.response.use(
     const status = error?.response?.status;
     const currentPath = window.location.pathname;
 
+    // 🔴 401 → sessió caducada
     if (status === 401 && currentPath !== "/login") {
       handleSessionExpired();
+      return Promise.reject(error);
     }
 
-    return Promise.reject(error);
+    // 🟡 Altres errors → deixar passar però normalitzats
+    const normalizedError = {
+      status,
+      message:
+        error?.response?.data?.message ||
+        error.message ||
+        "Error inesperat",
+    };
+
+    return Promise.reject(normalizedError);
   }
 );
 
