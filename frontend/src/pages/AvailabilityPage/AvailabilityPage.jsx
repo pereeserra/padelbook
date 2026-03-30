@@ -450,13 +450,13 @@ function AvailabilityPage() {
         <div ref={topFeedbackRef}></div>
 
         {error && (
-          <div className="ap-alert ap-alert--error fade-in">
-            <strong>Error:</strong> {error}
+          <div className="pb-feedback pb-feedback--error fade-in">
+            <p className="pb-feedback__text">{error}</p>
           </div>
         )}
 
         {showAuthHelp && (
-          <div className="ap-alert ap-alert--info fade-in">
+          <div className="pb-feedback pb-feedback--info fade-in">
             <p>Necessites iniciar sessió per reservar pistes.</p>
             <div className="ap-alert-actions">
               <Link to="/login" className="btn btn-primary btn-sm">
@@ -470,7 +470,7 @@ function AvailabilityPage() {
         )}
 
         {success && reservationSummary && (
-          <div className="ap-alert ap-alert--success fade-in fade-in-up">
+          <div className="pb-feedback pb-feedback--success fade-in fade-in-up">
             <div className="ap-success-header">
               <h3>🎉 Reserva Confirmada</h3>
               <span className="ap-success-code">{reservationSummary.codi_reserva}</span>

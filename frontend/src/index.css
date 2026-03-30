@@ -407,6 +407,12 @@ p {
   color: #0f172a;
 }
 
+.pb-feedback--info {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e3a8a;
+}
+
 .pb-badge-pill {
   display: inline-flex;
   align-items: center;
