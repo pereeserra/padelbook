@@ -16,8 +16,8 @@
   position: relative;
   overflow: hidden;
   border-radius: 30px;
-  padding: 2rem;
-  margin-bottom: 1.75rem;
+  padding: 1.35rem;
+  margin-bottom: 1.5rem;
   background: linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(37, 99, 235, 0.9));
   box-shadow: 0 28px 60px rgba(37, 99, 235, 0.14);
   color: #ffffff;

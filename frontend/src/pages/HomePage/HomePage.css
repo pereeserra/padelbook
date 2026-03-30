@@ -20,8 +20,8 @@
 .home__hero {
   position: relative;
   overflow: hidden;
-  border-radius: 28px;
-  padding: 1.1rem 1.2rem;
+  border-radius: 30px;
+  padding: 1.35rem;
   border: 1px solid rgba(255, 255, 255, 0.55);
   box-shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
 }
@@ -45,7 +45,7 @@
 }
 
 .home__hero--mobile {
-  padding: 1.15rem;
+  padding: 1.1rem;
   border-radius: 24px;
 }
 
