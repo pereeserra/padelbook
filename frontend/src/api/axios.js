@@ -24,7 +24,7 @@ api.interceptors.response.use(
     const status = error?.response?.status;
     const currentPath = window.location.pathname;
 
-    if (status === 401) {
+    if (status === 401 && currentPath !== "/login") {
       handleSessionExpired();
     }
 
