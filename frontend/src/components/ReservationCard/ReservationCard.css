@@ -146,6 +146,12 @@
   border: 1px solid #fecdd3;
 }
 
+.res-card__badge--past {
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
 .res-card__delete-icon-button {
   width: 40px;
   height: 40px;
@@ -167,6 +173,15 @@
 .res-card__delete-icon-button:hover {
   transform: translateY(-1px);
   box-shadow: 0 12px 22px rgba(220, 38, 38, 0.14);
+}
+
+.res-card__delete-icon-button:focus-visible,
+.res-card__cancel-button:focus-visible,
+.res-card__confirm-danger-button:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.14),
+    0 0 0 7px rgba(37, 99, 235, 0.08);
 }
 
 .res-card__delete-icon-button--disabled {
@@ -328,6 +343,15 @@
   font-weight: 800;
   padding: 0.72rem 1rem;
   cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.res-card__confirm-danger-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 24px rgba(220, 38, 38, 0.18);
 }
 
 .res-card__confirm-danger-button--loading {

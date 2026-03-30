@@ -50,6 +50,12 @@
   font-size: 0.9rem;
   font-weight: 700;
   color: #334155;
+  transition: color 0.18s ease, transform 0.18s ease;
+}
+
+.footer__link:hover {
+  color: #1d4ed8;
+  transform: translateY(-1px);
 }
 
 .footer__right {
