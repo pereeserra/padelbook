@@ -6,9 +6,8 @@ function AdminRoute({ children }) {
   const user = getUserFromToken();
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login?session=expired" replace />;
   }
-
   if (user.rol !== "admin") {
     return <Navigate to="/" replace />;
   }

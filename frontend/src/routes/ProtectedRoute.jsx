@@ -6,7 +6,7 @@ function ProtectedRoute({ children }) {
   const user = getUserFromToken();
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login?session=expired" replace />;
   }
 
   return children;

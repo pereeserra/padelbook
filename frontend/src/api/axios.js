@@ -1,4 +1,5 @@
 import axios from "axios";
+import { handleSessionExpired } from "../utils/sessionManager";
 
 // Configuració de l'instància d'axios amb la URL base de l'API
 const api = axios.create({
@@ -24,12 +25,7 @@ api.interceptors.response.use(
     const currentPath = window.location.pathname;
 
     if (status === 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-
-      if (currentPath !== "/login") {
-        window.location.href = "/login?session=expired";
-      }
+      handleSessionExpired();
     }
 
     return Promise.reject(error);

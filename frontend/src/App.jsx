@@ -1,4 +1,11 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import AdminRoute from "./routes/AdminRoute";
@@ -13,9 +20,26 @@ import ProfilePage from "./pages/ProfilePage/ProfilePage";
 import BackToTopButton from "./components/BackToTopButton/BackToTopButton";
 import Footer from "./components/Footer/Footer";
 
-function App() {
+function AppContent() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const handleExpired = () => {
+      if (location.pathname !== "/login") {
+        navigate("/login?session=expired", { replace: true });
+      }
+    };
+
+    window.addEventListener("session-expired", handleExpired);
+
+    return () => {
+      window.removeEventListener("session-expired", handleExpired);
+    };
+  }, [navigate, location.pathname]);
+
   return (
-    <BrowserRouter>
+    <>
       <ScrollToTop />
       <Navbar />
 
@@ -58,6 +82,14 @@ function App() {
       <Footer />
 
       <BackToTopButton />
+    </>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
     </BrowserRouter>
   );
 }
