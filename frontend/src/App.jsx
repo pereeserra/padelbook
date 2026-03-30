@@ -26,7 +26,10 @@ function AppContent() {
 
   useEffect(() => {
     const handleExpired = () => {
-      if (location.pathname !== "/login") {
+      const isLogin = location.pathname === "/login";
+      const hasExpiredParam = location.search.includes("session=expired");
+
+      if (!isLogin || (isLogin && !hasExpiredParam)) {
         navigate("/login?session=expired", { replace: true });
       }
     };
