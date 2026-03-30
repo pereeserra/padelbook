@@ -420,12 +420,33 @@ exports.deleteCancelledReservationPermanently = async (req, res) => {
       return fail(res, "No tens permís per eliminar aquesta reserva", 403);
     }
 
-    if (reservation.estat !== RESERVATION_STATUS.CANCELLED) {
-      return fail(
-        res,
-        "Només es poden eliminar definitivament les reserves cancel·lades",
-        400
+    // Permetre eliminar:
+    // - cancel·lades
+    // - finalitzades (activa però passada)
+
+    if (reservation.estat === RESERVATION_STATUS.ACTIVE) {
+      const now = new Date();
+
+      const [timeSlotRows] = await db.query(
+        "SELECT hora_fi FROM time_slots WHERE id = ? LIMIT 1",
+        [reservation.time_slot_id]
       );
+
+      if (timeSlotRows.length === 0) {
+        return fail(res, "No s'ha pogut validar la franja horària", 500);
+      }
+
+      const hora_fi = timeSlotRows[0].hora_fi;
+
+      const reservationEnd = new Date(`${reservation.data_reserva}T${hora_fi}`);
+
+      if (reservationEnd >= now) {
+        return fail(
+          res,
+          "Només es poden eliminar reserves cancel·lades o ja finalitzades",
+          400
+        );
+      }
     }
 
     await db.query("DELETE FROM reservations WHERE id = ?", [reservationId]);
