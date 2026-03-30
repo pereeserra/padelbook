@@ -24,6 +24,13 @@
   border-bottom: 1px solid rgba(226, 232, 240, 0.9);
 }
 
+@media (max-width: 768px) {
+  .ap-hero {
+    min-height: 180px;
+    margin-bottom: 1.2rem;
+  }
+}
+
 .ap-hero__bg {
   position: absolute;
   inset: 0;
@@ -82,6 +89,13 @@
   margin: 0 0 0.7rem;
   letter-spacing: -0.04em;
   color: #0f172a;
+}
+
+@media (max-width: 768px) {
+  .ap-title {
+    font-size: 1.9rem;
+    line-height: 1.1;
+  }
 }
 
 .ap-subtitle {
@@ -164,6 +178,8 @@
   padding: 0.45rem 0 0.65rem;
   -ms-overflow-style: none;
   scrollbar-width: none;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
 }
 
 .ap-dates-scroll::-webkit-scrollbar {
@@ -172,8 +188,8 @@
 
 .ap-day-btn {
   flex: 0 0 auto;
-  width: 86px;
-  min-height: 96px;
+  width: 82px;
+  min-height: 92px;
   border-radius: 20px;
   border: 1px solid #dbe3ef;
   background: linear-gradient(180deg, #ffffff, #f8fafc);
@@ -336,16 +352,18 @@
 
 .ap-courts-grid {
   display: grid;
-  gap: 1.4rem;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 1.1rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
 }
 
+
 .ap-court-card {
+  min-width: 0;
   background: rgba(255, 255, 255, 0.88);
-  border-radius: 28px;
-  padding: 1.35rem;
+  border-radius: 24px;
+  padding: 1.1rem;
   border: 1px solid rgba(148, 163, 184, 0.16);
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.05);
   backdrop-filter: blur(12px);
   transition: transform 0.22s ease, box-shadow 0.22s ease;
 }
@@ -363,7 +381,7 @@
   margin-bottom: 1.15rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid #eef2f7;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
 }
 
 .ap-court-header > div:first-child {
@@ -383,9 +401,15 @@
 
 .ap-court-name {
   margin: 0;
-  font-size: 1.45rem;
+  font-size: 1.35rem;
   font-weight: 900;
   color: #0f172a;
+}
+
+@media (max-width: 768px) {
+  .ap-court-name {
+    font-size: 1.2rem;
+  }
 }
 
 .ap-court-badges {
@@ -393,8 +417,7 @@
   align-items: center;
   justify-content: flex-end;
   gap: 0.35rem;
-  flex-wrap: nowrap;
-  white-space: nowrap;
+  flex-wrap: wrap;
   flex: 0 1 auto;
   min-width: 0;
 }
@@ -423,13 +446,13 @@
 
 .ap-slots-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
-  gap: 0.7rem;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: 0.6rem;
 }
 
 .ap-slot-pill {
-  min-height: 44px;
-  padding: 0.7rem 0.4rem;
+  min-height: 48px;
+  padding: 0.75rem 0.5rem;
   border-radius: 14px;
   font-size: 0.92rem;
   font-weight: 800;
@@ -547,7 +570,7 @@
   display: flex;
   align-items: flex-end;
   gap: 0.9rem;
-  padding-right: 2.4rem;
+  padding-right: 0;
 }
 
 .ap-payment-field {
@@ -573,6 +596,7 @@
 .ap-payment-toggle {
   display: inline-flex;
   align-items: center;
+  flex-wrap: wrap;
   padding: 0.28rem;
   border-radius: 16px;
   background: #eaf1ff;
@@ -831,13 +855,66 @@
     font-size: 1rem;
   }
 
-  .ap-dates-card {
+    .ap-dates-card {
     border-radius: 22px;
     padding: 1rem;
   }
 
+  .ap-dates-scroll {
+    justify-content: flex-start;
+    gap: 0.6rem;
+    padding: 0.35rem 0.15rem 0.55rem;
+  }
+
+  .ap-day-btn {
+    width: 74px;
+    min-height: 84px;
+    border-radius: 18px;
+    scroll-snap-align: start;
+  }
+
+  .ap-day-name {
+    font-size: 0.78rem;
+  }
+
+  .ap-day-num {
+    font-size: 1.45rem;
+  }
+
+  .ap-day-today {
+    font-size: 0.68rem;
+  }
+
   .ap-courts-grid {
     grid-template-columns: 1fr;
+  }
+
+  .ap-court-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ap-court-badges {
+    justify-content: flex-start;
+  }
+
+  .ap-court-meta {
+    white-space: normal;
+    text-align: center;
+  }
+
+  .ap-slots-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+  }
+
+  .ap-slot-pill {
+    min-height: 52px;
+    font-size: 0.95rem;
+  }
+
+  .ap-floating-action {
+    padding: 0.9rem 1rem;
   }
 
   .ap-floating-inner {
@@ -851,6 +928,18 @@
     flex-direction: column;
     align-items: stretch;
     gap: 0.75rem;
+  }
+
+  .ap-floating-close {
+    top: 0;
+    right: 0;
+    width: 34px;
+    height: 34px;
+  }
+
+  .ap-floating-time {
+    font-size: 1rem;
+    line-height: 1.45;
   }
 
   .ap-floating-price {
@@ -868,6 +957,17 @@
 
   .ap-payment-field {
     width: 100%;
+  }
+
+  .ap-payment-toggle {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .ap-payment-option {
+    width: 100%;
+    justify-content: center;
   }
 
   .ap-payment-select {
