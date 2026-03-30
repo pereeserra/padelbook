@@ -3,7 +3,7 @@
     radial-gradient(circle at top, rgba(37, 99, 235, 0.08), transparent 30%),
     linear-gradient(180deg, #f8fafc 0%, #eef4ff 100%);
   min-height: 100vh;
-  padding-bottom: 4rem;
+  padding-bottom: 3rem;
   color: #0f172a;
 }
 
