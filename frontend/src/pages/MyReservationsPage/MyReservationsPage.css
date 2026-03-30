@@ -116,7 +116,7 @@
 }
 
 .my-res__summary-section {
-  padding: 1.5rem;
+  padding: 1.25rem;
   margin-bottom: 1rem;
 }
 
@@ -163,7 +163,7 @@
 
 .my-res__filtered-empty-state {
   margin-top: 1rem;
-  padding: 2rem;
+  padding: 1.5rem;
   text-align: center;
 }
 
@@ -192,8 +192,8 @@
 }
 
 .my-res__empty-state {
-  margin-top: 2rem;
-  padding: 2rem;
+  margin-top: 1.5rem;
+  padding: 1.5rem;
   text-align: center;
 }
 
@@ -394,6 +394,30 @@
 @media (max-width: 768px) {
   .my-res__grid {
     grid-template-columns: 1fr;
+  }
+
+  .my-res__summary-section {
+    padding: 1rem;
+  }
+
+  .my-res__filtered-empty-state,
+  .my-res__empty-state {
+    padding: 1.25rem 1rem;
+    border-radius: 20px;
+  }
+
+  .my-res__filtered-empty-title {
+    font-size: 1.2rem;
+  }
+
+  .my-res__empty-title {
+    font-size: 1.25rem;
+  }
+
+  .my-res__filtered-empty-text,
+  .my-res__empty-text {
+    font-size: 0.96rem;
+    line-height: 1.65;
   }
 
   .my-res__tools-row {
