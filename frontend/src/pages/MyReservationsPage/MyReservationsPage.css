@@ -342,17 +342,17 @@
 
 .my-res__tools-row {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.75rem;
   align-items: center;
-  margin-top: 0.75rem;
+  margin-top: 1rem;
   flex-wrap: wrap;
 }
 
 .my-res__search-input,
 .my-res__date-filter {
-  min-height: 44px;
-  padding: 0.6rem 0.8rem;
-  border-radius: 12px;
+  min-height: 48px;
+  padding: 0.75rem 0.95rem;
+  border-radius: 14px;
   border: 1px solid #cbd5e1;
   background: white;
   color: #0f172a;
@@ -376,11 +376,17 @@
   .my-res__tools-row {
     flex-direction: column;
     align-items: stretch;
+    gap: 0.8rem;
+    margin-top: 1rem;
   }
 
   .my-res__search-input,
   .my-res__date-filter {
     width: 100%;
     min-width: 0;
+  }
+
+  .my-res__tools-row .btn {
+    width: 100%;
   }
 }
