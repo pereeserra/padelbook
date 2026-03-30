@@ -217,21 +217,33 @@ function MyReservationsPage() {
     return () => clearTimeout(timeout);
   }, [activeFilter, hasInteractedWithFilter]);
 
+  const getReservationEndDate = (reservation) => {
+    const [year, month, day] = String(reservation.data_reserva || "")
+      .split("-")
+      .map(Number);
+
+    const [hours, minutes, seconds = 0] = String(reservation.hora_fi || "00:00:00")
+      .split(":")
+      .map(Number);
+
+    return new Date(year, month - 1, day, hours, minutes, seconds);
+  };
+
   const now = new Date();
 
   const activeReservations = useMemo(() => {
     return reservations.filter((reservation) => {
-      const endDate = new Date(`${reservation.data_reserva}T${reservation.hora_fi}`);
+      const endDate = getReservationEndDate(reservation);
       return reservation.estat === "activa" && endDate >= now;
     });
-  }, [reservations]);
+  }, [reservations, now]);
 
   const pastReservations = useMemo(() => {
     return reservations.filter((reservation) => {
-      const endDate = new Date(`${reservation.data_reserva}T${reservation.hora_fi}`);
+      const endDate = getReservationEndDate(reservation);
       return reservation.estat === "activa" && endDate < now;
     });
-  }, [reservations]);
+  }, [reservations, now]);
 
   const cancelledReservations = useMemo(() => {
     return reservations.filter((reservation) => reservation.estat === "cancel·lada");
@@ -280,6 +292,29 @@ function MyReservationsPage() {
     if (activeFilter === "past") return "finalitzades";
     if (activeFilter === "cancelled") return "cancel·lades";
     return "totals";
+  }, [activeFilter]);
+
+  const currentSectionTitle = useMemo(() => {
+    if (activeFilter === "active") return "Reserves actives";
+    if (activeFilter === "past") return "Reserves finalitzades";
+    if (activeFilter === "cancelled") return "Reserves cancel·lades";
+    return "Totes les reserves";
+  }, [activeFilter]);
+
+  const currentSectionText = useMemo(() => {
+    if (activeFilter === "active") {
+      return "Aquí tens les reserves futures que encara pots gestionar o cancel·lar.";
+    }
+
+    if (activeFilter === "past") {
+      return "Aquí tens les reserves que ja s'han completat i que pots repetir o eliminar de l'historial.";
+    }
+
+    if (activeFilter === "cancelled") {
+      return "Aquí tens les reserves cancel·lades que encara vols conservar o eliminar.";
+    }
+
+    return "Aquí tens tot l'historial complet de reserves.";
   }, [activeFilter]);
 
   return (
@@ -477,32 +512,42 @@ function MyReservationsPage() {
             </section>
 
             {filteredReservations.length > 0 ? (
-              <section className="fade-in-up delay-2 my-res__grid">
-                {filteredReservations.map((reservation) => (
-                  <div
-                    key={reservation.id}
-                    className={
-                      recentlyCancelledReservationId === reservation.id
-                        ? "my-res__recently-cancelled-wrapper"
-                        : undefined
-                    }
-                  >
-                    <ReservationCard
-                      reservation={reservation}
-                      onCancel={handleCancel}
-                      onDeleteCancelled={handleDeleteCancelled}
-                      onRepeatReservation={handleRepeatReservation}
-                      isCancelling={cancellingReservationId === reservation.id}
-                      isDeletingCancelled={
-                        deletingCancelledReservationId === reservation.id
-                      }
-                      confirmingCancel={confirmingReservationId === reservation.id}
-                      onStartCancel={setConfirmingReservationId}
-                      onAbortCancel={() => setConfirmingReservationId(null)}
-                    />
+              <>
+                <section className="fade-in-up delay-2 my-res__results-head">
+                  <div>
+                    <span className="pb-kicker">{filterLabel}</span>
+                    <h3 className="my-res__results-title">{currentSectionTitle}</h3>
+                    <p className="my-res__results-text">{currentSectionText}</p>
                   </div>
-                ))}
-              </section>
+                </section>
+
+                <section className="fade-in-up delay-2 my-res__grid">
+                  {filteredReservations.map((reservation) => (
+                    <div
+                      key={reservation.id}
+                      className={
+                        recentlyCancelledReservationId === reservation.id
+                          ? "my-res__recently-cancelled-wrapper"
+                          : undefined
+                      }
+                    >
+                      <ReservationCard
+                        reservation={reservation}
+                        onCancel={handleCancel}
+                        onDeleteCancelled={handleDeleteCancelled}
+                        onRepeatReservation={handleRepeatReservation}
+                        isCancelling={cancellingReservationId === reservation.id}
+                        isDeletingCancelled={
+                          deletingCancelledReservationId === reservation.id
+                        }
+                        confirmingCancel={confirmingReservationId === reservation.id}
+                        onStartCancel={setConfirmingReservationId}
+                        onAbortCancel={() => setConfirmingReservationId(null)}
+                      />
+                    </div>
+                  ))}
+                </section>
+              </>
             ) : (
               <section className="scale-in pb-surface-card my-res__filtered-empty-state">
                 <span className="my-res__filtered-empty-icon">

@@ -161,6 +161,23 @@
   transition: all 0.2s ease;
 }
 
+.my-res__results-head {
+  margin-bottom: 0.9rem;
+}
+
+.my-res__results-title {
+  margin: 0;
+  font-size: 1.35rem;
+  color: #0f172a;
+}
+
+.my-res__results-text {
+  margin-top: 0.35rem;
+  margin-bottom: 0;
+  color: #64748b;
+  line-height: 1.65;
+}
+
 .my-res__filtered-empty-state {
   margin-top: 1rem;
   padding: 1.5rem;
@@ -411,6 +428,15 @@
 
   .my-res__stat-label {
     font-size: 0.84rem;
+  }
+
+  .my-res__results-title {
+    font-size: 1.2rem;
+  }
+
+  .my-res__results-text {
+    font-size: 0.96rem;
+    line-height: 1.65;
   }
 
   .my-res__grid {
