@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 import { scrollToElementWithOffset } from "../../utils/helpers";
@@ -10,6 +10,9 @@ import { getErrorMessage } from "../../utils/errorHandler";
 function AvailabilityPage() {
   const hiddenDateInputRef = useRef(null);
   const topFeedbackRef = useRef(null);
+  const repeatReservationHandledRef = useRef(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const getToday = () => {
     const today = new Date();
@@ -32,6 +35,7 @@ function AvailabilityPage() {
   const [reservationSummary, setReservationSummary] = useState(null);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [reserving, setReserving] = useState(false);
+  const [repeatReservationInfo, setRepeatReservationInfo] = useState(null);
 
   // Funció per formatar el preu, mostrant "Preu no disponible" si no hi ha valor vàlid
   const formatPrice = (value) => {
@@ -218,10 +222,58 @@ function AvailabilityPage() {
     }
   };
 
+  useEffect(() => {
+    const repeatReservation = location.state?.repeatReservation;
+
+    if (!repeatReservation || repeatReservationHandledRef.current) return;
+
+    repeatReservationHandledRef.current = true;
+    setRepeatReservationInfo(repeatReservation);
+    setDate(repeatReservation.data_reserva);
+
+    if (repeatReservation.metode_pagament) {
+      setPaymentMethod(repeatReservation.metode_pagament);
+    }
+
+    setShowOnlyAvailable(false);
+    setCourtTypeFilter("tots");
+    setCourtEnvironmentFilter("totes");
+    clearMessages();
+  }, [location.state]);
+
   // Efecte per obtenir la disponibilitat cada vegada que canvia la data seleccionada
   useEffect(() => {
     fetchAvailability(date);
   }, [date]);
+
+  useEffect(() => {
+    if (!repeatReservationInfo || loading || availability.length === 0) return;
+    if (date !== repeatReservationInfo.data_reserva) return;
+
+    const matchedSlot = availability.find((slot) => {
+      return (
+        slot.nom_pista === repeatReservationInfo.nom_pista &&
+        slot.hora_inici === repeatReservationInfo.hora_inici &&
+        slot.hora_fi === repeatReservationInfo.hora_fi
+      );
+    });
+
+    if (matchedSlot && matchedSlot.disponible) {
+      setSelectedSlot(matchedSlot);
+      setSuccess("");
+      setError("");
+      scrollToElementWithOffset(topFeedbackRef.current, 120);
+    } else {
+      setSelectedSlot(null);
+      setError(
+        "La reserva anterior s'ha carregat, però aquesta franja ja no està disponible."
+      );
+      scrollToElementWithOffset(topFeedbackRef.current, 120);
+    }
+
+    setRepeatReservationInfo(null);
+    navigate(location.pathname, { replace: true, state: {} });
+  }, [repeatReservationInfo, availability, loading, date, navigate, location.pathname]);
 
   // Memorització de la disponibilitat filtrada segons l'estat de "Només disponibles"
   const filteredAvailability = useMemo(() => {

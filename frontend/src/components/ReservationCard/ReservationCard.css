@@ -284,6 +284,17 @@
   justify-content: flex-end;
 }
 
+.res-card__footer--past {
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.res-card__repeat-button {
+  min-height: 42px;
+}
+
 .res-card__cancel-button {
   background: linear-gradient(135deg, #ef4444, #dc2626);
   color: white;
@@ -405,6 +416,12 @@
     justify-content: stretch;
   }
 
+  .res-card__footer--past {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .res-card__repeat-button,
   .res-card__cancel-button {
     width: 100%;
   }

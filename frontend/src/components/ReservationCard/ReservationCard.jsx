@@ -5,6 +5,7 @@ function ReservationCard({
   reservation,
   onCancel,
   onDeleteCancelled,
+  onRepeatReservation,
   isCancelling = false,
   isDeletingCancelled = false,
   confirmingCancel = false,
@@ -196,6 +197,18 @@ function ReservationCard({
                 <span className="res-card__main-price">{reservationPrice}</span>
               </div>
             </div>
+
+      {isPastReservation && (
+        <div className="res-card__footer res-card__footer--past">
+          <button
+            type="button"
+            className="btn btn-light btn-sm res-card__repeat-button"
+            onClick={() => onRepeatReservation(reservation)}
+          >
+            Tornar a reservar
+          </button>
+        </div>
+      )}
 
       {isActive && !confirmingCancel && !isPastReservation && (
         <div className="res-card__footer">

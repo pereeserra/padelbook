@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 import ReservationCard from "../../components/ReservationCard/ReservationCard";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
@@ -7,6 +7,7 @@ import "./MyReservationsPage.css";
 import { getErrorMessage } from "../../utils/errorHandler";
 
 function MyReservationsPage() {
+    const navigate = useNavigate();
     const topFeedbackRef = useRef(null);
     const summaryRef = useRef(null);
     const segmentedRef = useRef(null);
@@ -147,6 +148,20 @@ function MyReservationsPage() {
         } finally {
           setCancellingReservationId(null);
         }
+  };
+
+  const handleRepeatReservation = (reservation) => {
+    navigate("/availability", {
+      state: {
+        repeatReservation: {
+          data_reserva: reservation.data_reserva,
+          nom_pista: reservation.nom_pista,
+          hora_inici: reservation.hora_inici,
+          hora_fi: reservation.hora_fi,
+          metode_pagament: reservation.metode_pagament || "online_simulat",
+        },
+      },
+    });
   };
 
   const handleDeleteCancelled = async (id) => {
@@ -476,6 +491,7 @@ function MyReservationsPage() {
                       reservation={reservation}
                       onCancel={handleCancel}
                       onDeleteCancelled={handleDeleteCancelled}
+                      onRepeatReservation={handleRepeatReservation}
                       isCancelling={cancellingReservationId === reservation.id}
                       isDeletingCancelled={
                         deletingCancelledReservationId === reservation.id
