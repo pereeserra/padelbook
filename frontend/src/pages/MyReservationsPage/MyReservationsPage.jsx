@@ -7,8 +7,9 @@ import "./MyReservationsPage.css";
 import { getErrorMessage } from "../../utils/errorHandler";
 
 function MyReservationsPage() {
-  const topFeedbackRef = useRef(null);
-  const summaryRef = useRef(null);
+    const topFeedbackRef = useRef(null);
+    const summaryRef = useRef(null);
+    const segmentedRef = useRef(null);
 
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
   const [hasInteractedWithFilter, setHasInteractedWithFilter] = useState(false);
@@ -51,10 +52,10 @@ function MyReservationsPage() {
   };
 
   const scrollToSummary = () => {
-    if (!summaryRef.current) return;
+    if (!segmentedRef.current) return;
 
     const top =
-      summaryRef.current.getBoundingClientRect().top + window.scrollY - 150;
+      segmentedRef.current.getBoundingClientRect().top + window.scrollY - 110;
 
     window.scrollTo({
       top,
@@ -411,6 +412,7 @@ function MyReservationsPage() {
               </div>
 
               <div
+                ref={segmentedRef}
                 className={`my-res__segmented ${isMobileView ? "my-res__segmented--mobile" : ""}`}
               >
                 <button
