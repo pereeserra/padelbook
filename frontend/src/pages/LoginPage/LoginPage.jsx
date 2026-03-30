@@ -10,6 +10,7 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [capsLock, setCapsLock] = useState(false);
@@ -178,7 +179,12 @@ function LoginPage() {
       }
 
       window.dispatchEvent(new Event("profile-updated"));
-      navigate("/availability");
+
+      setSuccess("Inici de sessió correcte. Redirigint...");
+
+      setTimeout(() => {
+        navigate("/availability");
+      }, 800);
     } catch (err) {
       console.error(err);
 
@@ -274,9 +280,11 @@ function LoginPage() {
             </div>
           )}
 
-          {error && (
-            <div className="scale-in login__error-box">
-              <p className="login__error-text">{error}</p>
+          {success && (
+            <div className="scale-in login__error-box" style={{ background: "#f0fdf4", border: "1px solid #bbf7d0" }}>
+              <p className="login__error-text" style={{ color: "#166534" }}>
+                {success}
+              </p>
             </div>
           )}
 

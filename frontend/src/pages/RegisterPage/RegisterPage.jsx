@@ -20,6 +20,7 @@ function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
@@ -229,7 +230,11 @@ function RegisterPage() {
         turnstileToken,
       });
 
-      navigate("/login");
+      setSuccess("Compte creat correctament. Redirigint al login...");
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 1000);
     } catch (err) {
       console.error(err);
 
@@ -339,9 +344,11 @@ function RegisterPage() {
 
           <div ref={feedbackRef} />
 
-          {error && (
-            <div className="scale-in register__error-box">
-              <p className="register__error-text">{error}</p>
+          {success && (
+            <div className="scale-in register__error-box" style={{ background: "#f0fdf4", border: "1px solid #bbf7d0" }}>
+              <p className="register__error-text" style={{ color: "#166534" }}>
+                {success}
+              </p>
             </div>
           )}
 
