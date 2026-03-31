@@ -670,6 +670,7 @@ function AvailabilityPage() {
                             key={slot.time_slot_id}
                             onClick={() => setSelectedSlot(isSelected ? null : slot)}
                             disabled={!slot.disponible || isPastTimeSlot(slot)}
+                            title={isPastTimeSlot(slot) ? "Hora passada" : ""}
                             className={`ap-slot-pill ${
                               !slot.disponible
                                 ? "is-booked"
