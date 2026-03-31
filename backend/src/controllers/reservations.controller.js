@@ -438,7 +438,14 @@ exports.deleteCancelledReservationPermanently = async (req, res) => {
 
       const hora_fi = timeSlotRows[0].hora_fi;
 
-      const reservationEnd = new Date(`${reservation.data_reserva}T${hora_fi}`);
+      const baseDate = new Date(reservation.data_reserva);
+
+      const [hours, minutes, seconds = 0] = String(hora_fi || "00:00:00")
+        .split(":")
+        .map(Number);
+
+      const reservationEnd = new Date(baseDate);
+      reservationEnd.setHours(hours, minutes, seconds, 0);
 
       if (reservationEnd >= now) {
         return fail(
