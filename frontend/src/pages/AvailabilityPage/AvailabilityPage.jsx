@@ -299,7 +299,7 @@ function AvailabilityPage() {
         Number(slot.coberta) === 1 ? "indoor" : "outdoor";
 
       const matchesAvailability =
-        !showOnlyAvailable || slot.disponible;
+        !showOnlyAvailable || (slot.disponible && !isPastTimeSlot(slot));
 
       const matchesCourtType =
         courtTypeFilter === "tots" ||
