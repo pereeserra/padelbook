@@ -1058,23 +1058,22 @@
 
 .ap-slot-item {
   min-width: 0;
-  max-height: 56px;
+  height: auto;
   opacity: 1;
-  transform: translateY(0) scale(1);
+  transform: scale(1);
   transform-origin: center top;
   overflow: hidden;
   transition:
-    max-height 0.34s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.22s ease,
-    transform 0.34s cubic-bezier(0.22, 1, 0.36, 1),
-    margin 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 0.25s ease,
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    margin 0.25s ease;
 }
 
 .ap-slot-item.is-hidden {
-  max-height: 0;
   opacity: 0;
-  transform: translateY(-6px) scale(0.96);
+  transform: scale(0.9);
   pointer-events: none;
+  position: absolute;
 }
 
 .ap-slot-item .ap-slot-pill {
