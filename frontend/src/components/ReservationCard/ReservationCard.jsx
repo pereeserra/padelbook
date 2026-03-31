@@ -15,15 +15,16 @@ function ReservationCard({
   const isActive = reservation.estat === "activa";
 
   const getReservationEndDate = () => {
-    const [year, month, day] = String(reservation.data_reserva || "")
-      .split("-")
-      .map(Number);
+    const baseDate = new Date(reservation.data_reserva);
 
     const [hours, minutes, seconds = 0] = String(reservation.hora_fi || "00:00:00")
       .split(":")
       .map(Number);
 
-    return new Date(year, month - 1, day, hours, minutes, seconds);
+    const endDate = new Date(baseDate);
+    endDate.setHours(hours, minutes, seconds, 0);
+
+    return endDate;
   };
 
   const isPastReservation = getReservationEndDate() < new Date();
@@ -168,7 +169,13 @@ function ReservationCard({
                   : "res-card__badge-dot--inactive"
               }`}
             />
-            {isPastReservation ? "finalitzada" : reservation.estat}
+            {
+              reservation.estat === "cancel·lada"
+                ? "cancel·lada"
+                : isPastReservation
+                  ? "finalitzada"
+                  : reservation.estat
+            }
           </span>
         </div>
       </div>
