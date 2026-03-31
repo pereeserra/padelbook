@@ -458,7 +458,7 @@
   font-weight: 800;
   border: none;
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition: opacity 0.26s ease, transform 0.26s ease, background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
   text-align: center;
 }
 
@@ -1046,4 +1046,10 @@
   cursor: not-allowed;
   border: 1px solid #cbd5f5;
   opacity: 0.6;
+}
+
+.ap-slot-pill.hide-slot {
+  opacity: 0;
+  transform: scale(0.8);
+  pointer-events: none;
 }

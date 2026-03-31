@@ -36,6 +36,7 @@ function AvailabilityPage() {
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [reserving, setReserving] = useState(false);
   const [repeatReservationInfo, setRepeatReservationInfo] = useState(null);
+  const [isAvailabilityTransitioning, setIsAvailabilityTransitioning] = useState(false);
 
   // Funció per formatar el preu, mostrant "Preu no disponible" si no hi ha valor vàlid
   const formatPrice = (value) => {
@@ -263,6 +264,16 @@ function AvailabilityPage() {
   }, [date]);
 
   useEffect(() => {
+    setIsAvailabilityTransitioning(true);
+
+    const timeout = setTimeout(() => {
+      setIsAvailabilityTransitioning(false);
+    }, 260);
+
+    return () => clearTimeout(timeout);
+  }, [showOnlyAvailable]);
+
+  useEffect(() => {
     if (!repeatReservationInfo || loading || availability.length === 0) return;
     if (date !== repeatReservationInfo.data_reserva) return;
 
@@ -298,8 +309,7 @@ function AvailabilityPage() {
       const normalizedEnvironment =
         Number(slot.coberta) === 1 ? "indoor" : "outdoor";
 
-      const matchesAvailability =
-        !showOnlyAvailable || (slot.disponible && !isPastTimeSlot(slot));
+      const matchesAvailability = true;
 
       const matchesCourtType =
         courtTypeFilter === "tots" ||
@@ -665,6 +675,10 @@ function AvailabilityPage() {
                           selectedSlot?.time_slot_id === slot.time_slot_id &&
                           selectedSlot?.court_id === slot.court_id;
 
+                        const shouldHideSlot =
+                          showOnlyAvailable &&
+                          (!slot.disponible || isPastTimeSlot(slot));
+
                         return (
                           <button
                             key={slot.time_slot_id}
@@ -672,7 +686,9 @@ function AvailabilityPage() {
                             disabled={!slot.disponible || isPastTimeSlot(slot)}
                             title={isPastTimeSlot(slot) ? "Hora passada" : ""}
                             className={`ap-slot-pill ${
-                              !slot.disponible
+                              shouldHideSlot
+                                ? "hide-slot"
+                                : !slot.disponible
                                 ? "is-booked"
                                 : isPastTimeSlot(slot)
                                 ? "is-past"
