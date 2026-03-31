@@ -14,8 +14,19 @@ function ReservationCard({
 }) {
   const isActive = reservation.estat === "activa";
 
-  const isPastReservation =
-    new Date(`${reservation.data_reserva}T${reservation.hora_fi}`) < new Date();
+  const getReservationEndDate = () => {
+    const [year, month, day] = String(reservation.data_reserva || "")
+      .split("-")
+      .map(Number);
+
+    const [hours, minutes, seconds = 0] = String(reservation.hora_fi || "00:00:00")
+      .split(":")
+      .map(Number);
+
+    return new Date(year, month - 1, day, hours, minutes, seconds);
+  };
+
+  const isPastReservation = getReservationEndDate() < new Date();
   const cardRef = useRef(null);
 
   // Funció per fer scroll suau cap a la targeta quan s'està confirmant la cancel·lació
