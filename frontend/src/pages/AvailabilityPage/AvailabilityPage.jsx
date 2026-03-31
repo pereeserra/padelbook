@@ -36,7 +36,6 @@ function AvailabilityPage() {
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [reserving, setReserving] = useState(false);
   const [repeatReservationInfo, setRepeatReservationInfo] = useState(null);
-  const [isAvailabilityTransitioning, setIsAvailabilityTransitioning] = useState(false);
 
   // Funció per formatar el preu, mostrant "Preu no disponible" si no hi ha valor vàlid
   const formatPrice = (value) => {
@@ -262,16 +261,6 @@ function AvailabilityPage() {
   useEffect(() => {
     fetchAvailability(date);
   }, [date]);
-
-  useEffect(() => {
-    setIsAvailabilityTransitioning(true);
-
-    const timeout = setTimeout(() => {
-      setIsAvailabilityTransitioning(false);
-    }, 260);
-
-    return () => clearTimeout(timeout);
-  }, [showOnlyAvailable]);
 
   useEffect(() => {
     if (!repeatReservationInfo || loading || availability.length === 0) return;
@@ -675,30 +664,36 @@ function AvailabilityPage() {
                           selectedSlot?.time_slot_id === slot.time_slot_id &&
                           selectedSlot?.court_id === slot.court_id;
 
+                        const isPastSlot = isPastTimeSlot(slot);
+
                         const shouldHideSlot =
                           showOnlyAvailable &&
-                          (!slot.disponible || isPastTimeSlot(slot));
+                          (!slot.disponible || isPastSlot);
 
                         return (
-                          <button
+                          <div
                             key={slot.time_slot_id}
-                            onClick={() => setSelectedSlot(isSelected ? null : slot)}
-                            disabled={!slot.disponible || isPastTimeSlot(slot)}
-                            title={isPastTimeSlot(slot) ? "Hora passada" : ""}
-                            className={`ap-slot-pill ${
-                              shouldHideSlot
-                                ? "hide-slot"
-                                : !slot.disponible
-                                ? "is-booked"
-                                : isPastTimeSlot(slot)
-                                ? "is-past"
-                                : isSelected
-                                ? "is-selected"
-                                : "is-available"
+                            className={`ap-slot-item ${
+                              shouldHideSlot ? "is-hidden" : ""
                             }`}
                           >
-                            {formatTimeShort(slot.hora_inici)}
-                          </button>
+                            <button
+                              onClick={() => setSelectedSlot(isSelected ? null : slot)}
+                              disabled={!slot.disponible || isPastSlot}
+                              title={isPastSlot ? "Hora passada" : ""}
+                              className={`ap-slot-pill ${
+                                !slot.disponible
+                                  ? "is-booked"
+                                  : isPastSlot
+                                  ? "is-past"
+                                  : isSelected
+                                  ? "is-selected"
+                                  : "is-available"
+                              }`}
+                            >
+                              {formatTimeShort(slot.hora_inici)}
+                            </button>
+                          </div>
                         );
                       })}
                     </div>
