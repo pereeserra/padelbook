@@ -90,6 +90,22 @@ function AvailabilityPage() {
     return selectedDate < getToday();
   };
 
+  const isPastTimeSlot = (slot) => {
+  const today = getToday();
+
+  // Només aplicar si és avui
+  if (date !== today) return false;
+
+  const now = new Date();
+
+  const [hours, minutes] = slot.hora_inici.split(":").map(Number);
+
+  const slotTime = new Date();
+  slotTime.setHours(hours, minutes, 0, 0);
+
+  return slotTime <= now;
+};
+
   // Funció per netejar missatges d'error i èxit, i restablir l'estat relacionat amb la reserva
   const clearMessages = () => {
     setError("");
@@ -653,10 +669,12 @@ function AvailabilityPage() {
                           <button
                             key={slot.time_slot_id}
                             onClick={() => setSelectedSlot(isSelected ? null : slot)}
-                            disabled={!slot.disponible}
+                            disabled={!slot.disponible || isPastTimeSlot(slot)}
                             className={`ap-slot-pill ${
                               !slot.disponible
                                 ? "is-booked"
+                                : isPastTimeSlot(slot)
+                                ? "is-past"
                                 : isSelected
                                 ? "is-selected"
                                 : "is-available"

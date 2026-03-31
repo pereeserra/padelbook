@@ -1039,3 +1039,11 @@
   color: #c2410c;
   border-color: #fdba74;
 }
+
+.ap-slot-pill.is-past {
+  background: #e2e8f0;
+  color: #64748b;
+  cursor: not-allowed;
+  border: 1px solid #cbd5f5;
+  opacity: 0.6;
+}
