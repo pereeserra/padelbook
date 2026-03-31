@@ -218,18 +218,29 @@ function MyReservationsPage() {
   }, [activeFilter, hasInteractedWithFilter]);
 
   const getReservationEndDate = (reservation) => {
-    const [year, month, day] = String(reservation.data_reserva || "")
-      .split("-")
-      .map(Number);
+    // Convertim la data ISO correctament
+    const baseDate = new Date(reservation.data_reserva);
 
     const [hours, minutes, seconds = 0] = String(reservation.hora_fi || "00:00:00")
       .split(":")
       .map(Number);
 
-    return new Date(year, month - 1, day, hours, minutes, seconds);
+    // Clonam la data i li aplicam l'hora de finalització
+    const endDate = new Date(baseDate);
+    endDate.setHours(hours, minutes, seconds, 0);
+
+    return endDate;
   };
 
-  const now = new Date();
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNow(new Date());
+    }, 60000); // cada 1 minut
+
+    return () => clearInterval(interval);
+  }, []);
 
   const activeReservations = useMemo(() => {
     return reservations.filter((reservation) => {
@@ -288,9 +299,9 @@ function MyReservationsPage() {
   ]);
 
   const filterLabel = useMemo(() => {
-    if (activeFilter === "active") return "actives";
-    if (activeFilter === "past") return "finalitzades";
-    if (activeFilter === "cancelled") return "cancel·lades";
+    if (activeFilter === "active") return "Actives";
+    if (activeFilter === "past") return "Finalitzades";
+    if (activeFilter === "cancelled") return "Cancel·lades";
     return "Totals";
   }, [activeFilter]);
 
