@@ -47,6 +47,37 @@ exports.createReservation = async (req, res) => {
       return fail(res, "No es poden fer reserves en dates passades", 400);
     }
 
+    // 🔒 BLOQUEIG HORES PASSADES DEL MATEIX DIA
+    if (data_reserva === todayString) {
+      const now = new Date();
+
+      const [timeSlotRows] = await db.query(
+        "SELECT hora_inici FROM time_slots WHERE id = ? LIMIT 1",
+        [time_slot_id]
+      );
+
+      if (timeSlotRows.length === 0) {
+        return fail(res, "Franja horària no trobada", 404);
+      }
+
+      const hora_inici = timeSlotRows[0].hora_inici;
+
+      const [hours, minutes, seconds = 0] = hora_inici
+        .split(":")
+        .map(Number);
+
+      const slotDateTime = new Date();
+      slotDateTime.setHours(hours, minutes, seconds, 0);
+
+      if (slotDateTime <= now) {
+        return fail(
+          res,
+          "No pots reservar una franja horària que ja ha passat",
+          400
+        );
+      }
+    }
+
     // Normalitzar i validar el mètode de pagament
     if (typeof metode_pagament === "string") {
       metode_pagament = metode_pagament.trim().toLowerCase();
