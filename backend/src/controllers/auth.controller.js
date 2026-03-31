@@ -17,13 +17,14 @@ const {
 // REGISTRE D'USUARI
 exports.register = async (req, res) => {
   try {
-    let { nom, email, password, turnstileToken } = req.body;
+    let { nom, llinatges, email, password, turnstileToken } = req.body;
 
     nom = normalizeFullName(nom);
+    llinatges = normalizeFullName(llinatges);
     email = normalizeEmail(email);
     password = typeof password === "string" ? password : "";
 
-    const profileValidation = validateProfileData(nom, email);
+    const profileValidation = validateProfileData(nom, llinatges, email);
     if (profileValidation.error) {
       return fail(res, profileValidation.error, 400);
     }
@@ -63,8 +64,8 @@ exports.register = async (req, res) => {
     const hash = await bcrypt.hash(password, 10);
 
     const [insertResult] = await db.query(
-      "INSERT INTO users (nom, email, password_hash, rol) VALUES (?, ?, ?, 'usuari')",
-      [nom, email, hash]
+      "INSERT INTO users (nom, llinatges, email, password_hash, rol, email_verificat) VALUES (?, ?, ?, ?, 'usuari', 0)",
+      [nom, llinatges, email, hash]
     );
 
     logSecurityEvent(req, "REGISTER_SUCCESS", {
@@ -133,6 +134,10 @@ exports.login = async (req, res) => {
     }
 
     const user = rows[0];
+
+    if (user.email_verificat === 0) {
+      return fail(res, "Has de verificar el teu correu abans d'iniciar sessió.", 403);
+    }
 
     const match = await bcrypt.compare(password, user.password_hash);
 

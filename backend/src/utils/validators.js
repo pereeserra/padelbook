@@ -181,25 +181,29 @@ const validateCourtData = (data) => {
 };
 
 // Función para validar los datos del perfil de usuario
-const validateProfileData = (nom, email) => {
-  if (!nom || !email) {
-    return { error: "Has d'omplir nom i correu electrònic." };
+const validateProfileData = (nom, llinatges, email) => {
+  if (!nom || !llinatges || !email) {
+    return { error: "Has d'omplir nom, llinatges i correu electrònic." };
   }
 
-  if (nom.length > 100) {
-    return { error: "El nom complet és massa llarg." };
+  if (nom.length > 50) {
+    return { error: "El nom és massa llarg." };
+  }
+
+  if (llinatges.length > 100) {
+    return { error: "Els llinatges són massa llargs." };
   }
 
   if (email.length > 150) {
     return { error: "El correu electrònic és massa llarg." };
   }
 
-  if (!hasMinFullNameLength(nom)) {
-    return { error: "El nom complet ha de tenir almenys 5 caràcters." };
+  if (nom.length < 2) {
+    return { error: "El nom ha de tenir almenys 2 caràcters." };
   }
 
-  if (!hasNameAndSurname(nom)) {
-    return { error: "Has d'introduir com a mínim nom i llinatge." };
+  if (llinatges.length < 2) {
+    return { error: "Els llinatges han de tenir almenys 2 caràcters." };
   }
 
   if (!isValidEmail(email)) {
