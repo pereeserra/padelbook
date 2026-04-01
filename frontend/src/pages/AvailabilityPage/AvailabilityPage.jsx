@@ -34,6 +34,7 @@ function AvailabilityPage() {
   const [showVerificationHelp, setShowVerificationHelp] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("online_simulat");
   const [duration, setDuration] = useState(1); // 1h per defecte
+  const [selectedSlot, setSelectedSlot] = useState(null);
   const [reservationSummary, setReservationSummary] = useState(null);
   const [reserving, setReserving] = useState(false);
   const [repeatReservationInfo, setRepeatReservationInfo] = useState(null);
@@ -202,6 +203,7 @@ function AvailabilityPage() {
         court_id: selectedSlot.court_id,
         time_slot_id: selectedSlot.time_slot_id,
         data_reserva: date,
+        duration,
         metode_pagament: paymentMethod,
       });
 
@@ -210,7 +212,9 @@ function AvailabilityPage() {
       setSuccess(
         `Reserva confirmada a ${selectedSlot.nom_pista} (${formatTimeShort(
           selectedSlot.hora_inici
-        )} - ${formatTimeShort(selectedSlot.hora_fi)}).`
+        )} - ${formatTimeShort(selectedSlot.hora_fi)}) · Duració: ${
+          duration === 1.5 ? "1h30" : "1h"
+        }.`
       );
 
       setReservationSummary({
@@ -226,6 +230,7 @@ function AvailabilityPage() {
         nom_pista: selectedSlot.nom_pista,
         hora_inici: selectedSlot.hora_inici,
         hora_fi: selectedSlot.hora_fi,
+        duration,
         data_reserva: date,
       });
 
@@ -591,6 +596,12 @@ function AvailabilityPage() {
                 <strong>
                   {formatTimeShort(reservationSummary.hora_inici)} -{" "}
                   {formatTimeShort(reservationSummary.hora_fi)}
+                </strong>
+              </div>
+              <div>
+                <span>Duració:</span>
+                <strong>
+                  {reservationSummary.duration === 1.5 ? "1h30" : "1h"}
                 </strong>
               </div>
               <div>
