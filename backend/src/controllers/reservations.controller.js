@@ -44,7 +44,46 @@ exports.createReservation = async (req, res) => {
       );
     }
 
-    let { court_id, time_slot_id, data_reserva } = req.body;
+    let { court_id, time_slot_id, data_reserva, duration } = req.body;
+
+    duration = Number(duration || 1);
+
+    if (![1, 1.5].includes(duration)) {
+      return fail(res, "Duració no vàlida", 400);
+    }
+
+    // Obtenir tots els slots ordenats
+    const [allSlots] = await db.query(
+      "SELECT id FROM time_slots ORDER BY hora_inici ASC"
+    );
+
+    const slotIndex = allSlots.findIndex(s => s.id === time_slot_id);
+
+    if (slotIndex === -1) {
+      return fail(res, "Franja no trobada", 404);
+    }
+
+    // calcular slots necessaris
+    const slotsNeeded = duration === 1 ? 1 : 2;
+
+    const selectedSlots = allSlots.slice(slotIndex, slotIndex + slotsNeeded);
+
+    if (selectedSlots.length < slotsNeeded) {
+      return fail(res, "No hi ha suficients franges consecutives", 400);
+    }
+
+    for (const slot of selectedSlots) {
+      const [existing] = await db.query(
+        `SELECT id FROM reservations
+        WHERE court_id = ? AND time_slot_id = ? AND data_reserva = ? AND estat = ?`,
+        [court_id, slot.id, data_reserva, RESERVATION_STATUS.ACTIVE]
+      );
+
+      if (existing.length > 0) {
+        return fail(res, "Una de les franges ja està reservada", 400);
+      }
+    }
+
     let { metode_pagament } = req.body;
 
     court_id = parsePositiveInteger(court_id);
@@ -196,36 +235,46 @@ exports.createReservation = async (req, res) => {
     }
 
     // 6. Crear la reserva amb codi temporal
-    const codiTemporal = `TEMP-${Date.now()}-${user_id}`;
+    const codiBase = `TEMP-${Date.now()}-${user_id}`;
 
-    const [insertResult] = await db.query(
-      `INSERT INTO reservations (
-        codi_reserva, 
-        user_id, 
-        court_id, 
-        time_slot_id, 
-        data_reserva, 
-        estat, 
-        preu_total,
-        estat_pagament,
-        metode_pagament
+    const createdIds = [];
+
+    for (const slot of selectedSlots) {
+      const [insertResult] = await db.query(
+        `INSERT INTO reservations (
+          codi_reserva, 
+          user_id, 
+          court_id, 
+          time_slot_id, 
+          data_reserva, 
+          estat, 
+          preu_total,
+          estat_pagament,
+          metode_pagament
         )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        codiTemporal,
-        user_id,
-        court_id,
-        time_slot_id,
-        data_reserva,
-        RESERVATION_STATUS.ACTIVE,
-        preu_total,
-        estat_pagament,
-        metode_pagament,
-      ]
-    );
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          codiBase,
+          user_id,
+          court_id,
+          slot.id,
+          data_reserva,
+          RESERVATION_STATUS.ACTIVE,
+          preu_total,
+          estat_pagament,
+          metode_pagament,
+        ]
+      );
 
-    const reservationId = insertResult.insertId;
-    const codi_reserva = `PB-${data_reserva.replace(/-/g, "")}-${String(reservationId).padStart(3, "0")}`;
+      createdIds.push(insertResult.insertId);
+    }
+
+    const codi_reserva = `PB-${data_reserva.replace(/-/g, "")}-${String(createdIds[0]).padStart(3, "0")}`;
+
+    await db.query(
+      `UPDATE reservations SET codi_reserva = ? WHERE codi_reserva = ?`,
+      [codi_reserva, codiBase]
+    );
 
     // 7. Guardar el codi definitiu
     await db.query(

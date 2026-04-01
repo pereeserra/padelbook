@@ -33,8 +33,8 @@ function AvailabilityPage() {
   const [showAuthHelp, setShowAuthHelp] = useState(false);
   const [showVerificationHelp, setShowVerificationHelp] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("online_simulat");
+  const [duration, setDuration] = useState(1); // 1h per defecte
   const [reservationSummary, setReservationSummary] = useState(null);
-  const [selectedSlot, setSelectedSlot] = useState(null);
   const [reserving, setReserving] = useState(false);
   const [repeatReservationInfo, setRepeatReservationInfo] = useState(null);
 
@@ -767,6 +767,27 @@ function AvailabilityPage() {
             </div>
 
             <div className="ap-floating-controls">
+              <div className="ap-payment-field">
+                <span className="ap-payment-label">Duració</span>
+
+                <div className="ap-payment-toggle">
+                  <button
+                    type="button"
+                    className={`ap-payment-option ${duration === 1 ? "is-active" : ""}`}
+                    onClick={() => setDuration(1)}
+                  >
+                    1h
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`ap-payment-option ${duration === 1.5 ? "is-active" : ""}`}
+                    onClick={() => setDuration(1.5)}
+                  >
+                    1h30
+                  </button>
+                </div>
+              </div>
               <div className="ap-payment-field">
                 <span className="ap-payment-label">Mètode de pagament</span>
 
