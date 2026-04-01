@@ -171,8 +171,11 @@ exports.login = async (req, res) => {
       user: {
         id: user.id,
         nom: user.nom,
+        llinatges: user.llinatges,
         email: user.email,
         rol: user.rol,
+        telefon: user.telefon,
+        email_verificat: user.email_verificat,
         created_at: user.created_at
       }
     });
@@ -195,7 +198,7 @@ exports.getMe = async (req, res) => {
     const userId = req.user.id;
 
     const [rows] = await db.query(
-      "SELECT id, nom, email, rol, created_at FROM users WHERE id = ? LIMIT 1",
+      "SELECT id, nom, llinatges, email, rol, telefon, email_verificat, created_at FROM users WHERE id = ? LIMIT 1",
       [userId]
     );
 
@@ -216,12 +219,12 @@ exports.updateMe = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    let { nom, email } = req.body;
+    let { nom, llinatges, email } = req.body;
 
     nom = normalizeFullName(nom);
     email = normalizeEmail(email);
 
-    const profileValidation = validateProfileData(nom, email);
+    const profileValidation = validateProfileData(nom, llinatges, email);
     if (profileValidation.error) {
       return fail(res, profileValidation.error, 400);
     }
@@ -249,12 +252,12 @@ exports.updateMe = async (req, res) => {
     }
 
     await db.query(
-      "UPDATE users SET nom = ?, email = ? WHERE id = ?",
-      [nom, email, userId]
+      "UPDATE users SET nom = ?, llinatges = ?, email = ? WHERE id = ?",
+      [nom, llinatges, email, userId]
     );
 
     const [updatedRows] = await db.query(
-      "SELECT id, nom, email, rol, created_at FROM users WHERE id = ? LIMIT 1",
+      "SELECT id, nom, llinatges, email, rol, telefon, email_verificat, created_at FROM users WHERE id = ? LIMIT 1",
       [userId]
     );
 
