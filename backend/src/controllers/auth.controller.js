@@ -1,6 +1,8 @@
 const db = require("../config/db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const { sendEmail } = require("../services/email.service");
 
 const { ok, message, fail } = require("../utils/response");
 const { verifyTurnstileToken } = require("../services/turnstile.service");
@@ -73,7 +75,32 @@ exports.register = async (req, res) => {
       email,
     });
 
-    return message(res, "Usuari registrat correctament", 201);
+    // GENERAR TOKEN DE VERIFICACIÓ
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+
+    // GUARDAR TOKEN A BD
+    await db.query(
+      "INSERT INTO verification_codes (user_id, code, type, expires_at) VALUES (?, ?, 'email_verification', DATE_ADD(NOW(), INTERVAL 24 HOUR))",
+      [insertResult.insertId, verificationToken]
+    );
+
+    // CONSTRUIR ENLLAÇ
+    const verifyUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/verify-email?token=${verificationToken}`;
+
+    // ENVIAR EMAIL
+    await sendEmail({
+      to: email,
+      subject: "Verifica el teu compte - PadelBook",
+      html: `
+        <h2>Verificació de correu</h2>
+        <p>Hola ${nom},</p>
+        <p>Fes clic al següent enllaç per verificar el teu compte:</p>
+        <a href="${verifyUrl}" target="_blank">${verifyUrl}</a>
+        <p>Aquest enllaç caduca en 24 hores.</p>
+      `,
+    });
+
+    return message(res, "Usuari registrat. Revisa el teu correu per verificar el compte.", 201);
 
   } catch (error) {
     console.error("Error al registre:", error);
@@ -349,5 +376,44 @@ exports.changePassword = async (req, res) => {
   } catch (error) {
     console.error("Error changePassword:", error);
     return fail(res, "Error canviant la contrasenya.");
+  }
+};
+
+// VERIFICAR EMAIL
+exports.verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.query;
+
+    if (!token) {
+      return fail(res, "Token no proporcionat.", 400);
+    }
+
+    const [rows] = await db.query(
+      "SELECT * FROM verification_codes WHERE code = ? AND type = 'email_verification' AND expires_at > NOW() LIMIT 1",
+      [token]
+    );
+
+    if (rows.length === 0) {
+      return fail(res, "Token invàlid o expirat.", 400);
+    }
+
+    const verification = rows[0];
+
+    // MARCAR USUARI COM VERIFICAT
+    await db.query(
+      "UPDATE users SET email_verificat = 1 WHERE id = ?",
+      [verification.user_id]
+    );
+
+    // ELIMINAR TOKEN
+    await db.query(
+      "DELETE FROM verification_codes WHERE id = ?",
+      [verification.id]
+    );
+
+    return message(res, "Compte verificat correctament.");
+  } catch (error) {
+    console.error("Error verifyEmail:", error);
+    return fail(res, "Error verificant el compte.");
   }
 };
