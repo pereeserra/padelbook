@@ -400,6 +400,27 @@ function AvailabilityPage() {
     };
   }, [availability]);
 
+  const isSlotValidForDuration = (courtSlots, slotIndex) => {
+    const slot = courtSlots[slotIndex];
+
+    // Slot actual no disponible → fora
+    if (!slot.disponible) return false;
+
+    // Si és 1h → OK
+    if (duration === 1) return true;
+
+    // Si és 1h30 → comprovar següent slot
+    if (duration === 1.5) {
+      const nextSlot = courtSlots[slotIndex + 1];
+
+      if (!nextSlot) return false;
+
+      return nextSlot.disponible;
+    }
+
+    return false;
+  };
+
   return (
     <div className="ap-wrapper">
       <header className="ap-hero">
@@ -704,16 +725,17 @@ function AvailabilityPage() {
                     </div>
 
                     <div className="ap-slots-grid">
-                      {court.slots.map((slot) => {
+                      {court.slots.map((slot, index) => {
                         const isSelected =
                           selectedSlot?.time_slot_id === slot.time_slot_id &&
                           selectedSlot?.court_id === slot.court_id;
 
                         const isPastSlot = isPastTimeSlot(slot);
+                        const isValid = isSlotValidForDuration(court.slots, index);
 
                         const shouldHideSlot =
                           showOnlyAvailable &&
-                          (!slot.disponible || isPastSlot);
+                          (!isValid || isPastSlot);
 
                         return (
                           <div
@@ -724,10 +746,10 @@ function AvailabilityPage() {
                           >
                             <button
                               onClick={() => setSelectedSlot(isSelected ? null : slot)}
-                              disabled={!slot.disponible || isPastSlot}
+                              disabled={!isValid || isPastSlot}
                               title={isPastSlot ? "Hora passada" : ""}
                               className={`ap-slot-pill ${
-                                !slot.disponible
+                                !isValid
                                   ? "is-booked"
                                   : isPastSlot
                                   ? "is-past"
