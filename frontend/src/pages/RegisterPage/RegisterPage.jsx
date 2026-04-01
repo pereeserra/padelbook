@@ -15,6 +15,7 @@ function RegisterPage() {
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 900);
 
   const [nom, setNom] = useState("");
+  const [llinatges, setLlinatges] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -156,19 +157,19 @@ function RegisterPage() {
 
   const validateForm = () => {
     const cleanNom = normalizeSpaces(nom);
+    const cleanLlinatges = normalizeSpaces(llinatges);
     const cleanEmail = email.trim().toLowerCase();
 
-    if (!cleanNom || !cleanEmail || !password.trim() || !confirmPassword.trim()) {
+    if (!cleanNom || !cleanLlinatges || !cleanEmail || !password.trim() || !confirmPassword.trim()) {
       return "Has d'omplir tots els camps.";
     }
 
-    if (cleanNom.length < 5) {
-      return "El nom complet ha de tenir almenys 5 caràcters.";
+    if (cleanNom.length < 2) {
+      return "El nom ha de tenir almenys 2 caràcters.";
     }
 
-    const words = cleanNom.split(" ").filter(Boolean);
-    if (words.length < 2) {
-      return "Has d'introduir com a mínim nom i llinatge.";
+    if (cleanLlinatges.length < 2) {
+      return "Els llinatges han de tenir almenys 2 caràcters.";
     }
 
     const emailRegex = /^[^\s@]{2,}@[^\s@]{2,}\.[A-Za-z]{2,}$/;
@@ -221,10 +222,12 @@ function RegisterPage() {
       setLoading(true);
 
       const cleanNom = normalizeSpaces(nom);
+      const cleanLlinatges = normalizeSpaces(llinatges);
       const cleanEmail = email.trim().toLowerCase();
 
       await api.post("/auth/register", {
         nom: cleanNom,
+        llinatges: cleanLlinatges,
         email: cleanEmail,
         password,
         turnstileToken,
@@ -353,20 +356,38 @@ function RegisterPage() {
           )}
 
           <form onSubmit={handleRegister} className="register__form">
-            <div className="register__field">
-              <label htmlFor="nom" className="register__label">
-                Nom i llinatges
-              </label>
+            <div className="register__field-group">
+              <div className="register__field">
+                <label htmlFor="nom" className="register__label">
+                  Nom
+                </label>
 
-              <input
-                id="nom"
-                type="text"
-                placeholder="Ex: Pere Serra"
-                value={nom}
-                onChange={(e) => setNom(e.target.value)}
-                className="register__input"
-                required
-              />
+                <input
+                  id="nom"
+                  type="text"
+                  placeholder="Ex: Pere"
+                  value={nom}
+                  onChange={(e) => setNom(e.target.value)}
+                  className="register__input"
+                  required
+                />
+              </div>
+
+              <div className="register__field">
+                <label htmlFor="llinatges" className="register__label">
+                  Llinatges
+                </label>
+
+                <input
+                  id="llinatges"
+                  type="text"
+                  placeholder="Ex: Serra Tugores"
+                  value={llinatges}
+                  onChange={(e) => setLlinatges(e.target.value)}
+                  className="register__input"
+                  required
+                />
+              </div>
             </div>
 
             <div className="register__field">

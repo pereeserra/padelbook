@@ -21,6 +21,7 @@ function ProfilePage() {
 
   const [formData, setFormData] = useState({
     nom: "",
+    llinatges: "",
     email: "",
   });
 
@@ -96,6 +97,7 @@ function ProfilePage() {
       setProfile(userData);
       setFormData({
         nom: userData.nom || "",
+        llinatges: userData.llinatges || "",
         email: userData.email || "",
       });
 
@@ -126,6 +128,7 @@ function ProfilePage() {
   const normalizedProfile = useMemo(() => {
     return {
       nom: normalizeSpaces(profile?.nom || ""),
+      llinatges: normalizeSpaces(profile?.llinatges || ""),
       email: (profile?.email || "").trim().toLowerCase(),
     };
   }, [profile]);
@@ -133,6 +136,7 @@ function ProfilePage() {
   const normalizedForm = useMemo(() => {
     return {
       nom: normalizeSpaces(formData.nom || ""),
+      llinatges: normalizeSpaces(formData.llinatges || ""),
       email: (formData.email || "").trim().toLowerCase(),
     };
   }, [formData]);
@@ -142,24 +146,24 @@ function ProfilePage() {
 
     return (
       normalizedProfile.nom !== normalizedForm.nom ||
+      normalizedProfile.llinatges !== normalizedForm.llinatges ||
       normalizedProfile.email !== normalizedForm.email
     );
   }, [profile, normalizedProfile, normalizedForm]);
 
   const firstName = useMemo(() => {
     if (!profile?.nom) return "Usuari";
-    return profile.nom.split(" ")[0];
+    return profile.nom;
   }, [profile]);
 
   const initials = useMemo(() => {
-    const fullName = profile?.nom?.trim() || "Usuari";
-    const parts = fullName.split(" ").filter(Boolean);
+    const nom = profile?.nom?.trim() || "";
+    const llinatges = profile?.llinatges?.trim() || "";
 
-    if (parts.length === 1) {
-      return parts[0].slice(0, 1).toUpperCase();
-    }
+    const firstInitial = nom ? nom[0].toUpperCase() : "U";
+    const secondInitial = llinatges ? llinatges[0].toUpperCase() : "";
 
-    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    return `${firstInitial}${secondInitial}` || "U";
   }, [profile]);
 
   const passwordChecks = useMemo(() => {
@@ -219,8 +223,12 @@ function ProfilePage() {
 
   const accountDetailItems = [
     {
-      label: "Nom complet",
+      label: "Nom",
       value: profile?.nom || "-",
+    },
+    {
+      label: "Llinatges",
+      value: profile?.llinatges || "-",
     },
     {
       label: "Correu",
@@ -256,19 +264,19 @@ function ProfilePage() {
 
   const validateProfileForm = () => {
     const cleanNom = normalizeSpaces(formData.nom);
+    const cleanLlinatges = normalizeSpaces(formData.llinatges);
     const cleanEmail = formData.email.trim().toLowerCase();
 
-    if (!cleanNom || !cleanEmail) {
-      return "Has d'omplir el nom i el correu electrònic.";
+    if (!cleanNom || !cleanLlinatges || !cleanEmail) {
+      return "Has d'omplir el nom, els llinatges i el correu electrònic.";
     }
 
-    if (cleanNom.length < 5) {
-      return "El nom complet ha de tenir almenys 5 caràcters.";
+    if (cleanNom.length < 2) {
+      return "El nom ha de tenir almenys 2 caràcters.";
     }
 
-    const words = cleanNom.split(" ").filter(Boolean);
-    if (words.length < 2) {
-      return "Has d'introduir com a mínim nom i llinatge.";
+    if (cleanLlinatges.length < 2) {
+      return "Els llinatges han de tenir almenys 2 caràcters.";
     }
 
     const emailRegex = /^[^\s@]{2,}@[^\s@]{2,}\.[A-Za-z]{2,}$/;
@@ -318,6 +326,7 @@ function ProfilePage() {
 
     setFormData({
       nom: profile.nom || "",
+      llinatges: profile.llinatges || "",
       email: profile.email || "",
     });
 
@@ -358,6 +367,7 @@ function ProfilePage() {
 
       const payload = {
         nom: normalizeSpaces(formData.nom),
+        llinatges: normalizeSpaces(formData.llinatges),
         email: formData.email.trim().toLowerCase(),
       };
 
@@ -370,6 +380,7 @@ function ProfilePage() {
       setProfile(updatedUser);
       setFormData({
         nom: updatedUser.nom || payload.nom,
+        llinatges: updatedUser.llinatges || payload.llinatges,
         email: updatedUser.email || payload.email,
       });
 
@@ -607,7 +618,7 @@ function ProfilePage() {
                       <span className="pb-kicker">Dades personals</span>
                       <h2 className="pb-panel-title">Informació del compte</h2>
                       <p className="pb-panel-text">
-                        Modifica el teu nom complet i el correu electrònic associat
+                        Modifica el teu nom, els llinatges i el correu electrònic associat
                         a la sessió.
                       </p>
                     </div>
@@ -629,7 +640,7 @@ function ProfilePage() {
                     >
                       <div className="pb-form-field">
                         <label htmlFor="nom" className="pb-form-label">
-                          Nom i llinatges
+                          Nom
                         </label>
                         <input
                           id="nom"
@@ -637,7 +648,23 @@ function ProfilePage() {
                           type="text"
                           value={formData.nom}
                           onChange={handleProfileChange}
-                          placeholder="Ex: Pere Serra"
+                          placeholder="Ex: Pere"
+                          className="pb-input"
+                          required
+                        />
+                      </div>
+
+                      <div className="pb-form-field">
+                        <label htmlFor="llinatges" className="pb-form-label">
+                          Llinatges
+                        </label>
+                        <input
+                          id="llinatges"
+                          name="llinatges"
+                          type="text"
+                          value={formData.llinatges}
+                          onChange={handleProfileChange}
+                          placeholder="Ex: Serra Tugores"
                           className="pb-input"
                           required
                         />
@@ -665,7 +692,7 @@ function ProfilePage() {
                       <div>
                         <p className="profile__info-strip-title">Consell de perfil</p>
                         <p className="profile__info-strip-text">
-                          Mantén un nom complet real i un correu vàlid per
+                          Mantén un nom real, uns llinatges correctes i un correu vàlid per
                           identificar millor el compte i rebre comunicacions sense
                           errors.
                         </p>

@@ -197,6 +197,12 @@
   gap: 1rem;
 }
 
+.register__field-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
 .register__field {
   display: flex;
   flex-direction: column;
@@ -384,4 +390,11 @@
   color: #64748b;
   font-size: 0.88rem;
   font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .register__field-group {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 }
