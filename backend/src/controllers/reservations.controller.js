@@ -179,7 +179,8 @@ exports.createReservation = async (req, res) => {
       return fail(res, "Aquesta pista no està disponible per reservar", 400);
     }
 
-    const preu_total = Number(court.preu_reserva || 0);
+    const basePrice = Number(court.preu_reserva || 0);
+    const preu_total = basePrice * duration;
 
     // 2. Comprovar que la franja existeix
     const [timeSlots] = await db.query(
@@ -276,11 +277,6 @@ exports.createReservation = async (req, res) => {
     }
 
     const codi_reserva = `PB-${data_reserva.replace(/-/g, "")}-${String(createdIds[0]).padStart(3, "0")}`;
-
-    await db.query(
-      `UPDATE reservations SET codi_reserva = ? WHERE codi_reserva = ?`,
-      [codi_reserva, codiBase]
-    );
 
       // 7. Guardar el codi definitiu a totes les reserves creades
       await db.query(
