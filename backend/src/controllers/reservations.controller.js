@@ -276,13 +276,11 @@ exports.createReservation = async (req, res) => {
       [codi_reserva, codiBase]
     );
 
-    // 7. Guardar el codi definitiu
-    await db.query(
-      `UPDATE reservations
-      SET codi_reserva = ?
-      WHERE id = ?`,
-      [codi_reserva, reservationId]
-    );
+      // 7. Guardar el codi definitiu a totes les reserves creades
+      await db.query(
+        `UPDATE reservations SET codi_reserva = ? WHERE codi_reserva = ?`,
+        [codi_reserva, codiBase]
+      );
 
     // 8. Enviar email de confirmació de reserva
     const [reservationDetails] = await db.query(
@@ -433,10 +431,10 @@ exports.deleteReservation = async (req, res) => {
       return fail(res, "Aquesta reserva ja està cancel·lada", 400);
     }
 
-    // 4. Cancel·lació lògica
+    // 4. Cancel·lar totes les reserves amb el mateix codi_reserva
     await db.query(
-      "UPDATE reservations SET estat = ? WHERE id = ?",
-      [RESERVATION_STATUS.CANCELLED, reservationId]
+      "UPDATE reservations SET estat = ? WHERE codi_reserva = ?",
+      [RESERVATION_STATUS.CANCELLED, reservationBase.codi_reserva]
     );
 
     const [reservationRows] = await db.query(
