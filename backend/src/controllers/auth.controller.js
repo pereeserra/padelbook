@@ -15,6 +15,14 @@ const {
   validateProfileData,
 } = require("../utils/validators");
 
+const buildVerificationEmailHtml = ({ nom, verifyUrl }) => `
+  <h2>Verificació de correu</h2>
+  <p>Hola ${nom},</p>
+  <p>Fes clic al següent enllaç per verificar el teu compte:</p>
+  <a href="${verifyUrl}" target="_blank">${verifyUrl}</a>
+  <p>Aquest enllaç caduca en 24 hores.</p>
+`;
+
 
 // REGISTRE D'USUARI
 exports.register = async (req, res) => {
@@ -75,29 +83,19 @@ exports.register = async (req, res) => {
       email,
     });
 
-    // GENERAR TOKEN DE VERIFICACIÓ
     const verificationToken = crypto.randomBytes(32).toString("hex");
 
-    // GUARDAR TOKEN A BD
     await db.query(
       "INSERT INTO verification_codes (user_id, code, type, expires_at) VALUES (?, ?, 'email_verification', DATE_ADD(NOW(), INTERVAL 24 HOUR))",
       [insertResult.insertId, verificationToken]
     );
 
-    // CONSTRUIR ENLLAÇ
     const verifyUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/verify-email?token=${verificationToken}`;
 
-    // ENVIAR EMAIL
     await sendEmail({
       to: email,
       subject: "Verifica el teu compte - PadelBook",
-      html: `
-        <h2>Verificació de correu</h2>
-        <p>Hola ${nom},</p>
-        <p>Fes clic al següent enllaç per verificar el teu compte:</p>
-        <a href="${verifyUrl}" target="_blank">${verifyUrl}</a>
-        <p>Aquest enllaç caduca en 24 hores.</p>
-      `,
+      html: buildVerificationEmailHtml({ nom, verifyUrl }),
     });
 
     return message(res, "Usuari registrat. Revisa el teu correu per verificar el compte.", 201);
@@ -425,5 +423,52 @@ exports.verifyEmail = async (req, res) => {
   } catch (error) {
     console.error("Error verifyEmail:", error);
     return fail(res, "Error verificant el compte.");
+  }
+};
+
+// REENVIAR VERIFICACIÓ D'EMAIL
+exports.resendVerification = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const [rows] = await db.query(
+      "SELECT id, nom, email, email_verificat FROM users WHERE id = ? LIMIT 1",
+      [userId]
+    );
+
+    if (rows.length === 0) {
+      return fail(res, "Usuari no trobat.", 404);
+    }
+
+    const user = rows[0];
+
+    if (user.email_verificat === 1) {
+      return fail(res, "Aquest compte ja està verificat.", 400);
+    }
+
+    await db.query(
+      "DELETE FROM verification_codes WHERE user_id = ? AND type = 'email_verification'",
+      [userId]
+    );
+
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+
+    await db.query(
+      "INSERT INTO verification_codes (user_id, code, type, expires_at) VALUES (?, ?, 'email_verification', DATE_ADD(NOW(), INTERVAL 24 HOUR))",
+      [userId, verificationToken]
+    );
+
+    const verifyUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/verify-email?token=${verificationToken}`;
+
+    await sendEmail({
+      to: user.email,
+      subject: "Torna a verificar el teu compte - PadelBook",
+      html: buildVerificationEmailHtml({ nom: user.nom, verifyUrl }),
+    });
+
+    return message(res, "T'hem reenviat el correu de verificació.");
+  } catch (error) {
+    console.error("Error resendVerification:", error);
+    return fail(res, "No s'ha pogut reenviar el correu de verificació.");
   }
 };

@@ -184,7 +184,7 @@
 
 .profile__hero-aside-mini-stats {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.7rem;
 }
 
@@ -584,4 +584,10 @@
 
 .profile__full-width-button {
   width: 100%;
+}
+
+@media (max-width: 640px) {
+  .profile__hero-aside-mini-stats {
+    grid-template-columns: 1fr;
+  }
 }

@@ -37,6 +37,7 @@ function ProfilePage() {
 
   const [feedback, setFeedback] = useState("");
   const [feedbackType, setFeedbackType] = useState("success");
+  const [resendingVerification, setResendingVerification] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -198,6 +199,13 @@ function ProfilePage() {
       ? "pb-badge-pill pb-badge-pill--amber"
       : "pb-badge-pill pb-badge-pill--rose";
 
+  const emailVerificationLabel = profile?.email_verificat === 1 ? "Verificat" : "Pendent";
+
+  const emailVerificationBadgeClass =
+    profile?.email_verificat === 1
+      ? "pb-badge-pill pb-badge-pill--green"
+      : "pb-badge-pill pb-badge-pill--amber";
+
   const accountSummaryCards = [
     {
       label: "Estat del perfil",
@@ -233,6 +241,10 @@ function ProfilePage() {
     {
       label: "Correu",
       value: profile?.email || "-",
+    },
+    {
+      label: "Verificació",
+      value: emailVerificationLabel,
     },
     {
       label: "Rol",
@@ -461,6 +473,32 @@ function ProfilePage() {
     setCapsLockNew(e.getModifierState("CapsLock"));
   };
 
+  const handleResendVerification = async () => {
+    try {
+      setResendingVerification(true);
+      clearFeedback();
+
+      const response = await api.post("/auth/resend-verification");
+      const successMessage =
+        response?.data?.message ||
+        response?.data?.data?.message ||
+        "T'hem reenviat el correu de verificació.";
+
+      showFeedbackMessage(successMessage, "success");
+    } catch (err) {
+      console.error(err);
+
+      const backendError =
+        err.response?.data?.error ||
+        err.response?.data?.message ||
+        "No s'ha pogut reenviar el correu de verificació.";
+
+      showFeedbackMessage(backendError, "error");
+    } finally {
+      setResendingVerification(false);
+    }
+  };
+
   if (loadingProfile) {
     return (
       <LoadingSpinner
@@ -495,8 +533,9 @@ function ProfilePage() {
                   </h1>
 
                   <p className="profile__hero-subtitle">
-                    Revisa el perfil, mantén el correu actualitzat i reforça la
-                    seguretat del compte des d’un espai molt més clar i ordenat.
+                    Revisa el perfil, mantén el correu actualitzat, controla l'estat
+                    de verificació i reforça la seguretat del compte des d’un espai
+                    molt més clar i ordenat.
                   </p>
                 </div>
               </div>
@@ -548,6 +587,11 @@ function ProfilePage() {
                     <span className="profile__hero-aside-mini-value">
                       {hasProfileChanges ? "Pendent" : "Correcte"}
                     </span>
+                  </div>
+
+                  <div className="profile__hero-aside-mini-stat">
+                    <span className="profile__hero-aside-mini-label">Verificació</span>
+                    <span className="profile__hero-aside-mini-value">{emailVerificationLabel}</span>
                   </div>
 
                   <div className="profile__hero-aside-mini-stat">
@@ -688,13 +732,19 @@ function ProfilePage() {
                     </div>
 
                     <div className="profile__info-strip">
-                      <div className="profile__info-strip-icon">i</div>
+                      <div className="profile__info-strip-icon">
+                        {profile?.email_verificat === 1 ? "✓" : "!"}
+                      </div>
                       <div>
-                        <p className="profile__info-strip-title">Consell de perfil</p>
+                        <p className="profile__info-strip-title">
+                          {profile?.email_verificat === 1
+                            ? "Correu verificat"
+                            : "Correu pendent de verificació"}
+                        </p>
                         <p className="profile__info-strip-text">
-                          Mantén un nom real, uns llinatges correctes i un correu vàlid per
-                          identificar millor el compte i rebre comunicacions sense
-                          errors.
+                          {profile?.email_verificat === 1
+                            ? "Aquest compte ja té el correu verificat i està llest per utilitzar totes les funcionalitats disponibles."
+                            : "Verifica el correu electrònic per reforçar la seguretat del compte i assegurar l'accés correcte a les funcionalitats restringides."}
                         </p>
                       </div>
                     </div>
@@ -718,6 +768,19 @@ function ProfilePage() {
                       >
                         Restablir
                       </button>
+
+                      {profile?.email_verificat !== 1 && (
+                        <button
+                          type="button"
+                          className="btn btn-secondary"
+                          onClick={handleResendVerification}
+                          disabled={resendingVerification}
+                        >
+                          {resendingVerification
+                            ? "Reenviant correu..."
+                            : "Reenviar verificació"}
+                        </button>
+                      )}
                     </div>
                   </form>
                 </section>
@@ -951,6 +1014,11 @@ function ProfilePage() {
                         >
                           {hasProfileChanges ? "Pendents" : "Al dia"}
                         </span>
+                      </div>
+
+                      <div className="profile__status-row">
+                        <span className="profile__status-label">Verificació</span>
+                        <span className={emailVerificationBadgeClass}>{emailVerificationLabel}</span>
                       </div>
 
                       <div className="profile__status-row">

@@ -17,6 +17,7 @@ router.post(
 );
 
 router.get("/verify-email", authController.verifyEmail);
+router.post("/resend-verification", authMiddleware, authController.resendVerification);
 
 // Ruta protegida per obtenir les dades de l'usuari autenticat
 router.get("/me", authMiddleware, authController.getMe);
