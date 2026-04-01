@@ -278,11 +278,11 @@ exports.createReservation = async (req, res) => {
 
     const codi_reserva = `PB-${data_reserva.replace(/-/g, "")}-${String(createdIds[0]).padStart(3, "0")}`;
 
-      // 7. Guardar el codi definitiu a totes les reserves creades
-      await db.query(
-        `UPDATE reservations SET codi_reserva = ? WHERE codi_reserva = ?`,
-        [codi_reserva, codiBase]
-      );
+    // 7. Guardar el codi definitiu a totes les reserves creades
+    await db.query(
+      `UPDATE reservations SET codi_reserva = ? WHERE codi_reserva = ?`,
+      [codi_reserva, codiBase]
+    );
 
     // 8. Enviar email de confirmació de reserva
     const [reservationDetails] = await db.query(

@@ -79,6 +79,39 @@ function MyReservationsPage() {
 
   const isSessionExpiredError = (err) => err?.response?.status === 401;
 
+  const groupReservations = (reservations) => {
+    const map = new Map();
+
+    for (const res of reservations) {
+      const key = res.codi_reserva;
+
+      if (!map.has(key)) {
+        map.set(key, {
+          ...res,
+          slots: [res],
+        });
+      } else {
+        map.get(key).slots.push(res);
+      }
+    }
+
+    return Array.from(map.values()).map((group) => {
+      const sortedSlots = group.slots.sort((a, b) =>
+        a.hora_inici.localeCompare(b.hora_inici)
+      );
+
+      const first = sortedSlots[0];
+      const last = sortedSlots[sortedSlots.length - 1];
+
+      return {
+        ...group,
+        hora_inici: first.hora_inici,
+        hora_fi: last.hora_fi,
+        total_slots: sortedSlots.length,
+      };
+    });
+  };
+
   const fetchReservations = async () => {
     try {
       setLoading(true);
@@ -87,7 +120,11 @@ function MyReservationsPage() {
       const response = await api.get("/reservations");
       const reservationsData = response?.data?.data || [];
 
-      setReservations(Array.isArray(reservationsData) ? reservationsData : []);
+      const grouped = groupReservations(
+        Array.isArray(reservationsData) ? reservationsData : []
+      );
+
+      setReservations(grouped);
     } catch (err) {
       console.error(err);
 
