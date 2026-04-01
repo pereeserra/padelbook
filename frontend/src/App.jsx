@@ -17,6 +17,7 @@ import AvailabilityPage from "./pages/AvailabilityPage/AvailabilityPage";
 import MyReservationsPage from "./pages/MyReservationsPage/MyReservationsPage";
 import AdminPage from "./pages/AdminPage/AdminPage";
 import ProfilePage from "./pages/ProfilePage/ProfilePage";
+import VerifyEmailPage from "./pages/VerifyEmailPage/VerifyEmailPage";
 import BackToTopButton from "./components/BackToTopButton/BackToTopButton";
 import Footer from "./components/Footer/Footer";
 
@@ -51,6 +52,7 @@ function AppContent() {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/availability" element={<AvailabilityPage />} />
 
           <Route
