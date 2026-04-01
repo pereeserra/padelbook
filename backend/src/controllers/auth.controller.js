@@ -389,7 +389,7 @@ exports.verifyEmail = async (req, res) => {
     }
 
     const [rows] = await db.query(
-      "SELECT * FROM verification_codes WHERE code = ? AND type = 'email_verification' AND expires_at > NOW() LIMIT 1",
+      "SELECT * FROM verification_codes WHERE code = ? AND type = 'email_verification' LIMIT 1",
       [token]
     );
 
@@ -399,16 +399,26 @@ exports.verifyEmail = async (req, res) => {
 
     const verification = rows[0];
 
-    // MARCAR USUARI COM VERIFICAT
-    await db.query(
-      "UPDATE users SET email_verificat = 1 WHERE id = ?",
+    if (new Date(verification.expires_at) < new Date()) {
+      return fail(res, "Token invàlid o expirat.", 400);
+    }
+
+    const [userRows] = await db.query(
+      "SELECT id, email_verificat FROM users WHERE id = ? LIMIT 1",
       [verification.user_id]
     );
 
-    // ELIMINAR TOKEN
+    if (userRows.length === 0) {
+      return fail(res, "Usuari no trobat.", 404);
+    }
+
+    if (userRows[0].email_verificat === 1) {
+      return message(res, "Aquest compte ja estava verificat.");
+    }
+
     await db.query(
-      "DELETE FROM verification_codes WHERE id = ?",
-      [verification.id]
+      "UPDATE users SET email_verificat = 1 WHERE id = ?",
+      [verification.user_id]
     );
 
     return message(res, "Compte verificat correctament.");
