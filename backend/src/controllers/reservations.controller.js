@@ -25,6 +25,7 @@ exports.createReservation = async (req, res) => {
   try {
     const user_id = req.user.id;
     const userRole = req.user.rol;
+
     let { court_id, time_slot_id, data_reserva } = req.body;
     let { metode_pagament } = req.body;
 
@@ -338,6 +339,24 @@ exports.deleteReservation = async (req, res) => {
     const reservationId = parsePositiveInteger(req.params.id);
     const userId = req.user.id;
     const userRole = req.user.rol;
+
+    // 🔒 BLOQUEIG SI EMAIL NO VERIFICAT
+  const [userRows] = await db.query(
+    "SELECT email_verificat FROM users WHERE id = ? LIMIT 1",
+    [user_id]
+  );
+
+  if (userRows.length === 0) {
+    return fail(res, "Usuari no trobat", 404);
+  }
+
+  if (!userRows[0].email_verificat) {
+    return fail(
+      res,
+      "Has de verificar el teu correu electrònic abans de fer una reserva",
+      403
+    );
+  }
 
     if (!reservationId) {
       return fail(res, "L'identificador de la reserva no és vàlid", 400);

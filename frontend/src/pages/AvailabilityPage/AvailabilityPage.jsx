@@ -31,6 +31,7 @@ function AvailabilityPage() {
   const [courtTypeFilter, setCourtTypeFilter] = useState("tots");
   const [courtEnvironmentFilter, setCourtEnvironmentFilter] = useState("totes");
   const [showAuthHelp, setShowAuthHelp] = useState(false);
+  const [showVerificationHelp, setShowVerificationHelp] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("online_simulat");
   const [reservationSummary, setReservationSummary] = useState(null);
   const [selectedSlot, setSelectedSlot] = useState(null);
@@ -111,6 +112,7 @@ function AvailabilityPage() {
     setError("");
     setSuccess("");
     setShowAuthHelp(false);
+    setShowVerificationHelp(false);
     setReservationSummary(null);
   };
 
@@ -189,6 +191,7 @@ function AvailabilityPage() {
       if (!token) {
         setError("Per reservar una pista, has d'iniciar sessió.");
         setShowAuthHelp(true);
+        setShowVerificationHelp(false);
         return;
       }
 
@@ -231,7 +234,21 @@ function AvailabilityPage() {
       scrollToElementWithOffset(topFeedbackRef.current, 120);
     } catch (err) {
       console.error(err);
-      setError(getErrorMessage(err, "No s'ha pogut crear la reserva."));
+
+      const errorMessage = getErrorMessage(
+        err,
+        "No s'ha pogut crear la reserva."
+      );
+
+      if (errorMessage.toLowerCase().includes("verificar el teu correu")) {
+        setError("Has de verificar el teu correu abans de reservar.");
+        setShowAuthHelp(false);
+        setShowVerificationHelp(true);
+      } else {
+        setError(errorMessage);
+        setShowVerificationHelp(false);
+      }
+
       scrollToElementWithOffset(topFeedbackRef.current, 120);
     } finally {
       setReserving(false);
@@ -531,6 +548,23 @@ function AvailabilityPage() {
               </Link>
               <Link to="/register" className="btn btn-outline-primary btn-sm">
                 Crear compte
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {showVerificationHelp && (
+          <div className="pb-feedback pb-feedback--info fade-in">
+            <p>
+              El teu compte encara no té el correu verificat. Verifica'l o
+              reenvia el correu des del teu perfil abans de reservar.
+            </p>
+            <div className="ap-alert-actions">
+              <Link to="/my-account" className="btn btn-primary btn-sm">
+                Anar al meu perfil
+              </Link>
+              <Link to="/login" className="btn btn-outline-primary btn-sm">
+                Tornar a login
               </Link>
             </div>
           </div>
