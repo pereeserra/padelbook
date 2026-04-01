@@ -46,7 +46,13 @@ exports.createReservation = async (req, res) => {
 
     let { court_id, time_slot_id, data_reserva, duration } = req.body;
 
-    duration = Number(duration || 1);
+    duration = Number(duration);
+
+    if (!duration) duration = 1;
+
+    if (duration !== 1 && duration !== 1.5) {
+      return fail(res, "Duració no vàlida", 400);
+    }
 
     if (![1, 1.5].includes(duration)) {
       return fail(res, "Duració no vàlida", 400);
@@ -325,7 +331,7 @@ exports.createReservation = async (req, res) => {
     }
 
     return message(res, "Reserva creada correctament", 201, {
-      id: reservationId,
+      id: createdIds[0],
       codi_reserva,
       preu_total,
       estat_pagament,
