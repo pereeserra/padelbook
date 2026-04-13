@@ -358,9 +358,24 @@ function AvailabilityPage() {
       scrollToElementWithOffset(topFeedbackRef.current, 120);
     } else {
       setSelectedSlot(null);
-      setError(
-        "La reserva anterior s'ha carregat, però aquesta franja ja no està disponible."
-      );
+
+      let repeatErrorMessage =
+        "La reserva anterior s'ha carregat, però aquesta franja ja no està disponible.";
+
+      if (matchedSlot) {
+        if (matchedSlot.motiu_no_disponible === "reserva") {
+          repeatErrorMessage =
+            "La reserva anterior s'ha carregat, però aquesta franja ja està reservada.";
+        } else if (matchedSlot.motiu_no_disponible === "manteniment") {
+          repeatErrorMessage =
+            "La reserva anterior s'ha carregat, però aquesta franja està bloquejada per manteniment.";
+        }
+      } else {
+        repeatErrorMessage =
+          "La reserva anterior s'ha carregat, però no s'ha pogut trobar aquesta franja exacta.";
+      }
+
+      setError(repeatErrorMessage);
       scrollToElementWithOffset(topFeedbackRef.current, 120);
     }
 
