@@ -30,6 +30,20 @@ function ReservationCard({
   const isPastReservation = getReservationEndDate() < new Date();
   const cardRef = useRef(null);
 
+  const reservationDateObj = new Date(reservation.data_reserva);
+  const today = new Date();
+  const isTodayReservation =
+    reservationDateObj.toDateString() === today.toDateString();
+
+  const temporalStatusLabel =
+    reservation.estat === "cancel·lada"
+      ? "Cancel·lada"
+      : isPastReservation
+      ? "Finalitzada"
+      : isTodayReservation
+      ? "Avui"
+      : "Pròxima";
+
   // Funció per fer scroll suau cap a la targeta quan s'està confirmant la cancel·lació
   const slowScrollToCard = () => {
     if (!cardRef.current) return;
@@ -89,6 +103,25 @@ function ReservationCard({
 
   return (
     <article ref={cardRef} className={cardClass}>
+      <div className="res-card__meta-strip">
+        <span className="res-card__meta-code">
+          Codi: {reservation.codi_reserva || "No disponible"}
+        </span>
+
+        <span
+          className={`res-card__meta-status ${
+            reservation.estat === "cancel·lada"
+              ? "res-card__meta-status--cancelled"
+              : isPastReservation
+              ? "res-card__meta-status--past"
+              : isTodayReservation
+              ? "res-card__meta-status--today"
+              : "res-card__meta-status--upcoming"
+          }`}
+        >
+          {temporalStatusLabel}
+        </span>
+      </div>
       <div className="res-card__header">
         <div className="res-card__header-main">
           <span className="res-card__eyebrow">Reserva de pista</span>
@@ -216,7 +249,7 @@ function ReservationCard({
               </div>
             </div>
 
-      {isPastReservation && (
+      {(isPastReservation || reservation.estat === "cancel·lada") && (
         <div className="res-card__footer res-card__footer--past">
           <button
             type="button"
