@@ -450,6 +450,45 @@ function AvailabilityPage() {
     };
   }, [availabilitySummary]);
 
+  const hourlySummary = useMemo(() => {
+    const map = new Map();
+
+    availability.forEach((slot) => {
+      const key = slot.hora_inici;
+
+      if (!map.has(key)) {
+        map.set(key, {
+          hora_inici: slot.hora_inici,
+          hora_fi: slot.hora_fi,
+          available: 0,
+          reserved: 0,
+          maintenance: 0,
+          past: 0,
+          total: 0,
+        });
+      }
+
+      const row = map.get(key);
+      const isPast = isPastTimeSlot(slot);
+
+      row.total += 1;
+
+      if (isPast) {
+        row.past += 1;
+      } else if (slot.disponible) {
+        row.available += 1;
+      } else if (slot.motiu_no_disponible === "manteniment") {
+        row.maintenance += 1;
+      } else {
+        row.reserved += 1;
+      }
+    });
+
+    return Array.from(map.values()).sort((a, b) =>
+      a.hora_inici.localeCompare(b.hora_inici)
+    );
+  }, [availability, date]);
+
   const isSlotValidForDuration = (slot) => {
     return slot.disponible;
   };
@@ -721,7 +760,50 @@ function AvailabilityPage() {
             <LoadingSpinner />
           </div>
         ) : (
-          <div className="ap-courts-grid">
+          <>
+            <section className="ap-summary-board fade-in-up">
+              <div className="ap-summary-board__header">
+                <div>
+                  <span className="ap-section-kicker">Vista resum</span>
+                  <h2 className="ap-section-title">Disponibilitat per franges</h2>
+                  <p className="ap-section-text">
+                    Aquesta vista resumeix quantes pistes hi ha lliures, reservades,
+                    en manteniment o ja passades a cada hora.
+                  </p>
+                </div>
+              </div>
+
+              <div className="ap-summary-grid">
+                {hourlySummary.map((row) => (
+                  <div
+                    key={row.hora_inici}
+                    className="ap-summary-card"
+                  >
+                    <div className="ap-summary-time">
+                      {formatTimeShort(row.hora_inici)} -{" "}
+                      {formatTimeShort(row.hora_fi)}
+                    </div>
+
+                    <div className="ap-summary-stats">
+                      <span className="ap-summary-pill ap-summary-pill--available">
+                        {row.available} lliures
+                      </span>
+                      <span className="ap-summary-pill ap-summary-pill--reserved">
+                        {row.reserved} reservades
+                      </span>
+                      <span className="ap-summary-pill ap-summary-pill--maintenance">
+                        {row.maintenance} manteniment
+                      </span>
+                      <span className="ap-summary-pill ap-summary-pill--past">
+                        {row.past} passades
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <div className="ap-courts-grid">
             {courtsData.length === 0 && !error && !success ? (
               <div className="ap-empty-state">
                 <span>🎾</span>
@@ -855,7 +937,8 @@ function AvailabilityPage() {
                 );
               })
             )}
-          </div>
+            </div>
+          </>
         )}
       </div>
 
