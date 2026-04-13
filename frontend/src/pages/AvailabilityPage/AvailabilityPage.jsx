@@ -148,12 +148,24 @@ function AvailabilityPage() {
       if (!selectedDate) {
         setError("Has de seleccionar una data.");
         setAvailability([]);
+        setAvailabilitySummary({
+          total_courts: 0,
+          total_slots: 0,
+          total_available_slots: 0,
+          total_unavailable_slots: 0,
+        });
         return;
       }
 
       if (isPastDate(selectedDate)) {
         setError("No pots consultar disponibilitat en dates passades.");
         setAvailability([]);
+        setAvailabilitySummary({
+          total_courts: 0,
+          total_slots: 0,
+          total_available_slots: 0,
+          total_unavailable_slots: 0,
+        });
         return;
       }
 
@@ -186,6 +198,7 @@ function AvailabilityPage() {
     } catch (err) {
       console.error(err);
       setError(getErrorMessage(err, "No s'ha pogut carregar la disponibilitat."));
+      setAvailability([]);
       setAvailabilitySummary({
         total_courts: 0,
         total_slots: 0,
