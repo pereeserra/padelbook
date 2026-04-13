@@ -43,6 +43,7 @@ function AvailabilityPage() {
   const [reservationSummary, setReservationSummary] = useState(null);
   const [reserving, setReserving] = useState(false);
   const [repeatReservationInfo, setRepeatReservationInfo] = useState(null);
+  const [slotHelpMessage, setSlotHelpMessage] = useState("");
 
   // Funció per formatar el preu, mostrant "Preu no disponible" si no hi ha valor vàlid
   const formatPrice = (value) => {
@@ -134,6 +135,7 @@ function AvailabilityPage() {
     setShowAuthHelp(false);
     setShowVerificationHelp(false);
     setReservationSummary(null);
+    setSlotHelpMessage("");
   };
 
   // Funció per obrir el selector de data ocult, amb maneig de compatibilitat per diferents navegadors
@@ -452,6 +454,19 @@ function AvailabilityPage() {
     return slot.disponible;
   };
 
+  const handleSlotClick = (slot, isSelected, isPastSlot) => {
+    if (isPastSlot || !slot.disponible) {
+      setSelectedSlot(null);
+      setReservationSummary(null);
+      setSlotHelpMessage(getSlotTitle(slot, isPastSlot));
+      scrollToElementWithOffset(topFeedbackRef.current, 120);
+      return;
+    }
+
+    setSlotHelpMessage("");
+    setSelectedSlot(isSelected ? null : slot);
+  };
+
   return (
     <div className="ap-wrapper">
       <header className="ap-hero">
@@ -646,6 +661,13 @@ function AvailabilityPage() {
           </div>
         )}
 
+        {slotHelpMessage && (
+          <div className="ap-inline-help fade-in">
+            <strong>Informació de la franja:</strong>
+            <span>{slotHelpMessage}</span>
+          </div>
+        )}
+
         {success && reservationSummary && (
           <div className="pb-feedback pb-feedback--success fade-in fade-in-up">
             <div className="ap-success-header">
@@ -802,7 +824,9 @@ function AvailabilityPage() {
                             }`}
                           >
                             <button
-                              onClick={() => setSelectedSlot(isSelected ? null : slot)}
+                              onClick={() =>
+                                handleSlotClick(slot, isSelected, isPastSlot)
+                              }
                               disabled={!isValid || isPastSlot}
                               title={getSlotTitle(slot, isPastSlot)}
                               className={`ap-slot-pill ${
