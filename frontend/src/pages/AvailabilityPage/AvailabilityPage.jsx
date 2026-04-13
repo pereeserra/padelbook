@@ -92,6 +92,20 @@ function AvailabilityPage() {
     return Number(coberta) === 1 ? "Indoor" : "Outdoor";
   };
 
+  const getSlotStatusLabel = (slot, isPastSlot) => {
+    if (isPastSlot) return "Hora passada";
+    if (slot.disponible) return "Disponible";
+    if (slot.motiu_no_disponible === "manteniment") return "Manteniment";
+    if (slot.motiu_no_disponible === "reserva") return "Reservada";
+    return "No disponible";
+  };
+
+  const getSlotTitle = (slot, isPastSlot) => {
+    if (isPastSlot) return "Hora passada";
+    if (slot.disponible) return "Franja disponible";
+    return slot.detall_no_disponible || "Franja no disponible";
+  };
+
   // Funció per determinar si la data seleccionada és anterior a la data actual
   const isPastDate = (selectedDate) => {
     return selectedDate < getToday();
@@ -518,6 +532,25 @@ function AvailabilityPage() {
             </div>
           </div>
 
+          <div className="ap-legend">
+            <span className="ap-legend__item">
+              <span className="ap-legend__dot ap-legend__dot--available"></span>
+              Disponible
+            </span>
+            <span className="ap-legend__item">
+              <span className="ap-legend__dot ap-legend__dot--reserved"></span>
+              Reservada
+            </span>
+            <span className="ap-legend__item">
+              <span className="ap-legend__dot ap-legend__dot--maintenance"></span>
+              Manteniment
+            </span>
+            <span className="ap-legend__item">
+              <span className="ap-legend__dot ap-legend__dot--past"></span>
+              Hora passada
+            </span>
+          </div>
+
           <div className="ap-date-filters">
             <div className="ap-selected-date-block">
               <span className="ap-selected-date-label">Data seleccionada</span>
@@ -697,7 +730,12 @@ function AvailabilityPage() {
             ) : (
               courtsData.map((court, courtIndex) => {
                 const availableCount = court.slots.filter((s) => s.disponible).length;
-                const occupiedCount = court.slots.length - availableCount;
+                const reservedCount = court.slots.filter(
+                  (s) => !s.disponible && s.motiu_no_disponible === "reserva"
+                ).length;
+                const maintenanceCount = court.slots.filter(
+                  (s) => !s.disponible && s.motiu_no_disponible === "manteniment"
+                ).length;
 
                 return (
                   <div
@@ -714,7 +752,11 @@ function AvailabilityPage() {
                         <span className="ap-court-meta">{availableCount} lliures</span>
 
                         <span className="ap-court-meta ap-court-meta--soft">
-                          {occupiedCount} ocupades
+                          {reservedCount} reservades
+                        </span>
+
+                        <span className="ap-court-meta ap-court-meta--maintenance">
+                          {maintenanceCount} manteniment
                         </span>
 
                         <span
@@ -762,18 +804,25 @@ function AvailabilityPage() {
                             <button
                               onClick={() => setSelectedSlot(isSelected ? null : slot)}
                               disabled={!isValid || isPastSlot}
-                              title={isPastSlot ? "Hora passada" : ""}
+                              title={getSlotTitle(slot, isPastSlot)}
                               className={`ap-slot-pill ${
-                                !isValid
-                                  ? "is-booked"
-                                  : isPastSlot
+                                isPastSlot
                                   ? "is-past"
-                                  : isSelected
-                                  ? "is-selected"
-                                  : "is-available"
+                                  : slot.disponible
+                                  ? isSelected
+                                    ? "is-selected"
+                                    : "is-available"
+                                  : slot.motiu_no_disponible === "manteniment"
+                                  ? "is-maintenance"
+                                  : "is-booked"
                               }`}
                             >
-                              {formatTimeShort(slot.hora_inici)}
+                              <span className="ap-slot-time">
+                                {formatTimeShort(slot.hora_inici)}
+                              </span>
+                              <span className="ap-slot-status">
+                                {getSlotStatusLabel(slot, isPastSlot)}
+                              </span>
                             </button>
                           </div>
                         );
