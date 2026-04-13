@@ -790,6 +790,18 @@
   color: #166534;
 }
 
+.ap-success-feedback {
+  position: relative;
+  z-index: 3;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .ap-success-feedback {
+    margin-bottom: 1.1rem;
+  }
+}
+
 .ap-inline-help {
   display: flex;
   flex-direction: column;

@@ -708,7 +708,7 @@ function AvailabilityPage() {
         )}
 
         {success && reservationSummary && (
-          <div className="pb-feedback pb-feedback--success fade-in fade-in-up">
+          <div className="pb-feedback pb-feedback--success ap-success-feedback fade-in fade-in-up">
             <div className="ap-success-header">
               <h3>🎉 Reserva Confirmada</h3>
               <span className="ap-success-code">{reservationSummary.codi_reserva}</span>
