@@ -827,7 +827,6 @@ function AvailabilityPage() {
                               onClick={() =>
                                 handleSlotClick(slot, isSelected, isPastSlot)
                               }
-                              disabled={!isValid || isPastSlot}
                               title={getSlotTitle(slot, isPastSlot)}
                               className={`ap-slot-pill ${
                                 isPastSlot
