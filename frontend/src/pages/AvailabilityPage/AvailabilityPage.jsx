@@ -24,6 +24,12 @@ function AvailabilityPage() {
 
   const [date, setDate] = useState(getToday());
   const [availability, setAvailability] = useState([]);
+  const [availabilitySummary, setAvailabilitySummary] = useState({
+    total_courts: 0,
+    total_slots: 0,
+    total_available_slots: 0,
+    total_unavailable_slots: 0,
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -157,12 +163,35 @@ function AvailabilityPage() {
       setSelectedSlot(null);
 
       const response = await api.get(`/availability?date=${selectedDate}`);
-      const availabilityData = response?.data?.data || [];
-      setAvailability(Array.isArray(availabilityData) ? availabilityData : []);
+      const availabilityData = response?.data?.data || {};
+
+      const courts = Array.isArray(availabilityData?.courts)
+        ? availabilityData.courts
+        : [];
+
+      const flatSlots = courts.flatMap((court) =>
+        Array.isArray(court.slots) ? court.slots : []
+      );
+
+      setAvailability(flatSlots);
+
+      setAvailabilitySummary(
+        availabilityData?.summary || {
+          total_courts: 0,
+          total_slots: 0,
+          total_available_slots: 0,
+          total_unavailable_slots: 0,
+        }
+      );
     } catch (err) {
       console.error(err);
       setError(getErrorMessage(err, "No s'ha pogut carregar la disponibilitat."));
-      setAvailability([]);
+      setAvailabilitySummary({
+        total_courts: 0,
+        total_slots: 0,
+        total_available_slots: 0,
+        total_unavailable_slots: 0,
+      });
     } finally {
       setLoading(false);
     }
@@ -384,18 +413,13 @@ function AvailabilityPage() {
 
   // Memorització de les estadístiques de disponibilitat, calculant el total de franges, franges disponibles, franges ocupades i total de pistes
   const availabilityStats = useMemo(() => {
-    const totalSlots = availability.length;
-    const availableSlots = availability.filter((slot) => slot.disponible).length;
-    const occupiedSlots = totalSlots - availableSlots;
-    const totalCourts = new Set(availability.map((slot) => slot.nom_pista)).size;
-
     return {
-      totalSlots,
-      availableSlots,
-      occupiedSlots,
-      totalCourts,
+      totalSlots: availabilitySummary.total_slots || 0,
+      availableSlots: availabilitySummary.total_available_slots || 0,
+      occupiedSlots: availabilitySummary.total_unavailable_slots || 0,
+      totalCourts: availabilitySummary.total_courts || 0,
     };
-  }, [availability]);
+  }, [availabilitySummary]);
 
   const isSlotValidForDuration = (slot) => {
     return slot.disponible;
