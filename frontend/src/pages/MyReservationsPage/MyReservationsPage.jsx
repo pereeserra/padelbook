@@ -365,6 +365,18 @@ function MyReservationsPage() {
     return "Aquí tens tot l'historial complet de reserves.";
   }, [activeFilter]);
 
+  const activeFilterTags = useMemo(() => {
+    const tags = [];
+
+    if (activeFilter === "active") tags.push("Només actives");
+    if (activeFilter === "past") tags.push("Només finalitzades");
+    if (activeFilter === "cancelled") tags.push("Només cancel·lades");
+    if (selectedDate) tags.push(`Data: ${selectedDate}`);
+    if (searchTerm.trim()) tags.push(`Cerca: ${searchTerm.trim()}`);
+
+    return tags;
+  }, [activeFilter, selectedDate, searchTerm]);
+
   return (
     <div className="my-res__page">
       <div
@@ -562,10 +574,32 @@ function MyReservationsPage() {
             {filteredReservations.length > 0 ? (
               <>
                 <section className="fade-in-up delay-2 my-res__results-head">
-                  <div>
-                    <span className="pb-kicker">{filterLabel}</span>
-                    <h3 className="my-res__results-title">{currentSectionTitle}</h3>
-                    <p className="my-res__results-text">{currentSectionText}</p>
+                  <div className="my-res__results-head-top">
+                    <div>
+                      <span className="pb-kicker">{filterLabel}</span>
+                      <h3 className="my-res__results-title">{currentSectionTitle}</h3>
+                      <p className="my-res__results-text">{currentSectionText}</p>
+                    </div>
+
+                    <Link to="/availability" className="btn btn-primary">
+                      Fer nova reserva
+                    </Link>
+                  </div>
+
+                  <div className="my-res__results-summary">
+                    <span className="my-res__results-summary-text">
+                      Mostrant <strong>{filteredReservations.length}</strong> resultat/s
+                    </span>
+
+                    {activeFilterTags.length > 0 && (
+                      <div className="my-res__active-tags">
+                        {activeFilterTags.map((tag) => (
+                          <span key={tag} className="my-res__active-tag">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </section>
 
