@@ -782,7 +782,7 @@ function AvailabilityPage() {
                     </div>
 
                     <div className="ap-slots-grid">
-                      {court.slots.map((slot, index) => {
+                      {court.slots.map((slot) => {
                         const isSelected =
                           selectedSlot?.time_slot_id === slot.time_slot_id &&
                           selectedSlot?.court_id === slot.court_id;
