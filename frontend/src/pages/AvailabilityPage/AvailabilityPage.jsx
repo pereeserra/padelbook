@@ -33,7 +33,6 @@ function AvailabilityPage() {
   const [showAuthHelp, setShowAuthHelp] = useState(false);
   const [showVerificationHelp, setShowVerificationHelp] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("online_simulat");
-  const [duration, setDuration] = useState(1); // 1h per defecte
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [reservationSummary, setReservationSummary] = useState(null);
   const [reserving, setReserving] = useState(false);
@@ -203,7 +202,7 @@ function AvailabilityPage() {
         court_id: selectedSlot.court_id,
         time_slot_id: selectedSlot.time_slot_id,
         data_reserva: date,
-        duration,
+        duration: 1,
         metode_pagament: paymentMethod,
       });
 
@@ -212,9 +211,7 @@ function AvailabilityPage() {
       setSuccess(
         `Reserva confirmada a ${selectedSlot.nom_pista} (${formatTimeShort(
           selectedSlot.hora_inici
-        )} - ${formatTimeShort(selectedSlot.hora_fi)}) · Duració: ${
-          duration === 1.5 ? "1h30" : "1h"
-        }.`
+        )} - ${formatTimeShort(selectedSlot.hora_fi)}) · Duració: 1h.`
       );
 
       setReservationSummary({
@@ -230,7 +227,7 @@ function AvailabilityPage() {
         nom_pista: selectedSlot.nom_pista,
         hora_inici: selectedSlot.hora_inici,
         hora_fi: selectedSlot.hora_fi,
-        duration,
+        duration: 1,
         data_reserva: date,
       });
 
@@ -400,25 +397,8 @@ function AvailabilityPage() {
     };
   }, [availability]);
 
-  const isSlotValidForDuration = (courtSlots, slotIndex) => {
-    const slot = courtSlots[slotIndex];
-
-    // Slot actual no disponible → fora
-    if (!slot.disponible) return false;
-
-    // Si és 1h → OK
-    if (duration === 1) return true;
-
-    // Si és 1h30 → comprovar següent slot
-    if (duration === 1.5) {
-      const nextSlot = courtSlots[slotIndex + 1];
-
-      if (!nextSlot) return false;
-
-      return nextSlot.disponible;
-    }
-
-    return false;
+  const isSlotValidForDuration = (slot) => {
+    return slot.disponible;
   };
 
   return (
@@ -621,9 +601,7 @@ function AvailabilityPage() {
               </div>
               <div>
                 <span>Duració:</span>
-                <strong>
-                  {reservationSummary.duration === 1.5 ? "1h30" : "1h"}
-                </strong>
+                <strong>1h</strong>
               </div>
               <div>
                 <span>Pagament:</span>
@@ -731,7 +709,7 @@ function AvailabilityPage() {
                           selectedSlot?.court_id === slot.court_id;
 
                         const isPastSlot = isPastTimeSlot(slot);
-                        const isValid = isSlotValidForDuration(court.slots, index);
+                        const isValid = isSlotValidForDuration(slot);
 
                         const shouldHideSlot =
                           showOnlyAvailable &&
@@ -800,27 +778,6 @@ function AvailabilityPage() {
             </div>
 
             <div className="ap-floating-controls">
-              <div className="ap-payment-field">
-                <span className="ap-payment-label">Duració</span>
-
-                <div className="ap-payment-toggle">
-                  <button
-                    type="button"
-                    className={`ap-payment-option ${duration === 1 ? "is-active" : ""}`}
-                    onClick={() => setDuration(1)}
-                  >
-                    1h
-                  </button>
-
-                  <button
-                    type="button"
-                    className={`ap-payment-option ${duration === 1.5 ? "is-active" : ""}`}
-                    onClick={() => setDuration(1.5)}
-                  >
-                    1h30
-                  </button>
-                </div>
-              </div>
               <div className="ap-payment-field">
                 <span className="ap-payment-label">Mètode de pagament</span>
 
