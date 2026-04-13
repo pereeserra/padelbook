@@ -13,8 +13,14 @@ const PAYMENT_METHOD = {
   CLUB: "al_club",
 };
 
+const RESERVATION_DURATION = {
+  ONE_HOUR: 1,
+  NINETY_MINUTES: 1.5,
+};
+
 module.exports = {
   RESERVATION_STATUS,
   PAYMENT_STATUS,
   PAYMENT_METHOD,
+  RESERVATION_DURATION,
 };

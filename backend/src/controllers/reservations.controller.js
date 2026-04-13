@@ -18,6 +18,7 @@ const {
   RESERVATION_STATUS,
   PAYMENT_STATUS,
   PAYMENT_METHOD,
+  RESERVATION_DURATION,
 } = require("../config/reservationConstants");
 
 // Crear reserva (amb comprovacions de disponibilitat i bloqueig)
@@ -48,13 +49,13 @@ exports.createReservation = async (req, res) => {
 
     duration = Number(duration);
 
-    if (!duration) duration = 1;
-
-    if (duration !== 1 && duration !== 1.5) {
-      return fail(res, "Duració no vàlida", 400);
+    if (!duration) {
+      duration = RESERVATION_DURATION.ONE_HOUR;
     }
 
-    if (![1, 1.5].includes(duration)) {
+    const allowedDurations = Object.values(RESERVATION_DURATION);
+
+    if (!allowedDurations.includes(duration)) {
       return fail(res, "Duració no vàlida", 400);
     }
 
@@ -70,7 +71,8 @@ exports.createReservation = async (req, res) => {
     }
 
     // calcular slots necessaris
-    const slotsNeeded = duration === 1 ? 1 : 2;
+    const slotsNeeded =
+      duration === RESERVATION_DURATION.ONE_HOUR ? 1 : 2;
 
     const selectedSlots = allSlots.slice(slotIndex, slotIndex + slotsNeeded);
 
@@ -227,18 +229,20 @@ exports.createReservation = async (req, res) => {
     }
 
     // 5. Comprovar si la pista està bloquejada per manteniment
-    const [maintenanceBlocks] = await db.query(
-      `SELECT id FROM maintenance_blocks
-       WHERE court_id = ? AND time_slot_id = ? AND data_bloqueig = ?`,
-      [court_id, time_slot_id, data_reserva]
-    );
-
-    if (maintenanceBlocks.length > 0) {
-      return fail(
-        res,
-        "La pista està bloquejada per manteniment en aquesta franja i data",
-        400
+    for (const slot of selectedSlots) {
+      const [maintenanceBlocks] = await db.query(
+        `SELECT id FROM maintenance_blocks
+         WHERE court_id = ? AND time_slot_id = ? AND data_bloqueig = ?`,
+        [court_id, slot.id, data_reserva]
       );
+
+      if (maintenanceBlocks.length > 0) {
+        return fail(
+          res,
+          "Una de les franges està bloquejada per manteniment",
+          400
+        );
+      }
     }
 
     // 6. Crear la reserva amb codi temporal
@@ -285,21 +289,25 @@ exports.createReservation = async (req, res) => {
     );
 
     // 8. Enviar email de confirmació de reserva
+    const firstSlotId = selectedSlots[0].id;
+    const lastSlotId = selectedSlots[selectedSlots.length - 1].id;
+
     const [reservationDetails] = await db.query(
       `
         SELECT
           u.nom,
           u.email,
           c.nom_pista,
-          t.hora_inici,
-          t.hora_fi
+          t1.hora_inici,
+          t2.hora_fi
         FROM users u
         JOIN courts c ON c.id = ?
-        JOIN time_slots t ON t.id = ?
+        JOIN time_slots t1 ON t1.id = ?
+        JOIN time_slots t2 ON t2.id = ?
         WHERE u.id = ?
         LIMIT 1
       `,
-      [court_id, time_slot_id, user_id]
+      [court_id, firstSlotId, lastSlotId, user_id]
     );
 
     const detail = reservationDetails[0];
@@ -331,6 +339,8 @@ exports.createReservation = async (req, res) => {
       codi_reserva,
       preu_total,
       estat_pagament,
+      metode_pagament,
+      duration,
     });
       } catch (error) {
         console.error("Error createReservation:", error);
