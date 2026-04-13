@@ -390,7 +390,8 @@ function AvailabilityPage() {
       const normalizedEnvironment =
         Number(slot.coberta) === 1 ? "indoor" : "outdoor";
 
-      const matchesAvailability = true;
+      const matchesAvailability =
+        !showOnlyAvailable || (slot.disponible && !isPastTimeSlot(slot));
 
       const matchesCourtType =
         courtTypeFilter === "tots" ||
