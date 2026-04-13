@@ -150,7 +150,7 @@ function ReservationCard({
         </div>
 
         <div className="res-card__header-actions">
-          {(!isActive || isPastReservation) && (
+          {reservation.estat === "cancel·lada" && (
             <button
               type="button"
               onClick={() => onDeleteCancelled(reservation.id)}
