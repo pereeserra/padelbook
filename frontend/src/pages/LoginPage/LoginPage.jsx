@@ -16,6 +16,9 @@ function LoginPage() {
   const [capsLock, setCapsLock] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
   const [turnstileReady, setTurnstileReady] = useState(false);
+  const [showVerificationHelp, setShowVerificationHelp] = useState(false);
+  const [resendingVerification, setResendingVerification] = useState(false);
+  const [verificationInfo, setVerificationInfo] = useState("");
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -52,6 +55,42 @@ function LoginPage() {
   // Detectar el estado de Caps Lock para mostrar una advertencia al usuario
   const handleCapsLock = (e) => {
     setCapsLock(e.getModifierState("CapsLock"));
+  };
+
+  const handleResendVerification = async () => {
+    try {
+      setVerificationInfo("");
+      setError("");
+      setResendingVerification(true);
+
+      const normalizedEmail = email.trim().toLowerCase();
+
+      if (!normalizedEmail) {
+        setError("Introdueix el teu correu electrònic per reenviar la verificació.");
+        return;
+      }
+
+      const response = await api.post("/auth/resend-verification", {
+        email: normalizedEmail,
+      });
+
+      const message =
+        response?.data?.message ||
+        response?.data?.data?.message ||
+        "T'hem reenviat el correu de verificació.";
+
+      setVerificationInfo(message);
+    } catch (err) {
+      console.error(err);
+      setError(
+        getErrorMessage(
+          err,
+          "No s'ha pogut reenviar el correu de verificació."
+        )
+      );
+    } finally {
+      setResendingVerification(false);
+    }
   };
 
   // Función para resetear el widget de Turnstile en caso de error o al desmontar el componente
@@ -188,7 +227,14 @@ function LoginPage() {
     } catch (err) {
       console.error(err);
 
-      setError(getErrorMessage(err, "No s'ha pogut iniciar sessió."));
+      const loginError = getErrorMessage(err, "No s'ha pogut iniciar sessió.");
+      const normalizedError = String(loginError).toLowerCase();
+
+      setError(loginError);
+      setShowVerificationHelp(
+        normalizedError.includes("verificar el teu correu") ||
+          normalizedError.includes("correu abans d'iniciar sessió")
+      );
 
       resetTurnstile();
     } finally {
@@ -289,11 +335,39 @@ function LoginPage() {
             </div>
           )}
 
-          {success && (
-            <div className="scale-in login__error-box" style={{ background: "#f0fdf4", border: "1px solid #bbf7d0" }}>
-              <p className="login__error-text" style={{ color: "#166534" }}>
-                {success}
+          {showVerificationHelp && (
+            <div className="scale-in login__verification-box">
+              <p className="login__verification-title">
+                Aquest compte encara no està verificat
               </p>
+
+              <p className="login__verification-text">
+                Revisa el teu correu electrònic i fes clic a l’enllaç de verificació.
+                Si no l’has rebut o ha caducat, pots reenviar-lo des d’aquí.
+              </p>
+
+              {verificationInfo && (
+                <div className="login__verification-success">
+                  {verificationInfo}
+                </div>
+              )}
+
+              <div className="login__verification-actions">
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={handleResendVerification}
+                  disabled={resendingVerification || !email.trim()}
+                >
+                  {resendingVerification
+                    ? "Reenviant verificació..."
+                    : "Reenviar verificació"}
+                </button>
+
+                <Link to="/register" className="btn btn-light">
+                  Crear un altre compte
+                </Link>
+              </div>
             </div>
           )}
 
@@ -308,7 +382,11 @@ function LoginPage() {
                 type="email"
                 placeholder="exemple@correu.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setShowVerificationHelp(false);
+                  setVerificationInfo("");
+                }}
                 className="login__input"
                 autoComplete="email"
                 required

@@ -23,6 +23,28 @@ const buildVerificationEmailHtml = ({ nom, verifyUrl }) => `
   <p>Aquest enllaç caduca en 24 hores.</p>
 `;
 
+const createAndSendVerificationEmail = async ({ userId, nom, email, subject }) => {
+  await db.query(
+    "DELETE FROM verification_codes WHERE user_id = ? AND type = 'email_verification'",
+    [userId]
+  );
+
+  const verificationToken = crypto.randomBytes(32).toString("hex");
+
+  await db.query(
+    "INSERT INTO verification_codes (user_id, code, type, expires_at) VALUES (?, ?, 'email_verification', DATE_ADD(NOW(), INTERVAL 24 HOUR))",
+    [userId, verificationToken]
+  );
+
+  const verifyUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/verify-email?token=${verificationToken}`;
+
+  await sendEmail({
+    to: email,
+    subject,
+    html: buildVerificationEmailHtml({ nom, verifyUrl }),
+  });
+};
+
 
 // REGISTRE D'USUARI
 exports.register = async (req, res) => {
@@ -83,19 +105,11 @@ exports.register = async (req, res) => {
       email,
     });
 
-    const verificationToken = crypto.randomBytes(32).toString("hex");
-
-    await db.query(
-      "INSERT INTO verification_codes (user_id, code, type, expires_at) VALUES (?, ?, 'email_verification', DATE_ADD(NOW(), INTERVAL 24 HOUR))",
-      [insertResult.insertId, verificationToken]
-    );
-
-    const verifyUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/verify-email?token=${verificationToken}`;
-
-    await sendEmail({
-      to: email,
+    await createAndSendVerificationEmail({
+      userId: insertResult.insertId,
+      nom,
+      email,
       subject: "Verifica el teu compte - PadelBook",
-      html: buildVerificationEmailHtml({ nom, verifyUrl }),
     });
 
     return message(res, "Usuari registrat. Revisa el teu correu per verificar el compte.", 201);
@@ -429,41 +443,51 @@ exports.verifyEmail = async (req, res) => {
 // REENVIAR VERIFICACIÓ D'EMAIL
 exports.resendVerification = async (req, res) => {
   try {
-    const userId = req.user.id;
+    let user = null;
 
-    const [rows] = await db.query(
-      "SELECT id, nom, email, email_verificat FROM users WHERE id = ? LIMIT 1",
-      [userId]
-    );
+    if (req.user?.id) {
+      const [rows] = await db.query(
+        "SELECT id, nom, email, email_verificat FROM users WHERE id = ? LIMIT 1",
+        [req.user.id]
+      );
 
-    if (rows.length === 0) {
-      return fail(res, "Usuari no trobat.", 404);
+      if (rows.length === 0) {
+        return fail(res, "Usuari no trobat.", 404);
+      }
+
+      user = rows[0];
+    } else {
+      const email = normalizeEmail(req.body?.email);
+
+      if (!email) {
+        return fail(res, "Has d'introduir un correu electrònic.", 400);
+      }
+
+      const [rows] = await db.query(
+        "SELECT id, nom, email, email_verificat FROM users WHERE email = ? LIMIT 1",
+        [email]
+      );
+
+      if (rows.length === 0) {
+        return fail(
+          res,
+          "No existeix cap compte amb aquest correu electrònic.",
+          404
+        );
+      }
+
+      user = rows[0];
     }
-
-    const user = rows[0];
 
     if (user.email_verificat === 1) {
       return fail(res, "Aquest compte ja està verificat.", 400);
     }
 
-    await db.query(
-      "DELETE FROM verification_codes WHERE user_id = ? AND type = 'email_verification'",
-      [userId]
-    );
-
-    const verificationToken = crypto.randomBytes(32).toString("hex");
-
-    await db.query(
-      "INSERT INTO verification_codes (user_id, code, type, expires_at) VALUES (?, ?, 'email_verification', DATE_ADD(NOW(), INTERVAL 24 HOUR))",
-      [userId, verificationToken]
-    );
-
-    const verifyUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/verify-email?token=${verificationToken}`;
-
-    await sendEmail({
-      to: user.email,
+    await createAndSendVerificationEmail({
+      userId: user.id,
+      nom: user.nom,
+      email: user.email,
       subject: "Torna a verificar el teu compte - PadelBook",
-      html: buildVerificationEmailHtml({ nom: user.nom, verifyUrl }),
     });
 
     return message(res, "T'hem reenviat el correu de verificació.");
