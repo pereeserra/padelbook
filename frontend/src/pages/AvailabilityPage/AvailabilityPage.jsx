@@ -948,11 +948,9 @@ function AvailabilityPage() {
                                 {formatTimeShort(slot.hora_inici)}
                               </span>
 
-                              {(!slot.disponible || isPastSlot) && (
-                                <span className="ap-slot-status">
-                                  {getSlotStatusLabel(slot, isPastSlot)}
-                                </span>
-                              )}
+                              <span className="ap-slot-status">
+                                {getSlotStatusLabel(slot, isPastSlot)}
+                              </span>
                             </button>
                           </div>
                         );
