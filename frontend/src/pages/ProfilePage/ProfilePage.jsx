@@ -478,7 +478,9 @@ function ProfilePage() {
       setResendingVerification(true);
       clearFeedback();
 
-      const response = await api.post("/auth/resend-verification");
+      const response = await api.post("/auth/resend-verification", {
+        email: (profile?.email || formData.email || "").trim().toLowerCase(),
+      });
       const successMessage =
         response?.data?.message ||
         response?.data?.data?.message ||

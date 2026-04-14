@@ -190,6 +190,8 @@ function LoginPage() {
 
     try {
       setError("");
+      setVerificationInfo("");
+      setShowVerificationHelp(false);
       setLoading(true);
 
       if (!turnstileToken) {
@@ -332,6 +334,12 @@ function LoginPage() {
               >
                 La teva sessió ha caducat. Torna a iniciar sessió.
               </p>
+            </div>
+          )}
+
+          {error && !showVerificationHelp && (
+            <div className="scale-in login__error-box">
+              <p className="login__error-text">{error}</p>
             </div>
           )}
 
