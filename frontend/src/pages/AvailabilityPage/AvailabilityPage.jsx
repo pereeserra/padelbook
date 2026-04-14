@@ -503,7 +503,7 @@ function AvailabilityPage() {
     return courtsList.sort((a, b) => a.nom_pista.localeCompare(b.nom_pista));
   }, [filteredAvailability]);
 
-  // Memorització de les estadístiques de disponibilitat, calculant el total de franges, franges disponibles, franges ocupades i total de pistes
+  // Memorització de les estadístiques generals de disponibilitat per mostrar-les a la capçalera
   const availabilityStats = useMemo(() => {
     return {
       totalSlots: availabilitySummary.total_slots || 0,
@@ -512,45 +512,6 @@ function AvailabilityPage() {
       totalCourts: availabilitySummary.total_courts || 0,
     };
   }, [availabilitySummary]);
-
-  const hourlySummary = useMemo(() => {
-    const map = new Map();
-
-    availability.forEach((slot) => {
-      const key = slot.hora_inici;
-
-      if (!map.has(key)) {
-        map.set(key, {
-          hora_inici: slot.hora_inici,
-          hora_fi: slot.hora_fi,
-          available: 0,
-          reserved: 0,
-          maintenance: 0,
-          past: 0,
-          total: 0,
-        });
-      }
-
-      const row = map.get(key);
-      const isPast = isPastTimeSlot(slot);
-
-      row.total += 1;
-
-      if (isPast) {
-        row.past += 1;
-      } else if (slot.disponible) {
-        row.available += 1;
-      } else if (slot.motiu_no_disponible === "manteniment") {
-        row.maintenance += 1;
-      } else {
-        row.reserved += 1;
-      }
-    });
-
-    return Array.from(map.values()).sort((a, b) =>
-      a.hora_inici.localeCompare(b.hora_inici)
-    );
-  }, [availability, date]);
 
   const isSlotValidForDuration = (slot, courtSlots, slotIndex) => {
     if (!slot.disponible) return false;
