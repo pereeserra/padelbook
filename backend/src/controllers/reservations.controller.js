@@ -375,18 +375,19 @@ exports.getReservations = async (req, res) => {
 
     const params = [userId];
     let query = `
-      SELECT 
-        r.id,
+      SELECT
+        MIN(r.id) AS id,
         r.codi_reserva,
         r.data_reserva,
         r.estat,
-        r.preu_total,
+        MAX(r.preu_total) AS preu_total,
         r.estat_pagament,
         r.metode_pagament,
-        r.created_at,
+        MIN(r.created_at) AS created_at,
         c.nom_pista,
-        t.hora_inici,
-        t.hora_fi
+        MIN(t.hora_inici) AS hora_inici,
+        MAX(t.hora_fi) AS hora_fi,
+        COUNT(*) AS total_slots
       FROM reservations r
       JOIN courts c ON r.court_id = c.id
       JOIN time_slots t ON r.time_slot_id = t.id
@@ -398,7 +399,16 @@ exports.getReservations = async (req, res) => {
       params.push(estat);
     }
 
-    query += `ORDER BY r.data_reserva DESC, t.hora_inici DESC`;
+    query += `
+      GROUP BY
+        r.codi_reserva,
+        r.data_reserva,
+        r.estat,
+        r.estat_pagament,
+        r.metode_pagament,
+        c.nom_pista
+      ORDER BY r.data_reserva DESC, hora_inici DESC
+    `;
 
     const [reservations] = await db.query(query, params);
 
@@ -564,7 +574,9 @@ exports.deleteCancelledReservationPermanently = async (req, res) => {
       }
     }
 
-    await db.query("DELETE FROM reservations WHERE id = ?", [reservationId]);
+    await db.query("DELETE FROM reservations WHERE codi_reserva = ?", [
+      reservation.codi_reserva,
+    ]);
 
     return message(res, "Reserva cancel·lada eliminada correctament");
   } catch (error) {
