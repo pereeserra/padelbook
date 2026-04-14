@@ -38,7 +38,7 @@ function AvailabilityPage() {
   const [showAuthHelp, setShowAuthHelp] = useState(false);
   const [showVerificationHelp, setShowVerificationHelp] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("online_simulat");
-  const [selectedDuration, setSelectedDuration] = useState(1);
+  const [selectedDuration, setSelectedDuration] = useState(2);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [reservationSummary, setReservationSummary] = useState(null);
   const [reserving, setReserving] = useState(false);
@@ -78,25 +78,22 @@ function AvailabilityPage() {
   };
 
   const formatDurationLabel = (duration) => {
-    if (Number(duration) === 1.5) return "1h30";
+    if (Number(duration) === 3) return "1h30";
     return "1h";
   };
 
-  const getReservationEndTime = (slot, duration) => {
+  const getReservationEndTime = (slot, duration, courtSlots = []) => {
     if (!slot?.hora_fi) return "";
 
-    if (Number(duration) === 1) {
-      return slot.hora_fi;
-    }
+    const slotIndex = courtSlots.findIndex(
+      (courtSlot) => courtSlot.time_slot_id === slot.time_slot_id
+    );
 
-    const [hours, minutes] = slot.hora_fi.split(":").map(Number);
-    const endDate = new Date();
-    endDate.setHours(hours, minutes + 30, 0, 0);
+    if (slotIndex === -1) return slot.hora_fi;
 
-    const endHours = String(endDate.getHours()).padStart(2, "0");
-    const endMinutes = String(endDate.getMinutes()).padStart(2, "0");
+    const endSlot = courtSlots[slotIndex + Number(duration) - 1];
 
-    return `${endHours}:${endMinutes}:00`;
+    return endSlot?.hora_fi || slot.hora_fi;
   };
 
   // Funció per formatar el tipus de pista, normalitzant les variants d'"individual" i mostrant "Dobles" per qualsevol altre valor
@@ -158,7 +155,7 @@ function AvailabilityPage() {
     setShowVerificationHelp(false);
     setReservationSummary(null);
     setSlotHelpMessage("");
-    setSelectedDuration(1);
+    setSelectedDuration(2);
   };
 
   // Funció per obrir el selector de data ocult, amb maneig de compatibilitat per diferents navegadors
@@ -262,6 +259,16 @@ function AvailabilityPage() {
     setDate(newDate);
   };
 
+  const getSelectedCourtSlots = () => {
+    if (!selectedSlot) return [];
+
+    const selectedCourt = courtsData.find(
+      (court) => court.court_id === selectedSlot.court_id
+    );
+
+    return selectedCourt?.slots || [];
+  };
+
   // Funció per manejar la reserva d'una pista, amb validació d'autenticació, maneig d'errors i actualització de l'estat de la reserva
   const handleReserve = async () => {
     if (!selectedSlot) return;
@@ -291,7 +298,8 @@ function AvailabilityPage() {
 
       const reservationEndTime = getReservationEndTime(
         selectedSlot,
-        selectedDuration
+        selectedDuration,
+        getSelectedCourtSlots()
       );
 
       setSuccess(
@@ -318,7 +326,8 @@ function AvailabilityPage() {
           selectedSlot,
           reservationData?.duration != null
             ? Number(reservationData.duration)
-            : selectedDuration
+            : selectedDuration,
+          getSelectedCourtSlots()
         ),
         duration:
           reservationData?.duration != null
@@ -546,13 +555,17 @@ function AvailabilityPage() {
   const isSlotValidForDuration = (slot, courtSlots, slotIndex) => {
     if (!slot.disponible) return false;
 
-    if (selectedDuration === 1) return true;
+    const slotsNeeded = Number(selectedDuration);
 
-    const nextSlot = courtSlots[slotIndex + 1];
+    for (let i = 0; i < slotsNeeded; i += 1) {
+      const currentSlot = courtSlots[slotIndex + i];
 
-    if (!nextSlot) return false;
+      if (!currentSlot) return false;
+      if (!currentSlot.disponible) return false;
+      if (isPastTimeSlot(currentSlot)) return false;
+    }
 
-    return nextSlot.disponible && !isPastTimeSlot(nextSlot);
+    return true;
   };
 
   const handleSlotClick = (slot, isSelected, isPastSlot, isValid) => {
@@ -560,9 +573,9 @@ function AvailabilityPage() {
       setSelectedSlot(null);
       setReservationSummary(null);
 
-      if (!isValid && selectedDuration === 1.5) {
+      if (!isValid && selectedDuration === 3) {
         setSlotHelpMessage(
-          "Per reservar 1h30 necessites dues franges consecutives disponibles."
+          "Per reservar 1h30 necessites tres franges consecutives disponibles."
         );
       } else {
         setSlotHelpMessage(getSlotTitle(slot, isPastSlot));
@@ -1065,11 +1078,19 @@ function AvailabilityPage() {
 
               <strong className="ap-floating-time">
                 {formatDisplayDate(date)} • {formatTimeShort(selectedSlot.hora_inici)} a{" "}
-                {formatTimeShort(getReservationEndTime(selectedSlot, selectedDuration))}
+                {formatTimeShort(
+                  getReservationEndTime(
+                    selectedSlot,
+                    selectedDuration,
+                    getSelectedCourtSlots()
+                  )
+                )}
               </strong>
 
               <span className="ap-floating-price">
-                {formatPrice(Number(selectedSlot.preu_reserva || 0) * selectedDuration)}
+                {formatPrice(
+                  Number(selectedSlot.preu_reserva || 0) * (selectedDuration / 2)
+                )}
               </span>
             </div>
 
@@ -1081,9 +1102,9 @@ function AvailabilityPage() {
                   <button
                     type="button"
                     className={`ap-payment-option ${
-                      selectedDuration === 1 ? "is-active" : ""
+                      selectedDuration === 2 ? "is-active" : ""
                     }`}
-                    onClick={() => setSelectedDuration(1)}
+                    onClick={() => setSelectedDuration(2)}
                   >
                     1h
                   </button>
@@ -1091,9 +1112,9 @@ function AvailabilityPage() {
                   <button
                     type="button"
                     className={`ap-payment-option ${
-                      selectedDuration === 1.5 ? "is-active" : ""
+                      selectedDuration === 3 ? "is-active" : ""
                     }`}
-                    onClick={() => setSelectedDuration(1.5)}
+                    onClick={() => setSelectedDuration(3)}
                   >
                     1h30
                   </button>

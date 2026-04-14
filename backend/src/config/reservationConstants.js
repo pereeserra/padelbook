@@ -14,8 +14,8 @@ const PAYMENT_METHOD = {
 };
 
 const RESERVATION_DURATION = {
-  ONE_HOUR: 1,
-  NINETY_MINUTES: 1.5,
+  ONE_HOUR: 2,
+  NINETY_MINUTES: 3,
 };
 
 module.exports = {

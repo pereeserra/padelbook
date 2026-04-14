@@ -71,8 +71,7 @@ exports.createReservation = async (req, res) => {
     }
 
     // calcular slots necessaris
-    const slotsNeeded =
-      duration === RESERVATION_DURATION.ONE_HOUR ? 1 : 2;
+    const slotsNeeded = duration;
 
     const selectedSlots = allSlots.slice(slotIndex, slotIndex + slotsNeeded);
 
@@ -182,7 +181,7 @@ exports.createReservation = async (req, res) => {
     }
 
     const basePrice = Number(court.preu_reserva || 0);
-    const preu_total = basePrice * duration;
+    const preu_total = basePrice * (duration / 2);
 
     // 2. Comprovar que la franja existeix
     const [timeSlots] = await db.query(
