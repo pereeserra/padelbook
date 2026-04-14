@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 import { scrollToElementWithOffset } from "../../utils/helpers";
-import heroImg from "../../assets/images/padelballs.webp";
 import "./AvailabilityPage.css";
 import { getErrorMessage } from "../../utils/errorHandler";
 
@@ -552,19 +551,48 @@ function AvailabilityPage() {
 
   return (
     <div className="ap-wrapper">
-      <header className="ap-hero">
-        <div className="ap-hero__bg">
-          <img src={heroImg} alt="Pista de pàdel" />
-          <div className="ap-hero__overlay" />
-        </div>
+      <header className="fade-in-up ap-hero-card">
+        <div className="ap-hero-card__grid">
+          <div className="ap-hero-card__main">
+            <span className="ap-hero-card__kicker">Disponibilitat en temps real</span>
+            <h1 className="ap-hero-card__title">Reserva de Pistes</h1>
+            <p className="ap-hero-card__subtitle">
+              Selecciona el dia, explora les pistes disponibles i confirma la teva
+              reserva d’una manera molt més clara i agradable.
+            </p>
+          </div>
 
-        <div className="ap-hero__inner">
-          <span className="ap-hero__kicker">Disponibilitat en temps real</span>
-          <h1 className="ap-title">Reserva de Pistes</h1>
-          <p className="ap-subtitle">
-            Selecciona el dia, explora les pistes disponibles i confirma la teva
-            reserva d’una manera molt més clara i agradable.
-          </p>
+          {!loading && !error && (
+            <div className="ap-hero-card__stats">
+              <div className="ap-hero-card__stat">
+                <span className="ap-hero-card__stat-number">
+                  {availabilityStats.totalCourts}
+                </span>
+                <span className="ap-hero-card__stat-label">Pistes</span>
+              </div>
+
+              <div className="ap-hero-card__stat">
+                <span className="ap-hero-card__stat-number">
+                  {availabilityStats.availableSlots}
+                </span>
+                <span className="ap-hero-card__stat-label">Lliures</span>
+              </div>
+
+              <div className="ap-hero-card__stat">
+                <span className="ap-hero-card__stat-number">
+                  {availabilityStats.occupiedSlots}
+                </span>
+                <span className="ap-hero-card__stat-label">Ocupades</span>
+              </div>
+
+              <div className="ap-hero-card__stat">
+                <span className="ap-hero-card__stat-number">
+                  {hourlySummary.length}
+                </span>
+                <span className="ap-hero-card__stat-label">Franges</span>
+              </div>
+            </div>
+          )}
         </div>
       </header>
 
