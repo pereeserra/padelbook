@@ -19,6 +19,7 @@ function LoginPage() {
   const [showVerificationHelp, setShowVerificationHelp] = useState(false);
   const [resendingVerification, setResendingVerification] = useState(false);
   const [verificationInfo, setVerificationInfo] = useState("");
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -39,6 +40,16 @@ function LoginPage() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+
+    const timeoutId = window.setTimeout(() => {
+      setResendCooldown((prev) => prev - 1);
+    }, 1000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [resendCooldown]);
+
   // Hacer scroll suave hacia el mensaje de error cuando se actualice el estado de error
   useEffect(() => {
     if (!error || !feedbackRef.current) return;
@@ -53,8 +64,10 @@ function LoginPage() {
   }, [error]);
 
   // Detectar el estado de Caps Lock para mostrar una advertencia al usuario
-  const handleCapsLock = (e) => {
-    setCapsLock(e.getModifierState("CapsLock"));
+  const formatCooldownTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${String(remainingSeconds).padStart(2, "0")}`;
   };
 
   const handleResendVerification = async () => {
@@ -80,6 +93,7 @@ function LoginPage() {
         "T'hem reenviat el correu de verificació.";
 
       setVerificationInfo(message);
+      setResendCooldown(120);
     } catch (err) {
       console.error(err);
       setError(
@@ -253,6 +267,7 @@ function LoginPage() {
             "T'hem reenviat el correu de verificació.";
 
           setVerificationInfo(resendMessage);
+          setResendCooldown(120);
         } catch (resendErr) {
           console.error(resendErr);
 
@@ -376,13 +391,13 @@ function LoginPage() {
           {showVerificationHelp && (
             <div className="scale-in login__verification-box">
               <p className="login__verification-title">
-                Has de verificar el correu abans d’iniciar sessió
+                Verifica el teu correu per continuar
               </p>
 
               <p className="login__verification-text">
-                Aquest compte necessita verificar el correu electrònic abans d’iniciar sessió.
-                Hem intentat reenviar-te automàticament el correu de verificació. Si no el reps,
-                pots tornar-lo a reenviar des d’aquí.
+                Aquest compte encara no té el correu verificat. T’hem reenviat automàticament
+                un correu de verificació. Revisa la safata d’entrada i, si no el trobes,
+                espera un moment abans de tornar-lo a reenviar.
               </p>
 
               {verificationInfo && (
@@ -396,10 +411,12 @@ function LoginPage() {
                   type="button"
                   className="btn btn-primary"
                   onClick={handleResendVerification}
-                  disabled={resendingVerification || !email.trim()}
+                  disabled={resendingVerification || !email.trim() || resendCooldown > 0}
                 >
                   {resendingVerification
                     ? "Reenviant verificació..."
+                    : resendCooldown > 0
+                    ? `Reenviar verificació (${formatCooldownTime(resendCooldown)})`
                     : "Reenviar verificació"}
                 </button>
 

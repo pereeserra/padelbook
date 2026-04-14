@@ -2,7 +2,10 @@ const db = require("../config/db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
-const { sendEmail } = require("../services/email.service");
+const {
+  sendEmail,
+  buildVerificationEmail,
+} = require("../services/email.service");
 
 const { ok, message, fail } = require("../utils/response");
 const { verifyTurnstileToken } = require("../services/turnstile.service");
@@ -14,14 +17,6 @@ const {
   validatePasswordStrength,
   validateProfileData,
 } = require("../utils/validators");
-
-const buildVerificationEmailHtml = ({ nom, verifyUrl }) => `
-  <h2>Verificació de correu</h2>
-  <p>Hola ${nom},</p>
-  <p>Fes clic al següent enllaç per verificar el teu compte:</p>
-  <a href="${verifyUrl}" target="_blank">${verifyUrl}</a>
-  <p>Aquest enllaç caduca en 24 hores.</p>
-`;
 
 const createAndSendVerificationEmail = async ({ userId, nom, email, subject }) => {
   await db.query(
@@ -41,7 +36,7 @@ const createAndSendVerificationEmail = async ({ userId, nom, email, subject }) =
   await sendEmail({
     to: email,
     subject,
-    html: buildVerificationEmailHtml({ nom, verifyUrl }),
+    html: buildVerificationEmail({ nom, verifyUrl }),
   });
 };
 

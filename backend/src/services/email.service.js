@@ -23,6 +23,62 @@ const sendEmail = async ({ to, subject, html }) => {
     html,
   });
 };
+
+const buildVerificationEmail = ({ nom, verifyUrl }) => {
+  return `
+    <div style="font-family: Arial, sans-serif; color: #0f172a; line-height: 1.6; max-width: 640px; margin: 0 auto; padding: 24px;">
+      <div style="background: linear-gradient(135deg, #0f172a, #2563eb); border-radius: 20px; padding: 24px; color: white; margin-bottom: 24px;">
+        <div style="font-size: 13px; font-weight: 700; opacity: 0.9; margin-bottom: 10px;">
+          PadelBook · Verificació de compte
+        </div>
+        <h1 style="margin: 0; font-size: 30px; line-height: 1.1;">
+          Verifica el teu correu electrònic
+        </h1>
+        <p style="margin: 14px 0 0; font-size: 16px; color: rgba(255,255,255,0.88);">
+          Necessitam confirmar la teva adreça de correu abans que puguis iniciar sessió.
+        </p>
+      </div>
+
+      <p style="margin: 0 0 16px; font-size: 16px;">
+        Hola <strong>${nom}</strong>,
+      </p>
+
+      <p style="margin: 0 0 16px; font-size: 16px;">
+        Prem el botó següent per verificar el teu compte i activar l’accés a PadelBook.
+      </p>
+
+      <div style="margin: 28px 0;">
+        <a
+          href="${verifyUrl}"
+          target="_blank"
+          style="display: inline-block; background: #2563eb; color: white; text-decoration: none; font-weight: 700; font-size: 16px; padding: 14px 22px; border-radius: 14px;"
+        >
+          Verificar el meu compte
+        </a>
+      </div>
+
+      <p style="margin: 0 0 14px; font-size: 15px; color: #475569;">
+        Si el botó no funciona, pots copiar i aferrar aquest enllaç al navegador:
+      </p>
+
+      <p style="margin: 0 0 18px; word-break: break-all;">
+        <a href="${verifyUrl}" target="_blank" style="color: #2563eb;">
+          ${verifyUrl}
+        </a>
+      </p>
+
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px; margin-top: 24px;">
+        <p style="margin: 0 0 8px; font-size: 14px; color: #0f172a; font-weight: 700;">
+          Important
+        </p>
+        <p style="margin: 0; font-size: 14px; color: #475569;">
+          Aquest enllaç caduca en 24 hores. Si no has creat aquest compte, pots ignorar aquest missatge.
+        </p>
+      </div>
+    </div>
+  `;
+};
+
 // Funcions per construir el contingut dels correus electrònics de reserva
 const buildReservationCreatedEmail = ({
   nom,
@@ -74,6 +130,7 @@ const buildReservationCancelledEmail = ({
 
 module.exports = {
   sendEmail,
+  buildVerificationEmail,
   buildReservationCreatedEmail,
   buildReservationCancelledEmail,
 };
