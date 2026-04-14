@@ -112,7 +112,11 @@ exports.register = async (req, res) => {
       subject: "Verifica el teu compte - PadelBook",
     });
 
-    return message(res, "Usuari registrat. Revisa el teu correu per verificar el compte.", 201);
+    return message(
+      res,
+      "Usuari registrat correctament. Si no reps el correu de verificació, podràs reenviar-lo des del login o des del teu compte.",
+      201
+    );
 
   } catch (error) {
     console.error("Error al registre:", error);

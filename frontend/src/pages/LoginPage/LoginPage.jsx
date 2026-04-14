@@ -232,11 +232,41 @@ function LoginPage() {
       const loginError = getErrorMessage(err, "No s'ha pogut iniciar sessió.");
       const normalizedError = String(loginError).toLowerCase();
 
-      setError(loginError);
-      setShowVerificationHelp(
+      const isUnverifiedEmailError =
         normalizedError.includes("verificar el teu correu") ||
-          normalizedError.includes("correu abans d'iniciar sessió")
-      );
+        normalizedError.includes("correu abans d'iniciar sessió");
+
+      setError(loginError);
+      setShowVerificationHelp(isUnverifiedEmailError);
+
+      if (isUnverifiedEmailError) {
+        try {
+          setResendingVerification(true);
+
+          const resendResponse = await api.post("/auth/resend-verification", {
+            email: email.trim().toLowerCase(),
+          });
+
+          const resendMessage =
+            resendResponse?.data?.message ||
+            resendResponse?.data?.data?.message ||
+            "T'hem reenviat el correu de verificació.";
+
+          setVerificationInfo(resendMessage);
+        } catch (resendErr) {
+          console.error(resendErr);
+
+          setVerificationInfo("");
+          setError(
+            getErrorMessage(
+              resendErr,
+              "No s'ha pogut reenviar el correu de verificació automàticament."
+            )
+          );
+        } finally {
+          setResendingVerification(false);
+        }
+      }
 
       resetTurnstile();
     } finally {
@@ -346,12 +376,13 @@ function LoginPage() {
           {showVerificationHelp && (
             <div className="scale-in login__verification-box">
               <p className="login__verification-title">
-                Aquest compte encara no està verificat
+                Has de verificar el correu abans d’iniciar sessió
               </p>
 
               <p className="login__verification-text">
-                Revisa el teu correu electrònic i fes clic a l’enllaç de verificació.
-                Si no l’has rebut o ha caducat, pots reenviar-lo des d’aquí.
+                Aquest compte necessita verificar el correu electrònic abans d’iniciar sessió.
+                Hem intentat reenviar-te automàticament el correu de verificació. Si no el reps,
+                pots tornar-lo a reenviar des d’aquí.
               </p>
 
               {verificationInfo && (
