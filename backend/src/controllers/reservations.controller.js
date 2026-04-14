@@ -23,21 +23,27 @@ const {
 
 // Crear reserva (amb comprovacions de disponibilitat i bloqueig)
 exports.createReservation = async (req, res) => {
+  let connection;
+
   try {
+    connection = await db.getConnection();
+    await connection.beginTransaction();
+
     const user_id = req.user.id;
     const userRole = req.user.rol;
 
-    // 🔒 BLOQUEIG SI EMAIL NO VERIFICAT
-    const [userRows] = await db.query(
+    const [userRows] = await connection.query(
       "SELECT email_verificat FROM users WHERE id = ? LIMIT 1",
       [user_id]
     );
 
     if (userRows.length === 0) {
+      await connection.rollback();
       return fail(res, "Usuari no trobat", 404);
     }
 
     if (!userRows[0].email_verificat) {
+      await connection.rollback();
       return fail(
         res,
         "Has de verificar el teu correu electrònic abans de gestionar reserves",
@@ -45,89 +51,94 @@ exports.createReservation = async (req, res) => {
       );
     }
 
-    let { court_id, time_slot_id, data_reserva, duration } = req.body;
-
-    duration = Number(duration);
-
-    if (!duration) {
-      duration = RESERVATION_DURATION.ONE_HOUR;
-    }
-
-    const allowedDurations = Object.values(RESERVATION_DURATION);
-
-    if (!allowedDurations.includes(duration)) {
-      return fail(res, "Duració no vàlida", 400);
-    }
-
-    // Obtenir tots els slots ordenats
-    const [allSlots] = await db.query(
-      "SELECT id FROM time_slots ORDER BY hora_inici ASC"
-    );
-
-    const slotIndex = allSlots.findIndex(s => s.id === time_slot_id);
-
-    if (slotIndex === -1) {
-      return fail(res, "Franja no trobada", 404);
-    }
-
-    // calcular slots necessaris
-    const slotsNeeded = duration;
-
-    const selectedSlots = allSlots.slice(slotIndex, slotIndex + slotsNeeded);
-
-    if (selectedSlots.length < slotsNeeded) {
-      return fail(res, "No hi ha suficients franges consecutives", 400);
-    }
-
-    for (const slot of selectedSlots) {
-      const [existing] = await db.query(
-        `SELECT id FROM reservations
-        WHERE court_id = ? AND time_slot_id = ? AND data_reserva = ? AND estat = ?`,
-        [court_id, slot.id, data_reserva, RESERVATION_STATUS.ACTIVE]
-      );
-
-      if (existing.length > 0) {
-        return fail(res, "Una de les franges ja està reservada", 400);
-      }
-    }
-
-    let { metode_pagament } = req.body;
+    let { court_id, time_slot_id, data_reserva, duration, metode_pagament } = req.body;
 
     court_id = parsePositiveInteger(court_id);
     time_slot_id = parsePositiveInteger(time_slot_id);
-    data_reserva =
-      typeof data_reserva === "string" ? data_reserva.trim() : "";
+    data_reserva = typeof data_reserva === "string" ? data_reserva.trim() : "";
+    duration = Number(duration) || RESERVATION_DURATION.ONE_HOUR;
 
     if (!court_id || !time_slot_id || !data_reserva) {
+      await connection.rollback();
       return fail(res, "Falten dades obligatòries", 400);
     }
 
     if (!isValidDateFormat(data_reserva)) {
+      await connection.rollback();
       return fail(res, "La data ha de tenir format YYYY-MM-DD", 400);
     }
 
-    const todayString = getTodayString();
+    const allowedDurations = Object.values(RESERVATION_DURATION);
+    if (!allowedDurations.includes(duration)) {
+      await connection.rollback();
+      return fail(res, "Duració no vàlida", 400);
+    }
 
+    const todayString = getTodayString();
     if (data_reserva < todayString) {
+      await connection.rollback();
       return fail(res, "No es poden fer reserves en dates passades", 400);
     }
 
-    // 🔒 BLOQUEIG HORES PASSADES DEL MATEIX DIA
+    if (typeof metode_pagament === "string") {
+      metode_pagament = metode_pagament.trim().toLowerCase();
+    } else {
+      metode_pagament = PAYMENT_METHOD.CLUB;
+    }
+
+    const allowedMethods = Object.values(PAYMENT_METHOD);
+    if (!allowedMethods.includes(metode_pagament)) {
+      await connection.rollback();
+      return fail(res, "Mètode de pagament no vàlid", 400);
+    }
+
+    let estat_pagament = PAYMENT_STATUS.PENDING;
+    if (metode_pagament === PAYMENT_METHOD.ONLINE) {
+      estat_pagament = PAYMENT_STATUS.PAID;
+    }
+
+    const [courts] = await connection.query(
+      "SELECT id, estat, preu_reserva, nom_pista FROM courts WHERE id = ? LIMIT 1",
+      [court_id]
+    );
+
+    if (courts.length === 0) {
+      await connection.rollback();
+      return fail(res, "La pista indicada no existeix", 404);
+    }
+
+    const court = courts[0];
+
+    if (court.estat !== "disponible") {
+      await connection.rollback();
+      return fail(res, "Aquesta pista no està disponible per reservar", 400);
+    }
+
+    const [allSlots] = await connection.query(
+      "SELECT id, hora_inici, hora_fi FROM time_slots ORDER BY hora_inici ASC"
+    );
+
+    const slotIndex = allSlots.findIndex((s) => s.id === time_slot_id);
+
+    if (slotIndex === -1) {
+      await connection.rollback();
+      return fail(res, "Franja no trobada", 404);
+    }
+
+    const slotsNeeded = duration;
+    const selectedSlots = allSlots.slice(slotIndex, slotIndex + slotsNeeded);
+
+    if (selectedSlots.length < slotsNeeded) {
+      await connection.rollback();
+      return fail(res, "No hi ha suficients franges consecutives", 400);
+    }
+
+    const firstSlot = selectedSlots[0];
+
     if (data_reserva === todayString) {
       const now = new Date();
 
-      const [timeSlotRows] = await db.query(
-        "SELECT hora_inici FROM time_slots WHERE id = ? LIMIT 1",
-        [time_slot_id]
-      );
-
-      if (timeSlotRows.length === 0) {
-        return fail(res, "Franja horària no trobada", 404);
-      }
-
-      const hora_inici = timeSlotRows[0].hora_inici;
-
-      const [hours, minutes, seconds = 0] = hora_inici
+      const [hours, minutes, seconds = 0] = String(firstSlot.hora_inici)
         .split(":")
         .map(Number);
 
@@ -135,6 +146,7 @@ exports.createReservation = async (req, res) => {
       slotDateTime.setHours(hours, minutes, seconds, 0);
 
       if (slotDateTime <= now) {
+        await connection.rollback();
         return fail(
           res,
           "No pots reservar una franja horària que ja ha passat",
@@ -143,67 +155,16 @@ exports.createReservation = async (req, res) => {
       }
     }
 
-    // Normalitzar i validar el mètode de pagament
-    if (typeof metode_pagament === "string") {
-      metode_pagament = metode_pagament.trim().toLowerCase();
-    } else {
-      metode_pagament = "al_club";
-    }
-
-    // Validar que el mètode de pagament és vàlid
-    const allowedMethods = Object.values(PAYMENT_METHOD);
-
-    if (!allowedMethods.includes(metode_pagament)) {
-      return res.status(400).json({ error: "Mètode de pagament no vàlid" });
-    }
-
-    // Determinar l'estat del pagament en funció del mètode de pagament
-    let estat_pagament = PAYMENT_STATUS.PENDING;
-
-    if (metode_pagament === PAYMENT_METHOD.ONLINE) {
-      estat_pagament = PAYMENT_STATUS.PAID;
-    }
-
-    // 1. Comprovar que la pista existeix i que sigui reservable
-    const [courts] = await db.query(
-      "SELECT id, estat, preu_reserva FROM courts WHERE id = ? LIMIT 1",
-      [court_id]
-    );
-
-    if (courts.length === 0) {
-      return fail(res, "La pista indicada no existeix", 404);
-    }
-
-    const court = courts[0];
-
-    if (court.estat !== "disponible") {
-      return fail(res, "Aquesta pista no està disponible per reservar", 400);
-    }
-
-    const basePrice = Number(court.preu_reserva || 0);
-    const preu_total = basePrice * (duration / 2);
-
-    // 2. Comprovar que la franja existeix
-    const [timeSlots] = await db.query(
-      "SELECT id FROM time_slots WHERE id = ? LIMIT 1",
-      [time_slot_id]
-    );
-
-    if (timeSlots.length === 0) {
-      return fail(res, "La franja horària indicada no existeix", 404);
-    }
-
-    // 3. Comprovar límit de reserves actives per usuari
-    // L'administrador no té límit de reserves actives
     if (userRole !== "admin") {
-      const [userActiveReservations] = await db.query(
-        `SELECT COUNT(*) AS total
-        FROM reservations
-        WHERE user_id = ? AND estat = ?`,
+      const [userActiveReservations] = await connection.query(
+        `SELECT COUNT(DISTINCT codi_reserva) AS total
+         FROM reservations
+         WHERE user_id = ? AND estat = ?`,
         [user_id, RESERVATION_STATUS.ACTIVE]
       );
 
       if (userActiveReservations[0].total >= MAX_ACTIVE_RESERVATIONS_PER_USER) {
+        await connection.rollback();
         return fail(
           res,
           `Has arribat al límit màxim de ${MAX_ACTIVE_RESERVATIONS_PER_USER} reserves actives`,
@@ -212,30 +173,26 @@ exports.createReservation = async (req, res) => {
       }
     }
 
-    // 4. Comprovar si ja existeix una reserva activa per aquesta pista, franja i data
-    const [existingReservations] = await db.query(
-      `SELECT id FROM reservations
-      WHERE court_id = ? AND time_slot_id = ? AND data_reserva = ? AND estat = ?`,
-      [court_id, time_slot_id, data_reserva, RESERVATION_STATUS.ACTIVE]
-    );
-
-    if (existingReservations.length > 0) {
-      return fail(
-        res,
-        "Aquesta pista ja està reservada en aquesta franja i data",
-        400
-      );
-    }
-
-    // 5. Comprovar si la pista està bloquejada per manteniment
     for (const slot of selectedSlots) {
-      const [maintenanceBlocks] = await db.query(
+      const [existing] = await connection.query(
+        `SELECT id FROM reservations
+         WHERE court_id = ? AND time_slot_id = ? AND data_reserva = ? AND estat = ?`,
+        [court_id, slot.id, data_reserva, RESERVATION_STATUS.ACTIVE]
+      );
+
+      if (existing.length > 0) {
+        await connection.rollback();
+        return fail(res, "Una de les franges ja està reservada", 400);
+      }
+
+      const [maintenanceBlocks] = await connection.query(
         `SELECT id FROM maintenance_blocks
          WHERE court_id = ? AND time_slot_id = ? AND data_bloqueig = ?`,
         [court_id, slot.id, data_reserva]
       );
 
       if (maintenanceBlocks.length > 0) {
+        await connection.rollback();
         return fail(
           res,
           "Una de les franges està bloquejada per manteniment",
@@ -244,27 +201,29 @@ exports.createReservation = async (req, res) => {
       }
     }
 
-    // 6. Crear la reserva amb codi temporal
-    const codiBase = `TEMP-${Date.now()}-${user_id}`;
+    const basePrice = Number(court.preu_reserva || 0);
+    const preu_total = basePrice * (duration / 2);
+
+    const codi_reserva = `PB-${data_reserva.replace(/-/g, "")}-${Date.now()}-${user_id}`;
 
     const createdIds = [];
 
     for (const slot of selectedSlots) {
-      const [insertResult] = await db.query(
+      const [insertResult] = await connection.query(
         `INSERT INTO reservations (
-          codi_reserva, 
-          user_id, 
-          court_id, 
-          time_slot_id, 
-          data_reserva, 
-          estat, 
+          codi_reserva,
+          user_id,
+          court_id,
+          time_slot_id,
+          data_reserva,
+          estat,
           preu_total,
           estat_pagament,
           metode_pagament
         )
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
-          codiBase,
+          codi_reserva,
           user_id,
           court_id,
           slot.id,
@@ -279,46 +238,28 @@ exports.createReservation = async (req, res) => {
       createdIds.push(insertResult.insertId);
     }
 
-    const codi_reserva = `PB-${data_reserva.replace(/-/g, "")}-${String(createdIds[0]).padStart(3, "0")}`;
+    await connection.commit();
 
-    // 7. Guardar el codi definitiu a totes les reserves creades
-    await db.query(
-      `UPDATE reservations SET codi_reserva = ? WHERE codi_reserva = ?`,
-      [codi_reserva, codiBase]
-    );
-
-    // 8. Enviar email de confirmació de reserva
-    const firstSlotId = selectedSlots[0].id;
-    const lastSlotId = selectedSlots[selectedSlots.length - 1].id;
+    const detail = {
+      nom_pista: court.nom_pista,
+      hora_inici: selectedSlots[0].hora_inici,
+      hora_fi: selectedSlots[selectedSlots.length - 1].hora_fi,
+    };
 
     const [reservationDetails] = await db.query(
-      `
-        SELECT
-          u.nom,
-          u.email,
-          c.nom_pista,
-          t1.hora_inici,
-          t2.hora_fi
-        FROM users u
-        JOIN courts c ON c.id = ?
-        JOIN time_slots t1 ON t1.id = ?
-        JOIN time_slots t2 ON t2.id = ?
-        WHERE u.id = ?
-        LIMIT 1
-      `,
-      [court_id, firstSlotId, lastSlotId, user_id]
+      `SELECT nom, email FROM users WHERE id = ? LIMIT 1`,
+      [user_id]
     );
 
-    const detail = reservationDetails[0];
+    const userDetail = reservationDetails[0];
 
-    // Enviar email només si l'usuari té un email vàlid
-    if (detail?.email) {
+    if (userDetail?.email) {
       try {
         await sendEmail({
-          to: detail.email,
+          to: userDetail.email,
           subject: `Reserva confirmada - ${codi_reserva}`,
           html: buildReservationCreatedEmail({
-            nom: detail.nom,
+            nom: userDetail.nom,
             codi_reserva,
             nom_pista: detail.nom_pista,
             data_reserva,
@@ -341,20 +282,28 @@ exports.createReservation = async (req, res) => {
       metode_pagament,
       duration,
     });
-      } catch (error) {
-        console.error("Error createReservation:", error);
+  } catch (error) {
+    if (connection) {
+      try {
+        await connection.rollback();
+      } catch {}
+    }
 
-        if (error.code === "ER_DUP_ENTRY") {
-          return res.status(409).json({
-            error: "Ja existeix un conflicte de reserva per aquesta pista, franja i data.",
-          });
-        }
+    console.error("Error createReservation:", error);
 
-        return res.status(500).json({
-          error: "Error creant la reserva",
-        });
-      }
-    };
+    if (error.code === "ER_DUP_ENTRY") {
+      return res.status(409).json({
+        error: "Ja existeix un conflicte de reserva per aquesta pista, franja i data.",
+      });
+    }
+
+    return res.status(500).json({
+      error: "Error creant la reserva",
+    });
+  } finally {
+    if (connection) connection.release();
+  }
+};
 
 // Obtenir reserves (totes per admin, només del propi usuari per a usuari normal)
 exports.getReservations = async (req, res) => {
