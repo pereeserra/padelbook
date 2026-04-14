@@ -625,13 +625,6 @@ function AvailabilityPage() {
                   </span>
                   <span className="ap-hero-card__stat-label">Ocupades</span>
                 </div>
-
-                <div className="ap-hero-card__stat">
-                  <span className="ap-hero-card__stat-number">
-                    {hourlySummary.length}
-                  </span>
-                  <span className="ap-hero-card__stat-label">Franges</span>
-                </div>
               </div>
             )}
           </div>
@@ -872,48 +865,6 @@ function AvailabilityPage() {
           </div>
         ) : (
           <>
-            <section className="ap-summary-board fade-in-up">
-              <div className="ap-summary-board__header">
-                <div>
-                  <span className="ap-section-kicker">Vista resum</span>
-                  <h2 className="ap-section-title">Disponibilitat per franges</h2>
-                  <p className="ap-section-text">
-                    Aquesta vista resumeix quantes pistes hi ha lliures, reservades,
-                    en manteniment o ja passades a cada hora.
-                  </p>
-                </div>
-              </div>
-
-              <div className="ap-summary-grid">
-                {hourlySummary.map((row) => (
-                  <div
-                    key={row.hora_inici}
-                    className="ap-summary-card"
-                  >
-                    <div className="ap-summary-time">
-                      {formatTimeShort(row.hora_inici)} -{" "}
-                      {formatTimeShort(row.hora_fi)}
-                    </div>
-
-                    <div className="ap-summary-stats">
-                      <span className="ap-summary-pill ap-summary-pill--available">
-                        {row.available} lliures
-                      </span>
-                      <span className="ap-summary-pill ap-summary-pill--reserved">
-                        {row.reserved} reservades
-                      </span>
-                      <span className="ap-summary-pill ap-summary-pill--maintenance">
-                        {row.maintenance} manteniment
-                      </span>
-                      <span className="ap-summary-pill ap-summary-pill--past">
-                        {row.past} passades
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-
             <div className="ap-courts-grid">
             {courtsData.length === 0 && !error && !success ? (
               <div className="ap-empty-state">
@@ -961,19 +912,12 @@ function AvailabilityPage() {
                       <div>
                         <span className="ap-court-eyebrow">Pista</span>
                         <h3 className="ap-court-name">{court.nom_pista}</h3>
+                        <p className="ap-court-summary">
+                          {availableCount} lliures · {reservedCount} reservades · {maintenanceCount} manteniment
+                        </p>
                       </div>
 
                       <div className="ap-court-badges">
-                        <span className="ap-court-meta">{availableCount} lliures</span>
-
-                        <span className="ap-court-meta ap-court-meta--soft">
-                          {reservedCount} reservades
-                        </span>
-
-                        <span className="ap-court-meta ap-court-meta--maintenance">
-                          {maintenanceCount} manteniment
-                        </span>
-
                         <span
                           className={`ap-court-meta ${
                             formatCourtType(court.slots[0]?.tipus) === "Individuals"
@@ -1042,9 +986,12 @@ function AvailabilityPage() {
                               <span className="ap-slot-time">
                                 {formatTimeShort(slot.hora_inici)}
                               </span>
-                              <span className="ap-slot-status">
-                                {getSlotStatusLabel(slot, isPastSlot)}
-                              </span>
+
+                              {(!slot.disponible || isPastSlot) && (
+                                <span className="ap-slot-status">
+                                  {getSlotStatusLabel(slot, isPastSlot)}
+                                </span>
+                              )}
                             </button>
                           </div>
                         );

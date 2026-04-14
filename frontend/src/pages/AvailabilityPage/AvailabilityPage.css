@@ -15,9 +15,9 @@
 
 .ap-hero-card {
   overflow: hidden;
-  border-radius: 30px;
-  padding: 1.3rem;
-  margin-bottom: 1.35rem;
+  border-radius: 26px;
+  padding: 1.05rem 1.15rem;
+  margin-bottom: 1.1rem;
   background: linear-gradient(135deg, rgba(15, 23, 42, 0.94), rgba(37, 99, 235, 0.88));
   box-shadow: 0 26px 56px rgba(37, 99, 235, 0.16);
   color: white;
@@ -57,15 +57,15 @@
 }
 
 .ap-hero-card__title {
-  margin: 0.9rem 0 0 0;
-  font-size: 2.8rem;
-  line-height: 1.02;
+  margin: 0.7rem 0 0 0;
+  font-size: 2.15rem;
+  line-height: 1.04;
   max-width: 760px;
   color: white;
 }
 
 .ap-hero-card__subtitle {
-  margin-top: 0.9rem;
+  margin-top: 0.7rem;
   margin-bottom: 0;
   font-size: 1rem;
   line-height: 1.72;
@@ -92,7 +92,7 @@
 }
 
 .ap-hero-card__stat-number {
-  font-size: 1.65rem;
+  font-size: 1.45rem;
   font-weight: 800;
   color: white;
   letter-spacing: -0.03em;
@@ -392,20 +392,20 @@
 
 .ap-courts-grid {
   display: grid;
-  gap: 1.1rem;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+  gap: 1rem;
+  grid-template-columns: 1fr;
 }
 
 
 .ap-court-card {
   min-width: 0;
-  background: rgba(255, 255, 255, 0.88);
-  border-radius: 24px;
-  padding: 1.1rem;
-  border: 1px solid rgba(148, 163, 184, 0.16);
-  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.05);
-  backdrop-filter: blur(12px);
-  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 22px;
+  padding: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.04);
+  backdrop-filter: blur(10px);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .ap-court-card:hover {
@@ -446,6 +446,14 @@
   color: #0f172a;
 }
 
+.ap-court-summary {
+  margin: 0.28rem 0 0;
+  font-size: 0.84rem;
+  color: #94a3b8;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
 @media (max-width: 768px) {
   .ap-court-name {
     font-size: 1.2rem;
@@ -467,11 +475,11 @@
   align-items: center;
   justify-content: center;
   white-space: nowrap;
-  font-size: 0.74rem;
+  font-size: 0.7rem;
   font-weight: 800;
   color: #15803d;
   background: #dcfce7;
-  padding: 0.38rem 0.72rem;
+  padding: 0.3rem 0.6rem;
   border-radius: 999px;
   letter-spacing: 0.03em;
   text-transform: uppercase;
@@ -492,16 +500,16 @@
 
 .ap-slots-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
-  gap: 0.6rem;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.5rem;
   align-items: start;
 }
 
 .ap-slot-pill {
-  min-height: 58px;
-  padding: 0.65rem 0.5rem;
-  border-radius: 14px;
-  font-size: 0.92rem;
+  min-height: 46px;
+  padding: 0.45rem 0.4rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
   font-weight: 800;
   border: none;
   cursor: pointer;
@@ -1243,26 +1251,27 @@
 }
 
 .ap-slot-pill.is-past {
-  background: #e2e8f0;
-  color: #64748b;
+  background: #f1f5f9;
+  color: #94a3b8;
   cursor: not-allowed;
-  border: 1px solid #cbd5f5;
-  opacity: 0.6;
+  border: 1px solid #e2e8f0;
+  opacity: 0.5;
 }
 
 .ap-slot-time {
   display: block;
   font-weight: 800;
   line-height: 1.1;
+  font-size: 0.95rem;
 }
 
 .ap-slot-status {
   display: block;
-  margin-top: 0.22rem;
-  font-size: 0.68rem;
+  margin-top: 0.16rem;
+  font-size: 0.62rem;
   font-weight: 700;
-  line-height: 1.1;
-  opacity: 0.9;
+  line-height: 1.05;
+  opacity: 0.82;
 }
 
 .ap-slot-item {
