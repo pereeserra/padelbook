@@ -82,6 +82,23 @@ function AvailabilityPage() {
     return "1h";
   };
 
+  const getReservationEndTime = (slot, duration) => {
+    if (!slot?.hora_fi) return "";
+
+    if (Number(duration) === 1) {
+      return slot.hora_fi;
+    }
+
+    const [hours, minutes] = slot.hora_fi.split(":").map(Number);
+    const endDate = new Date();
+    endDate.setHours(hours, minutes + 30, 0, 0);
+
+    const endHours = String(endDate.getHours()).padStart(2, "0");
+    const endMinutes = String(endDate.getMinutes()).padStart(2, "0");
+
+    return `${endHours}:${endMinutes}:00`;
+  };
+
   // Funció per formatar el tipus de pista, normalitzant les variants d'"individual" i mostrant "Dobles" per qualsevol altre valor
   const formatCourtType = (tipus) => {
     const normalized = String(tipus || "").trim().toLowerCase();
@@ -272,10 +289,15 @@ function AvailabilityPage() {
 
       const reservationData = response?.data?.data || null;
 
+      const reservationEndTime = getReservationEndTime(
+        selectedSlot,
+        selectedDuration
+      );
+
       setSuccess(
         `Reserva confirmada a ${selectedSlot.nom_pista} (${formatTimeShort(
           selectedSlot.hora_inici
-        )} - ${formatTimeShort(selectedSlot.hora_fi)}) · Duració: ${formatDurationLabel(
+        )} - ${formatTimeShort(reservationEndTime)}) · Duració: ${formatDurationLabel(
           selectedDuration
         )}.`
       );
@@ -292,7 +314,12 @@ function AvailabilityPage() {
         estat_pagament: reservationData?.estat_pagament || "No disponible",
         nom_pista: selectedSlot.nom_pista,
         hora_inici: selectedSlot.hora_inici,
-        hora_fi: selectedSlot.hora_fi,
+        hora_fi: getReservationEndTime(
+          selectedSlot,
+          reservationData?.duration != null
+            ? Number(reservationData.duration)
+            : selectedDuration
+        ),
         duration:
           reservationData?.duration != null
             ? Number(reservationData.duration)
@@ -556,7 +583,7 @@ function AvailabilityPage() {
           <div className="ap-hero-card__grid">
             <div className="ap-hero-card__main">
               <span className="ap-hero-card__kicker">Disponibilitat en temps real</span>
-              <h1 className="ap-hero-card__title">Reserva de Pistes</h1>
+              <h1 className="ap-hero-card__title">Reserva de pistes</h1>
               <p className="ap-hero-card__subtitle">
                 Selecciona el dia, explora les pistes disponibles i confirma la teva
                 reserva d’una manera molt més clara i agradable.
@@ -1038,7 +1065,7 @@ function AvailabilityPage() {
 
               <strong className="ap-floating-time">
                 {formatDisplayDate(date)} • {formatTimeShort(selectedSlot.hora_inici)} a{" "}
-                {formatTimeShort(selectedSlot.hora_fi)}
+                {formatTimeShort(getReservationEndTime(selectedSlot, selectedDuration))}
               </strong>
 
               <span className="ap-floating-price">

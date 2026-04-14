@@ -18,6 +18,7 @@ function LoginPage() {
   const [turnstileReady, setTurnstileReady] = useState(false);
   const [showVerificationHelp, setShowVerificationHelp] = useState(false);
   const [resendingVerification, setResendingVerification] = useState(false);
+  const [sendingInitialVerification, setSendingInitialVerification] = useState(false);
   const [verificationInfo, setVerificationInfo] = useState("");
   const [resendCooldown, setResendCooldown] = useState(0);
 
@@ -260,7 +261,7 @@ function LoginPage() {
 
       if (isUnverifiedEmailError) {
         try {
-          setResendingVerification(true);
+          setSendingInitialVerification(true);
 
           const resendResponse = await api.post("/auth/resend-verification", {
             email: email.trim().toLowerCase(),
@@ -285,7 +286,7 @@ function LoginPage() {
             )
           );
         } finally {
-          setResendingVerification(false);
+          setSendingInitialVerification(false);
         }
       }
 
@@ -417,9 +418,16 @@ function LoginPage() {
                   type="button"
                   className="btn btn-primary"
                   onClick={handleResendVerification}
-                  disabled={resendingVerification || !email.trim() || resendCooldown > 0}
+                  disabled={
+                    sendingInitialVerification ||
+                    resendingVerification ||
+                    !email.trim() ||
+                    resendCooldown > 0
+                  }
                 >
-                  {resendingVerification
+                  {sendingInitialVerification
+                    ? "Enviant verificació..."
+                    : resendingVerification
                     ? "Reenviant verificació..."
                     : resendCooldown > 0
                     ? `Reenviar verificació (${formatCooldownTime(resendCooldown)})`
