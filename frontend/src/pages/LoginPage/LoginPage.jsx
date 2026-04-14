@@ -89,6 +89,7 @@ function LoginPage() {
 
       const response = await api.post("/auth/resend-verification", {
         email: normalizedEmail,
+        mode: "resend",
       });
 
       const message =
@@ -263,6 +264,7 @@ function LoginPage() {
 
           const resendResponse = await api.post("/auth/resend-verification", {
             email: email.trim().toLowerCase(),
+            mode: "initial",
           });
 
           const resendMessage =

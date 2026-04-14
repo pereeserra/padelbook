@@ -443,6 +443,7 @@ exports.verifyEmail = async (req, res) => {
 exports.resendVerification = async (req, res) => {
   try {
     let user = null;
+    const resendMode = req.body?.mode === "initial" ? "initial" : "resend";
 
     if (req.user?.id) {
       const [rows] = await db.query(
@@ -486,10 +487,18 @@ exports.resendVerification = async (req, res) => {
       userId: user.id,
       nom: user.nom,
       email: user.email,
-      subject: "Torna a verificar el teu compte - PadelBook",
+      subject:
+        resendMode === "initial"
+          ? "Verifica el teu compte - PadelBook"
+          : "Torna a verificar el teu compte - PadelBook",
     });
 
-    return message(res, "T'hem reenviat el correu de verificació.");
+    return message(
+      res,
+      resendMode === "initial"
+        ? "T'hem enviat el correu de verificació."
+        : "T'hem reenviat el correu de verificació."
+    );
   } catch (error) {
     console.error("Error resendVerification:", error);
     return fail(res, "No s'ha pogut reenviar el correu de verificació.");
