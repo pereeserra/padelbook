@@ -63,6 +63,10 @@ function LoginPage() {
     });
   }, [error]);
 
+  const handleCapsLock = (e) => {
+    setCapsLock(e.getModifierState("CapsLock"));
+  };
+
   // Detectar el estado de Caps Lock para mostrar una advertencia al usuario
   const formatCooldownTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
