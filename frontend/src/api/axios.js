@@ -33,7 +33,22 @@ api.interceptors.response.use(
     // 🟡 Altres errors → deixar passar però normalitzats
     const normalizedError = {
       status,
+      response: {
+        data: {
+          error:
+            error?.response?.data?.error ||
+            error?.response?.data?.message ||
+            error.message ||
+            "Error inesperat",
+          message:
+            error?.response?.data?.message ||
+            error?.response?.data?.error ||
+            error.message ||
+            "Error inesperat",
+        },
+      },
       message:
+        error?.response?.data?.error ||
         error?.response?.data?.message ||
         error.message ||
         "Error inesperat",
