@@ -551,52 +551,51 @@ function AvailabilityPage() {
 
   return (
     <div className="ap-wrapper">
-      <header className="fade-in-up ap-hero-card">
-        <div className="ap-hero-card__grid">
-          <div className="ap-hero-card__main">
-            <span className="ap-hero-card__kicker">Disponibilitat en temps real</span>
-            <h1 className="ap-hero-card__title">Reserva de Pistes</h1>
-            <p className="ap-hero-card__subtitle">
-              Selecciona el dia, explora les pistes disponibles i confirma la teva
-              reserva d’una manera molt més clara i agradable.
-            </p>
-          </div>
-
-          {!loading && !error && (
-            <div className="ap-hero-card__stats">
-              <div className="ap-hero-card__stat">
-                <span className="ap-hero-card__stat-number">
-                  {availabilityStats.totalCourts}
-                </span>
-                <span className="ap-hero-card__stat-label">Pistes</span>
-              </div>
-
-              <div className="ap-hero-card__stat">
-                <span className="ap-hero-card__stat-number">
-                  {availabilityStats.availableSlots}
-                </span>
-                <span className="ap-hero-card__stat-label">Lliures</span>
-              </div>
-
-              <div className="ap-hero-card__stat">
-                <span className="ap-hero-card__stat-number">
-                  {availabilityStats.occupiedSlots}
-                </span>
-                <span className="ap-hero-card__stat-label">Ocupades</span>
-              </div>
-
-              <div className="ap-hero-card__stat">
-                <span className="ap-hero-card__stat-number">
-                  {hourlySummary.length}
-                </span>
-                <span className="ap-hero-card__stat-label">Franges</span>
-              </div>
-            </div>
-          )}
-        </div>
-      </header>
-
       <div className="ap-container">
+        <header className="fade-in-up ap-hero-card">
+          <div className="ap-hero-card__grid">
+            <div className="ap-hero-card__main">
+              <span className="ap-hero-card__kicker">Disponibilitat en temps real</span>
+              <h1 className="ap-hero-card__title">Reserva de Pistes</h1>
+              <p className="ap-hero-card__subtitle">
+                Selecciona el dia, explora les pistes disponibles i confirma la teva
+                reserva d’una manera molt més clara i agradable.
+              </p>
+            </div>
+
+            {!loading && !error && (
+              <div className="ap-hero-card__stats">
+                <div className="ap-hero-card__stat">
+                  <span className="ap-hero-card__stat-number">
+                    {availabilityStats.totalCourts}
+                  </span>
+                  <span className="ap-hero-card__stat-label">Pistes</span>
+                </div>
+
+                <div className="ap-hero-card__stat">
+                  <span className="ap-hero-card__stat-number">
+                    {availabilityStats.availableSlots}
+                  </span>
+                  <span className="ap-hero-card__stat-label">Lliures</span>
+                </div>
+
+                <div className="ap-hero-card__stat">
+                  <span className="ap-hero-card__stat-number">
+                    {availabilityStats.occupiedSlots}
+                  </span>
+                  <span className="ap-hero-card__stat-label">Ocupades</span>
+                </div>
+
+                <div className="ap-hero-card__stat">
+                  <span className="ap-hero-card__stat-number">
+                    {hourlySummary.length}
+                  </span>
+                  <span className="ap-hero-card__stat-label">Franges</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </header>
         <section className="ap-dates-card fade-in-up">
           <div className="ap-dates-card__top">
             <div>
