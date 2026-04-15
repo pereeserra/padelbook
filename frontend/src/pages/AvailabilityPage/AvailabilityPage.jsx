@@ -968,19 +968,22 @@ function AvailabilityPage() {
                       </div>
                     </div>
 
-                    <div className="ap-slots-grid">
-                      {court.slots.map((slot) => {
-                        const isSelected =
-                          selectedSlot?.time_slot_id === slot.time_slot_id &&
-                          selectedSlot?.court_id === slot.court_id;
+                    {(() => {
+                      const allCourtSlots =
+                        allCourtsData.find((c) => c.court_id === court.court_id)?.slots || [];
 
-                        const isPastSlot = isPastTimeSlot(slot);
-                        const allCourtSlots =
-                          allCourtsData.find((c) => c.court_id === court.court_id)?.slots || [];
+                      return (
+                        <div className="ap-slots-grid">
+                          {court.slots.map((slot) => {
+                            const isSelected =
+                              selectedSlot?.time_slot_id === slot.time_slot_id &&
+                              selectedSlot?.court_id === slot.court_id;
 
-                        const slotIndex = allCourtSlots.findIndex(
-                          (courtSlot) => courtSlot.time_slot_id === slot.time_slot_id
-                        );
+                            const isPastSlot = isPastTimeSlot(slot);
+
+                            const slotIndex = allCourtSlots.findIndex(
+                              (courtSlot) => courtSlot.time_slot_id === slot.time_slot_id
+                            );
 
                         const isValid = isSlotValidForDuration(
                           slot,
@@ -1027,7 +1030,9 @@ function AvailabilityPage() {
                           </div>
                         );
                       })}
-                    </div>
+                        </div>
+                      );
+                    })()}
                   </div>
                 );
               })
