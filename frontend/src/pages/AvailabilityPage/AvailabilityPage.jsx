@@ -114,9 +114,10 @@ function AvailabilityPage() {
     return Number(coberta) === 1 ? "Indoor" : "Outdoor";
   };
 
-  const getSlotStatusLabel = (slot, isPastSlot) => {
+  const getSlotStatusLabel = (slot, isPastSlot, isValid = true) => {
     if (isPastSlot) return "Hora passada";
-    if (slot.disponible) return "Disponible";
+    if (slot.disponible && isValid) return "Disponible";
+    if (slot.disponible && !isValid) return "No vàlida";
     if (slot.motiu_no_disponible === "manteniment") return "Manteniment";
     if (slot.motiu_no_disponible === "reserva") return "Reservada";
     return "No disponible";
@@ -132,7 +133,7 @@ function AvailabilityPage() {
     if (!slot?.hora_inici) return false;
 
     if (selectedDuration === 3) {
-      return slot.hora_inici < "20:00:00";
+      return slot.hora_inici <= "19:30:00";
     }
 
     return slot.hora_inici <= "20:00:00";
@@ -622,11 +623,11 @@ function AvailabilityPage() {
       } else if (!isValid) {
         if (selectedDuration === 3) {
           setSlotHelpMessage(
-            "Aquesta franja no permet iniciar una reserva de 1h30."
+            "Aquesta franja no permet iniciar una reserva de 1h30 fins a les 21:00."
           );
         } else {
           setSlotHelpMessage(
-            "Aquesta franja no permet completar la duració seleccionada."
+            "Aquesta franja no permet completar una reserva d'1 hora fins a les 21:00."
           );
         }
       } else {
@@ -1063,7 +1064,7 @@ function AvailabilityPage() {
                               </span>
 
                               <span className="ap-slot-status">
-                                {getSlotStatusLabel(slot, isPastSlot)}
+                                {getSlotStatusLabel(slot, isPastSlot, isValid)}
                               </span>
                             </button>
                           </div>
