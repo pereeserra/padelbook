@@ -325,16 +325,18 @@
 }
 
 .profile__card-header-status {
-  min-width: 220px;
-  flex: 0 0 220px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   align-items: flex-start;
+  width: fit-content;
+  max-width: 100%;
 }
 
 .profile__card-header-status .pb-badge-pill {
-  min-width: 220px;
+  min-width: auto;
+  width: auto;
   justify-content: center;
+  white-space: nowrap;
 }
 
 .profile__form {
@@ -611,12 +613,13 @@
   }
 
   .profile__card-header-status {
-    min-width: 100%;
-    flex-basis: 100%;
+    width: fit-content;
+    max-width: 100%;
     justify-content: flex-start;
   }
 
   .profile__card-header-status .pb-badge-pill {
     min-width: auto;
+    width: auto;
   }
 }
