@@ -260,6 +260,7 @@ exports.updateMe = async (req, res) => {
     let { nom, llinatges, email } = req.body;
 
     nom = normalizeFullName(nom);
+    llinatges = normalizeFullName(llinatges);
     email = normalizeEmail(email);
 
     const profileValidation = validateProfileData(nom, llinatges, email);
