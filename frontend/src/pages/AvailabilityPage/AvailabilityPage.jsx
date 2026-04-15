@@ -264,7 +264,7 @@ function AvailabilityPage() {
   const getSelectedCourtSlots = () => {
     if (!selectedSlot) return [];
 
-    const selectedCourt = courtsData.find(
+    const selectedCourt = allCourtsData.find(
       (court) => court.court_id === selectedSlot.court_id
     );
 
@@ -477,7 +477,7 @@ function AvailabilityPage() {
       const normalizedEnvironment =
         Number(slot.coberta) === 1 ? "indoor" : "outdoor";
 
-      const visibleAsStart = slot.hora_inici < "20:00:00";
+      const visibleAsStart = slot.hora_inici <= "20:00:00";
 
       const matchesAvailability =
         !showOnlyAvailable || (slot.disponible && !isPastTimeSlot(slot));
@@ -522,10 +522,23 @@ function AvailabilityPage() {
   }, []);
 
   // Memorització de les pistes agrupades per nom, amb ordenació dels horaris i de les pistes
-  const courtsData = useMemo(() => {
+  const allCourtsData = useMemo(() => {
     const map = new Map();
 
-    filteredAvailability.forEach((slot) => {
+    availability.forEach((slot) => {
+      const normalizedType = String(slot.tipus || "").trim().toLowerCase();
+      const normalizedEnvironment =
+        Number(slot.coberta) === 1 ? "indoor" : "outdoor";
+
+      const matchesCourtType =
+        courtTypeFilter === "tots" || normalizedType === courtTypeFilter;
+
+      const matchesCourtEnvironment =
+        courtEnvironmentFilter === "totes" ||
+        normalizedEnvironment === courtEnvironmentFilter;
+
+      if (!matchesCourtType || !matchesCourtEnvironment) return;
+
       if (!map.has(slot.nom_pista)) {
         map.set(slot.nom_pista, {
           nom_pista: slot.nom_pista,
@@ -544,7 +557,20 @@ function AvailabilityPage() {
     });
 
     return courtsList.sort((a, b) => a.nom_pista.localeCompare(b.nom_pista));
-  }, [filteredAvailability]);
+  }, [availability, courtTypeFilter, courtEnvironmentFilter]);
+
+  const courtsData = useMemo(() => {
+    return allCourtsData.map((court) => ({
+      ...court,
+      slots: court.slots.filter((slot) => {
+        const visibleAsStart = slot.hora_inici <= "20:00:00";
+        const matchesAvailability =
+          !showOnlyAvailable || (slot.disponible && !isPastTimeSlot(slot));
+
+        return visibleAsStart && matchesAvailability;
+      }),
+    }));
+  }, [allCourtsData, showOnlyAvailable, date]);
 
   // Memorització de les estadístiques generals de disponibilitat per mostrar-les a la capçalera
   const availabilityStats = useMemo(() => {
@@ -898,7 +924,9 @@ function AvailabilityPage() {
                 )}
               </div>
             ) : (
-              courtsData.map((court, courtIndex) => {
+              courtsData
+                .filter((court) => court.slots.length > 0)
+                .map((court, courtIndex) => {
                 const availableCount = court.slots.filter((s) => s.disponible).length;
                 const reservedCount = court.slots.filter(
                   (s) => !s.disponible && s.motiu_no_disponible === "reserva"
