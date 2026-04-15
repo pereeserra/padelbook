@@ -89,11 +89,13 @@ function AvailabilityPage() {
       (courtSlot) => courtSlot.time_slot_id === slot.time_slot_id
     );
 
-    if (slotIndex === -1) return slot.hora_fi;
+    if (slotIndex === -1) return "";
 
     const endSlot = courtSlots[slotIndex + Number(duration) - 1];
 
-    return endSlot?.hora_fi || slot.hora_fi;
+    if (!endSlot) return "";
+
+    return endSlot.hora_fi;
   };
 
   // Funció per formatar el tipus de pista, normalitzant les variants d'"individual" i mostrant "Dobles" per qualsevol altre valor
@@ -268,6 +270,44 @@ function AvailabilityPage() {
 
     return selectedCourt?.slots || [];
   };
+
+  useEffect(() => {
+    if (!selectedSlot) return;
+
+    const selectedCourtSlots = getSelectedCourtSlots();
+
+    const slotIndex = selectedCourtSlots.findIndex(
+      (courtSlot) => courtSlot.time_slot_id === selectedSlot.time_slot_id
+    );
+
+    if (slotIndex === -1) {
+      setSelectedSlot(null);
+      setReservationSummary(null);
+      setSlotHelpMessage("La franja seleccionada ja no està disponible.");
+      return;
+    }
+
+    const stillValid = isSlotValidForDuration(
+      selectedSlot,
+      selectedCourtSlots,
+      slotIndex
+    );
+
+    if (!stillValid) {
+      setSelectedSlot(null);
+      setReservationSummary(null);
+
+      if (selectedDuration === 3) {
+        setSlotHelpMessage(
+          "Per reservar 1h30 necessites tres franges consecutives disponibles."
+        );
+      } else {
+        setSlotHelpMessage(
+          "La duració seleccionada no és compatible amb aquesta franja."
+        );
+      }
+    }
+  }, [selectedDuration, availability, courtTypeFilter, courtEnvironmentFilter, showOnlyAvailable]);
 
   // Funció per manejar la reserva d'una pista, amb validació d'autenticació, maneig d'errors i actualització de l'estat de la reserva
   const handleReserve = async () => {
@@ -965,7 +1005,19 @@ function AvailabilityPage() {
         )}
       </div>
 
-      {selectedSlot && !success && (
+      {selectedSlot &&
+        !success &&
+        (() => {
+          const selectedCourtSlots = getSelectedCourtSlots();
+          const slotIndex = selectedCourtSlots.findIndex(
+            (courtSlot) => courtSlot.time_slot_id === selectedSlot.time_slot_id
+          );
+
+          return (
+            slotIndex !== -1 &&
+            isSlotValidForDuration(selectedSlot, selectedCourtSlots, slotIndex)
+          );
+        })() && (
         <div className="ap-floating-action slide-up">
           <div className="ap-floating-inner">
             <button
@@ -1065,7 +1117,19 @@ function AvailabilityPage() {
         </div>
       )}
 
-      {selectedSlot && !success && <div className="ap-bottom-spacing"></div>}
+      {selectedSlot &&
+        !success &&
+        (() => {
+          const selectedCourtSlots = getSelectedCourtSlots();
+          const slotIndex = selectedCourtSlots.findIndex(
+            (courtSlot) => courtSlot.time_slot_id === selectedSlot.time_slot_id
+          );
+
+          return (
+            slotIndex !== -1 &&
+            isSlotValidForDuration(selectedSlot, selectedCourtSlots, slotIndex)
+          );
+        })() && <div className="ap-bottom-spacing"></div>}
     </div>
   );
 }
