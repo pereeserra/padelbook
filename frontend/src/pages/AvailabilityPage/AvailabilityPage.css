@@ -536,6 +536,23 @@
   transform: translateY(-1px);
 }
 
+.ap-slot-pill.is-available-soft {
+  background: #f8fafc;
+  color: #64748b;
+  border: 1px solid #dbeafe;
+  opacity: 0.92;
+}
+
+.ap-slot-pill.is-available-soft:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  transform: none;
+}
+
+.ap-slot-pill.is-available-soft .ap-slot-status {
+  color: #94a3b8;
+}
+
 .ap-slot-pill.is-booked {
   background: #fff1f2;
   color: #b91c1c;

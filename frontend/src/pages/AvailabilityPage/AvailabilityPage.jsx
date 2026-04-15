@@ -128,6 +128,16 @@ function AvailabilityPage() {
     return slot.detall_no_disponible || "Franja no disponible";
   };
 
+  const isVisibleStartSlot = (slot) => {
+    if (!slot?.hora_inici) return false;
+
+    if (selectedDuration === 3) {
+      return slot.hora_inici < "20:00:00";
+    }
+
+    return slot.hora_inici <= "20:00:00";
+  };
+
   // Funció per determinar si la data seleccionada és anterior a la data actual
   const isPastDate = (selectedDate) => {
     return selectedDate < getToday();
@@ -559,7 +569,7 @@ function AvailabilityPage() {
     return allCourtsData.map((court) => ({
       ...court,
       slots: court.slots.filter((slot) => {
-        const visibleAsStart = slot.hora_inici <= "20:00:00";
+        const visibleAsStart = isVisibleStartSlot(slot);
         const matchesAvailability =
           !showOnlyAvailable || (slot.disponible && !isPastTimeSlot(slot));
 
@@ -599,10 +609,26 @@ function AvailabilityPage() {
       setSelectedSlot(null);
       setReservationSummary(null);
 
-      if (!isValid && selectedDuration === 3) {
-        setSlotHelpMessage(
-          "Per reservar 1h30 necessites tres franges consecutives disponibles."
-        );
+      if (isPastSlot) {
+        setSlotHelpMessage("Aquesta hora ja ha passat.");
+      } else if (!slot.disponible) {
+        if (slot.motiu_no_disponible === "reserva") {
+          setSlotHelpMessage("Aquesta franja ja està reservada.");
+        } else if (slot.motiu_no_disponible === "manteniment") {
+          setSlotHelpMessage("Aquesta franja està bloquejada per manteniment.");
+        } else {
+          setSlotHelpMessage("Aquesta franja no està disponible.");
+        }
+      } else if (!isValid) {
+        if (selectedDuration === 3) {
+          setSlotHelpMessage(
+            "Aquesta franja no permet iniciar una reserva de 1h30."
+          );
+        } else {
+          setSlotHelpMessage(
+            "Aquesta franja no permet completar la duració seleccionada."
+          );
+        }
       } else {
         setSlotHelpMessage(getSlotTitle(slot, isPastSlot));
       }
@@ -611,7 +637,12 @@ function AvailabilityPage() {
       return;
     }
 
-    setSlotHelpMessage("");
+    const endTime = getReservationEndTime(slot, selectedDuration, getSelectedCourtSlots());
+
+    setSlotHelpMessage(
+      `Reserva possible: de ${formatTimeShort(slot.hora_inici)} a ${formatTimeShort(endTime)}`
+    );
+
     setSelectedSlot(isSelected ? null : slot);
   };
 
@@ -994,6 +1025,12 @@ function AvailabilityPage() {
                         const shouldHideSlot =
                           showOnlyAvailable &&
                           (!isValid || isPastSlot);
+                        
+                        const isSoftAvailable =
+                          !isPastSlot &&
+                          slot.disponible &&
+                          !isSelected &&
+                          !isValid;
 
                         return (
                           <div
@@ -1013,6 +1050,8 @@ function AvailabilityPage() {
                                   : slot.disponible
                                   ? isSelected
                                     ? "is-selected"
+                                    : isSoftAvailable
+                                    ? "is-available-soft"
                                     : "is-available"
                                   : slot.motiu_no_disponible === "manteniment"
                                   ? "is-maintenance"
