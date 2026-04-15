@@ -44,9 +44,6 @@ function ReservationCard({
       ? "Avui"
       : "Pròxima";
 
-  const reservationTypeLabel =
-    reservation.total_slots >= 3 ? "1h30" : "1h";
-
   // Funció per fer scroll suau cap a la targeta quan s'està confirmant la cancel·lació
   const slowScrollToCard = () => {
     if (!cardRef.current) return;
@@ -148,19 +145,7 @@ function ReservationCard({
               </svg>
             </span>
 
-            <div className="res-card__title-stack">
-              <h3 className="res-card__title">{reservation.nom_pista}</h3>
-              <div className="res-card__mini-tags">
-                <span className="res-card__mini-tag">{reservationTypeLabel}</span>
-                <span className="res-card__mini-tag">
-                  {reservation.metode_pagament === "online_simulat"
-                    ? "Online"
-                    : reservation.metode_pagament === "al_club"
-                    ? "Al club"
-                    : "Sense mètode"}
-                </span>
-              </div>
-            </div>
+            <h3 className="res-card__title">{reservation.nom_pista}</h3>
           </div>
         </div>
 
@@ -200,6 +185,31 @@ function ReservationCard({
               )}
             </button>
           )}
+
+          <span
+            className={`res-card__badge ${
+              isPastReservation
+                ? "res-card__badge--past"
+                : isActive
+                  ? "res-card__badge--active"
+                  : "res-card__badge--inactive"
+            }`}
+          >
+            <span
+              className={`res-card__badge-dot ${
+                isActive
+                  ? "res-card__badge-dot--active"
+                  : "res-card__badge-dot--inactive"
+              }`}
+            />
+            {
+              reservation.estat === "cancel·lada"
+                ? "cancel·lada"
+                : isPastReservation
+                  ? "finalitzada"
+                  : reservation.estat
+            }
+          </span>
         </div>
       </div>
 
