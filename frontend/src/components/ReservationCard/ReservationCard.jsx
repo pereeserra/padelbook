@@ -108,19 +108,17 @@ function ReservationCard({
           Codi: {reservation.codi_reserva || "No disponible"}
         </span>
 
-        <span
-          className={`res-card__meta-status ${
-            reservation.estat === "cancel·lada"
-              ? "res-card__meta-status--cancelled"
-              : isPastReservation
-              ? "res-card__meta-status--past"
-              : isTodayReservation
-              ? "res-card__meta-status--today"
-              : "res-card__meta-status--upcoming"
-          }`}
-        >
-          {temporalStatusLabel}
-        </span>
+        {reservation.estat !== "cancel·lada" && !isPastReservation && (
+          <span
+            className={`res-card__meta-status ${
+              isTodayReservation
+                ? "res-card__meta-status--today"
+                : "res-card__meta-status--upcoming"
+            }`}
+          >
+            {temporalStatusLabel}
+          </span>
+        )}
       </div>
       <div className="res-card__header">
         <div className="res-card__header-main">
@@ -150,13 +148,21 @@ function ReservationCard({
         </div>
 
         <div className="res-card__header-actions">
-          {reservation.estat === "cancel·lada" && (
+          {(reservation.estat === "cancel·lada" || isPastReservation) && (
             <button
               type="button"
               onClick={() => onDeleteCancelled(reservation.id)}
               disabled={isDeletingCancelled}
-              title="Eliminar reserva cancel·lada"
-              aria-label="Eliminar reserva cancel·lada"
+              title={
+                reservation.estat === "cancel·lada"
+                  ? "Eliminar reserva cancel·lada"
+                  : "Eliminar reserva finalitzada"
+              }
+              aria-label={
+                reservation.estat === "cancel·lada"
+                  ? "Eliminar reserva cancel·lada"
+                  : "Eliminar reserva finalitzada"
+              }
               className={`res-card__delete-icon-button ${
                 isDeletingCancelled
                   ? "res-card__delete-icon-button--disabled"
@@ -223,6 +229,23 @@ function ReservationCard({
                 <span className="res-card__main-label">Hora</span>
                 <span className="res-card__main-value">
                   {reservation.hora_inici?.slice(0, 5)} - {reservation.hora_fi?.slice(0, 5)}
+                </span>
+              </div>
+
+              <div className="res-card__main-row">
+                <span className="res-card__main-label">Pagament</span>
+                <span
+                  className={`res-card__payment-badge ${
+                    reservation.metode_pagament === "online_simulat"
+                      ? "res-card__payment-badge--online"
+                      : "res-card__payment-badge--club"
+                  }`}
+                >
+                  {reservation.metode_pagament === "online_simulat"
+                    ? "Online"
+                    : reservation.metode_pagament === "al_club"
+                    ? "Al club"
+                    : "No disponible"}
                 </span>
               </div>
 
