@@ -477,21 +477,17 @@ function AvailabilityPage() {
       const normalizedEnvironment =
         Number(slot.coberta) === 1 ? "indoor" : "outdoor";
 
-      const visibleAsStart = slot.hora_inici <= "20:00:00";
-
       const matchesAvailability =
         !showOnlyAvailable || (slot.disponible && !isPastTimeSlot(slot));
 
       const matchesCourtType =
-        courtTypeFilter === "tots" ||
-        normalizedType === courtTypeFilter;
+        courtTypeFilter === "tots" || normalizedType === courtTypeFilter;
 
       const matchesCourtEnvironment =
         courtEnvironmentFilter === "totes" ||
         normalizedEnvironment === courtEnvironmentFilter;
 
       return (
-        visibleAsStart &&
         matchesAvailability &&
         matchesCourtType &&
         matchesCourtEnvironment
@@ -979,12 +975,17 @@ function AvailabilityPage() {
                           selectedSlot?.court_id === slot.court_id;
 
                         const isPastSlot = isPastTimeSlot(slot);
+                        const allCourtSlots =
+                          allCourtsData.find((c) => c.court_id === court.court_id)?.slots || [];
+
+                        const slotIndex = allCourtSlots.findIndex(
+                          (courtSlot) => courtSlot.time_slot_id === slot.time_slot_id
+                        );
+
                         const isValid = isSlotValidForDuration(
                           slot,
-                          court.slots,
-                          court.slots.findIndex(
-                            (courtSlot) => courtSlot.time_slot_id === slot.time_slot_id
-                          )
+                          allCourtSlots,
+                          slotIndex
                         );
 
                         const shouldHideSlot =
