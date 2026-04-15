@@ -477,6 +477,8 @@ function AvailabilityPage() {
       const normalizedEnvironment =
         Number(slot.coberta) === 1 ? "indoor" : "outdoor";
 
+      const visibleAsStart = slot.hora_inici < "20:00:00";
+
       const matchesAvailability =
         !showOnlyAvailable || (slot.disponible && !isPastTimeSlot(slot));
 
@@ -489,6 +491,7 @@ function AvailabilityPage() {
         normalizedEnvironment === courtEnvironmentFilter;
 
       return (
+        visibleAsStart &&
         matchesAvailability &&
         matchesCourtType &&
         matchesCourtEnvironment
