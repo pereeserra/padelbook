@@ -638,10 +638,15 @@ function AvailabilityPage() {
       return;
     }
 
-    const endTime = getReservationEndTime(slot, selectedDuration, getSelectedCourtSlots());
+    const clickedCourtSlots =
+      allCourtsData.find((court) => court.court_id === slot.court_id)?.slots || [];
+
+    const endTime = getReservationEndTime(slot, selectedDuration, clickedCourtSlots);
 
     setSlotHelpMessage(
-      `Reserva possible: de ${formatTimeShort(slot.hora_inici)} a ${formatTimeShort(endTime)}`
+      endTime
+        ? `Reserva possible: de ${formatTimeShort(slot.hora_inici)} a ${formatTimeShort(endTime)}`
+        : "No s'ha pogut calcular l'hora final de la reserva."
     );
 
     setSelectedSlot(isSelected ? null : slot);
