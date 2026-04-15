@@ -189,17 +189,17 @@ function ProfilePage() {
 
   const passwordDraftStrengthText = !hasPasswordDraft
     ? "Sense avaluar"
-    : completedPasswordChecks <= 2
-    ? "Baixa"
-    : completedPasswordChecks <= 4
+    : completedPasswordChecks === 6
+    ? "Alta"
+    : completedPasswordChecks >= 4
     ? "Mitjana"
-    : "Alta";
+    : "Baixa";
 
   const passwordDraftStrengthClass = !hasPasswordDraft
     ? "pb-badge-pill pb-badge-pill--blue"
-    : completedPasswordChecks >= 5
+    : completedPasswordChecks === 6
     ? "pb-badge-pill pb-badge-pill--green"
-    : completedPasswordChecks >= 3
+    : completedPasswordChecks >= 4
     ? "pb-badge-pill pb-badge-pill--amber"
     : "pb-badge-pill pb-badge-pill--rose";
 
@@ -456,9 +456,9 @@ function ProfilePage() {
       });
 
       setAccountSecurityLevel(
-        completedPasswordChecks >= 5
+        completedPasswordChecks === 6
           ? "Alta"
-          : completedPasswordChecks >= 3
+          : completedPasswordChecks >= 4
           ? "Mitjana"
           : "Baixa"
       );
