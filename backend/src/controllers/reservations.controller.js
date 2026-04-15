@@ -523,11 +523,19 @@ exports.deleteCancelledReservationPermanently = async (req, res) => {
       }
     }
 
+    const wasCancelled =
+      reservation.estat === RESERVATION_STATUS.CANCELLED;
+
     await db.query("DELETE FROM reservations WHERE codi_reserva = ?", [
       reservation.codi_reserva,
     ]);
 
-    return message(res, "Reserva cancel·lada eliminada correctament");
+    return message(
+      res,
+      wasCancelled
+        ? "Reserva cancel·lada eliminada correctament"
+        : "Reserva finalitzada eliminada correctament"
+    );
   } catch (error) {
     console.error("Error deleteCancelledReservationPermanently:", error);
     return fail(res, "Error eliminant definitivament la reserva");
