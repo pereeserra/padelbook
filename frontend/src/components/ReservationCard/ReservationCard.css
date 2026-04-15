@@ -85,9 +85,10 @@
   min-height: 30px;
   padding: 0.28rem 0.68rem;
   border-radius: 999px;
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   font-weight: 800;
   border: 1px solid transparent;
+  opacity: 0.95;
 }
 
 .res-card__meta-status--today {
@@ -145,8 +146,35 @@
 
 .res-card__title-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.55rem;
+}
+
+.res-card__title-stack {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.res-card__mini-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.res-card__mini-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0.24rem 0.62rem;
+  border-radius: 999px;
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  font-size: 0.74rem;
+  font-weight: 800;
+  white-space: nowrap;
 }
 
 .res-card__title-icon {

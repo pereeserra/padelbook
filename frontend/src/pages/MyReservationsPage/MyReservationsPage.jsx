@@ -269,6 +269,36 @@ function MyReservationsPage() {
     return reservations.filter((reservation) => reservation.estat === "cancel·lada");
   }, [reservations]);
 
+  const sortReservationsForView = (list, filter) => {
+    const sorted = [...list];
+
+    const getStartDateTime = (reservation) => {
+      const baseDate = new Date(reservation.data_reserva);
+      const [hours, minutes, seconds = 0] = String(
+        reservation.hora_inici || "00:00:00"
+      )
+        .split(":")
+        .map(Number);
+
+      const result = new Date(baseDate);
+      result.setHours(hours, minutes, seconds, 0);
+      return result;
+    };
+
+    sorted.sort((a, b) => {
+      const aStart = getStartDateTime(a).getTime();
+      const bStart = getStartDateTime(b).getTime();
+
+      if (filter === "active") {
+        return aStart - bStart;
+      }
+
+      return bStart - aStart;
+    });
+
+    return sorted;
+  };
+
   const filteredReservations = useMemo(() => {
     let baseList = reservations;
 
@@ -296,7 +326,7 @@ function MyReservationsPage() {
       });
     }
 
-    return baseList;
+    return sortReservationsForView(baseList, activeFilter);
   }, [
     activeFilter,
     reservations,
