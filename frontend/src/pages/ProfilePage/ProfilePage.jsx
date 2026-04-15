@@ -185,17 +185,36 @@ function ProfilePage() {
 
   const completedPasswordChecks = Object.values(passwordChecks).filter(Boolean).length;
 
-  const passwordStrengthText =
-    completedPasswordChecks <= 2
-      ? "Baixa"
-      : completedPasswordChecks <= 4
-      ? "Mitjana"
-      : "Alta";
+  const hasPasswordDraft = passwordData.newPassword.trim().length > 0;
 
-  const passwordStrengthClass =
-    completedPasswordChecks >= 5
+  const passwordDraftStrengthText = !hasPasswordDraft
+    ? "Sense avaluar"
+    : completedPasswordChecks <= 2
+    ? "Baixa"
+    : completedPasswordChecks <= 4
+    ? "Mitjana"
+    : "Alta";
+
+  const passwordDraftStrengthClass = !hasPasswordDraft
+    ? "pb-badge-pill pb-badge-pill--blue"
+    : completedPasswordChecks >= 5
+    ? "pb-badge-pill pb-badge-pill--green"
+    : completedPasswordChecks >= 3
+    ? "pb-badge-pill pb-badge-pill--amber"
+    : "pb-badge-pill pb-badge-pill--rose";
+
+  const [accountSecurityLevel, setAccountSecurityLevel] = useState(() => {
+    return localStorage.getItem("padelbook-account-security-level") || "Mitjana";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("padelbook-account-security-level", accountSecurityLevel);
+  }, [accountSecurityLevel]);
+
+  const accountSecurityClass =
+    accountSecurityLevel === "Alta"
       ? "pb-badge-pill pb-badge-pill--green"
-      : completedPasswordChecks >= 3
+      : accountSecurityLevel === "Mitjana"
       ? "pb-badge-pill pb-badge-pill--amber"
       : "pb-badge-pill pb-badge-pill--rose";
 
@@ -224,7 +243,7 @@ function ProfilePage() {
     },
     {
       label: "Seguretat",
-      value: `Nivell ${passwordStrengthText.toLowerCase()}`,
+      value: `Nivell ${accountSecurityLevel.toLowerCase()}`,
       text: "Pots reforçar la sessió actualitzant la contrasenya quan vulguis.",
     },
   ];
@@ -436,6 +455,14 @@ function ProfilePage() {
         newPassword: passwordData.newPassword,
       });
 
+      setAccountSecurityLevel(
+        completedPasswordChecks >= 5
+          ? "Alta"
+          : completedPasswordChecks >= 3
+          ? "Mitjana"
+          : "Baixa"
+      );
+
       setPasswordData({
         currentPassword: "",
         newPassword: "",
@@ -598,7 +625,7 @@ function ProfilePage() {
 
                   <div className="profile__hero-aside-mini-stat">
                     <span className="profile__hero-aside-mini-label">Seguretat</span>
-                    <span className="profile__hero-aside-mini-value">{passwordStrengthText}</span>
+                    <span className="profile__hero-aside-mini-value">{accountSecurityLevel}</span>
                   </div>
                 </div>
               </div>
@@ -801,9 +828,11 @@ function ProfilePage() {
                       </p>
                     </div>
 
-                    <span className={passwordStrengthClass}>
-                      Seguretat: {passwordStrengthText}
-                    </span>
+                    <div className="profile__card-header-status">
+                      <span className={passwordDraftStrengthClass}>
+                        Nova contrasenya: {passwordDraftStrengthText}
+                      </span>
+                    </div>
                   </div>
 
                   <form onSubmit={handleChangePassword} className="profile__form">
@@ -1025,7 +1054,9 @@ function ProfilePage() {
 
                       <div className="profile__status-row">
                         <span className="profile__status-label">Contrasenya</span>
-                        <span className={passwordStrengthClass}>{passwordStrengthText}</span>
+                        <span className={`profile__status-value ${accountSecurityClass}`}>
+                          {accountSecurityLevel}
+                        </span>
                       </div>
 
                       <div className="profile__status-row">

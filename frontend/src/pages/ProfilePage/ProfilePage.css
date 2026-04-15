@@ -324,6 +324,19 @@
   margin-bottom: 1.15rem;
 }
 
+.profile__card-header-status {
+  min-width: 220px;
+  flex: 0 0 220px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+
+.profile__card-header-status .pb-badge-pill {
+  min-width: 220px;
+  justify-content: center;
+}
+
 .profile__form {
   display: flex;
   flex-direction: column;
@@ -554,6 +567,12 @@
   flex-wrap: wrap;
 }
 
+.profile__status-value {
+  min-width: 92px;
+  display: inline-flex;
+  justify-content: center;
+}
+
 .profile__status-label {
   color: #334155;
   font-weight: 700;
@@ -589,5 +608,15 @@
 @media (max-width: 640px) {
   .profile__hero-aside-mini-stats {
     grid-template-columns: 1fr;
+  }
+
+  .profile__card-header-status {
+    min-width: 100%;
+    flex-basis: 100%;
+    justify-content: flex-start;
+  }
+
+  .profile__card-header-status .pb-badge-pill {
+    min-width: auto;
   }
 }
