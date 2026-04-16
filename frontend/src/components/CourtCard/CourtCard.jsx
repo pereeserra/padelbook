@@ -64,6 +64,17 @@ function CourtCard({
           <span className="court-card__meta-label">Modalitat</span>
           <span className="court-card__meta-value">{courtModeLabel}</span>
         </div>
+
+        <div className="court-card__meta-item">
+          <span className="court-card__meta-label">Preu/persona</span>
+          <span className="court-card__meta-value">
+            {court.preu_reserva !== undefined &&
+            court.preu_reserva !== null &&
+            court.preu_reserva !== ""
+              ? `${Number(court.preu_reserva).toFixed(2)} €`
+              : "No definit"}
+          </span>
+        </div>
       </div>
 
       <div className="court-card__badges-row">

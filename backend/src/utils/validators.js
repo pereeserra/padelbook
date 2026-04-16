@@ -145,7 +145,7 @@ const validateCourtData = (data) => {
   if (preu_reserva !== undefined && preu_reserva !== null && preu_reserva !== "") {
     parsedPreu = Number(preu_reserva);
     if (Number.isNaN(parsedPreu) || parsedPreu < 0) {
-      return { error: "El preu de reserva no és vàlid" };
+      return { error: "El preu per persona no és vàlid" };
     }
   }
   preu_reserva = parsedPreu;

@@ -32,6 +32,15 @@ function CreateCourtForm({
       label: "Estat",
       value: newCourt.estat === "disponible" ? "Disponible" : "Manteniment",
     },
+    {
+      label: "Preu/persona",
+      value:
+        newCourt.preu_reserva !== undefined &&
+        newCourt.preu_reserva !== null &&
+        newCourt.preu_reserva !== ""
+          ? `${Number(newCourt.preu_reserva).toFixed(2)} €`
+          : "No definit",
+    },
   ];
 
   return (
@@ -142,20 +151,20 @@ function CreateCourtForm({
 
         <div className="court-form__field">
           <label htmlFor="preu_reserva" className="court-form__label">
-            Preu base (€)
+            Preu per persona (€)
           </label>
           <input
             id="preu_reserva"
             type="number"
             min="0"
             step="0.01"
-            placeholder="Ex: 15.00"
+            placeholder="Ex: 6.50"
             value={newCourt.preu_reserva || ""}
             onChange={(e) => updateField("preu_reserva", e.target.value)}
             className="court-form__input"
           />
           <span className="court-form__helper-text">
-            Opcional. Preu per defecte per a la pista.
+            Opcional. Import que pagarà cada jugador per 1 hora.
           </span>
         </div>
 

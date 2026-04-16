@@ -114,6 +114,22 @@ function AvailabilityPage() {
     return Number(coberta) === 1 ? "Indoor" : "Outdoor";
   };
 
+  const getPlayersCount = (tipus) => {
+    return String(tipus || "").trim().toLowerCase() === "individual" ? 2 : 4;
+  };
+
+  const getPerPersonPrice = (slot) => {
+    return Number(slot?.preu_reserva || 0);
+  };
+
+  const getReservationTotalPrice = (slot, duration) => {
+    const perPersonPrice = getPerPersonPrice(slot);
+    const playersCount = getPlayersCount(slot?.tipus);
+    const durationFactor = Number(duration) / 2;
+
+    return perPersonPrice * playersCount * durationFactor;
+  };
+
   const getSlotStatusLabel = (slot, isPastSlot, isValid = true) => {
     if (isPastSlot) return "Hora passada";
     if (slot.disponible && isValid) return "Disponible";
@@ -909,6 +925,10 @@ function AvailabilityPage() {
                     : "Pagament al club"}
                 </strong>
               </div>
+              <div>
+                <span>Total reserva:</span>
+                <strong>{formatPrice(reservationSummary.preu_total)}</strong>
+              </div>
             </div>
 
             <div className="ap-success-actions">
@@ -1127,11 +1147,16 @@ function AvailabilityPage() {
                 )}
               </strong>
 
-              <span className="ap-floating-price">
-                {formatPrice(
-                  Number(selectedSlot.preu_reserva || 0) * (selectedDuration / 2)
-                )}
-              </span>
+              <div className="ap-floating-price-group">
+                <span className="ap-floating-price">
+                  {formatPrice(getPerPersonPrice(selectedSlot))} / persona
+                </span>
+                <span className="ap-floating-total">
+                  Total reserva: {formatPrice(
+                    getReservationTotalPrice(selectedSlot, selectedDuration)
+                  )}
+                </span>
+              </div>
             </div>
 
             <div className="ap-floating-controls">

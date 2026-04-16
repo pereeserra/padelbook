@@ -642,6 +642,32 @@
   gap: 0.35rem;
 }
 
+.ap-floating-price-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  align-items: flex-start;
+}
+
+.ap-floating-price {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 0.42rem 0.72rem;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.ap-floating-total {
+  color: #475569;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
 .ap-floating-court {
   font-size: 0.78rem;
   color: #64748b;
@@ -1108,6 +1134,11 @@
     line-height: 1.45;
   }
 
+  .ap-floating-price-group {
+    width: 100%;
+    align-items: flex-start;
+  }
+
   .ap-floating-price {
     display: inline-flex;
     align-items: center;
@@ -1119,6 +1150,10 @@
     border: 1px solid #bfdbfe;
     font-size: 0.84rem;
     font-weight: 800;
+  }
+
+  .ap-floating-total {
+    font-size: 0.82rem;
   }
 
   .ap-payment-field {
