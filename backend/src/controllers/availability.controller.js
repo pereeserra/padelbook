@@ -20,7 +20,8 @@ exports.getAvailability = async (req, res) => {
       SELECT 
         c.id AS court_id,
         c.nom_pista,
-        c.preu_reserva,
+        c.preu_persona_1h,
+        c.preu_persona_1h30,
         c.tipus,
         c.coberta,
         t.id AS time_slot_id,
@@ -75,7 +76,8 @@ exports.getAvailability = async (req, res) => {
         courtsMap.set(row.court_id, {
           court_id: row.court_id,
           nom_pista: row.nom_pista,
-          preu_reserva: row.preu_reserva,
+          preu_persona_1h: row.preu_persona_1h,
+          preu_persona_1h30: row.preu_persona_1h30,
           tipus: row.tipus,
           coberta: row.coberta,
           total_slots: 0,
@@ -90,7 +92,8 @@ exports.getAvailability = async (req, res) => {
       const slot = {
         court_id: row.court_id,
         nom_pista: row.nom_pista,
-        preu_reserva: row.preu_reserva,
+        preu_persona_1h: row.preu_persona_1h,
+        preu_persona_1h30: row.preu_persona_1h30,
         tipus: row.tipus,
         coberta: row.coberta,
         time_slot_id: row.time_slot_id,
