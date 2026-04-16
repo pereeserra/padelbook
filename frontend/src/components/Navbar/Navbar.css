@@ -390,6 +390,45 @@
   gap: 0.55rem;
 }
 
+.pb-navbar__mobile-account {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.pb-navbar__mobile-account-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.22rem;
+  padding: 1rem;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+}
+
+.pb-navbar__mobile-account-label {
+  color: #2563eb;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.pb-navbar__mobile-account-name {
+  color: #0f172a;
+  font-size: 0.96rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.pb-navbar__mobile-account-email {
+  color: #64748b;
+  font-size: 0.84rem;
+  font-weight: 600;
+  word-break: break-word;
+}
+
 .pb-navbar__mobile-link {
   min-height: 48px;
   padding: 0.9rem 1rem;
@@ -406,6 +445,15 @@
   background: linear-gradient(135deg, #eff6ff, #dbeafe);
   color: #1d4ed8;
   border-color: rgba(191, 219, 254, 0.95);
+}
+
+.pb-navbar__mobile-link--danger {
+  color: #b91c1c;
+}
+
+.pb-navbar__mobile-link--danger:hover {
+  background: rgba(254, 242, 242, 0.95);
+  color: #991b1b;
 }
 
 @media (max-width: 920px) {
