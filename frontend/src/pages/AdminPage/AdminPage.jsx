@@ -17,7 +17,8 @@ function AdminPage() {
     coberta: 0,
     estat: "disponible",
     descripcio: "",
-    preu_reserva: "",
+    preu_persona_1h: "",
+    preu_persona_1h30: "",
   };
 
   const editSectionRef = useRef(null);
@@ -669,7 +670,8 @@ function AdminPage() {
       coberta: Number(court.coberta) || 0,
       estat: court.estat || "disponible",
       descripcio: court.descripcio || "",
-      preu_reserva: court.preu_reserva || "",
+      preu_persona_1h: court.preu_persona_1h || "",
+      preu_persona_1h30: court.preu_persona_1h30 || "",
     });
     setConfirmingCourtId(null);
 

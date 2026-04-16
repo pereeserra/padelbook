@@ -118,16 +118,19 @@ function AvailabilityPage() {
     return String(tipus || "").trim().toLowerCase() === "individual" ? 2 : 4;
   };
 
-  const getPerPersonPrice = (slot) => {
-    return Number(slot?.preu_reserva || 0);
+  const getPerPersonPrice = (slot, duration) => {
+    if (Number(duration) === 3) {
+      return Number(slot?.preu_persona_1h30 || 0);
+    }
+
+    return Number(slot?.preu_persona_1h || 0);
   };
 
   const getReservationTotalPrice = (slot, duration) => {
-    const perPersonPrice = getPerPersonPrice(slot);
+    const perPersonPrice = getPerPersonPrice(slot, duration);
     const playersCount = getPlayersCount(slot?.tipus);
-    const durationFactor = Number(duration) / 2;
 
-    return perPersonPrice * playersCount * durationFactor;
+    return perPersonPrice * playersCount;
   };
 
   const getSlotStatusLabel = (slot, isPastSlot, isValid = true) => {
@@ -1149,7 +1152,7 @@ function AvailabilityPage() {
 
               <div className="ap-floating-price-group">
                 <span className="ap-floating-price">
-                  {formatPrice(getPerPersonPrice(selectedSlot))} / persona
+                  {formatPrice(getPerPersonPrice(selectedSlot, selectedDuration))} / persona
                 </span>
                 <span className="ap-floating-total">
                   Total reserva: {formatPrice(

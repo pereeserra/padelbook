@@ -98,7 +98,7 @@ exports.createReservation = async (req, res) => {
     }
 
     const [courts] = await connection.query(
-      "SELECT id, estat, preu_reserva, nom_pista, tipus FROM courts WHERE id = ? LIMIT 1",
+      "SELECT id, estat, preu_persona_1h, preu_persona_1h30, nom_pista, tipus FROM courts WHERE id = ? LIMIT 1",
       [court_id]
     );
 
@@ -201,10 +201,14 @@ exports.createReservation = async (req, res) => {
       }
     }
 
-    const preuPerPersona = Number(court.preu_reserva || 0);
     const playersCount = court.tipus === "individual" ? 2 : 4;
-    const durationFactor = duration / 2;
-    const preu_total = preuPerPersona * playersCount * durationFactor;
+
+    const preuPerPersona =
+      Number(duration) === RESERVATION_DURATION.ONE_HOUR
+        ? Number(court.preu_persona_1h || 0)
+        : Number(court.preu_persona_1h30 || 0);
+
+    const preu_total = preuPerPersona * playersCount;
 
     const codi_reserva = `PB-${data_reserva.replace(/-/g, "")}-${Date.now()}-${user_id}`;
 

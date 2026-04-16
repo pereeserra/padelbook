@@ -33,12 +33,21 @@ function CreateCourtForm({
       value: newCourt.estat === "disponible" ? "Disponible" : "Manteniment",
     },
     {
-      label: "Preu/persona",
+      label: "Preu/persona 1h",
       value:
-        newCourt.preu_reserva !== undefined &&
-        newCourt.preu_reserva !== null &&
-        newCourt.preu_reserva !== ""
-          ? `${Number(newCourt.preu_reserva).toFixed(2)} €`
+        newCourt.preu_persona_1h !== undefined &&
+        newCourt.preu_persona_1h !== null &&
+        newCourt.preu_persona_1h !== ""
+          ? `${Number(newCourt.preu_persona_1h).toFixed(2)} €`
+          : "No definit",
+    },
+    {
+      label: "Preu/persona 1h30",
+      value:
+        newCourt.preu_persona_1h30 !== undefined &&
+        newCourt.preu_persona_1h30 !== null &&
+        newCourt.preu_persona_1h30 !== ""
+          ? `${Number(newCourt.preu_persona_1h30).toFixed(2)} €`
           : "No definit",
     },
   ];
@@ -150,21 +159,40 @@ function CreateCourtForm({
         </div>
 
         <div className="court-form__field">
-          <label htmlFor="preu_reserva" className="court-form__label">
-            Preu per persona (€)
+          <label htmlFor="preu_persona_1h" className="court-form__label">
+            Preu per persona (1h) (€)
           </label>
           <input
-            id="preu_reserva"
+            id="preu_persona_1h"
             type="number"
             min="0"
             step="0.01"
-            placeholder="Ex: 6.50"
-            value={newCourt.preu_reserva || ""}
-            onChange={(e) => updateField("preu_reserva", e.target.value)}
+            placeholder="Ex: 5.00"
+            value={newCourt.preu_persona_1h || ""}
+            onChange={(e) => updateField("preu_persona_1h", e.target.value)}
             className="court-form__input"
           />
           <span className="court-form__helper-text">
-            Opcional. Import que pagarà cada jugador per 1 hora.
+            Opcional. Import que pagarà cada jugador si la reserva dura 1 hora.
+          </span>
+        </div>
+
+        <div className="court-form__field">
+          <label htmlFor="preu_persona_1h30" className="court-form__label">
+            Preu per persona (1h30) (€)
+          </label>
+          <input
+            id="preu_persona_1h30"
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="Ex: 7.50"
+            value={newCourt.preu_persona_1h30 || ""}
+            onChange={(e) => updateField("preu_persona_1h30", e.target.value)}
+            className="court-form__input"
+          />
+          <span className="court-form__helper-text">
+            Opcional. Import que pagarà cada jugador si la reserva dura 1h30.
           </span>
         </div>
 

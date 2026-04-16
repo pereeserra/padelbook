@@ -66,12 +66,23 @@ function CourtCard({
         </div>
 
         <div className="court-card__meta-item">
-          <span className="court-card__meta-label">Preu/persona</span>
+          <span className="court-card__meta-label">Preu 1h</span>
           <span className="court-card__meta-value">
-            {court.preu_reserva !== undefined &&
-            court.preu_reserva !== null &&
-            court.preu_reserva !== ""
-              ? `${Number(court.preu_reserva).toFixed(2)} €`
+            {court.preu_persona_1h !== undefined &&
+            court.preu_persona_1h !== null &&
+            court.preu_persona_1h !== ""
+              ? `${Number(court.preu_persona_1h).toFixed(2)} €`
+              : "No definit"}
+          </span>
+        </div>
+
+        <div className="court-card__meta-item">
+          <span className="court-card__meta-label">Preu 1h30</span>
+          <span className="court-card__meta-value">
+            {court.preu_persona_1h30 !== undefined &&
+            court.preu_persona_1h30 !== null &&
+            court.preu_persona_1h30 !== ""
+              ? `${Number(court.preu_persona_1h30).toFixed(2)} €`
               : "No definit"}
           </span>
         </div>

@@ -134,21 +134,45 @@ const parseBinaryFlag = (value) => {
 
 // Función para validar los datos de una pista de pádel
 const validateCourtData = (data) => {
-  let { nom_pista, tipus, coberta, estat, descripcio, preu_reserva } = data;
+  let {
+    nom_pista,
+    tipus,
+    coberta,
+    estat,
+    descripcio,
+    preu_persona_1h,
+    preu_persona_1h30,
+  } = data;
 
   nom_pista = normalizeText(nom_pista);
   tipus = normalizeText(tipus).toLowerCase();
   estat = normalizeText(estat).toLowerCase();
   descripcio = normalizeText(descripcio);
   coberta = parseBinaryFlag(coberta);
-  let parsedPreu = 0;
-  if (preu_reserva !== undefined && preu_reserva !== null && preu_reserva !== "") {
-    parsedPreu = Number(preu_reserva);
-    if (Number.isNaN(parsedPreu) || parsedPreu < 0) {
-      return { error: "El preu per persona no és vàlid" };
+
+  let parsedPreu1h = null;
+  let parsedPreu1h30 = null;
+
+  if (preu_persona_1h !== undefined && preu_persona_1h !== null && preu_persona_1h !== "") {
+    parsedPreu1h = Number(preu_persona_1h);
+    if (Number.isNaN(parsedPreu1h) || parsedPreu1h < 0) {
+      return { error: "El preu per persona d'1 hora no és vàlid" };
     }
   }
-  preu_reserva = parsedPreu;
+
+  if (
+    preu_persona_1h30 !== undefined &&
+    preu_persona_1h30 !== null &&
+    preu_persona_1h30 !== ""
+  ) {
+    parsedPreu1h30 = Number(preu_persona_1h30);
+    if (Number.isNaN(parsedPreu1h30) || parsedPreu1h30 < 0) {
+      return { error: "El preu per persona d'1h30 no és vàlid" };
+    }
+  }
+
+  preu_persona_1h = parsedPreu1h;
+  preu_persona_1h30 = parsedPreu1h30;
 
   const allowedCourtStatuses = ["disponible", "manteniment"];
   const allowedCourtTypes = ["dobles", "individual"];
@@ -177,7 +201,18 @@ const validateCourtData = (data) => {
     return { error: `L'estat de la pista no és vàlid. Valors permesos: ${allowedCourtStatuses.join(", ")}` };
   }
 
-  return { error: null, data: { nom_pista, tipus, coberta, estat, descripcio, preu_reserva } };
+  return {
+    error: null,
+    data: {
+      nom_pista,
+      tipus,
+      coberta,
+      estat,
+      descripcio,
+      preu_persona_1h,
+      preu_persona_1h30,
+    },
+  };
 };
 
 // Función para validar los datos del perfil de usuario

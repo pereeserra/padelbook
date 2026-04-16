@@ -260,7 +260,15 @@ exports.createCourt = async (req, res) => {
       return res.status(400).json({ error: validation.error });
     }
 
-    const { nom_pista, tipus, coberta, estat, descripcio, preu_reserva } = validation.data;
+    const {
+      nom_pista,
+      tipus,
+      coberta,
+      estat,
+      descripcio,
+      preu_persona_1h,
+      preu_persona_1h30,
+    } = validation.data;
 
     const [existingName] = await db.query(
       "SELECT id FROM courts WHERE nom_pista = ? LIMIT 1",
@@ -274,9 +282,25 @@ exports.createCourt = async (req, res) => {
     }
 
     const [result] = await db.query(
-      `INSERT INTO courts (nom_pista, tipus, coberta, estat, descripcio, preu_reserva)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [nom_pista, tipus, coberta, estat, descripcio, preu_reserva || null]
+      `INSERT INTO courts (
+        nom_pista,
+        tipus,
+        coberta,
+        estat,
+        descripcio,
+        preu_persona_1h,
+        preu_persona_1h30
+      )
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [
+        nom_pista,
+        tipus,
+        coberta,
+        estat,
+        descripcio,
+        preu_persona_1h,
+        preu_persona_1h30,
+      ]
     );
 
     await db.query(
@@ -322,7 +346,15 @@ exports.updateCourt = async (req, res) => {
       return res.status(400).json({ error: validation.error });
     }
 
-    const { nom_pista, tipus, coberta, estat, descripcio, preu_reserva } = validation.data;
+    const {
+      nom_pista,
+      tipus,
+      coberta,
+      estat,
+      descripcio,
+      preu_persona_1h,
+      preu_persona_1h30,
+    } = validation.data;
 
     const [existingCourt] = await db.query(
       "SELECT * FROM courts WHERE id = ?",
@@ -348,9 +380,18 @@ exports.updateCourt = async (req, res) => {
 
     await db.query(
       `UPDATE courts
-       SET nom_pista = ?, tipus = ?, coberta = ?, estat = ?, descripcio = ?, preu_reserva = ?
+       SET nom_pista = ?, tipus = ?, coberta = ?, estat = ?, descripcio = ?, preu_persona_1h = ?, preu_persona_1h30 = ?
        WHERE id = ?`,
-      [nom_pista, tipus, coberta, estat, descripcio, preu_reserva || null, courtId]
+      [
+        nom_pista,
+        tipus,
+        coberta,
+        estat,
+        descripcio,
+        preu_persona_1h,
+        preu_persona_1h30,
+        courtId,
+      ]
     );
 
     await db.query(
