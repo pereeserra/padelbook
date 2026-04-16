@@ -14,7 +14,7 @@ function AdminPage() {
   const emptyCourt = {
     nom_pista: "",
     tipus: "dobles",
-    coberta: 0,
+    coberta: 1,
     estat: "disponible",
     descripcio: "",
     preu_persona_1h: "",

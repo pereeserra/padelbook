@@ -132,8 +132,8 @@ function CreateCourtForm({
             onChange={(e) => updateField("coberta", e.target.value)}
             className="court-form__input"
           >
-            <option value={0}>Outdoor</option>
             <option value={1}>Indoor</option>
+            <option value={0}>Outdoor</option>
           </select>
           <span className="court-form__helper-text">
             Indica si està protegida o a l'aire lliure.
