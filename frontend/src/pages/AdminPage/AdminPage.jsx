@@ -1224,51 +1224,51 @@ function AdminPage() {
               </p>
 
               <div
-                className={`admin__hero-actions ${
-                  isMobileView ? "admin__hero-actions--mobile" : ""
+                className={`admin__hero-tabs ${
+                  isMobileView ? "admin__hero-tabs--mobile" : ""
                 }`}
               >
                 <button
                   type="button"
-                  className={`btn ${
-                    activeTab === "dashboard" ? "btn-primary" : "btn-light"
+                  className={`admin__hero-tab ${
+                    activeTab === "dashboard" ? "is-active" : ""
                   }`}
                   onClick={() => setActiveTab("dashboard")}
                 >
-                  Dashboard
+                  <span className="admin__hero-tab-label">Dashboard</span>
                 </button>
 
                 <button
                   type="button"
-                  className={`btn ${
-                    activeTab === "courts" ? "btn-primary" : "btn-light"
+                  className={`admin__hero-tab ${
+                    activeTab === "courts" ? "is-active" : ""
                   }`}
                   onClick={() => {
                     setActiveTab("courts");
                     setEditingCourtId(null);
                   }}
                 >
-                  Gestió de pistes
+                  <span className="admin__hero-tab-label">Gestió de pistes</span>
                 </button>
 
                 <button
                   type="button"
-                  className={`btn ${
-                    activeTab === "reservations" ? "btn-primary" : "btn-light"
+                  className={`admin__hero-tab ${
+                    activeTab === "reservations" ? "is-active" : ""
                   }`}
                   onClick={() => setActiveTab("reservations")}
                 >
-                  Reserves
+                  <span className="admin__hero-tab-label">Reserves</span>
                 </button>
 
                 <button
                   type="button"
-                  className={`btn ${
-                    activeTab === "users" ? "btn-primary" : "btn-light"
+                  className={`admin__hero-tab ${
+                    activeTab === "users" ? "is-active" : ""
                   }`}
                   onClick={() => setActiveTab("users")}
                 >
-                  Usuaris
+                  <span className="admin__hero-tab-label">Usuaris</span>
                 </button>
               </div>
             </div>
