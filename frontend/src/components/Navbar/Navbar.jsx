@@ -159,23 +159,23 @@ function Navbar() {
   const isActive = (path) => location.pathname === path;
 
   // Funcions auxiliars per obtenir el nom d'usuari i les inicials per l'avatar
-  const getDisplayName = (fullName) => {
-    if (!fullName) return "Usuari";
-    return fullName.split(" ")[0];
+  const getDisplayName = (nom) => {
+    if (!nom) return "Usuari";
+    return nom.trim().split(" ")[0];
   };
 
-  // Funció per obtenir les inicials d'un nom complet (fins a 2 lletres)
-  const getInitials = (fullName) => {
-    if (!fullName) return "U";
+  // Funció per obtenir les inicials a partir de nom + llinatges
+  const getInitials = (nom, llinatges) => {
+    const cleanNom = typeof nom === "string" ? nom.trim() : "";
+    const cleanLlinatges = typeof llinatges === "string" ? llinatges.trim() : "";
 
-    const parts = fullName.trim().split(" ").filter(Boolean);
+    const firstInitial = cleanNom ? cleanNom[0].toUpperCase() : "U";
+    const secondInitial = cleanLlinatges ? cleanLlinatges[0].toUpperCase() : "";
 
-    if (parts.length === 1) {
-      return parts[0].slice(0, 1).toUpperCase();
-    }
-
-    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    return `${firstInitial}${secondInitial}` || "U";
   };
+
+  const fullUserName = [user?.nom, user?.llinatges].filter(Boolean).join(" ").trim();
 
   // Obtenir el nom d'usuari per mostrar al menú d'usuari i les inicials per l'avatar
   const userName = getDisplayName(user?.nom);
@@ -242,7 +242,9 @@ function Navbar() {
                 aria-haspopup="menu"
                 aria-expanded={isUserMenuOpen}
               >
-                <span className="pb-navbar__avatar">{getInitials(user?.nom)}</span>
+                <span className="pb-navbar__avatar">
+                  {getInitials(user?.nom, user?.llinatges)}
+                </span>
 
                 {!isMobileView && (
                   <span className="pb-navbar__user-meta">
@@ -273,7 +275,9 @@ function Navbar() {
               {isUserMenuOpen && (
                 <div className="pb-navbar__dropdown" role="menu">
                   <div className="pb-navbar__dropdown-head">
-                    <span className="pb-navbar__dropdown-name">{user?.nom || "Usuari"}</span>
+                    <span className="pb-navbar__dropdown-name">
+                      {fullUserName || "Usuari"}
+                    </span>
                     <span className="pb-navbar__dropdown-role">{userRoleLabel}</span>
                     {userEmail && (
                       <span className="pb-navbar__dropdown-email">{userEmail}</span>

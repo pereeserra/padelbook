@@ -269,13 +269,16 @@ exports.updateMe = async (req, res) => {
     }
 
     const [currentUsers] = await db.query(
-      "SELECT id FROM users WHERE id = ? LIMIT 1",
+      "SELECT id, nom, email, email_verificat FROM users WHERE id = ? LIMIT 1",
       [userId]
     );
 
     if (currentUsers.length === 0) {
       return fail(res, "Usuari no trobat.", 404);
     }
+
+    const currentUser = currentUsers[0];
+    const emailChanged = currentUser.email !== email;
 
     const [existingUsers] = await db.query(
       "SELECT id FROM users WHERE email = ? AND id <> ? LIMIT 1",
@@ -291,16 +294,32 @@ exports.updateMe = async (req, res) => {
     }
 
     await db.query(
-      "UPDATE users SET nom = ?, llinatges = ?, email = ? WHERE id = ?",
-      [nom, llinatges, email, userId]
+      "UPDATE users SET nom = ?, llinatges = ?, email = ?, email_verificat = ? WHERE id = ?",
+      [nom, llinatges, email, emailChanged ? 0 : currentUser.email_verificat, userId]
     );
+
+    if (emailChanged) {
+      await createAndSendVerificationEmail({
+        userId,
+        nom,
+        email,
+        subject: "Verifica el teu nou correu - PadelBook",
+      });
+    }
 
     const [updatedRows] = await db.query(
       "SELECT id, nom, llinatges, email, rol, telefon, email_verificat, created_at FROM users WHERE id = ? LIMIT 1",
       [userId]
     );
 
-    return message(res, "Perfil actualitzat correctament", 200, updatedRows[0]);
+    return message(
+      res,
+      emailChanged
+        ? "Perfil actualitzat correctament. Hem enviat un correu de verificació a la nova adreça."
+        : "Perfil actualitzat correctament",
+      200,
+      updatedRows[0]
+    );
 
   } catch (error) {
     console.error("Error updateMe:", error);

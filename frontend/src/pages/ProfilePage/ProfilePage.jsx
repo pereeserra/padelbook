@@ -418,7 +418,12 @@ function ProfilePage() {
       localStorage.setItem("user", JSON.stringify(updatedUser));
       window.dispatchEvent(new Event("profile-updated"));
 
-      showFeedbackMessage("Perfil actualitzat correctament.", "success");
+      showFeedbackMessage(
+        updatedUser.email_verificat === 1
+          ? "Perfil actualitzat correctament."
+          : "Perfil actualitzat correctament. Revisa el teu correu per verificar la nova adreça electrònica.",
+        "success"
+      );
     } catch (err) {
       console.error(err);
 
