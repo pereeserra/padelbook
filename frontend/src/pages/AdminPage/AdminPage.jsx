@@ -1230,45 +1230,94 @@ function AdminPage() {
               >
                 <button
                   type="button"
-                  className={`btn ${
-                    activeTab === "dashboard" ? "btn-primary" : "btn-light"
+                  className={`admin__hero-tab ${
+                    activeTab === "dashboard" ? "is-active" : ""
                   }`}
                   onClick={() => setActiveTab("dashboard")}
                 >
-                  Dashboard
+                  <span className="admin__hero-tab-label">Dashboard</span>
+                  <span className="admin__hero-tab-count">{dashboardCards.length}</span>
                 </button>
 
                 <button
                   type="button"
-                  className={`btn ${
-                    activeTab === "courts" ? "btn-primary" : "btn-light"
+                  className={`admin__hero-tab ${
+                    activeTab === "courts" ? "is-active" : ""
                   }`}
                   onClick={() => {
                     setActiveTab("courts");
                     setEditingCourtId(null);
                   }}
                 >
-                  Gestió de pistes
+                  <span className="admin__hero-tab-label">Pistes i manteniments</span>
+                  <span className="admin__hero-tab-count">
+                    {courts.length + maintenanceBlocks.length}
+                  </span>
                 </button>
 
                 <button
                   type="button"
-                  className={`btn ${
-                    activeTab === "reservations" ? "btn-primary" : "btn-light"
+                  className={`admin__hero-tab ${
+                    activeTab === "reservations" ? "is-active" : ""
                   }`}
                   onClick={() => setActiveTab("reservations")}
                 >
-                  Reserves
+                  <span className="admin__hero-tab-label">Reserves</span>
+                  <span className="admin__hero-tab-count">{reservations.length}</span>
                 </button>
 
                 <button
                   type="button"
-                  className={`btn ${
-                    activeTab === "users" ? "btn-primary" : "btn-light"
+                  className={`admin__hero-tab ${
+                    activeTab === "users" ? "is-active" : ""
                   }`}
                   onClick={() => setActiveTab("users")}
                 >
-                  Usuaris
+                  <span className="admin__hero-tab-label">Usuaris</span>
+                  <span className="admin__hero-tab-count">{users.length}</span>
+                </button>
+              </div>
+
+              <div
+                className={`admin__hero-shortcuts ${
+                  isMobileView ? "admin__hero-shortcuts--mobile" : ""
+                }`}
+              >
+                <button
+                  type="button"
+                  className="btn btn-light admin__hero-shortcut"
+                  onClick={() => {
+                    setActiveTab("courts");
+                    setEditingCourtId(null);
+                    setTimeout(() => {
+                      scrollToElementWithOffset(editSectionRef.current, 90);
+                    }, 80);
+                  }}
+                >
+                  Crear pista ràpidament
+                </button>
+
+                <button
+                  type="button"
+                  className="btn btn-light admin__hero-shortcut"
+                  onClick={() => {
+                    setActiveTab("courts");
+                    setTimeout(() => {
+                      scrollToElementWithOffset(courtsSectionRef.current, 90);
+                    }, 80);
+                  }}
+                >
+                  Veure pistes i manteniments
+                </button>
+
+                <button
+                  type="button"
+                  className="btn btn-light admin__hero-shortcut"
+                  onClick={() => {
+                    setActiveTab("users");
+                  }}
+                >
+                  Revisar usuaris
                 </button>
               </div>
             </div>
@@ -1320,6 +1369,15 @@ function AdminPage() {
                     </span>
                     <span className="admin__hero-panel-card-value">
                       {users.length}
+                    </span>
+                  </div>
+
+                  <div className="admin__hero-panel-card">
+                    <span className="admin__hero-panel-card-label">
+                      Manteniments
+                    </span>
+                    <span className="admin__hero-panel-card-value">
+                      {maintenanceBlocks.length}
                     </span>
                   </div>
                 </div>
@@ -2275,11 +2333,11 @@ function AdminPage() {
                           isMobileView ? "admin__section-title--mobile" : ""
                         }`}
                       >
-                        Pistes
+                        Pistes i manteniments
                       </h2>
                       <p className="pb-panel-text">
-                        Cerca, filtra i gestiona les pistes existents amb més
-                        rapidesa.
+                        Gestiona les pistes existents, revisa el seu estat i controla
+                        també els bloquejos de manteniment des d’un mateix bloc operatiu.
                       </p>
                     </div>
 
@@ -2387,10 +2445,19 @@ function AdminPage() {
 
                       <div className="admin__court-quick-stat">
                         <span className="admin__court-quick-stat-label">
-                          Manteniment
+                          En manteniment
                         </span>
                         <span className="admin__court-quick-stat-value">
                           {filteredMaintenanceCourtsCount}
+                        </span>
+                      </div>
+
+                      <div className="admin__court-quick-stat">
+                        <span className="admin__court-quick-stat-label">
+                          Bloquejos
+                        </span>
+                        <span className="admin__court-quick-stat-value">
+                          {filteredMaintenanceBlocks.length}
                         </span>
                       </div>
                     </div>
