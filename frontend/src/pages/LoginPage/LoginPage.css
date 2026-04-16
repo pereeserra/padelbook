@@ -252,6 +252,38 @@
   min-height: 46px;
 }
 
+.login__show-button:focus-visible,
+.login__submit-button:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.22);
+  outline-offset: 2px;
+}
+
+.login__show-button:hover {
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+
+.login__submit-button {
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    opacity 0.18s ease,
+    filter 0.18s ease;
+}
+
+.login__submit-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.login__submit-button--loading,
+.login__submit-button--disabled,
+.login__submit-button:disabled {
+  transform: none;
+  opacity: 0.82;
+  filter: saturate(0.92);
+  cursor: not-allowed;
+}
+
 .login__caps-warning {
   color: #b91c1c;
   font-size: 0.85rem;

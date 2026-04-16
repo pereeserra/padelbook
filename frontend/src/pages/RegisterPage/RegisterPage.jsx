@@ -566,8 +566,11 @@ function RegisterPage() {
 
             <button
               type="submit"
-              className="btn btn-primary btn-full"
+              className={`btn btn-primary btn-full register__submit-button ${
+                loading || !turnstileToken ? "register__submit-button--disabled" : ""
+              } ${loading ? "register__submit-button--loading" : ""}`}
               disabled={loading || !turnstileToken}
+              aria-busy={loading}
             >
               {loading ? "Creant compte..." : "Crear compte"}
             </button>

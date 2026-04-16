@@ -1145,6 +1145,7 @@ function AvailabilityPage() {
                       selectedDuration === 2 ? "is-active" : ""
                     }`}
                     onClick={() => setSelectedDuration(2)}
+                    disabled={reserving}
                   >
                     1h
                   </button>
@@ -1155,6 +1156,7 @@ function AvailabilityPage() {
                       selectedDuration === 3 ? "is-active" : ""
                     }`}
                     onClick={() => setSelectedDuration(3)}
+                    disabled={reserving}
                   >
                     1h30
                   </button>
@@ -1171,6 +1173,7 @@ function AvailabilityPage() {
                       paymentMethod === "online_simulat" ? "is-active" : ""
                     }`}
                     onClick={() => setPaymentMethod("online_simulat")}
+                    disabled={reserving}
                   >
                     Pagament online
                   </button>
@@ -1181,6 +1184,7 @@ function AvailabilityPage() {
                       paymentMethod === "al_club" ? "is-active" : ""
                     }`}
                     onClick={() => setPaymentMethod("al_club")}
+                    disabled={reserving}
                   >
                     Pagament al club
                   </button>
@@ -1190,7 +1194,10 @@ function AvailabilityPage() {
               <button
                 onClick={handleReserve}
                 disabled={reserving}
-                className="btn btn-primary ap-reserve-btn"
+                className={`btn btn-primary ap-reserve-btn ${
+                  reserving ? "ap-reserve-btn--loading" : ""
+                }`}
+                aria-busy={reserving}
               >
                 {reserving ? "Reservant..." : "Confirmar Reserva"}
               </button>

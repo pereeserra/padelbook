@@ -332,6 +332,11 @@
   transform: translateY(-1px);
 }
 
+.my-res__segmented-btn:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.18);
+  outline-offset: 2px;
+}
+
 .my-res__segmented-btn.is-active {
   background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: white;

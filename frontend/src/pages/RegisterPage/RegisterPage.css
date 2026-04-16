@@ -253,6 +253,38 @@
   min-height: 46px;
 }
 
+.register__show-button:focus-visible,
+.register__submit-button:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.22);
+  outline-offset: 2px;
+}
+
+.register__show-button:hover {
+  border-color: #86efac;
+  color: #047857;
+}
+
+.register__submit-button {
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    opacity 0.18s ease,
+    filter 0.18s ease;
+}
+
+.register__submit-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.register__submit-button--loading,
+.register__submit-button--disabled,
+.register__submit-button:disabled {
+  transform: none;
+  opacity: 0.82;
+  filter: saturate(0.92);
+  cursor: not-allowed;
+}
+
 .register__caps-warning {
   color: #b91c1c;
   font-size: 0.85rem;

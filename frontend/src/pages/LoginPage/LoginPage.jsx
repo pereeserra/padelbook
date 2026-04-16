@@ -526,8 +526,11 @@ function LoginPage() {
 
             <button
               type="submit"
-              className="btn btn-primary btn-full"
+              className={`btn btn-primary btn-full login__submit-button ${
+                loading || !turnstileToken ? "login__submit-button--disabled" : ""
+              } ${loading ? "login__submit-button--loading" : ""}`}
               disabled={loading || !turnstileToken}
+              aria-busy={loading}
             >
               {loading ? "Iniciant sessió..." : "Entrar a PadelBook"}
             </button>
