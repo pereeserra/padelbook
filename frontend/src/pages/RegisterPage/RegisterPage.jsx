@@ -347,6 +347,12 @@ function RegisterPage() {
 
           <div ref={feedbackRef} />
 
+          {error && (
+            <div className="scale-in register__error-box">
+              <p className="register__error-text">{error}</p>
+            </div>
+          )}
+
           {success && (
             <div className="scale-in register__error-box" style={{ background: "#f0fdf4", border: "1px solid #bbf7d0" }}>
               <p className="register__error-text" style={{ color: "#166534" }}>
@@ -367,7 +373,11 @@ function RegisterPage() {
                   type="text"
                   placeholder="Ex: Pere"
                   value={nom}
-                  onChange={(e) => setNom(e.target.value)}
+                  onChange={(e) => {
+                    setNom(e.target.value);
+                    setError("");
+                    setSuccess("");
+                  }}
                   className="register__input"
                   required
                 />
@@ -383,7 +393,11 @@ function RegisterPage() {
                   type="text"
                   placeholder="Ex: Serra Tugores"
                   value={llinatges}
-                  onChange={(e) => setLlinatges(e.target.value)}
+                  onChange={(e) => {
+                    setLlinatges(e.target.value);
+                    setError("");
+                    setSuccess("");
+                  }}
                   className="register__input"
                   required
                 />
@@ -400,7 +414,11 @@ function RegisterPage() {
                 type="email"
                 placeholder="exemple@correu.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setError("");
+                  setSuccess("");
+                }}
                 className="register__input"
                 required
               />
@@ -421,7 +439,11 @@ function RegisterPage() {
                   type={showPassword ? "text" : "password"}
                   placeholder="Mínim 8 caràcters"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setError("");
+                    setSuccess("");
+                  }}
                   onKeyUp={handleCapsLock}
                   onKeyDown={handleCapsLock}
                   className="register__input"
@@ -456,7 +478,11 @@ function RegisterPage() {
                 type={showPassword ? "text" : "password"}
                 placeholder="Repeteix la contrasenya"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                  setError("");
+                  setSuccess("");
+                }}
                 className="register__input"
                 required
               />

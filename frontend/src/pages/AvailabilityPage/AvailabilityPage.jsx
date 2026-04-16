@@ -843,7 +843,7 @@ function AvailabilityPage() {
               <Link to="/login" className="btn btn-primary btn-sm">
                 Iniciar sessió
               </Link>
-              <Link to="/register" className="btn btn-outline-primary btn-sm">
+              <Link to="/register" className="btn btn-light btn-sm">
                 Crear compte
               </Link>
             </div>
@@ -860,7 +860,7 @@ function AvailabilityPage() {
               <Link to="/my-account" className="btn btn-primary btn-sm">
                 Anar al meu perfil
               </Link>
-              <Link to="/login" className="btn btn-outline-primary btn-sm">
+              <Link to="/login" className="btn btn-light btn-sm">
                 Tornar a login
               </Link>
             </div>

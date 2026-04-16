@@ -454,6 +454,8 @@ function LoginPage() {
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
+                  setError("");
+                  setSuccess("");
                   setShowVerificationHelp(false);
                   setVerificationInfo("");
                 }}
@@ -478,7 +480,11 @@ function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   placeholder="Introdueix la teva contrasenya"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setError("");
+                    setSuccess("");
+                  }}
                   onKeyDown={handleCapsLock}
                   onKeyUp={handleCapsLock}
                   className="login__input"
