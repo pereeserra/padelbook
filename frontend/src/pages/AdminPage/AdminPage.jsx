@@ -265,7 +265,7 @@ function AdminPage() {
     label:
       item?.label ??
       (item?.hora_inici && item?.hora_fi
-        ? `${item.hora_inici} - ${item.hora_fi}`
+        ? `${formatTimeOnly(item.hora_inici)} - ${formatTimeOnly(item.hora_fi)}`
         : item?.hora ??
           item?.time_slot ??
           item?.slot ??
@@ -1089,12 +1089,25 @@ function AdminPage() {
   const formatDateOnly = (value) => {
     if (!value) return "Data no disponible";
 
-    const parsed = new Date(`${value}T00:00:00`);
-    if (Number.isNaN(parsed.getTime())) return value;
+    const rawValue = String(value).trim();
+
+    const parsed = rawValue.includes("T")
+      ? new Date(rawValue)
+      : new Date(`${rawValue}T00:00:00`);
+
+    if (Number.isNaN(parsed.getTime())) return rawValue;
 
     return parsed.toLocaleDateString("ca-ES", {
-      dateStyle: "medium",
+      day: "numeric",
+      month: "short",
+      year: "numeric",
     });
+  };
+
+  const formatTimeOnly = (value) => {
+    if (!value) return "";
+
+    return String(value).slice(0, 5);
   };
 
   // Funció per formatar les accions del registre d'activitat recent de manera més amigable i llegible al dashboard, amb suport per diferents formats d'entrada i gestió de valors no reconeguts
