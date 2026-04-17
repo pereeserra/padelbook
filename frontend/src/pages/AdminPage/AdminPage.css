@@ -745,7 +745,7 @@
 
 @media (max-width: 1380px) {
   .admin__logs-filters-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(170px, 0.82fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .admin__logs-filters-grid .admin__court-filter-field:first-child {
@@ -758,7 +758,7 @@
 
   .admin__logs-filters-grid .admin__court-filter-actions {
     grid-column: 1 / -1;
-    justify-self: start;
+    justify-self: end;
   }
 }
 
@@ -797,7 +797,7 @@
 
   .admin__logs-filters-grid .admin__court-filter-actions {
     grid-column: 1 / -1;
-    justify-self: start;
+    justify-self: end;
   }
 
   .admin__hero-tabs {
@@ -1423,7 +1423,7 @@
 
 .admin__logs-filters-grid {
   display: grid;
-  grid-template-columns: minmax(340px, 1.45fr) minmax(160px, 0.78fr) minmax(160px, 0.78fr);
+  grid-template-columns: minmax(320px, 1.45fr) minmax(150px, 0.78fr) minmax(150px, 0.78fr) auto;
   gap: 0.85rem;
   align-items: end;
   margin-bottom: 1rem;
@@ -1455,7 +1455,7 @@
 .admin__logs-filters-grid .admin__court-filter-actions {
   align-self: end;
   min-width: 0;
-  grid-column: 3 / 4;
+  grid-column: 4 / 5;
   justify-self: end;
 }
 
