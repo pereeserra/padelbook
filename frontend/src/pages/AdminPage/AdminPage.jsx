@@ -1579,7 +1579,13 @@ function AdminPage() {
                       isMobileView ? "admin__analytics-grid--mobile" : ""
                     }`}
                   >
-                    <div className="pb-surface-card admin__section-card">
+                    <div
+                      className={`pb-surface-card admin__section-card ${
+                        activeCourtStats.length <= 2
+                          ? "admin__section-card--compact-metrics"
+                          : ""
+                      }`}
+                    >
                       <div
                         className={`admin__analytics-header ${
                           isMobileView ? "admin__analytics-header--mobile" : ""
@@ -1598,13 +1604,26 @@ function AdminPage() {
 
                       {activeCourtStats.length > 0 ? (
                         <>
-                          <div className="admin__metric-list">
+                          <div
+                            className={`admin__metric-list ${
+                              activeCourtStats.length <= 2
+                                ? "admin__metric-list--compact-courts"
+                                : ""
+                            }`}
+                          >
                             {visibleCourtStats.map((item) => {
                               const width =
                                 topCourtValue > 0 ? `${(item.value / topCourtValue) * 100}%` : "0%";
 
                               return (
-                                <div key={item.id} className="admin__metric-item">
+                                <div
+                                  key={item.id}
+                                  className={`admin__metric-item ${
+                                    activeCourtStats.length <= 2
+                                      ? "admin__metric-item--compact-court"
+                                      : ""
+                                  }`}
+                                >
                                   <div
                                     className={`admin__metric-top-row ${
                                       isMobileView ? "admin__metric-top-row--mobile" : ""
@@ -1621,6 +1640,14 @@ function AdminPage() {
                               );
                             })}
                           </div>
+
+                          {activeCourtStats.length <= 2 && (
+                            <p className="admin__compact-support-text">
+                              {activeCourtStats.length === 1
+                                ? "Només una pista registra activitat en el període actual."
+                                : "Només dues pistes registren activitat en el període actual."}
+                            </p>
+                          )}
 
                           {activeCourtStats.length > 5 && (
                             <div className="admin__metrics-toggle">

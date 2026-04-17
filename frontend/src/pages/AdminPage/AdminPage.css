@@ -419,6 +419,10 @@
   gap: 0.75rem;
 }
 
+.admin__metric-list--compact-courts {
+  gap: 0.65rem;
+}
+
 .admin__metric-item {
   display: flex;
   flex-direction: column;
@@ -432,6 +436,10 @@
     background-color 0.2s ease,
     border-color 0.2s ease,
     box-shadow 0.2s ease;
+}
+
+.admin__metric-item--compact-court {
+  padding: 0.72rem 0.85rem;
 }
 
 .admin__metric-item:hover {
@@ -499,6 +507,18 @@
   margin: 0;
   color: #64748b;
   line-height: 1.65;
+}
+
+.admin__section-card--compact-metrics {
+  align-self: start;
+}
+
+.admin__compact-support-text {
+  margin: 0.2rem 0 0 0;
+  color: #64748b;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  font-weight: 600;
 }
 
 .admin__logs-list {
