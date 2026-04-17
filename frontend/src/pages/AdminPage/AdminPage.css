@@ -743,13 +743,17 @@
   line-height: 1.65;
 }
 
-@media (max-width: 1180px) {
+@media (max-width: 1380px) {
   .admin__logs-filters-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(160px, 0.75fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .admin__logs-filters-grid .admin__court-filter-field:first-child {
+    grid-column: 1 / -1;
   }
 
   .admin__logs-filters-grid .admin__court-filter-actions {
-    grid-column: 1 / -1;
+    grid-column: auto;
   }
 }
 
@@ -1428,6 +1432,10 @@
 .admin__logs-filters-grid .pb-select {
   width: 100%;
   min-width: 0;
+}
+
+.admin__logs-filters-grid .pb-input {
+  text-overflow: ellipsis;
 }
 
 .admin__logs-filters-grid .admin__court-filter-actions {
