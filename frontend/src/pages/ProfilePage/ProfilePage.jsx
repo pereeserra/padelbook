@@ -579,7 +579,7 @@ function ProfilePage() {
               >
                 <button
                   type="button"
-                  className="profile__hero-btn profile__hero-btn--primary"
+                  className="profile__hero-btn profile__hero-btn--secondary"
                   onClick={() => scrollToElementWithOffset(profileFormRef.current, 110)}
                 >
                   Editar perfil

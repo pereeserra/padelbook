@@ -125,10 +125,12 @@
 
 .profile__hero-aside {
   display: flex;
+  align-items: flex-start;
 }
 
 .profile__hero-aside-card {
   width: 100%;
+  height: fit-content;
   border-radius: 24px;
   padding: 1rem;
   background: rgba(255, 255, 255, 0.11);
