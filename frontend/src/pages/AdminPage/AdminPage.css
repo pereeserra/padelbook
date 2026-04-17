@@ -423,6 +423,10 @@
   gap: 0.65rem;
 }
 
+.admin__metric-list--compact-dates {
+  gap: 0.65rem;
+}
+
 .admin__metric-item {
   display: flex;
   flex-direction: column;
@@ -439,6 +443,10 @@
 }
 
 .admin__metric-item--compact-court {
+  padding: 0.72rem 0.85rem;
+}
+
+.admin__metric-item--compact-date {
   padding: 0.72rem 0.85rem;
 }
 
