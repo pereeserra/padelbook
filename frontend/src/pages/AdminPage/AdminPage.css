@@ -743,6 +743,16 @@
   line-height: 1.65;
 }
 
+@media (max-width: 1180px) {
+  .admin__logs-filters-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(160px, 0.75fr);
+  }
+
+  .admin__logs-filters-grid .admin__court-filter-actions {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (max-width: 1024px) {
   .admin__hero-grid,
   .admin__dashboard-stats-grid {
@@ -1395,8 +1405,8 @@
 
 .admin__logs-filters-grid {
   display: grid;
-  grid-template-columns: minmax(260px, 1.35fr) minmax(210px, 0.8fr) minmax(210px, 0.8fr) auto;
-  gap: 1rem;
+  grid-template-columns: minmax(0, 1.35fr) minmax(170px, 0.8fr) minmax(170px, 0.8fr) auto;
+  gap: 0.85rem;
   align-items: end;
   margin-bottom: 1rem;
 }
@@ -1411,14 +1421,18 @@
 
 .admin__logs-filters-grid .admin__court-filter-field {
   min-width: 0;
+  width: 100%;
 }
 
-.admin__logs-filters-grid .pb-input {
+.admin__logs-filters-grid .pb-input,
+.admin__logs-filters-grid .pb-select {
   width: 100%;
+  min-width: 0;
 }
 
 .admin__logs-filters-grid .admin__court-filter-actions {
   align-self: end;
+  min-width: 0;
 }
 
 .admin__logs-filters-grid .admin__court-filter-actions .btn {
