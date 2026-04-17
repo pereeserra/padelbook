@@ -745,15 +745,20 @@
 
 @media (max-width: 1380px) {
   .admin__logs-filters-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr) minmax(170px, 0.82fr);
   }
 
   .admin__logs-filters-grid .admin__court-filter-field:first-child {
     grid-column: 1 / -1;
   }
 
+  .admin__logs-filters-grid .admin__court-filter-field:first-child .pb-input {
+    min-width: 100%;
+  }
+
   .admin__logs-filters-grid .admin__court-filter-actions {
-    grid-column: auto;
+    grid-column: 1 / -1;
+    justify-self: start;
   }
 }
 
@@ -784,6 +789,15 @@
 
   .admin__logs-filters-grid {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .admin__logs-filters-grid .admin__court-filter-field:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .admin__logs-filters-grid .admin__court-filter-actions {
+    grid-column: 1 / -1;
+    justify-self: start;
   }
 
   .admin__hero-tabs {
@@ -1409,7 +1423,7 @@
 
 .admin__logs-filters-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(170px, 0.8fr) minmax(170px, 0.8fr) auto;
+  grid-template-columns: minmax(340px, 1.45fr) minmax(160px, 0.78fr) minmax(160px, 0.78fr);
   gap: 0.85rem;
   align-items: end;
   margin-bottom: 1rem;
@@ -1441,6 +1455,8 @@
 .admin__logs-filters-grid .admin__court-filter-actions {
   align-self: end;
   min-width: 0;
+  grid-column: 3 / 4;
+  justify-self: end;
 }
 
 .admin__logs-filters-grid .admin__court-filter-actions .btn {

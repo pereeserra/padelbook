@@ -1872,7 +1872,7 @@ function AdminPage() {
                             type="text"
                             value={logSearch}
                             onChange={(e) => setLogSearch(e.target.value)}
-                            placeholder="Acció, admin, detall o entitat..."
+                            placeholder="Acció, admin o detall..."
                             className="pb-input"
                           />
                         </div>
