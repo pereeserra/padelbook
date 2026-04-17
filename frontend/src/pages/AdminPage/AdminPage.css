@@ -1423,8 +1423,8 @@
 
 .admin__logs-filters-grid {
   display: grid;
-  grid-template-columns: minmax(320px, 1.45fr) minmax(150px, 0.78fr) minmax(150px, 0.78fr) auto;
-  gap: 0.85rem;
+  grid-template-columns: 230px 120px 120px auto;
+  gap: 0.75rem;
   align-items: end;
   margin-bottom: 1rem;
 }
