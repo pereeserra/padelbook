@@ -241,13 +241,17 @@ function AdminPage() {
       `Pista ${index + 1}`,
     value:
       Number(
-        item?.total ??
+        item?.totalReservations ??
+          item?.activeReservations ??
+          item?.total ??
           item?.count ??
           item?.reservations ??
           item?.total_reserves ??
           item?.value ??
           0
       ) || 0,
+    activeReservations: Number(item?.activeReservations ?? 0) || 0,
+    cancelledReservations: Number(item?.cancelledReservations ?? 0) || 0,
   });
 
   // Normalització de les estadístiques per franja horària, amb suport per diferents formats de resposta
@@ -259,37 +263,57 @@ function AdminPage() {
       item?.franja_id ??
       `slot-${index}`,
     label:
-      item?.hora ??
-      item?.time_slot ??
-      item?.slot ??
-      item?.franja ??
       item?.label ??
-      `Franja ${index + 1}`,
+      (item?.hora_inici && item?.hora_fi
+        ? `${item.hora_inici} - ${item.hora_fi}`
+        : item?.hora ??
+          item?.time_slot ??
+          item?.slot ??
+          item?.franja ??
+          `Franja ${index + 1}`),
     value:
       Number(
-        item?.total ??
+        item?.totalReservations ??
+          item?.activeReservations ??
+          item?.total ??
           item?.count ??
           item?.reservations ??
           item?.total_reserves ??
           item?.value ??
           0
       ) || 0,
+    activeReservations: Number(item?.activeReservations ?? 0) || 0,
+    cancelledReservations: Number(item?.cancelledReservations ?? 0) || 0,
   });
 
   // Normalització de les estadístiques per data, amb suport per diferents formats de resposta
-  const normalizeDateStat = (item, index) => ({
-    id: item?.id ?? item?.date ?? item?.data ?? `date-${index}`,
-    label: item?.data ?? item?.date ?? item?.label ?? `Data ${index + 1}`,
-    value:
-      Number(
-        item?.total ??
-          item?.count ??
-          item?.reservations ??
-          item?.total_reserves ??
-          item?.value ??
-          0
-      ) || 0,
-  });
+  const normalizeDateStat = (item, index) => {
+    const rawDate =
+      item?.data_reserva ??
+      item?.data ??
+      item?.date ??
+      item?.label ??
+      null;
+
+    return {
+      id: item?.id ?? rawDate ?? `date-${index}`,
+      rawDate,
+      label: rawDate ? formatDateOnly(rawDate) : `Data ${index + 1}`,
+      value:
+        Number(
+          item?.totalReservations ??
+            item?.activeReservations ??
+            item?.total ??
+            item?.count ??
+            item?.reservations ??
+            item?.total_reserves ??
+            item?.value ??
+            0
+        ) || 0,
+      activeReservations: Number(item?.activeReservations ?? 0) || 0,
+      cancelledReservations: Number(item?.cancelledReservations ?? 0) || 0,
+    };
+  };
 
   // Funció per normalitzar les entrades del registre d'activitat recent, amb suport per diferents formats de resposta i estructures de dades
   const normalizeLogItem = (log, index) => ({
@@ -823,42 +847,58 @@ function AdminPage() {
     return Math.max(...statsByDate.map((item) => item.value), 0);
   }, [statsByDate]);
 
-  // Memoritzar les estadístiques més recents per data per mostrar-les de manera destacada al dashboard, assegurant que els valors estiguin actualitzats quan les dades de les estadístiques canviïn i evitant càlculs innecessaris en cada renderitzat
-  const recentDateStats = useMemo(() => {
-    return statsByDate.slice(0, 5);
-  }, [statsByDate]);
-
-  // Memoritzar la pista, franja horària i data amb més reserves per mostrar-les com a insights clau al dashboard, assegurant que els valors estiguin actualitzats quan les dades de les estadístiques canviïn i evitant càlculs innecessaris en cada renderitzat
-  const topCourt = useMemo(() => {
-    if (!statsByCourt.length) return null;
-    return [...statsByCourt].sort((a, b) => b.value - a.value)[0];
+  // Memoritzar només les estadístiques que realment tenen activitat per millorar la lectura del dashboard
+  const activeCourtStats = useMemo(() => {
+    return statsByCourt.filter((item) => item.value > 0);
   }, [statsByCourt]);
 
-  // Memoritzar la franja horària amb més reserves per mostrar-la com a insight clau al dashboard, assegurant que els valors estiguin actualitzats quan les dades de les estadístiques canviïn i evitant càlculs innecessaris en cada renderitzat
-  const topTimeslot = useMemo(() => {
-    if (!statsByTimeslot.length) return null;
-    return [...statsByTimeslot].sort((a, b) => b.value - a.value)[0];
+  const activeTimeslotStats = useMemo(() => {
+    return statsByTimeslot.filter((item) => item.value > 0);
   }, [statsByTimeslot]);
 
-  // Memoritzar el dia amb més reserves per mostrar-lo com a insight clau al dashboard, assegurant que els valors estiguin actualitzats quan les dades de les estadístiques canviïn i evitant càlculs innecessaris en cada renderitzat
-  const busiestDate = useMemo(() => {
-    if (!statsByDate.length) return null;
-    return [...statsByDate].sort((a, b) => b.value - a.value)[0];
+  const activeDateStats = useMemo(() => {
+    return statsByDate.filter((item) => item.value > 0);
   }, [statsByDate]);
 
-  // Memoritzar les estadístiques per pista, franja horària i data que seran visibles al dashboard segons si s'ha seleccionat mostrar totes les dades o només les més recents, assegurant que els valors estiguin actualitzats quan les dades de les estadístiques o les opcions de visualització canviïn i evitant càlculs innecessaris en cada renderitzat
-  const visibleCourtStats = useMemo(() => {
-    return showAllCourtStats ? statsByCourt : statsByCourt.slice(0, 5);
-  }, [statsByCourt, showAllCourtStats]);
+  const recentDateStats = useMemo(() => {
+    return activeDateStats.slice(-5).reverse();
+  }, [activeDateStats]);
 
-  // Memoritzar les estadístiques per franja horària que seran visibles al dashboard segons si s'ha seleccionat mostrar totes les dades o només les més recents, assegurant que els valors estiguin actualitzats quan les dades de les estadístiques o les opcions de visualització canviïn i evitant càlculs innecessaris en cada renderitzat
+  const topCourt = useMemo(() => {
+    if (!activeCourtStats.length) return null;
+    return [...activeCourtStats].sort((a, b) => b.value - a.value)[0];
+  }, [activeCourtStats]);
+
+  const topTimeslot = useMemo(() => {
+    if (!activeTimeslotStats.length) return null;
+    return [...activeTimeslotStats].sort((a, b) => b.value - a.value)[0];
+  }, [activeTimeslotStats]);
+
+  const busiestDate = useMemo(() => {
+    if (!activeDateStats.length) return null;
+    return [...activeDateStats].sort((a, b) => b.value - a.value)[0];
+  }, [activeDateStats]);
+
+  const activeReservationsTotal =
+    overviewStats.activeReservations ?? activeReservationsCount ?? 0;
+  const totalReservationsCount =
+    overviewStats.totalReservations ?? reservations.length ?? 0;
+
+  const occupancyRate =
+    totalReservationsCount > 0
+      ? Math.round((activeReservationsTotal / totalReservationsCount) * 100)
+      : 0;
+
+  const visibleCourtStats = useMemo(() => {
+    return showAllCourtStats ? activeCourtStats : activeCourtStats.slice(0, 5);
+  }, [activeCourtStats, showAllCourtStats]);
+
   const visibleTimeslotStats = useMemo(() => {
     return showAllTimeslotStats
-      ? statsByTimeslot
-      : statsByTimeslot.slice(0, 5);
-  }, [statsByTimeslot, showAllTimeslotStats]);
+      ? activeTimeslotStats
+      : activeTimeslotStats.slice(0, 5);
+  }, [activeTimeslotStats, showAllTimeslotStats]);
 
-  // Memoritzar les estadístiques per data que seran visibles al dashboard segons si s'ha seleccionat mostrar totes les dades o només les més recents, assegurant que els valors estiguin actualitzats quan les dades de les estadístiques o les opcions de visualització canviïn i evitant càlculs innecessaris en cada renderitzat
   const visibleDateStats = useMemo(() => {
     return showAllDateStats ? recentDateStats : recentDateStats.slice(0, 5);
   }, [recentDateStats, showAllDateStats]);
@@ -1162,23 +1202,32 @@ function AdminPage() {
     },
   ];
 
-  // Definir els insights clau del dashboard basats en les estadístiques més recents, assegurant que els valors mostrats estiguin actualitzats i siguin consistents amb les dades carregades, i proporcionant missatges per a casos sense dades disponibles
   const quickInsights = [
     {
-      label: "Pista amb més reserves",
-      value: topCourt ? `${topCourt.label} · ${topCourt.value}` : "Sense dades",
+      label: "Pista líder",
+      value: topCourt ? topCourt.label : "Sense dades",
+      detail: topCourt
+        ? `${topCourt.value} reserves registrades`
+        : "Encara no hi ha activitat suficient",
     },
     {
-      label: "Franja més demandada",
-      value: topTimeslot
-        ? `${topTimeslot.label} · ${topTimeslot.value}`
-        : "Sense dades",
+      label: "Franja més activa",
+      value: topTimeslot ? topTimeslot.label : "Sense dades",
+      detail: topTimeslot
+        ? `${topTimeslot.value} reserves en aquesta franja`
+        : "Encara no hi ha activitat suficient",
     },
     {
-      label: "Dia amb més activitat",
-      value: busiestDate
-        ? `${busiestDate.label} · ${busiestDate.value}`
-        : "Sense dades",
+      label: "Dia amb més moviment",
+      value: busiestDate ? busiestDate.label : "Sense dades",
+      detail: busiestDate
+        ? `${busiestDate.value} reserves aquell dia`
+        : "No hi ha dades de dies amb activitat",
+    },
+    {
+      label: "Ocupació activa",
+      value: `${occupancyRate}%`,
+      detail: `${activeReservationsTotal} de ${totalReservationsCount} reserves estan actives`,
     },
   ];
 
@@ -1502,6 +1551,9 @@ function AdminPage() {
                           <span className="admin__insight-value">
                             {insight.value}
                           </span>
+                          <span className="admin__insight-detail">
+                            {insight.detail}
+                          </span>
                         </article>
                       ))}
                     </div>
@@ -1527,11 +1579,11 @@ function AdminPage() {
                           </h3>
                         </div>
                         <span className="pb-badge-pill pb-badge-pill--blue">
-                          {statsByCourt.length} pistes
+                          {activeCourtStats.length} amb activitat
                         </span>
                       </div>
 
-                      {statsByCourt.length > 0 ? (
+                      {activeCourtStats.length > 0 ? (
                         <>
                           <div className="admin__metric-list">
                             {visibleCourtStats.map((item) => {
@@ -1557,7 +1609,7 @@ function AdminPage() {
                             })}
                           </div>
 
-                          {statsByCourt.length > 5 && (
+                          {activeCourtStats.length > 5 && (
                             <div className="admin__metrics-toggle">
                               <button
                                 type="button"
@@ -1571,7 +1623,7 @@ function AdminPage() {
                         </>
                       ) : (
                         <p className="admin__empty-analytics-text">
-                          Encara no hi ha dades disponibles per pista.
+                          Encara no hi ha reserves registrades per pista.
                         </p>
                       )}
                     </div>
@@ -1589,11 +1641,11 @@ function AdminPage() {
                           </h3>
                         </div>
                         <span className="pb-badge-pill pb-badge-pill--green">
-                          {statsByTimeslot.length} franges
+                          {activeTimeslotStats.length} amb activitat
                         </span>
                       </div>
 
-                      {statsByTimeslot.length > 0 ? (
+                      {activeTimeslotStats.length > 0 ? (
                         <>
                           <div className="admin__metric-list">
                             {visibleTimeslotStats.map((item) => {
@@ -1624,7 +1676,7 @@ function AdminPage() {
                             })}
                           </div>
 
-                          {statsByTimeslot.length > 5 && (
+                          {activeTimeslotStats.length > 5 && (
                             <div className="admin__metrics-toggle">
                               <button
                                 type="button"
@@ -1638,7 +1690,7 @@ function AdminPage() {
                         </>
                       ) : (
                         <p className="admin__empty-analytics-text">
-                          Encara no hi ha dades disponibles per franja.
+                          Encara no hi ha franges amb reserves registrades.
                         </p>
                       )}
                     </div>
@@ -1664,7 +1716,7 @@ function AdminPage() {
                           </h3>
                         </div>
                         <span className="pb-badge-pill pb-badge-pill--amber">
-                          {recentDateStats.length} registres
+                          {activeDateStats.length} dies actius
                         </span>
                       </div>
 
@@ -1711,7 +1763,7 @@ function AdminPage() {
                         </>
                       ) : (
                         <p className="admin__empty-analytics-text">
-                          Encara no hi ha dades disponibles per dates.
+                          Encara no hi ha dies amb activitat de reserves.
                         </p>
                       )}
                     </div>
