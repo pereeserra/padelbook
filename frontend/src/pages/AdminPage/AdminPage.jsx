@@ -1261,143 +1261,54 @@ function AdminPage() {
           isMobileView ? "admin__container--mobile" : ""
         }`}
       >
-        <section
-          className={`fade-in-up admin__hero ${
-            isMobileView ? "admin__hero--mobile" : ""
-          }`}
-        >
+        <section className="fade-in-up admin__toolbar">
           <div
-            className={`admin__hero-grid ${
-              isMobileView ? "admin__hero-grid--mobile" : ""
+            className={`admin__toolbar-tabs ${
+              isMobileView ? "admin__toolbar-tabs--mobile" : ""
             }`}
           >
-            <div>
-              <span className="pb-chip">Administració</span>
+            <button
+              type="button"
+              className={`admin__toolbar-tab ${
+                activeTab === "dashboard" ? "is-active" : ""
+              }`}
+              onClick={() => setActiveTab("dashboard")}
+            >
+              <span className="admin__toolbar-tab-label">Dashboard</span>
+            </button>
 
-              <h1
-                className={`admin__title ${
-                  isMobileView ? "admin__title--mobile" : ""
-                }`}
-              >
-                Panell d’administració
-              </h1>
+            <button
+              type="button"
+              className={`admin__toolbar-tab ${
+                activeTab === "courts" ? "is-active" : ""
+              }`}
+              onClick={() => {
+                setActiveTab("courts");
+                setEditingCourtId(null);
+              }}
+            >
+              <span className="admin__toolbar-tab-label">Gestió de pistes</span>
+            </button>
 
-              <p className="admin__subtitle">
-                Controla pistes, reserves, estadístiques i activitat recent des
-                d’un espai més complet, més ordenat i amb millor lectura visual.
-              </p>
+            <button
+              type="button"
+              className={`admin__toolbar-tab ${
+                activeTab === "reservations" ? "is-active" : ""
+              }`}
+              onClick={() => setActiveTab("reservations")}
+            >
+              <span className="admin__toolbar-tab-label">Reserves</span>
+            </button>
 
-              <div
-                className={`admin__hero-tabs ${
-                  isMobileView ? "admin__hero-tabs--mobile" : ""
-                }`}
-              >
-                <button
-                  type="button"
-                  className={`admin__hero-tab ${
-                    activeTab === "dashboard" ? "is-active" : ""
-                  }`}
-                  onClick={() => setActiveTab("dashboard")}
-                >
-                  <span className="admin__hero-tab-label">Dashboard</span>
-                </button>
-
-                <button
-                  type="button"
-                  className={`admin__hero-tab ${
-                    activeTab === "courts" ? "is-active" : ""
-                  }`}
-                  onClick={() => {
-                    setActiveTab("courts");
-                    setEditingCourtId(null);
-                  }}
-                >
-                  <span className="admin__hero-tab-label">Gestió de pistes</span>
-                </button>
-
-                <button
-                  type="button"
-                  className={`admin__hero-tab ${
-                    activeTab === "reservations" ? "is-active" : ""
-                  }`}
-                  onClick={() => setActiveTab("reservations")}
-                >
-                  <span className="admin__hero-tab-label">Reserves</span>
-                </button>
-
-                <button
-                  type="button"
-                  className={`admin__hero-tab ${
-                    activeTab === "users" ? "is-active" : ""
-                  }`}
-                  onClick={() => setActiveTab("users")}
-                >
-                  <span className="admin__hero-tab-label">Usuaris</span>
-                </button>
-              </div>
-            </div>
-
-            {!error && (
-              <div className="admin__hero-panel">
-                <span className="admin__hero-panel-label">Resum executiu</span>
-
-                <div className="admin__hero-panel-grid">
-                  <div className="admin__hero-panel-card">
-                    <span className="admin__hero-panel-card-label">
-                      Pistes totals
-                    </span>
-                    <span className="admin__hero-panel-card-value">
-                      {courts.length}
-                    </span>
-                  </div>
-
-                  <div className="admin__hero-panel-card">
-                    <span className="admin__hero-panel-card-label">
-                      Disponibles
-                    </span>
-                    <span className="admin__hero-panel-card-value">
-                      {availableCourts.length}
-                    </span>
-                  </div>
-
-                  <div className="admin__hero-panel-card">
-                    <span className="admin__hero-panel-card-label">
-                      Reserves
-                    </span>
-                    <span className="admin__hero-panel-card-value">
-                      {reservations.length}
-                    </span>
-                  </div>
-
-                  <div className="admin__hero-panel-card">
-                    <span className="admin__hero-panel-card-label">
-                      Cobertes
-                    </span>
-                    <span className="admin__hero-panel-card-value">
-                      {coveredCourts.length}
-                    </span>
-                  </div>
-
-                  <div className="admin__hero-panel-card">
-                    <span className="admin__hero-panel-card-label">
-                      Usuaris
-                    </span>
-                    <span className="admin__hero-panel-card-value">
-                      {users.length}
-                    </span>
-                  </div>
-
-                  <div className="admin__hero-panel-card">
-                    <span className="admin__hero-panel-card-label">
-                      Manteniments
-                    </span>
-                    <span className="admin__hero-panel-card-value">
-                      {maintenanceBlocks.length}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
+            <button
+              type="button"
+              className={`admin__toolbar-tab ${
+                activeTab === "users" ? "is-active" : ""
+              }`}
+              onClick={() => setActiveTab("users")}
+            >
+              <span className="admin__toolbar-tab-label">Usuaris</span>
+            </button>
           </div>
         </section>
 

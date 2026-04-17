@@ -1469,6 +1469,74 @@
 }
 
 /* ========================================
+   BARRA SUPERIOR ADMIN COMPACTA
+======================================== */
+
+.admin__toolbar {
+  margin-bottom: 1.2rem;
+}
+
+.admin__toolbar-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  padding: 0.45rem;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.05);
+}
+
+.admin__toolbar-tabs--mobile {
+  width: 100%;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.admin__toolbar-tab {
+  min-height: 50px;
+  padding: 0.82rem 1.2rem;
+  border: 0;
+  border-radius: 16px;
+  background: transparent;
+  color: #475569;
+  font: inherit;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.admin__toolbar-tab:hover {
+  background: #f8fafc;
+  color: #0f172a;
+  transform: translateY(-1px);
+}
+
+.admin__toolbar-tab.is-active {
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  color: #1d4ed8;
+  box-shadow: inset 0 0 0 1px rgba(191, 219, 254, 0.95);
+}
+
+.admin__toolbar-tab:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.18);
+  outline-offset: 2px;
+}
+
+.admin__toolbar-tab-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+/* ========================================
    NOU DASHBOARD ADMIN DES DE ZERO
 ======================================== */
 
@@ -1582,6 +1650,7 @@
   background: rgba(255, 255, 255, 0.92);
   border: 1px solid rgba(148, 163, 184, 0.14);
   box-shadow: 0 18px 40px rgba(15, 23, 42, 0.045);
+  height: 100%;
 }
 
 .admin-dashboard__feature-card--primary {
@@ -1603,6 +1672,15 @@
 
 .admin-dashboard__panel-head--logs {
   margin-bottom: 1rem;
+}
+
+.admin-dashboard__panel--logs {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-dashboard__log-list {
+  flex: 1;
 }
 
 .admin-dashboard__mini-kicker {
@@ -1743,9 +1821,9 @@
 
 .admin-dashboard__bottom-grid {
   display: grid;
-  grid-template-columns: minmax(320px, 0.78fr) minmax(0, 1.22fr);
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
   gap: 1rem;
-  align-items: start;
+  align-items: stretch;
 }
 
 .admin-dashboard__metric-list {
@@ -1970,6 +2048,17 @@
 }
 
 @media (max-width: 768px) {
+  .admin__toolbar-tabs {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin__toolbar-tab {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
   .admin-dashboard__topbar,
   .admin-dashboard__feature-card,
   .admin-dashboard__panel {
