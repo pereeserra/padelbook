@@ -1573,14 +1573,14 @@ function AdminPage() {
                   </div>
                 </section>
 
-                <section className="fade-in-up delay-2 admin__section">
+                <section className="fade-in-up delay-2 admin__section admin__section--dashboard-main">
                   <div
-                    className={`admin__analytics-grid ${
+                    className={`admin__analytics-grid admin__analytics-grid--dashboard-main ${
                       isMobileView ? "admin__analytics-grid--mobile" : ""
                     }`}
                   >
                     <div
-                      className={`pb-surface-card admin__section-card ${
+                      className={`pb-surface-card admin__section-card admin__dashboard-card admin__dashboard-card--courts ${
                         activeCourtStats.length <= 2
                           ? "admin__section-card--compact-metrics"
                           : ""
@@ -1668,7 +1668,7 @@ function AdminPage() {
                       )}
                     </div>
 
-                    <div className="pb-surface-card admin__section-card">
+                    <div className="pb-surface-card admin__section-card admin__dashboard-card admin__dashboard-card--timeslots">
                       <div
                         className={`admin__analytics-header ${
                           isMobileView ? "admin__analytics-header--mobile" : ""
@@ -1737,14 +1737,14 @@ function AdminPage() {
                   </div>
                 </section>
 
-                <section className="fade-in-up delay-3 admin__section">
+                <section className="fade-in-up delay-3 admin__section admin__section--dashboard-bottom">
                   <div
-                    className={`admin__analytics-grid ${
+                    className={`admin__analytics-grid admin__analytics-grid--dashboard-bottom ${
                       isMobileView ? "admin__analytics-grid--mobile" : ""
                     }`}
                   >
                     <div
-                      className={`pb-surface-card admin__section-card ${
+                      className={`pb-surface-card admin__section-card admin__dashboard-card admin__dashboard-card--dates ${
                         activeDateStats.length <= 3
                           ? "admin__section-card--compact-metrics"
                           : ""
@@ -1837,7 +1837,7 @@ function AdminPage() {
                       )}
                     </div>
 
-                    <div className="pb-surface-card admin__section-card">
+                    <div className="pb-surface-card admin__section-card admin__dashboard-card admin__dashboard-card--logs">
                       <div
                         className={`admin__analytics-header ${
                           isMobileView ? "admin__analytics-header--mobile" : ""

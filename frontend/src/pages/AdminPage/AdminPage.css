@@ -329,8 +329,17 @@
 
 .admin__analytics-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
+  align-items: start;
+}
+
+.admin__analytics-grid--dashboard-main {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.admin__analytics-grid--dashboard-bottom {
+  grid-template-columns: minmax(320px, 0.78fr) minmax(0, 1.22fr);
 }
 
 .admin__analytics-grid--mobile {
@@ -360,12 +369,31 @@
 
 .admin__insights-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.9rem;
+  align-items: stretch;
 }
 
 .admin__insights-grid--mobile {
   grid-template-columns: 1fr;
+}
+
+.admin__section--dashboard-main,
+.admin__section--dashboard-bottom {
+  margin-top: 1.1rem;
+}
+
+.admin__dashboard-card {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+}
+
+.admin__dashboard-card--courts,
+.admin__dashboard-card--timeslots,
+.admin__dashboard-card--dates,
+.admin__dashboard-card--logs {
+  align-self: stretch;
 }
 
 .admin__insight-card {
@@ -518,7 +546,7 @@
 }
 
 .admin__section-card--compact-metrics {
-  align-self: start;
+  width: 100%;
 }
 
 .admin__compact-support-text {
@@ -717,9 +745,14 @@
 
 @media (max-width: 1024px) {
   .admin__hero-grid,
-  .admin__analytics-grid,
-  .admin__insights-grid,
   .admin__dashboard-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin__analytics-grid,
+  .admin__analytics-grid--dashboard-main,
+  .admin__analytics-grid--dashboard-bottom,
+  .admin__insights-grid {
     grid-template-columns: 1fr;
   }
 
