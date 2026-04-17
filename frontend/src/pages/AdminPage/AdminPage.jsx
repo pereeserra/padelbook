@@ -1261,54 +1261,143 @@ function AdminPage() {
           isMobileView ? "admin__container--mobile" : ""
         }`}
       >
-        <section className="fade-in-up admin__toolbar">
+        <section
+          className={`fade-in-up admin__hero ${
+            isMobileView ? "admin__hero--mobile" : ""
+          }`}
+        >
           <div
-            className={`admin__toolbar-tabs ${
-              isMobileView ? "admin__toolbar-tabs--mobile" : ""
+            className={`admin__hero-grid ${
+              isMobileView ? "admin__hero-grid--mobile" : ""
             }`}
           >
-            <button
-              type="button"
-              className={`admin__toolbar-tab ${
-                activeTab === "dashboard" ? "is-active" : ""
-              }`}
-              onClick={() => setActiveTab("dashboard")}
-            >
-              <span className="admin__toolbar-tab-label">Dashboard</span>
-            </button>
+            <div>
+              <span className="pb-chip">Administració</span>
 
-            <button
-              type="button"
-              className={`admin__toolbar-tab ${
-                activeTab === "courts" ? "is-active" : ""
-              }`}
-              onClick={() => {
-                setActiveTab("courts");
-                setEditingCourtId(null);
-              }}
-            >
-              <span className="admin__toolbar-tab-label">Gestió de pistes</span>
-            </button>
+              <h1
+                className={`admin__title ${
+                  isMobileView ? "admin__title--mobile" : ""
+                }`}
+              >
+                Panell d’administració
+              </h1>
 
-            <button
-              type="button"
-              className={`admin__toolbar-tab ${
-                activeTab === "reservations" ? "is-active" : ""
-              }`}
-              onClick={() => setActiveTab("reservations")}
-            >
-              <span className="admin__toolbar-tab-label">Reserves</span>
-            </button>
+              <p className="admin__subtitle">
+                Controla pistes, reserves, estadístiques i activitat recent des
+                d’un espai més complet, més ordenat i amb millor lectura visual.
+              </p>
 
-            <button
-              type="button"
-              className={`admin__toolbar-tab ${
-                activeTab === "users" ? "is-active" : ""
-              }`}
-              onClick={() => setActiveTab("users")}
-            >
-              <span className="admin__toolbar-tab-label">Usuaris</span>
-            </button>
+              <div
+                className={`admin__hero-tabs ${
+                  isMobileView ? "admin__hero-tabs--mobile" : ""
+                }`}
+              >
+                <button
+                  type="button"
+                  className={`admin__hero-tab ${
+                    activeTab === "dashboard" ? "is-active" : ""
+                  }`}
+                  onClick={() => setActiveTab("dashboard")}
+                >
+                  <span className="admin__hero-tab-label">Dashboard</span>
+                </button>
+
+                <button
+                  type="button"
+                  className={`admin__hero-tab ${
+                    activeTab === "courts" ? "is-active" : ""
+                  }`}
+                  onClick={() => {
+                    setActiveTab("courts");
+                    setEditingCourtId(null);
+                  }}
+                >
+                  <span className="admin__hero-tab-label">Gestió de pistes</span>
+                </button>
+
+                <button
+                  type="button"
+                  className={`admin__hero-tab ${
+                    activeTab === "reservations" ? "is-active" : ""
+                  }`}
+                  onClick={() => setActiveTab("reservations")}
+                >
+                  <span className="admin__hero-tab-label">Reserves</span>
+                </button>
+
+                <button
+                  type="button"
+                  className={`admin__hero-tab ${
+                    activeTab === "users" ? "is-active" : ""
+                  }`}
+                  onClick={() => setActiveTab("users")}
+                >
+                  <span className="admin__hero-tab-label">Usuaris</span>
+                </button>
+              </div>
+            </div>
+
+            {!error && (
+              <div className="admin__hero-panel">
+                <span className="admin__hero-panel-label">Resum executiu</span>
+
+                <div className="admin__hero-panel-grid">
+                  <div className="admin__hero-panel-card">
+                    <span className="admin__hero-panel-card-label">
+                      Pistes totals
+                    </span>
+                    <span className="admin__hero-panel-card-value">
+                      {courts.length}
+                    </span>
+                  </div>
+
+                  <div className="admin__hero-panel-card">
+                    <span className="admin__hero-panel-card-label">
+                      Disponibles
+                    </span>
+                    <span className="admin__hero-panel-card-value">
+                      {availableCourts.length}
+                    </span>
+                  </div>
+
+                  <div className="admin__hero-panel-card">
+                    <span className="admin__hero-panel-card-label">
+                      Reserves
+                    </span>
+                    <span className="admin__hero-panel-card-value">
+                      {reservations.length}
+                    </span>
+                  </div>
+
+                  <div className="admin__hero-panel-card">
+                    <span className="admin__hero-panel-card-label">
+                      Cobertes
+                    </span>
+                    <span className="admin__hero-panel-card-value">
+                      {coveredCourts.length}
+                    </span>
+                  </div>
+
+                  <div className="admin__hero-panel-card">
+                    <span className="admin__hero-panel-card-label">
+                      Usuaris
+                    </span>
+                    <span className="admin__hero-panel-card-value">
+                      {users.length}
+                    </span>
+                  </div>
+
+                  <div className="admin__hero-panel-card">
+                    <span className="admin__hero-panel-card-label">
+                      Manteniments
+                    </span>
+                    <span className="admin__hero-panel-card-value">
+                      {maintenanceBlocks.length}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </section>
 
@@ -1381,49 +1470,102 @@ function AdminPage() {
                   ref={dashboardSectionRef}
                   className="fade-in-up delay-1 admin__section"
                 >
-                  <div className="admin-dashboard__shell">
-                    <div className="admin-dashboard__topbar">
-                      <div className="admin-dashboard__topbar-copy">
-                        <span className="admin-dashboard__eyebrow">
-                          Dashboard administratiu
-                        </span>
-                        <h2 className="admin-dashboard__title">
-                          Resum clar, net i més professional del sistema
-                        </h2>
-                        <p className="admin-dashboard__subtitle">
-                          Consulta l’estat general de reserves, pistes i activitat
-                          recent des d’un panell molt més compacte i llegible.
-                        </p>
-                      </div>
-
-                      <div className="admin-dashboard__topbar-actions">
-                        <button
-                          type="button"
-                          className="btn btn-light"
-                          onClick={() => fetchDashboardData()}
-                        >
-                          Actualitzar dashboard
-                        </button>
-                      </div>
+                  <div
+                    className={`admin__section-header ${
+                      isMobileView ? "admin__section-header--mobile" : ""
+                    }`}
+                  >
+                    <div>
+                      <span className="pb-kicker">Visió general</span>
+                      <h2
+                        className={`pb-panel-title ${
+                          isMobileView ? "admin__section-title--mobile" : ""
+                        }`}
+                      >
+                        Dashboard administratiu
+                      </h2>
+                      <p className="pb-panel-text">
+                        Visió ràpida de l’estat del sistema, volum de reserves i
+                        pistes.
+                      </p>
                     </div>
 
-                    <div className="admin-dashboard__kpi-grid">
-                      {dashboardCards.slice(0, 4).map((card) => (
-                        <article
-                          key={card.label}
-                          className={`admin-dashboard__kpi-card ${card.accentClass}`}
-                        >
-                          <div className="admin-dashboard__kpi-head">
-                            <span className="admin-dashboard__kpi-icon">
-                              {card.icon}
-                            </span>
-                            <span className="admin-dashboard__kpi-label">
-                              {card.label}
-                            </span>
-                          </div>
+                    <button
+                      type="button"
+                      className="btn btn-light"
+                      onClick={() => fetchDashboardData()}
+                    >
+                      Actualitzar dashboard
+                    </button>
+                  </div>
 
-                          <span className="admin-dashboard__kpi-value">
-                            {card.value}
+                  <div
+                    className={`admin__dashboard-stats-grid ${
+                      isMobileView ? "admin__dashboard-stats-grid--mobile" : ""
+                    }`}
+                  >
+                    {dashboardCards.map((card) => (
+                      <article
+                        key={card.label}
+                        className={`pb-surface-card admin__dashboard-stat-card ${card.accentClass}`}
+                      >
+                        <div className="admin__dashboard-stat-top">
+                          <span className="admin__dashboard-stat-icon">
+                            {card.icon}
+                          </span>
+                          <span className="admin__dashboard-stat-label">
+                            {card.label}
+                          </span>
+                        </div>
+
+                        <span
+                          className={`admin__dashboard-stat-value ${
+                            isMobileView
+                              ? "admin__dashboard-stat-value--mobile"
+                              : ""
+                          }`}
+                        >
+                          {card.value}
+                        </span>
+                      </article>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="fade-in-up delay-2 admin__section">
+                  <div className="pb-surface-card admin__section-card">
+                    <div
+                      className={`admin__analytics-header ${
+                        isMobileView ? "admin__analytics-header--mobile" : ""
+                      }`}
+                    >
+                      <div>
+                        <span className="pb-kicker">Resum ràpid</span>
+                        <h3 className="admin__analytics-title">Insights clau</h3>
+                      </div>
+                      <span className="pb-badge-pill pb-badge-pill--blue">
+                        Executiu
+                      </span>
+                    </div>
+
+                    <div
+                      className={`admin__insights-grid ${
+                        isMobileView ? "admin__insights-grid--mobile" : ""
+                      }`}
+                    >
+                      {quickInsights.map((insight) => (
+                        <article
+                          className="pb-surface-card admin__insight-card"
+                          key={insight.label}
+                        >
+                          <span className="admin__insight-label">
+                            {insight.label}
+                          </span>
+                          <span className="admin__insight-value">
+                            {insight.value}
+                          </span>
+                          <span className="admin__insight-detail">
+                            {insight.detail}
                           </span>
                         </article>
                       ))}
@@ -1431,189 +1573,121 @@ function AdminPage() {
                   </div>
                 </section>
 
-                <section className="fade-in-up delay-2 admin__section">
-                  <div className="admin-dashboard__overview-grid">
-                    <article className="admin-dashboard__feature-card admin-dashboard__feature-card--primary">
-                      <div className="admin-dashboard__feature-head">
+                <section className="fade-in-up delay-2 admin__section admin__section--dashboard-main">
+                  <div
+                    className={`admin__analytics-grid admin__analytics-grid--dashboard-main ${
+                      isMobileView ? "admin__analytics-grid--mobile" : ""
+                    }`}
+                  >
+                    <div
+                      className={`pb-surface-card admin__section-card admin__dashboard-card admin__dashboard-card--courts ${
+                        activeCourtStats.length <= 2
+                          ? "admin__section-card--compact-metrics"
+                          : ""
+                      }`}
+                    >
+                      <div
+                        className={`admin__analytics-header ${
+                          isMobileView ? "admin__analytics-header--mobile" : ""
+                        }`}
+                      >
                         <div>
-                          <span className="admin-dashboard__mini-kicker">
-                            Estat general
-                          </span>
-                          <h3 className="admin-dashboard__feature-title">
-                            Vista executiva del panell
-                          </h3>
-                        </div>
-
-                        <span className="admin-dashboard__feature-badge">
-                          En directe
-                        </span>
-                      </div>
-
-                      <div className="admin-dashboard__feature-insights">
-                        {quickInsights.map((insight) => (
-                          <article
-                            key={insight.label}
-                            className="admin-dashboard__feature-insight-card"
-                          >
-                            <span className="admin-dashboard__feature-insight-label">
-                              {insight.label}
-                            </span>
-                            <span className="admin-dashboard__feature-insight-value">
-                              {insight.value}
-                            </span>
-                            <span className="admin-dashboard__feature-insight-text">
-                              {insight.detail}
-                            </span>
-                          </article>
-                        ))}
-                      </div>
-                    </article>
-
-                    <article className="admin-dashboard__feature-card admin-dashboard__feature-card--secondary">
-                      <div className="admin-dashboard__feature-head">
-                        <div>
-                          <span className="admin-dashboard__mini-kicker">
-                            Estat operatiu
-                          </span>
-                          <h3 className="admin-dashboard__feature-title">
-                            Indicadors ràpids
-                          </h3>
-                        </div>
-                      </div>
-
-                      <div className="admin-dashboard__status-list">
-                        <div className="admin-dashboard__status-item">
-                          <span className="admin-dashboard__status-label">
-                            Pistes disponibles
-                          </span>
-                          <strong className="admin-dashboard__status-value">
-                            {overviewStats.availableCourts ?? availableCourts.length}
-                          </strong>
-                        </div>
-
-                        <div className="admin-dashboard__status-item">
-                          <span className="admin-dashboard__status-label">
-                            Pistes cobertes
-                          </span>
-                          <strong className="admin-dashboard__status-value">
-                            {overviewStats.coveredCourts ?? coveredCourts.length}
-                          </strong>
-                        </div>
-
-                        <div className="admin-dashboard__status-item">
-                          <span className="admin-dashboard__status-label">
-                            Usuaris registrats
-                          </span>
-                          <strong className="admin-dashboard__status-value">
-                            {users.length}
-                          </strong>
-                        </div>
-
-                        <div className="admin-dashboard__status-item">
-                          <span className="admin-dashboard__status-label">
-                            Manteniments
-                          </span>
-                          <strong className="admin-dashboard__status-value">
-                            {maintenanceBlocks.length}
-                          </strong>
-                        </div>
-                      </div>
-                    </article>
-                  </div>
-                </section>
-
-                <section className="fade-in-up delay-2 admin__section">
-                  <div className="admin-dashboard__content-grid">
-                    <article className="admin-dashboard__panel">
-                      <div className="admin-dashboard__panel-head">
-                        <div>
-                          <span className="admin-dashboard__mini-kicker">
-                            Anàlisi
-                          </span>
-                          <h3 className="admin-dashboard__panel-title">
+                          <span className="pb-kicker">Anàlisi</span>
+                          <h3 className="admin__analytics-title">
                             Reserves per pista
                           </h3>
                         </div>
-
-                        <span className="admin-dashboard__panel-badge admin-dashboard__panel-badge--blue">
+                        <span className="pb-badge-pill pb-badge-pill--blue">
                           {activeCourtStats.length} amb activitat
                         </span>
                       </div>
 
                       {activeCourtStats.length > 0 ? (
                         <>
-                          <div className="admin-dashboard__metric-list">
+                          <div
+                            className={`admin__metric-list ${
+                              activeCourtStats.length <= 2
+                                ? "admin__metric-list--compact-courts"
+                                : ""
+                            }`}
+                          >
                             {visibleCourtStats.map((item) => {
                               const width =
-                                topCourtValue > 0
-                                  ? `${(item.value / topCourtValue) * 100}%`
-                                  : "0%";
+                                topCourtValue > 0 ? `${(item.value / topCourtValue) * 100}%` : "0%";
 
                               return (
                                 <div
                                   key={item.id}
-                                  className="admin-dashboard__metric-item"
+                                  className={`admin__metric-item ${
+                                    activeCourtStats.length <= 2
+                                      ? "admin__metric-item--compact-court"
+                                      : ""
+                                  }`}
                                 >
-                                  <div className="admin-dashboard__metric-row">
-                                    <span className="admin-dashboard__metric-label">
-                                      {item.label}
-                                    </span>
-                                    <span className="admin-dashboard__metric-value">
-                                      {item.value}
-                                    </span>
+                                  <div
+                                    className={`admin__metric-top-row ${
+                                      isMobileView ? "admin__metric-top-row--mobile" : ""
+                                    }`}
+                                  >
+                                    <span className="admin__metric-label">{item.label}</span>
+                                    <span className="admin__metric-value">{item.value}</span>
                                   </div>
 
-                                  <div className="admin-dashboard__metric-track">
-                                    <div
-                                      className="admin-dashboard__metric-fill admin-dashboard__metric-fill--blue"
-                                      style={{ width }}
-                                    />
+                                  <div className="admin__metric-bar-track">
+                                    <div className="admin__metric-bar-fill" style={{ width }} />
                                   </div>
                                 </div>
                               );
                             })}
                           </div>
 
+                          {activeCourtStats.length <= 2 && (
+                            <p className="admin__compact-support-text">
+                              {activeCourtStats.length === 1
+                                ? "Només una pista registra activitat en el període actual."
+                                : "Només dues pistes registren activitat en el període actual."}
+                            </p>
+                          )}
+
                           {activeCourtStats.length > 5 && (
-                            <div className="admin-dashboard__panel-footer">
+                            <div className="admin__metrics-toggle">
                               <button
                                 type="button"
                                 className="btn btn-light btn-sm"
                                 onClick={() => setShowAllCourtStats((prev) => !prev)}
                               >
-                                {showAllCourtStats
-                                  ? "Mostrar menys"
-                                  : "Veure més pistes"}
+                                {showAllCourtStats ? "Mostrar menys" : "Veure més pistes"}
                               </button>
                             </div>
                           )}
                         </>
                       ) : (
-                        <p className="admin-dashboard__empty-text">
+                        <p className="admin__empty-analytics-text">
                           Encara no hi ha reserves registrades per pista.
                         </p>
                       )}
-                    </article>
+                    </div>
 
-                    <article className="admin-dashboard__panel">
-                      <div className="admin-dashboard__panel-head">
+                    <div className="pb-surface-card admin__section-card admin__dashboard-card admin__dashboard-card--timeslots">
+                      <div
+                        className={`admin__analytics-header ${
+                          isMobileView ? "admin__analytics-header--mobile" : ""
+                        }`}
+                      >
                         <div>
-                          <span className="admin-dashboard__mini-kicker">
-                            Demanda
-                          </span>
-                          <h3 className="admin-dashboard__panel-title">
+                          <span className="pb-kicker">Demanda</span>
+                          <h3 className="admin__analytics-title">
                             Franges més reservades
                           </h3>
                         </div>
-
-                        <span className="admin-dashboard__panel-badge admin-dashboard__panel-badge--green">
+                        <span className="pb-badge-pill pb-badge-pill--green">
                           {activeTimeslotStats.length} amb activitat
                         </span>
                       </div>
 
                       {activeTimeslotStats.length > 0 ? (
                         <>
-                          <div className="admin-dashboard__metric-list">
+                          <div className="admin__metric-list">
                             {visibleTimeslotStats.map((item) => {
                               const width =
                                 topTimeslotValue > 0
@@ -1621,22 +1695,19 @@ function AdminPage() {
                                   : "0%";
 
                               return (
-                                <div
-                                  key={item.id}
-                                  className="admin-dashboard__metric-item"
-                                >
-                                  <div className="admin-dashboard__metric-row">
-                                    <span className="admin-dashboard__metric-label">
-                                      {item.label}
-                                    </span>
-                                    <span className="admin-dashboard__metric-value">
-                                      {item.value}
-                                    </span>
+                                <div key={item.id} className="admin__metric-item">
+                                  <div
+                                    className={`admin__metric-top-row ${
+                                      isMobileView ? "admin__metric-top-row--mobile" : ""
+                                    }`}
+                                  >
+                                    <span className="admin__metric-label">{item.label}</span>
+                                    <span className="admin__metric-value">{item.value}</span>
                                   </div>
 
-                                  <div className="admin-dashboard__metric-track">
+                                  <div className="admin__metric-bar-track">
                                     <div
-                                      className="admin-dashboard__metric-fill admin-dashboard__metric-fill--green"
+                                      className="admin__metric-bar-fill--secondary"
                                       style={{ width }}
                                     />
                                   </div>
@@ -1646,74 +1717,89 @@ function AdminPage() {
                           </div>
 
                           {activeTimeslotStats.length > 5 && (
-                            <div className="admin-dashboard__panel-footer">
+                            <div className="admin__metrics-toggle">
                               <button
                                 type="button"
                                 className="btn btn-light btn-sm"
-                                onClick={() =>
-                                  setShowAllTimeslotStats((prev) => !prev)
-                                }
+                                onClick={() => setShowAllTimeslotStats((prev) => !prev)}
                               >
-                                {showAllTimeslotStats
-                                  ? "Mostrar menys"
-                                  : "Veure més franges"}
+                                {showAllTimeslotStats ? "Mostrar menys" : "Veure més franges"}
                               </button>
                             </div>
                           )}
                         </>
                       ) : (
-                        <p className="admin-dashboard__empty-text">
+                        <p className="admin__empty-analytics-text">
                           Encara no hi ha franges amb reserves registrades.
                         </p>
                       )}
-                    </article>
+                    </div>
                   </div>
                 </section>
 
-                <section className="fade-in-up delay-3 admin__section">
-                  <div className="admin-dashboard__bottom-grid">
-                    <article className="admin-dashboard__panel">
-                      <div className="admin-dashboard__panel-head">
+                <section className="fade-in-up delay-3 admin__section admin__section--dashboard-bottom">
+                  <div
+                    className={`admin__analytics-grid admin__analytics-grid--dashboard-bottom ${
+                      isMobileView ? "admin__analytics-grid--mobile" : ""
+                    }`}
+                  >
+                    <div
+                      className={`pb-surface-card admin__section-card admin__dashboard-card admin__dashboard-card--dates ${
+                        activeDateStats.length <= 3
+                          ? "admin__section-card--compact-metrics"
+                          : ""
+                      }`}
+                    >
+                      <div
+                        className={`admin__analytics-header ${
+                          isMobileView ? "admin__analytics-header--mobile" : ""
+                        }`}
+                      >
                         <div>
-                          <span className="admin-dashboard__mini-kicker">
-                            Tendència
-                          </span>
-                          <h3 className="admin-dashboard__panel-title">
+                          <span className="pb-kicker">Tendència</span>
+                          <h3 className="admin__analytics-title">
                             Activitat per dates
                           </h3>
                         </div>
-
-                        <span className="admin-dashboard__panel-badge admin-dashboard__panel-badge--amber">
+                        <span className="pb-badge-pill pb-badge-pill--amber">
                           {activeDateStats.length} dies actius
                         </span>
                       </div>
 
                       {recentDateStats.length > 0 ? (
                         <>
-                          <div className="admin-dashboard__metric-list">
+                          <div
+                            className={`admin__metric-list ${
+                              activeDateStats.length <= 3
+                                ? "admin__metric-list--compact-dates"
+                                : ""
+                            }`}
+                          >
                             {visibleDateStats.map((item) => {
                               const width =
-                                topDateValue > 0
-                                  ? `${(item.value / topDateValue) * 100}%`
-                                  : "0%";
+                                topDateValue > 0 ? `${(item.value / topDateValue) * 100}%` : "0%";
 
                               return (
                                 <div
                                   key={item.id}
-                                  className="admin-dashboard__metric-item"
+                                  className={`admin__metric-item ${
+                                    activeDateStats.length <= 3
+                                      ? "admin__metric-item--compact-date"
+                                      : ""
+                                  }`}
                                 >
-                                  <div className="admin-dashboard__metric-row">
-                                    <span className="admin-dashboard__metric-label">
-                                      {item.label}
-                                    </span>
-                                    <span className="admin-dashboard__metric-value">
-                                      {item.value}
-                                    </span>
+                                  <div
+                                    className={`admin__metric-top-row ${
+                                      isMobileView ? "admin__metric-top-row--mobile" : ""
+                                    }`}
+                                  >
+                                    <span className="admin__metric-label">{item.label}</span>
+                                    <span className="admin__metric-value">{item.value}</span>
                                   </div>
 
-                                  <div className="admin-dashboard__metric-track">
+                                  <div className="admin__metric-bar-track">
                                     <div
-                                      className="admin-dashboard__metric-fill admin-dashboard__metric-fill--amber"
+                                      className="admin__metric-bar-fill--tertiary"
                                       style={{ width }}
                                     />
                                   </div>
@@ -1722,48 +1808,62 @@ function AdminPage() {
                             })}
                           </div>
 
+                          {activeDateStats.length <= 3 && (
+                            <p className="admin__compact-support-text">
+                              {activeDateStats.length === 1
+                                ? "Només hi ha un dia amb activitat en el període actual."
+                                : activeDateStats.length === 2
+                                  ? "Només hi ha dos dies amb activitat en el període actual."
+                                  : "Només hi ha tres dies amb activitat en el període actual."}
+                            </p>
+                          )}
+
                           {recentDateStats.length > 5 && (
-                            <div className="admin-dashboard__panel-footer">
+                            <div className="admin__metrics-toggle">
                               <button
                                 type="button"
                                 className="btn btn-light btn-sm"
                                 onClick={() => setShowAllDateStats((prev) => !prev)}
                               >
-                                {showAllDateStats
-                                  ? "Mostrar menys"
-                                  : "Veure més dates"}
+                                {showAllDateStats ? "Mostrar menys" : "Veure més dates"}
                               </button>
                             </div>
                           )}
                         </>
                       ) : (
-                        <p className="admin-dashboard__empty-text">
+                        <p className="admin__empty-analytics-text">
                           Encara no hi ha dies amb activitat de reserves.
                         </p>
                       )}
-                    </article>
+                    </div>
 
-                    <article className="admin-dashboard__panel admin-dashboard__panel--logs">
-                      <div className="admin-dashboard__panel-head admin-dashboard__panel-head--logs">
+                    <div className="pb-surface-card admin__section-card admin__dashboard-card admin__dashboard-card--logs">
+                      <div
+                        className={`admin__analytics-header ${
+                          isMobileView ? "admin__analytics-header--mobile" : ""
+                        }`}
+                      >
                         <div>
-                          <span className="admin-dashboard__mini-kicker">
-                            Traçabilitat
-                          </span>
-                          <h3 className="admin-dashboard__panel-title">
+                          <span className="pb-kicker">Traçabilitat</span>
+                          <h3 className="admin__analytics-title">
                             Activitat recent admin
                           </h3>
                         </div>
 
-                        <span className="admin-dashboard__panel-badge admin-dashboard__panel-badge--rose">
+                        <span className="pb-badge-pill pb-badge-pill--rose">
                           {filteredAdminLogs.length} accions
                         </span>
                       </div>
 
-                      <div className="admin-dashboard__filters-grid">
-                        <div className="admin-dashboard__filter-field admin-dashboard__filter-field--search">
+                      <div
+                        className={`admin__logs-filters-grid ${
+                          isMobileView ? "admin__logs-filters-grid--mobile" : ""
+                        }`}
+                      >
+                        <div className="admin__court-filter-field">
                           <label
                             htmlFor="logSearch"
-                            className="admin-dashboard__filter-label"
+                            className="admin__filter-label"
                           >
                             Cercar al log
                           </label>
@@ -1777,10 +1877,10 @@ function AdminPage() {
                           />
                         </div>
 
-                        <div className="admin-dashboard__filter-field">
+                        <div className="admin__court-filter-field">
                           <label
                             htmlFor="logActionFilter"
-                            className="admin-dashboard__filter-label"
+                            className="admin__filter-label"
                           >
                             Acció
                           </label>
@@ -1801,10 +1901,10 @@ function AdminPage() {
                           </select>
                         </div>
 
-                        <div className="admin-dashboard__filter-field">
+                        <div className="admin__court-filter-field">
                           <label
                             htmlFor="logAdminFilter"
-                            className="admin-dashboard__filter-label"
+                            className="admin__filter-label"
                           >
                             Administrador
                           </label>
@@ -1823,7 +1923,7 @@ function AdminPage() {
                           </select>
                         </div>
 
-                        <div className="admin-dashboard__filter-actions">
+                        <div className="admin__court-filter-actions">
                           <button
                             type="button"
                             className="btn btn-light"
@@ -1836,13 +1936,19 @@ function AdminPage() {
 
                       {filteredAdminLogs.length > 0 ? (
                         <>
-                          <div className="admin-dashboard__log-list">
+                          <div className="admin__logs-list admin__logs-list--compact">
                             {visibleAdminLogs.map((log) => (
                               <article
                                 key={log.id}
-                                className="admin-dashboard__log-card"
+                                className="admin__log-item admin__log-item--compact"
                               >
-                                <div className="admin-dashboard__log-top">
+                                <div
+                                  className={`admin__log-top-row ${
+                                    isMobileView
+                                      ? "admin__log-top-row--mobile"
+                                      : ""
+                                  }`}
+                                >
                                   <span
                                     className={`activity-type ${getLogActionType(
                                       log.action
@@ -1851,37 +1957,35 @@ function AdminPage() {
                                     {formatActionLabel(log.action)}
                                   </span>
 
-                                  <span className="admin-dashboard__log-date">
+                                  <span className="admin__log-date">
                                     {formatDateTime(log.createdAt)}
                                   </span>
                                 </div>
 
-                                <div className="admin-dashboard__log-middle">
-                                  <p className="admin-dashboard__log-title">
+                                <div className="admin__log-summary-row">
+                                  <p className="admin__log-summary">
                                     {getLogSummary(log)}
                                   </p>
 
                                   {log.entity && (
-                                    <span className="admin-dashboard__log-entity">
+                                    <span className="admin__log-entity-pill">
                                       {formatLogEntityLabel(log.entity)}
                                       {log.entityId ? ` · ID ${log.entityId}` : ""}
                                     </span>
                                   )}
                                 </div>
 
-                                <p className="admin-dashboard__log-admin">
+                                <p className="admin__log-admin">
                                   {log.adminName}
                                   {log.adminId ? ` · Admin ID ${log.adminId}` : ""}
                                 </p>
 
-                                <p className="admin-dashboard__log-text">
+                                <p className="admin__log-details">
                                   {log.details || "Sense detalls addicionals."}
                                 </p>
 
-                                {(log.entity === "court" ||
-                                  log.entity === "user" ||
-                                  log.entity === "maintenance_block") && (
-                                  <div className="admin-dashboard__log-actions">
+                                {(log.entity === "court" || log.entity === "user" || log.entity === "maintenance_block") && (
+                                  <div className="admin__log-actions">
                                     <button
                                       type="button"
                                       className="btn btn-light btn-sm"
@@ -1900,11 +2004,13 @@ function AdminPage() {
                           </div>
 
                           {filteredAdminLogs.length > 3 && (
-                            <div className="admin-dashboard__panel-footer">
+                            <div className="admin__logs-toggle">
                               <button
                                 type="button"
                                 className="btn btn-light"
-                                onClick={() => setShowAllActivity((prev) => !prev)}
+                                onClick={() =>
+                                  setShowAllActivity((prev) => !prev)
+                                }
                               >
                                 {showAllActivity
                                   ? "Mostrar menys"
@@ -1914,17 +2020,17 @@ function AdminPage() {
                           )}
                         </>
                       ) : (
-                        <div className="admin-dashboard__empty-state">
-                          <p className="admin-dashboard__empty-title">
+                        <div className="admin__empty-filtered-state admin__logs-empty-state">
+                          <p className="admin__empty-filtered-title">
                             No hi ha logs que coincideixin
                           </p>
-                          <p className="admin-dashboard__empty-text">
+                          <p className="admin__empty-filtered-text">
                             Revisa els filtres aplicats o neteja la cerca per tornar
                             a veure tota l'activitat administrativa.
                           </p>
                         </div>
                       )}
-                    </article>
+                    </div>
                   </div>
                 </section>
               </>

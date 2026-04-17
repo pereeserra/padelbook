@@ -136,8 +136,7 @@
   backdrop-filter: blur(10px);
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
-  justify-content: space-between;
+  gap: 0.55rem;
 }
 
 .profile__hero-aside-top-row {
@@ -171,7 +170,7 @@
 }
 
 .profile__hero-aside-email {
-  margin: 0.45rem 0 0 0;
+  margin: 0.2rem 0 0 0;
   color: rgba(255, 255, 255, 0.84);
   line-height: 1.55;
   word-break: break-word;
@@ -620,6 +619,53 @@
 
 .profile__full-width-button {
   width: 100%;
+}
+
+.profile__hero-btn {
+  min-height: 52px;
+  padding: 0.85rem 1.3rem;
+  border-radius: 16px;
+  border: 1px solid transparent;
+  font: inherit;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.profile__hero-btn:hover {
+  transform: translateY(-2px);
+}
+
+.profile__hero-btn--primary {
+  background: #ffffff;
+  color: #1d4ed8;
+  box-shadow:
+    0 12px 26px rgba(15, 23, 42, 0.16),
+    inset 0 0 0 1px rgba(219, 234, 254, 0.95);
+}
+
+.profile__hero-btn--primary:hover {
+  box-shadow:
+    0 16px 30px rgba(15, 23, 42, 0.22),
+    inset 0 0 0 1px rgba(191, 219, 254, 1);
+}
+
+.profile__hero-btn--secondary {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+}
+
+.profile__hero-btn--secondary:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.28);
 }
 
 @media (max-width: 640px) {

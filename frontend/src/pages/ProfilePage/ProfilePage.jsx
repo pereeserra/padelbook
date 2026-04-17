@@ -579,7 +579,7 @@ function ProfilePage() {
               >
                 <button
                   type="button"
-                  className="btn btn-light"
+                  className="profile__hero-btn profile__hero-btn--primary"
                   onClick={() => scrollToElementWithOffset(profileFormRef.current, 110)}
                 >
                   Editar perfil
@@ -587,7 +587,7 @@ function ProfilePage() {
 
                 <button
                   type="button"
-                  className="btn btn-light"
+                  className="profile__hero-btn profile__hero-btn--secondary"
                   onClick={() => scrollToElementWithOffset(passwordFormRef.current, 110)}
                 >
                   Canviar contrasenya
@@ -600,7 +600,9 @@ function ProfilePage() {
                 <div className="profile__hero-aside-top-row">
                   <div className="profile__hero-aside-identity">
                     <span className="profile__hero-aside-label">Compte actual</span>
-                    <span className="profile__hero-aside-name">{profile?.nom || "Usuari"}</span>
+                    <span className="profile__hero-aside-name">
+                      {`${profile?.nom || ""} ${profile?.llinatges || ""}`.trim() || "Usuari"}
+                    </span>
                     <p className="profile__hero-aside-email">{profile?.email || "-"}</p>
                   </div>
 
