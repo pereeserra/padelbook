@@ -841,7 +841,8 @@
   }
 
   .admin__hero-panel-grid,
-  .admin__court-quick-stats {
+  .admin__court-quick-stats,
+  .admin__summary-inline-grid {
     grid-template-columns: 1fr;
   }
 
@@ -878,6 +879,10 @@
 
   .admin__section-card {
     padding: 1rem;
+  }
+
+  .admin__table-actions .btn {
+    width: 100%;
   }
 }
 
@@ -1033,6 +1038,7 @@
   border-radius: 16px;
   overflow: hidden;
   background: #ffffff;
+  box-shadow: inset 0 0 0 1px #eef2f7;
 }
 
 /* HEADER */
@@ -1151,7 +1157,7 @@
 }
 
 .admin__user-detail-card {
-  margin-top: 1.25rem;
+  margin-top: 1.35rem;
   border-radius: 20px;
   padding: 1.25rem;
   border: 1px solid rgba(148, 163, 184, 0.18);
@@ -1496,4 +1502,77 @@
 
 .admin__logs-empty-state {
   margin-top: 0.5rem;
+}
+
+.admin__section-card--reservations,
+.admin__section-card--users {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.admin__summary-inline-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.admin__summary-inline-grid--users {
+  margin-bottom: 0.1rem;
+}
+
+.admin__summary-inline-grid--mobile {
+  grid-template-columns: 1fr;
+}
+
+.admin__summary-inline-card {
+  border-radius: 18px;
+  padding: 0.9rem 1rem;
+  background: linear-gradient(180deg, #fafcff, #ffffff);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.admin__summary-inline-label {
+  display: block;
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.28rem;
+}
+
+.admin__summary-inline-value {
+  color: #0f172a;
+  font-size: 1.18rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.admin__filters-active-text {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0 0 10px 0;
+}
+
+.admin__table-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.admin__maintenance-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.admin__maintenance-actions--mobile {
+  width: 100%;
+  justify-content: stretch;
+}
+
+.admin__maintenance-actions--mobile .btn {
+  width: 100%;
 }

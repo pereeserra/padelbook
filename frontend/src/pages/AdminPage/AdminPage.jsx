@@ -2066,10 +2066,37 @@ function AdminPage() {
                 </div>
 
                 <div
-                  className={`pb-surface-card admin__section-card ${
+                  className={`pb-surface-card admin__section-card admin__section-card--reservations ${
                     isMobileView ? "admin__section-card--mobile" : ""
                   }`}
                 >
+                  <div
+                    className={`admin__summary-inline-grid ${
+                      isMobileView ? "admin__summary-inline-grid--mobile" : ""
+                    }`}
+                  >
+                    <div className="admin__summary-inline-card">
+                      <span className="admin__summary-inline-label">Totals</span>
+                      <span className="admin__summary-inline-value">
+                        {reservations.length}
+                      </span>
+                    </div>
+
+                    <div className="admin__summary-inline-card">
+                      <span className="admin__summary-inline-label">Actives</span>
+                      <span className="admin__summary-inline-value">
+                        {activeReservationsCount}
+                      </span>
+                    </div>
+
+                    <div className="admin__summary-inline-card">
+                      <span className="admin__summary-inline-label">Cancel·lades</span>
+                      <span className="admin__summary-inline-value">
+                        {cancelledReservationsCount}
+                      </span>
+                    </div>
+                  </div>
+
                   <AdminReservationsTable reservations={reservations} />
                 </div>
               </section>
@@ -2104,10 +2131,35 @@ function AdminPage() {
                 </div>
 
                 <div
-                  className={`pb-surface-card admin__section-card ${
+                  className={`pb-surface-card admin__section-card admin__section-card--users ${
                     isMobileView ? "admin__section-card--mobile" : ""
                   }`}
                 >
+                  <div
+                    className={`admin__summary-inline-grid admin__summary-inline-grid--users ${
+                      isMobileView ? "admin__summary-inline-grid--mobile" : ""
+                    }`}
+                  >
+                    <div className="admin__summary-inline-card">
+                      <span className="admin__summary-inline-label">Totals</span>
+                      <span className="admin__summary-inline-value">{users.length}</span>
+                    </div>
+
+                    <div className="admin__summary-inline-card">
+                      <span className="admin__summary-inline-label">Admins</span>
+                      <span className="admin__summary-inline-value">
+                        {users.filter((user) => (user.rol || "").toLowerCase() === "admin").length}
+                      </span>
+                    </div>
+
+                    <div className="admin__summary-inline-card">
+                      <span className="admin__summary-inline-label">Usuaris</span>
+                      <span className="admin__summary-inline-value">
+                        {users.filter((user) => (user.rol || "").toLowerCase() !== "admin").length}
+                      </span>
+                    </div>
+                  </div>
+
                   <div
                     className={`admin__users-tools-grid ${
                       isMobileView ? "admin__users-tools-grid--mobile" : ""
@@ -2161,7 +2213,7 @@ function AdminPage() {
                   </div>
 
                   {(userSearch || userRoleFilter !== "tots") && (
-                    <p style={{ fontSize: "13px", color: "#64748b", marginBottom: "10px" }}>
+                    <p className="admin__filters-active-text">
                       🔎 Filtres actius
                     </p>
                   )}
@@ -2203,7 +2255,7 @@ function AdminPage() {
                                   </td>
                                   <td>{formatDateTime(user.created_at)}</td>
                                   <td>
-                                    <div style={{ display: "flex", gap: "8px" }}>
+                                    <div className="admin__table-actions">
                                       <button
                                         type="button"
                                         className="btn btn-light btn-sm"
@@ -2804,8 +2856,11 @@ function AdminPage() {
                                 Creat: {formatDateTime(block.createdAt)}
                               </span>
 
-                              <div style={{ display: "flex", gap: "8px" }}>
-                              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                              <div
+                                className={`admin__maintenance-actions ${
+                                  isMobileView ? "admin__maintenance-actions--mobile" : ""
+                                }`}
+                              >
                                 <button
                                   type="button"
                                   className="btn btn-light"
@@ -2821,7 +2876,6 @@ function AdminPage() {
                                 >
                                   Editar
                                 </button>
-                              </div>
 
                                 <button
                                   type="button"
