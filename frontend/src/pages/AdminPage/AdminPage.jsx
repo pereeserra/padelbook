@@ -581,6 +581,16 @@ function AdminPage() {
     try {
       if (!editingMaintenanceId) return;
 
+      if (!maintenanceForm.data_bloqueig || maintenanceForm.data_bloqueig < todayString) {
+        showFeedbackMessage("No pots seleccionar una data anterior a avui.", "error");
+        return;
+      }
+
+      if (!maintenanceForm.time_slot_id) {
+        showFeedbackMessage("Has de seleccionar una franja horària.", "error");
+        return;
+      }
+
       setSavingMaintenance(true);
 
       await api.put(`/admin/maintenance/${editingMaintenanceId}`, {
@@ -612,6 +622,31 @@ function AdminPage() {
 
   const handleCreateMaintenance = async () => {
     try {
+      if (!maintenanceForm.court_id) {
+        showFeedbackMessage("Has de seleccionar una pista.", "error");
+        return;
+      }
+
+      if (!maintenanceForm.time_slot_id) {
+        showFeedbackMessage("Has de seleccionar una franja horària.", "error");
+        return;
+      }
+
+      if (!maintenanceForm.data_bloqueig) {
+        showFeedbackMessage("Has de seleccionar una data.", "error");
+        return;
+      }
+
+      if (maintenanceForm.data_bloqueig < todayString) {
+        showFeedbackMessage("No pots seleccionar una data anterior a avui.", "error");
+        return;
+      }
+
+      if (!maintenanceForm.motiu.trim()) {
+        showFeedbackMessage("Has d'indicar el motiu del manteniment.", "error");
+        return;
+      }
+
       setSavingMaintenance(true);
 
       await api.post("/admin/maintenance", {
@@ -1078,21 +1113,74 @@ function AdminPage() {
   const maintenanceAvailableTimeSlots = useMemo(() => {
     const uniqueSlots = new Map();
 
-    maintenanceBlocks.forEach((block) => {
-      if (!block.timeSlotId) return;
+    const normalizeTime = (value) => {
+      if (!value) return "";
+      return String(value).slice(0, 5);
+    };
 
-      if (!uniqueSlots.has(block.timeSlotId)) {
-        uniqueSlots.set(block.timeSlotId, {
-          id: block.timeSlotId,
-          label: `${block.startTime} - ${block.endTime}`,
+    reservations.forEach((reservation) => {
+      const timeSlotId =
+        reservation?.time_slot_id ??
+        reservation?.slot_id ??
+        reservation?.franja_id ??
+        reservation?.timeSlotId ??
+        null;
+
+      const startTime =
+        reservation?.hora_inici ??
+        reservation?.start_time ??
+        reservation?.startTime ??
+        "";
+
+      const endTime =
+        reservation?.hora_fi ??
+        reservation?.end_time ??
+        reservation?.endTime ??
+        "";
+
+      if (!timeSlotId || !startTime || !endTime) return;
+
+      if (!uniqueSlots.has(timeSlotId)) {
+        uniqueSlots.set(timeSlotId, {
+          id: timeSlotId,
+          label: `${normalizeTime(startTime)} - ${normalizeTime(endTime)}`,
+          startTime: normalizeTime(startTime),
+          endTime: normalizeTime(endTime),
         });
       }
     });
 
-    return Array.from(uniqueSlots.values()).sort((a, b) =>
+    maintenanceBlocks.forEach((block) => {
+      if (!block.timeSlotId || !block.startTime || !block.endTime) return;
+
+      if (!uniqueSlots.has(block.timeSlotId)) {
+        uniqueSlots.set(block.timeSlotId, {
+          id: block.timeSlotId,
+          label: `${normalizeTime(block.startTime)} - ${normalizeTime(block.endTime)}`,
+          startTime: normalizeTime(block.startTime),
+          endTime: normalizeTime(block.endTime),
+        });
+      }
+    });
+
+    const allSlots = Array.from(uniqueSlots.values()).sort((a, b) =>
       a.label.localeCompare(b.label)
     );
-  }, [maintenanceBlocks]);
+
+    if (maintenanceForm.data_bloqueig !== todayString) {
+      return allSlots;
+    }
+
+    const now = new Date();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+    return allSlots.filter((slot) => {
+      const [hours, minutes] = String(slot.startTime).split(":").map(Number);
+      const slotMinutes = hours * 60 + minutes;
+
+      return slotMinutes >= currentMinutes;
+    });
+  }, [reservations, maintenanceBlocks, maintenanceForm.data_bloqueig, todayString]);
 
   const resetUserFilters = () => {
     setUserSearch("");
@@ -2684,13 +2772,14 @@ function AdminPage() {
                       </div>
 
                       <div className="admin__court-filter-field">
-                        <label className="admin__filter-label" htmlFor="maintenanceCreateDate">
+                        <label className="admin__filter-label" htmlFor="maintenanceEditDate">
                           Data
                         </label>
                         <input
-                          id="maintenanceCreateDate"
+                          id="maintenanceEditDate"
                           type="date"
                           className="pb-input"
+                          min={todayString}
                           value={maintenanceForm.data_bloqueig}
                           onChange={(e) =>
                             handleMaintenanceFormChange("data_bloqueig", e.target.value)
@@ -2813,6 +2902,7 @@ function AdminPage() {
                             id="maintenanceEditDate"
                             type="date"
                             className="pb-input"
+                            min={todayString}
                             value={maintenanceForm.data_bloqueig}
                             onChange={(e) =>
                               handleMaintenanceFormChange("data_bloqueig", e.target.value)
