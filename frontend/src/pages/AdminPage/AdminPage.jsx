@@ -24,6 +24,7 @@ function AdminPage() {
   const editSectionRef = useRef(null);
   const dashboardSectionRef = useRef(null);
   const reservationsSectionRef = useRef(null);
+  const usersSectionRef = useRef(null);
   const courtsSectionRef = useRef(null);
   const feedbackRef = useRef(null);
 
@@ -2103,7 +2104,10 @@ function AdminPage() {
             )}
 
             {activeTab === "users" && (
-              <section className="fade-in-up delay-2 admin__section">
+              <section
+                ref={usersSectionRef}
+                className="fade-in-up delay-2 admin__section"
+              >
                 <div
                   className={`admin__section-header ${
                     isMobileView ? "admin__section-header--mobile" : ""
@@ -2472,7 +2476,7 @@ function AdminPage() {
                     </span>
                   </div>
 
-                  <div className="pb-surface-card admin__section-card">
+                  <div className="pb-surface-card admin__section-card admin__section-card--courts-tools">
                     <div
                       className={`admin__court-tools-grid ${
                         isMobileView ? "admin__court-tools-grid--mobile" : ""
