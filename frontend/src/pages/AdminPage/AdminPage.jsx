@@ -610,6 +610,37 @@ function AdminPage() {
     }
   };
 
+  const handleCreateMaintenance = async () => {
+    try {
+      setSavingMaintenance(true);
+
+      await api.post("/admin/maintenance", {
+        court_id: Number(maintenanceForm.court_id),
+        time_slot_id: Number(maintenanceForm.time_slot_id),
+        data_bloqueig: maintenanceForm.data_bloqueig,
+        motiu: maintenanceForm.motiu,
+      });
+
+      showFeedbackMessage("Manteniment creat correctament");
+      resetMaintenanceEditor();
+      await refreshAllAdminData();
+    } catch (err) {
+      console.error(err);
+
+      if (isSessionExpiredError(err)) {
+        return;
+      }
+
+      const errorMsg =
+        err.response?.data?.error ||
+        "Error creant manteniment";
+
+      showFeedbackMessage(errorMsg, "error");
+    } finally {
+      setSavingMaintenance(false);
+    }
+  };
+
   // Funció per gestionar la creació o actualització d'una pista, enviant les dades al backend i actualitzant la vista en conseqüència, amb suport per diferents formats de resposta i missatges de feedback contextuals
   const handleCreateOrUpdateCourt = async (e) => {
     e.preventDefault();
@@ -2581,6 +2612,127 @@ function AdminPage() {
                           {filteredMaintenanceCourtsCount}
                         </span>
                       </div>
+                    </div>
+                  </div>
+
+                  <div className="pb-surface-card admin__section-card admin__maintenance-editor">
+                    <div
+                      className={`admin__section-header ${
+                        isMobileView ? "admin__section-header--mobile" : ""
+                      }`}
+                    >
+                      <div>
+                        <span className="pb-kicker">Nou bloqueig</span>
+                        <h3 className="pb-panel-title admin__maintenance-title">
+                          Crear manteniment
+                        </h3>
+                        <p className="pb-panel-text">
+                          Bloqueja una pista en una franja i data concreta per manteniment.
+                        </p>
+                      </div>
+
+                      <span className="pb-badge-pill pb-badge-pill--amber">
+                        Nou
+                      </span>
+                    </div>
+
+                    <div
+                      className={`admin__maintenance-edit-grid ${
+                        isMobileView ? "admin__maintenance-edit-grid--mobile" : ""
+                      }`}
+                    >
+                      <div className="admin__court-filter-field">
+                        <label className="admin__filter-label" htmlFor="maintenanceCreateCourt">
+                          Pista
+                        </label>
+                        <select
+                          id="maintenanceCreateCourt"
+                          className="pb-input"
+                          value={maintenanceForm.court_id}
+                          onChange={(e) =>
+                            handleMaintenanceFormChange("court_id", e.target.value)
+                          }
+                        >
+                          <option value="">Selecciona pista</option>
+                          {maintenanceAvailableCourts.map((court) => (
+                            <option key={court.id} value={court.id}>
+                              {court.nom_pista}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="admin__court-filter-field">
+                        <label className="admin__filter-label" htmlFor="maintenanceCreateSlot">
+                          Franja horària
+                        </label>
+                        <select
+                          id="maintenanceCreateSlot"
+                          className="pb-input"
+                          value={maintenanceForm.time_slot_id}
+                          onChange={(e) =>
+                            handleMaintenanceFormChange("time_slot_id", e.target.value)
+                          }
+                        >
+                          <option value="">Selecciona franja</option>
+                          {maintenanceAvailableTimeSlots.map((slot) => (
+                            <option key={slot.id} value={slot.id}>
+                              {slot.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="admin__court-filter-field">
+                        <label className="admin__filter-label" htmlFor="maintenanceCreateDate">
+                          Data
+                        </label>
+                        <input
+                          id="maintenanceCreateDate"
+                          type="date"
+                          className="pb-input"
+                          value={maintenanceForm.data_bloqueig}
+                          onChange={(e) =>
+                            handleMaintenanceFormChange("data_bloqueig", e.target.value)
+                          }
+                        />
+                      </div>
+
+                      <div className="admin__court-filter-field admin__maintenance-edit-field-full">
+                        <label className="admin__filter-label" htmlFor="maintenanceCreateReason">
+                          Motiu
+                        </label>
+                        <textarea
+                          id="maintenanceCreateReason"
+                          className="pb-input admin__maintenance-textarea"
+                          rows="4"
+                          value={maintenanceForm.motiu}
+                          onChange={(e) =>
+                            handleMaintenanceFormChange("motiu", e.target.value)
+                          }
+                          placeholder="Explica el motiu del manteniment..."
+                        />
+                      </div>
+                    </div>
+
+                    <div className="admin__maintenance-edit-actions">
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={handleCreateMaintenance}
+                        disabled={savingMaintenance}
+                      >
+                        {savingMaintenance ? "Creant..." : "Crear manteniment"}
+                      </button>
+
+                      <button
+                        type="button"
+                        className="btn btn-light"
+                        onClick={resetMaintenanceEditor}
+                        disabled={savingMaintenance}
+                      >
+                        Netejar camps
+                      </button>
                     </div>
                   </div>
 
