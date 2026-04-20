@@ -1532,8 +1532,8 @@ function AdminPage() {
                   </div>
                 </section>
 
-                <section className="fade-in-up delay-2 admin__section">
-                  <div className="pb-surface-card admin__section-card">
+                <section className="fade-in-up delay-2 admin__section admin__section--compact-top">
+                  <div className="pb-surface-card admin__section-card admin__section-card--executive">
                     <div
                       className={`admin__analytics-header ${
                         isMobileView ? "admin__analytics-header--mobile" : ""
@@ -1573,7 +1573,7 @@ function AdminPage() {
                   </div>
                 </section>
 
-                <section className="fade-in-up delay-2 admin__section admin__section--dashboard-main">
+                <section className="fade-in-up delay-2 admin__section admin__section--dashboard-main admin__section--dashboard-feature">
                   <div
                     className={`admin__analytics-grid admin__analytics-grid--dashboard-main ${
                       isMobileView ? "admin__analytics-grid--mobile" : ""
@@ -2651,7 +2651,7 @@ function AdminPage() {
                     </div>
                   )}
 
-                  <div className="pb-surface-card admin__section-card admin__maintenance-panel">
+                  <div className="pb-surface-card admin__section-card admin__maintenance-panel admin__section-card--subtle">
                     <div
                       className={`admin__section-header ${
                         isMobileView ? "admin__section-header--mobile" : ""
@@ -2858,7 +2858,7 @@ function AdminPage() {
 
                   {filteredCourts.length > 0 ? (
                     <div
-                      className={`admin__cards ${
+                      className={`admin__cards admin__cards--courts ${
                         isMobileView ? "admin__cards--mobile" : ""
                       }`}
                     >
