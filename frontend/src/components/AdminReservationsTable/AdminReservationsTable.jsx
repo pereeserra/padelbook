@@ -9,6 +9,7 @@ function AdminReservationsTable({ reservations = [] }) {
   const [selectedReservation, setSelectedReservation] = useState(null);
   const [detailLoadingId, setDetailLoadingId] = useState(null);
   const reservationCardRefs = useRef({});
+  const expandedDetailRefs = useRef({});
   const [closingReservationId, setClosingReservationId] = useState(null);
 
   // Normalitza i ordena les reserves per data i hora de forma descendente
@@ -160,6 +161,25 @@ function formatTime(time) {
     });
   };
 
+  const scrollToExpandedDetail = (reservationId) => {
+    window.requestAnimationFrame(() => {
+      window.setTimeout(() => {
+        const expandedDetail = expandedDetailRefs.current[reservationId];
+
+        if (expandedDetail) {
+          const topOffset = 132;
+          const detailTop =
+            expandedDetail.getBoundingClientRect().top + window.scrollY - topOffset;
+
+          window.scrollTo({
+            top: Math.max(detailTop, 0),
+            behavior: "smooth",
+          });
+        }
+      }, 180);
+    });
+  };
+
   const closeReservationDetail = (reservationId = selectedReservation?.id) => {
     if (!reservationId) return;
 
@@ -191,9 +211,7 @@ function formatTime(time) {
 
       setSelectedReservation(reservationDetail);
 
-      window.setTimeout(() => {
-        scrollToReservationCard(id);
-      }, 60);
+      scrollToExpandedDetail(id);
     } catch (err) {
       console.error(err);
       alert("Error carregant el detall de la reserva");
@@ -258,6 +276,13 @@ function formatTime(time) {
             ? "admin-res__expandable-wrap--closing"
             : ""
         }`}
+        ref={(node) => {
+          if (node) {
+            expandedDetailRefs.current[reservationId] = node;
+          } else {
+            delete expandedDetailRefs.current[reservationId];
+          }
+        }}
       >
         <div className="admin-res__expandable-card">
           <div className="admin-res__expandable-head">
