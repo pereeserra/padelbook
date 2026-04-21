@@ -250,6 +250,12 @@ function MyReservationsPage() {
     return reservations.filter((reservation) => reservation.estat === "cancel·lada");
   }, [reservations]);
 
+  const normalizeReservationDateForFilter = (value) => {
+      if (!value) return "";
+
+      return String(value).split("T")[0];
+    };
+
   const sortReservationsForView = (list, filter) => {
     const sorted = [...list];
 
@@ -289,7 +295,8 @@ function MyReservationsPage() {
 
     if (selectedDate) {
       baseList = baseList.filter(
-        (reservation) => reservation.data_reserva === selectedDate
+        (reservation) =>
+          normalizeReservationDateForFilter(reservation.data_reserva) === selectedDate
       );
     }
 
