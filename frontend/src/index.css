@@ -349,6 +349,15 @@ p {
   line-height: 1.6;
 }
 
+.pb-input::placeholder,
+.pb-textarea::placeholder {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.98rem;
+  font-weight: 500;
+  color: #94a3b8; /* més elegant i subtil */
+  opacity: 1;
+}
+
 .pb-input:focus,
 .pb-textarea:focus,
 .pb-select:focus {
