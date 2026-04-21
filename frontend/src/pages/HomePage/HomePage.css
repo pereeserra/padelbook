@@ -171,6 +171,16 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
+}
+
+.home__mockup-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 42px rgba(15, 23, 42, 0.12);
+  border-color: rgba(96, 165, 250, 0.32);
 }
 
 .home__mockup-top {
@@ -204,6 +214,7 @@
   border-radius: 16px;
   overflow: hidden;
   border: 2px solid rgba(255, 255, 255, 0.7);
+  transition: transform 0.22s ease;
 }
 
 .home__mockup-court img {
@@ -233,6 +244,10 @@
   border-radius: 16px;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
+  transition:
+    transform 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease;
 }
 
 .home__mockup-hour {
@@ -275,16 +290,6 @@
   border-radius: 22px;
   padding: 1rem;
   box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
-}
-
-.home__mockup-mini-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.08);
-  border-color: rgba(96, 165, 250, 0.3);
 }
 
 .home__mockup-mini-eyebrow {
@@ -310,6 +315,15 @@
   color: #64748b;
   line-height: 1.6;
   font-size: 0.95rem;
+}
+
+.home__mockup-card:hover .home__mockup-court {
+  transform: scale(1.015);
+}
+
+.home__mockup-card:hover .home__mockup-slot-row {
+  border-color: rgba(96, 165, 250, 0.22);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
 }
 
 .home__court-line-vertical {
