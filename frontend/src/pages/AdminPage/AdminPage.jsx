@@ -1354,7 +1354,7 @@ function AdminPage() {
               isMobileView ? "admin__hero-grid--mobile" : ""
             }`}
           >
-            <div>
+            <div className="admin__hero-content">
               <span className="pb-chip">Administració</span>
 
               <h1

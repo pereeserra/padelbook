@@ -35,8 +35,13 @@
   align-items: center;
 }
 
-.admin__hero-grid--mobile {
-  grid-template-columns: 1fr;
+.admin__hero-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100%;
+  padding-top: 0.25rem;
+  padding-bottom: 0.35rem;
 }
 
 .admin__title {
@@ -63,7 +68,7 @@
   align-items: center;
   gap: 0.5rem;
   flex-wrap: wrap;
-  margin-top: 1.65rem;
+  margin-top: 2.15rem;
   padding: 0.38rem;
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.08);
