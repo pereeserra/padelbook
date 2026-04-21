@@ -144,12 +144,12 @@ function HomePage() {
 
         <section className="fade-in-up delay-1 home__section">
           <div className="home__section-header">
-            <span className="home__section-kicker">Per què destaca?</span>
-            <h2 className="home__section-title">Una home que convida a explorar</h2>
+            <span className="home__section-kicker">Per què PadelBook?</span>
+            <h2 className="home__section-title">Una entrada clara al món de les reserves de pàdel</h2>
             <p className="home__section-text">
-              En lloc de semblar una pràctica bàsica, aquesta nova línia visual
-              cerca que la web tengui presència, profunditat i una primera
-              impressió molt més bona.
+              La pàgina d’inici està pensada per mostrar des del primer moment
+              què pots fer dins PadelBook: consultar disponibilitat, reservar
+              pistes i gestionar les teves reserves de manera ràpida i visual.
             </p>
           </div>
 
@@ -193,11 +193,12 @@ function HomePage() {
 
         <section className="fade-in-up delay-2 home__section">
           <div className="home__section-header">
-            <span className="home__section-kicker">Ambient visual</span>
-            <h2 className="home__section-title">Tres àrees que fan més viva la web</h2>
+            <span className="home__section-kicker">Què hi trobaràs?</span>
+            <h2 className="home__section-title">Tres àrees clau per reservar, consultar i gestionar</h2>
             <p className="home__section-text">
-              Encara no hem posat fotografies reals, però ja hem creat blocs
-              visuals forts perquè la pàgina deixi de veure’s plana.
+              PadelBook agrupa les accions principals en tres blocs molt clars:
+              veure disponibilitat, fer reserves i tenir el control del teu
+              compte i historial dins un mateix entorn.
             </p>
           </div>
 
@@ -307,7 +308,7 @@ function HomePage() {
               <p className="home__cta-text">
                 {isLoggedIn
                   ? "Accedeix a les teves reserves, consulta disponibilitat i gestiona-ho tot de forma ràpida i clara."
-                  : "Aquesta és només la primera passa del canvi visual. A partir d’aquí podem dur aquest mateix estil a login, register, disponibilitat, reserves i admin."}
+                  : "Descobreix pistes disponibles, reserva en pocs passos i comença a gestionar el teu joc dins una experiència més moderna i ordenada."}
               </p>
             </div>
 
