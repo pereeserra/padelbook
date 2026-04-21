@@ -251,10 +251,22 @@ function MyReservationsPage() {
   }, [reservations]);
 
   const normalizeReservationDateForFilter = (value) => {
-      if (!value) return "";
+    if (!value) return "";
 
-      return String(value).split("T")[0];
-    };
+    const rawValue = String(value).trim();
+
+    const isoMatch = rawValue.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (isoMatch) {
+      return `${isoMatch[1]}-${isoMatch[2]}-${isoMatch[3]}`;
+    }
+
+    const localMatch = rawValue.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (localMatch) {
+      return `${localMatch[3]}-${localMatch[2]}-${localMatch[1]}`;
+    }
+
+    return rawValue;
+  };
 
   const sortReservationsForView = (list, filter) => {
     const sorted = [...list];
