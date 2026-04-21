@@ -7,7 +7,7 @@ function AdminReservationsTable({ reservations = [] }) {
   const [statusFilter, setStatusFilter] = useState("totes");
 
   const [selectedReservation, setSelectedReservation] = useState(null);
-  const [loadingDetail, setLoadingDetail] = useState(false);
+  const [detailLoadingId, setDetailLoadingId] = useState(null);
 
   // Normalitza i ordena les reserves per data i hora de forma descendente
   const normalizedReservations = useMemo(() => {
@@ -140,8 +140,13 @@ function formatTime(time) {
   };
 
   const handleViewReservationDetail = async (id) => {
+    if (selectedReservation?.id === id) {
+      setSelectedReservation(null);
+      return;
+    }
+
     try {
-      setLoadingDetail(true);
+      setDetailLoadingId(id);
 
       const res = await api.get(`/admin/reservations/${id}`);
 
@@ -150,7 +155,7 @@ function formatTime(time) {
       console.error(err);
       alert("Error carregant el detall de la reserva");
     } finally {
-      setLoadingDetail(false);
+      setDetailLoadingId(null);
     }
   };
 
@@ -196,108 +201,125 @@ function formatTime(time) {
     );
   }
 
-  const DetailModal = () => {
-    if (!selectedReservation) return null;
+  const renderExpandedDetail = (reservationId) => {
+    if (selectedReservation?.id !== reservationId) return null;
 
     const r = selectedReservation;
 
     return (
-      <div className="admin-res__modal-overlay">
-        <div className="admin-res__modal">
-          <div className="admin-res__modal-header">
-            <h3>Detall de reserva</h3>
-            <span className="admin-res__code-badge">
-              {r.codi_reserva || "Sense codi"}
+      <div className="admin-res__expandable-wrap">
+        <div className="admin-res__expandable-card">
+          <div className="admin-res__expandable-head">
+            <div className="admin-res__expandable-title-block">
+              <span className="admin-res__expandable-kicker">
+                Detall de reserva
+              </span>
+              <h4 className="admin-res__expandable-title">
+                {r.codi_reserva || "Sense codi"}
+              </h4>
+            </div>
+
+            <button
+              type="button"
+              className="btn btn-light btn-sm admin-res__expandable-close"
+              onClick={closeReservationDetail}
+            >
+              Amagar detall
+            </button>
+          </div>
+
+          <div className="admin-res__expandable-summary">
+            <span className={getReservationStatusClass(r.estat)}>
+              {r.estat || "Sense estat"}
+            </span>
+            <span className={getPaymentStatusClass(r.estat_pagament)}>
+              {paymentStatusLabel(r.estat_pagament)}
+            </span>
+            <span className={getPaymentMethodClass(r.metode_pagament)}>
+              {paymentMethodLabel(r.metode_pagament)}
             </span>
           </div>
 
-          <div className="admin-res__modal-grid">
-            <div className="admin-res__modal-item">
-              <span className="admin-res__modal-label">ID reserva</span>
-              <span>{r.id}</span>
+          <div className="admin-res__expandable-grid">
+            <div className="admin-res__expandable-item">
+              <span className="admin-res__expandable-label">ID reserva</span>
+              <span className="admin-res__expandable-value">{r.id}</span>
             </div>
 
-            <div className="admin-res__modal-item">
-              <span className="admin-res__modal-label">Usuari</span>
-              <span>{r.usuari_nom}</span>
+            <div className="admin-res__expandable-item">
+              <span className="admin-res__expandable-label">Usuari</span>
+              <span className="admin-res__expandable-value">
+                {r.usuari_nom || "-"}
+              </span>
             </div>
 
-            <div className="admin-res__modal-item">
-              <span className="admin-res__modal-label">Email</span>
-              <span>{r.usuari_email}</span>
+            <div className="admin-res__expandable-item">
+              <span className="admin-res__expandable-label">Email</span>
+              <span className="admin-res__expandable-value">
+                {r.usuari_email || "-"}
+              </span>
             </div>
 
-            <div className="admin-res__modal-item">
-              <span className="admin-res__modal-label">ID usuari</span>
-              <span>{r.user_id}</span>
+            <div className="admin-res__expandable-item">
+              <span className="admin-res__expandable-label">Telèfon</span>
+              <span className="admin-res__expandable-value">
+                {r.usuari_telefon || "-"}
+              </span>
             </div>
 
-            <div className="admin-res__modal-item">
-              <span className="admin-res__modal-label">Pista</span>
-              <span>{r.nom_pista}</span>
+            <div className="admin-res__expandable-item">
+              <span className="admin-res__expandable-label">Pista</span>
+              <span className="admin-res__expandable-value">
+                {r.nom_pista || "-"}
+              </span>
             </div>
 
-            <div className="admin-res__modal-item">
-              <span className="admin-res__modal-label">ID pista</span>
-              <span>{r.court_id}</span>
-            </div>
-
-            <div className="admin-res__modal-item">
-              <span className="admin-res__modal-label">Franja</span>
-              <span>
+            <div className="admin-res__expandable-item">
+              <span className="admin-res__expandable-label">Franja</span>
+              <span className="admin-res__expandable-value">
                 {formatTime(r.hora_inici)} - {formatTime(r.hora_fi)}
               </span>
             </div>
 
-            <div className="admin-res__modal-item">
-              <span className="admin-res__modal-label">ID franja</span>
-              <span>{r.time_slot_id}</span>
+            <div className="admin-res__expandable-item">
+              <span className="admin-res__expandable-label">Data</span>
+              <span className="admin-res__expandable-value">
+                {formatDate(r.data_reserva)}
+              </span>
             </div>
 
-            <div className="admin-res__modal-item">
-              <span className="admin-res__modal-label">Data</span>
-              <span>{formatDate(r.data_reserva)}</span>
+            <div className="admin-res__expandable-item">
+              <span className="admin-res__expandable-label">Import</span>
+              <span className="admin-res__expandable-value admin-res__expandable-value--price">
+                {r.preu_total != null ? `${Number(r.preu_total).toFixed(2)} €` : "-"}
+              </span>
             </div>
 
-            <div className="admin-res__modal-item">
-              <span className="admin-res__modal-label">Estat</span>
-              <span>{r.estat}</span>
+            <div className="admin-res__expandable-item">
+              <span className="admin-res__expandable-label">ID usuari</span>
+              <span className="admin-res__expandable-value">{r.user_id || "-"}</span>
             </div>
 
-            <div className="admin-res__modal-item">
-              <span className="admin-res__modal-label">Pagament</span>
-              <span>{paymentStatusLabel(r.estat_pagament)}</span>
+            <div className="admin-res__expandable-item">
+              <span className="admin-res__expandable-label">ID pista</span>
+              <span className="admin-res__expandable-value">{r.court_id || "-"}</span>
             </div>
 
-            <div className="admin-res__modal-item">
-              <span className="admin-res__modal-label">Mètode</span>
-              <span>{paymentMethodLabel(r.metode_pagament)}</span>
+            <div className="admin-res__expandable-item">
+              <span className="admin-res__expandable-label">ID franja</span>
+              <span className="admin-res__expandable-value">
+                {r.time_slot_id || "-"}
+              </span>
             </div>
 
-            <div className="admin-res__modal-item">
-              <span className="admin-res__modal-label">Import</span>
-              <span>{r.preu_total} €</span>
-            </div>
-
-            <div className="admin-res__modal-item">
-              <span className="admin-res__modal-label">Creat</span>
-              <span>
+            <div className="admin-res__expandable-item">
+              <span className="admin-res__expandable-label">Creat</span>
+              <span className="admin-res__expandable-value">
                 {r.created_at
                   ? new Date(r.created_at).toLocaleString("ca-ES")
                   : "-"}
               </span>
             </div>
-          </div>
-
-          <div className="admin-res__modal-item admin-res__modal-item--full">
-            <span className="admin-res__modal-label">Telèfon</span>
-            <span>{r.usuari_telefon || "-"}</span>
-          </div>
-
-          <div className="admin-res__modal-actions">
-            <button className="btn btn-light" onClick={closeReservationDetail}>
-              Tancar
-            </button>
           </div>
         </div>
       </div>
@@ -306,8 +328,7 @@ function formatTime(time) {
 
   return (
     <>
-      <DetailModal />
-    <div className="admin-res__wrapper">
+      <div className="admin-res__wrapper">
       <div className="admin-res__header">
         <div>
           <span className="admin-res__eyebrow">Control administratiu</span>
@@ -394,6 +415,9 @@ function formatTime(time) {
                   ? `${Number(reservation.preu).toFixed(2)} €`
                   : "-";
 
+            const isExpanded = selectedReservation?.id === reservation.id;
+            const isLoadingThisDetail = detailLoadingId === reservation.id;
+
             return (
               <article key={reservation.id} className="admin-res__card">
                 <div className="admin-res__card-top">
@@ -457,13 +481,19 @@ function formatTime(time) {
                 </div>
 
                 <div className="admin-res__card-footer">
-                  <div style={{ display: "flex", gap: "8px" }}>
+                  <div className="admin-res__card-footer-row">
                     <button
                       type="button"
-                      className="btn btn-light"
+                      className={`btn btn-light admin-res__toggle-detail-btn ${
+                        isExpanded ? "admin-res__toggle-detail-btn--active" : ""
+                      }`}
                       onClick={() => handleViewReservationDetail(reservation.id)}
                     >
-                      Veure detall
+                      {isLoadingThisDetail
+                        ? "Carregant..."
+                        : isExpanded
+                          ? "Amagar detall"
+                          : "Veure detall"}
                     </button>
 
                     <div className="admin-res__payment-block">
@@ -485,6 +515,8 @@ function formatTime(time) {
                     </div>
                   </div>
                 </div>
+
+                {renderExpandedDetail(reservation.id)}
               </article>
             );
           })}
