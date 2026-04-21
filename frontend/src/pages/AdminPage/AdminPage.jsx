@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import api from "../../api/axios";
 import CreateCourtForm from "../../components/CreateCourtForm/CreateCourtForm";
 import CourtCard from "../../components/CourtCard/CourtCard";
@@ -2356,168 +2356,188 @@ function AdminPage() {
                                 Number(confirmingUserRoleId) === Number(user.id);
 
                               return (
-                                <tr
-                                  key={user.id}
-                                  ref={(node) => {
-                                    if (node) {
-                                      userRowRefs.current[user.id] = node;
-                                    } else {
-                                      delete userRowRefs.current[user.id];
-                                    }
-                                  }}
-                                >
-                                  <td>{user.id}</td>
-                                  <td>{user.nom}</td>
-                                  <td>{user.email}</td>
-                                  <td>
-                                    <span
-                                      className={`admin__role-badge ${
-                                        (user.rol || "").toLowerCase() === "admin"
-                                          ? "admin__role-badge--admin"
-                                          : "admin__role-badge--user"
-                                      }`}
-                                    >
-                                      {user.rol}
-                                    </span>
-                                  </td>
-                                  <td>{formatDateTime(user.created_at)}</td>
-                                  <td>
-                                    <div className="admin__table-actions">
-                                      <button
-                                        type="button"
-                                        className={`btn btn-light btn-sm ${
-                                          isSelectedUser ? "admin__user-view-button--active" : ""
+                                <Fragment key={user.id}>
+                                  <tr
+                                    ref={(node) => {
+                                      if (node) {
+                                        userRowRefs.current[user.id] = node;
+                                      } else {
+                                        delete userRowRefs.current[user.id];
+                                      }
+                                    }}
+                                  >
+                                    <td>{user.id}</td>
+                                    <td>{user.nom}</td>
+                                    <td>{user.email}</td>
+                                    <td>
+                                      <span
+                                        className={`admin__role-badge ${
+                                          (user.rol || "").toLowerCase() === "admin"
+                                            ? "admin__role-badge--admin"
+                                            : "admin__role-badge--user"
                                         }`}
-                                        onClick={() => handleViewUserDetail(user.id)}
                                       >
-                                        {isSelectedUser ? "Amagar" : "Veure"}
-                                      </button>
+                                        {user.rol}
+                                      </span>
+                                    </td>
+                                    <td>{formatDateTime(user.created_at)}</td>
+                                    <td>
+                                      <div className="admin__table-actions">
+                                        <button
+                                          type="button"
+                                          className={`btn btn-light btn-sm ${
+                                            isSelectedUser ? "admin__user-view-button--active" : ""
+                                          }`}
+                                          onClick={() => handleViewUserDetail(user.id)}
+                                        >
+                                          {isSelectedUser ? "Amagar" : "Veure"}
+                                        </button>
 
-                                      {isConfirmingRoleChange ? (
-                                        <div className="admin__role-confirm-inline">
+                                        <div className="admin__role-action-wrap">
                                           <button
                                             type="button"
-                                            className="btn btn-primary btn-sm admin__user-role-button"
-                                            onClick={() => handleToggleUserRole(user)}
+                                            className={`btn btn-light btn-sm admin__user-role-button ${
+                                              isConfirmingRoleChange
+                                                ? "admin__user-role-button--pending"
+                                                : ""
+                                            }`}
+                                            onClick={() =>
+                                              isConfirmingRoleChange
+                                                ? handleCancelUserRoleChange()
+                                                : handleStartUserRoleChange(user.id)
+                                            }
                                             disabled={
                                               updatingUserRoleId === user.id ||
                                               isCurrentUser
                                             }
                                           >
-                                            {updatingUserRoleId === user.id
-                                              ? "Canviant..."
-                                              : "Confirmar rol"}
+                                            {isConfirmingRoleChange
+                                              ? "Canvi de rol"
+                                              : "Canviar rol"}
                                           </button>
 
-                                          <button
-                                            type="button"
-                                            className="btn btn-light btn-sm"
-                                            onClick={handleCancelUserRoleChange}
-                                            disabled={updatingUserRoleId === user.id}
-                                          >
-                                            Cancel·lar
-                                          </button>
+                                          {isConfirmingRoleChange && (
+                                            <div className="admin__role-confirm-popover">
+                                              <button
+                                                type="button"
+                                                className="btn btn-primary btn-sm admin__user-role-button"
+                                                onClick={() => handleToggleUserRole(user)}
+                                                disabled={
+                                                  updatingUserRoleId === user.id ||
+                                                  isCurrentUser
+                                                }
+                                              >
+                                                {updatingUserRoleId === user.id
+                                                  ? "Canviant..."
+                                                  : "Confirmar"}
+                                              </button>
+
+                                              <button
+                                                type="button"
+                                                className="btn btn-light btn-sm"
+                                                onClick={handleCancelUserRoleChange}
+                                                disabled={updatingUserRoleId === user.id}
+                                              >
+                                                Cancel·lar
+                                              </button>
+                                            </div>
+                                          )}
                                         </div>
-                                      ) : (
-                                        <button
-                                          type="button"
-                                          className="btn btn-light btn-sm admin__user-role-button"
-                                          onClick={() => handleStartUserRoleChange(user.id)}
-                                          disabled={
-                                            updatingUserRoleId === user.id ||
-                                            isCurrentUser
-                                          }
+                                      </div>
+                                    </td>
+                                  </tr>
+
+                                  {isSelectedUser && (
+                                    <tr className="admin__user-detail-row">
+                                      <td colSpan="6">
+                                        <div
+                                          ref={userDetailCardRef}
+                                          className="admin__user-detail-card"
                                         >
-                                          Canviar rol
-                                        </button>
-                                      )}
-                                    </div>
-                                  </td>
-                                </tr>
+                                          <div className="admin__user-detail-header">
+                                            <div className="admin__user-detail-heading">
+                                              <span className="pb-kicker">Detall d'usuari</span>
+                                              <h3 className="admin__analytics-title">
+                                                {selectedUser.nom}
+                                              </h3>
+
+                                              <div className="admin__user-detail-summary">
+                                                <span
+                                                  className={`admin__role-badge ${
+                                                    (selectedUser.rol || "").toLowerCase() === "admin"
+                                                      ? "admin__role-badge--admin"
+                                                      : "admin__role-badge--user"
+                                                  }`}
+                                                >
+                                                  {selectedUser.rol}
+                                                </span>
+
+                                                <span className="admin__user-detail-summary-pill">
+                                                  {selectedUser.total_reserves} reserves
+                                                </span>
+                                              </div>
+                                            </div>
+                                          </div>
+
+                                          {loadingUserDetail ? (
+                                            <p className="admin__user-detail-loading">
+                                              Carregant detall d'usuari...
+                                            </p>
+                                          ) : (
+                                            <div className="admin__user-detail-grid">
+                                              <div className="admin__user-detail-item">
+                                                <span className="admin__user-detail-label">ID</span>
+                                                <strong className="admin__user-detail-value">
+                                                  {selectedUser.id}
+                                                </strong>
+                                              </div>
+
+                                              <div className="admin__user-detail-item">
+                                                <span className="admin__user-detail-label">Nom</span>
+                                                <strong className="admin__user-detail-value">
+                                                  {selectedUser.nom}
+                                                </strong>
+                                              </div>
+
+                                              <div className="admin__user-detail-item">
+                                                <span className="admin__user-detail-label">Email</span>
+                                                <strong className="admin__user-detail-value">
+                                                  {selectedUser.email}
+                                                </strong>
+                                              </div>
+
+                                              <div className="admin__user-detail-item">
+                                                <span className="admin__user-detail-label">Telèfon</span>
+                                                <strong className="admin__user-detail-value">
+                                                  {selectedUser.telefon || "—"}
+                                                </strong>
+                                              </div>
+
+                                              <div className="admin__user-detail-item">
+                                                <span className="admin__user-detail-label">Registre</span>
+                                                <strong className="admin__user-detail-value">
+                                                  {formatDateTime(selectedUser.created_at)}
+                                                </strong>
+                                              </div>
+
+                                              <div className="admin__user-detail-item">
+                                                <span className="admin__user-detail-label">Total reserves</span>
+                                                <strong className="admin__user-detail-value">
+                                                  {selectedUser.total_reserves}
+                                                </strong>
+                                              </div>
+                                            </div>
+                                          )}
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  )}
+                                </Fragment>
                               );
                             })}
                           </tbody>
                         </table>
                       </div>
-
-                      {selectedUser && (
-                        <div ref={userDetailCardRef} className="admin__user-detail-card">
-                          <div className="admin__user-detail-header">
-                            <div className="admin__user-detail-heading">
-                              <span className="pb-kicker">Detall d'usuari</span>
-                              <h3 className="admin__analytics-title">
-                                {selectedUser.nom}
-                              </h3>
-
-                              <div className="admin__user-detail-summary">
-                                <span
-                                  className={`admin__role-badge ${
-                                    (selectedUser.rol || "").toLowerCase() === "admin"
-                                      ? "admin__role-badge--admin"
-                                      : "admin__role-badge--user"
-                                  }`}
-                                >
-                                  {selectedUser.rol}
-                                </span>
-
-                                <span className="admin__user-detail-summary-pill">
-                                  {selectedUser.total_reserves} reserves
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {loadingUserDetail ? (
-                            <p className="admin__user-detail-loading">
-                              Carregant detall d'usuari...
-                            </p>
-                          ) : (
-                            <div className="admin__user-detail-grid">
-                              <div className="admin__user-detail-item">
-                                <span className="admin__user-detail-label">ID</span>
-                                <strong className="admin__user-detail-value">
-                                  {selectedUser.id}
-                                </strong>
-                              </div>
-
-                              <div className="admin__user-detail-item">
-                                <span className="admin__user-detail-label">Nom</span>
-                                <strong className="admin__user-detail-value">
-                                  {selectedUser.nom}
-                                </strong>
-                              </div>
-
-                              <div className="admin__user-detail-item">
-                                <span className="admin__user-detail-label">Email</span>
-                                <strong className="admin__user-detail-value">
-                                  {selectedUser.email}
-                                </strong>
-                              </div>
-
-                              <div className="admin__user-detail-item">
-                                <span className="admin__user-detail-label">Telèfon</span>
-                                <strong className="admin__user-detail-value">
-                                  {selectedUser.telefon || "—"}
-                                </strong>
-                              </div>
-
-                              <div className="admin__user-detail-item">
-                                <span className="admin__user-detail-label">Registre</span>
-                                <strong className="admin__user-detail-value">
-                                  {formatDateTime(selectedUser.created_at)}
-                                </strong>
-                              </div>
-
-                              <div className="admin__user-detail-item">
-                                <span className="admin__user-detail-label">Total reserves</span>
-                                <strong className="admin__user-detail-value">
-                                  {selectedUser.total_reserves}
-                                </strong>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
                     </>
                   ) : (
                     <div className="pb-surface-card admin__empty-filtered-state">

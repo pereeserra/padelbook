@@ -1075,6 +1075,16 @@
   background: #f8fafc;
 }
 
+.admin__user-detail-row:hover {
+  background: transparent !important;
+}
+
+.admin__user-detail-row td {
+  padding: 0 0 1rem 0;
+  border-bottom: 1px solid #f1f5f9;
+  background: transparent;
+}
+
 /* ID columna més discreta */
 .admin__table td:first-child {
   font-weight: 700;
@@ -1140,11 +1150,32 @@
   color: #1d4ed8;
 }
 
-.admin__role-confirm-inline {
+.admin__role-action-wrap {
+  position: relative;
   display: inline-flex;
   align-items: center;
+}
+
+.admin__role-confirm-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
   gap: 0.5rem;
-  flex-wrap: wrap;
+  padding: 0.65rem;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #dbeafe;
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.12);
+  white-space: nowrap;
+}
+
+.admin__user-role-button--pending {
+  border-color: #bfdbfe;
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  color: #1d4ed8;
 }
 
 .admin__role-cell {
@@ -1173,7 +1204,7 @@
 }
 
 .admin__user-detail-card {
-  margin-top: 1.35rem;
+  margin-top: 0.85rem;
   border-radius: 22px;
   padding: 1.25rem;
   border: 1px solid rgba(191, 219, 254, 0.75);
@@ -1283,12 +1314,16 @@
     align-items: flex-start;
   }
 
-  .admin__role-confirm-inline {
+  .admin__role-action-wrap {
     width: 100%;
   }
 
-  .admin__role-confirm-inline .btn {
-    width: 100%;
+  .admin__role-confirm-popover {
+    left: 0;
+    right: auto;
+    width: max-content;
+    max-width: calc(100vw - 64px);
+    flex-wrap: wrap;
   }
 
   .admin__user-detail-grid {
