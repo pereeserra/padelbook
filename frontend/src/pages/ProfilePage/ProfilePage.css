@@ -702,3 +702,20 @@
     width: auto;
   }
 }
+
+.pb-input--error {
+  border-color: #fca5a5;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.08);
+}
+
+.pb-form-help {
+  display: block;
+  margin-top: 0.45rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.pb-form-help--error {
+  color: #b91c1c;
+  font-weight: 700;
+}

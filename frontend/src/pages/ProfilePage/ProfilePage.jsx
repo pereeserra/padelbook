@@ -157,6 +157,26 @@ function ProfilePage() {
     );
   }, [profile, normalizedProfile, normalizedForm]);
 
+  const normalizedPhone = useMemo(() => {
+    return (formData.telefon || "").replace(/\s+/g, "").trim();
+  }, [formData.telefon]);
+
+  const isPhoneValid = useMemo(() => {
+    if (!normalizedPhone) return true;
+    return /^[0-9]{9}$/.test(normalizedPhone);
+  }, [normalizedPhone]);
+
+  const phoneValidationMessage = useMemo(() => {
+    if (!normalizedPhone) return "";
+    if (!/^[0-9]+$/.test(normalizedPhone)) {
+      return "El número de telèfon només pot contenir números.";
+    }
+    if (!/^[0-9]{9}$/.test(normalizedPhone)) {
+      return "El número de telèfon ha de tenir exactament 9 dígits.";
+    }
+    return "";
+  }, [normalizedPhone]);
+
   const firstName = useMemo(() => {
     if (!profile?.nom) return "Usuari";
     return profile.nom;
@@ -302,6 +322,7 @@ function ProfilePage() {
     const cleanNom = normalizeSpaces(formData.nom);
     const cleanLlinatges = normalizeSpaces(formData.llinatges);
     const cleanEmail = formData.email.trim().toLowerCase();
+    const cleanTelefon = (formData.telefon || "").replace(/\s+/g, "").trim();
 
     if (!cleanNom || !cleanLlinatges || !cleanEmail) {
       return "Has d'omplir el nom, els llinatges i el correu electrònic.";
@@ -318,6 +339,10 @@ function ProfilePage() {
     const emailRegex = /^[^\s@]{2,}@[^\s@]{2,}\.[A-Za-z]{2,}$/;
     if (!emailRegex.test(cleanEmail)) {
       return "Introdueix un correu electrònic vàlid.";
+    }
+
+    if (cleanTelefon && !/^[0-9]{9}$/.test(cleanTelefon)) {
+      return "Introdueix un número de telèfon vàlid de 9 dígits.";
     }
 
     return "";
@@ -785,8 +810,16 @@ function ProfilePage() {
                           value={formData.telefon}
                           onChange={handleProfileChange}
                           placeholder="Ex: 600123456"
-                          className="pb-input"
+                          className={`pb-input ${!isPhoneValid ? "pb-input--error" : ""}`}
+                          inputMode="numeric"
+                          autoComplete="tel"
+                          maxLength={9}
                         />
+                        {phoneValidationMessage && (
+                          <span className="pb-form-help pb-form-help--error">
+                            {phoneValidationMessage}
+                          </span>
+                        )}
                       </div>
                     </div>
 
@@ -814,7 +847,7 @@ function ProfilePage() {
                       <button
                         type="submit"
                         className="btn btn-primary"
-                        disabled={savingProfile || !hasProfileChanges}
+                        disabled={savingProfile || !hasProfileChanges || !isPhoneValid}
                       >
                         {savingProfile ? "Guardant canvis..." : "Guardar canvis"}
                       </button>
