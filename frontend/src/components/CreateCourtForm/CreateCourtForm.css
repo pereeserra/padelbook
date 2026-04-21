@@ -59,12 +59,13 @@
 
 .court-form__top-panel-summary {
   display: grid;
-  gap: 0.7rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.45rem;
 }
 
 .court-form__summary-item {
-  border-radius: 18px;
-  padding: 0.9rem 1rem;
+  border-radius: 14px;
+  padding: 0.55rem 0.75rem;
   background: rgba(255, 255, 255, 0.74);
   border: 1px solid rgba(191, 219, 254, 0.9);
 }
@@ -72,17 +73,18 @@
 .court-form__summary-label {
   display: block;
   color: #64748b;
-  font-size: 0.74rem;
+  font-size: 0.65rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.1rem;
 }
 
 .court-form__summary-value {
   color: #0f172a;
   font-weight: 800;
-  line-height: 1.4;
+  line-height: 1.2;
+  font-size: 0.9rem;
 }
 
 .court-form__form-grid {
