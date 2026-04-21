@@ -257,7 +257,9 @@ exports.updateMe = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    let { nom, llinatges, email } = req.body;
+    let { nom, llinatges, email, telefon } = req.body;
+
+    telefon = typeof telefon === "string" ? telefon.trim() : null;
 
     nom = normalizeFullName(nom);
     llinatges = normalizeFullName(llinatges);
@@ -293,9 +295,20 @@ exports.updateMe = async (req, res) => {
       );
     }
 
+    if (telefon && !/^[0-9]{9,15}$/.test(telefon)) {
+      return fail(res, "El número de telèfon no és vàlid.", 400);
+    }
+
     await db.query(
-      "UPDATE users SET nom = ?, llinatges = ?, email = ?, email_verificat = ? WHERE id = ?",
-      [nom, llinatges, email, emailChanged ? 0 : currentUser.email_verificat, userId]
+      "UPDATE users SET nom = ?, llinatges = ?, email = ?, telefon = ?, email_verificat = ? WHERE id = ?",
+      [
+        nom,
+        llinatges,
+        email,
+        telefon,
+        emailChanged ? 0 : currentUser.email_verificat,
+        userId
+      ]
     );
 
     if (emailChanged) {

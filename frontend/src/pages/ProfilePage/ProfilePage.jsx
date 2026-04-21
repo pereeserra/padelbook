@@ -23,6 +23,7 @@ function ProfilePage() {
     nom: "",
     llinatges: "",
     email: "",
+    telefon: "",
   });
 
   const [passwordData, setPasswordData] = useState({
@@ -100,6 +101,7 @@ function ProfilePage() {
         nom: userData.nom || "",
         llinatges: userData.llinatges || "",
         email: userData.email || "",
+        telefon: userData.telefon || "",
       });
 
       localStorage.setItem("user", JSON.stringify(userData));
@@ -131,6 +133,7 @@ function ProfilePage() {
       nom: normalizeSpaces(profile?.nom || ""),
       llinatges: normalizeSpaces(profile?.llinatges || ""),
       email: (profile?.email || "").trim().toLowerCase(),
+      telefon: (profile?.telefon || "").trim(),
     };
   }, [profile]);
 
@@ -139,6 +142,7 @@ function ProfilePage() {
       nom: normalizeSpaces(formData.nom || ""),
       llinatges: normalizeSpaces(formData.llinatges || ""),
       email: (formData.email || "").trim().toLowerCase(),
+      telefon: (formData.telefon || "").trim(),
     };
   }, [formData]);
 
@@ -148,7 +152,8 @@ function ProfilePage() {
     return (
       normalizedProfile.nom !== normalizedForm.nom ||
       normalizedProfile.llinatges !== normalizedForm.llinatges ||
-      normalizedProfile.email !== normalizedForm.email
+      normalizedProfile.email !== normalizedForm.email ||
+      normalizedProfile.telefon !== normalizedForm.telefon
     );
   }, [profile, normalizedProfile, normalizedForm]);
 
@@ -359,6 +364,7 @@ function ProfilePage() {
       nom: profile.nom || "",
       llinatges: profile.llinatges || "",
       email: profile.email || "",
+      telefon: profile.telefon || "",
     });
 
     showFeedbackMessage("S'han restablert els canvis pendents del perfil.", "success");
@@ -400,6 +406,7 @@ function ProfilePage() {
         nom: normalizeSpaces(formData.nom),
         llinatges: normalizeSpaces(formData.llinatges),
         email: formData.email.trim().toLowerCase(),
+        telefon: (formData.telefon || "").trim(),
       };
 
       const response = await api.put("/auth/me", payload);
@@ -413,6 +420,7 @@ function ProfilePage() {
         nom: updatedUser.nom || payload.nom,
         llinatges: updatedUser.llinatges || payload.llinatges,
         email: updatedUser.email || payload.email,
+        telefon: updatedUser.telefon || payload.telefon,
       });
 
       localStorage.setItem("user", JSON.stringify(updatedUser));
@@ -763,6 +771,21 @@ function ProfilePage() {
                           placeholder="exemple@correu.com"
                           className="pb-input"
                           required
+                        />
+                      </div>
+
+                      <div className="pb-form-field">
+                        <label htmlFor="telefon" className="pb-form-label">
+                          Número de telèfon
+                        </label>
+                        <input
+                          id="telefon"
+                          name="telefon"
+                          type="tel"
+                          value={formData.telefon}
+                          onChange={handleProfileChange}
+                          placeholder="Ex: 600123456"
+                          className="pb-input"
                         />
                       </div>
                     </div>
