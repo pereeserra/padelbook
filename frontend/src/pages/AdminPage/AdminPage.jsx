@@ -124,7 +124,9 @@ function AdminPage() {
 
   const handleViewUserDetail = async (userId) => {
     if (selectedUser?.id === userId) {
-      scrollToUserRow(userId);
+      window.setTimeout(() => {
+        scrollToUserRow(userId);
+      }, 40);
 
       window.setTimeout(() => {
         setSelectedUser(null);
@@ -142,7 +144,7 @@ function AdminPage() {
 
       window.setTimeout(() => {
         scrollToUserDetailCard();
-      }, 80);
+      }, 140);
     } catch (err) {
       console.error(err);
 
@@ -188,13 +190,13 @@ function AdminPage() {
     const row = userRowRefs.current[userId];
     if (!row) return;
 
-    scrollToElementWithOffset(row, 120);
+    scrollToElementWithOffset(row, 180);
   };
 
   const scrollToUserDetailCard = () => {
     if (!userDetailCardRef.current) return;
 
-    scrollToElementWithOffset(userDetailCardRef.current, 120);
+    scrollToElementWithOffset(userDetailCardRef.current, 190);
   };
 
   // Funció per normalitzar les dades de visió general del dashboard, amb suport per diferents formats de resposta
