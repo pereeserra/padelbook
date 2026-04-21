@@ -253,6 +253,16 @@ function MyReservationsPage() {
   const normalizeReservationDateForFilter = (value) => {
     if (!value) return "";
 
+    const parsedDate = new Date(value);
+
+    if (!Number.isNaN(parsedDate.getTime())) {
+      const year = parsedDate.getFullYear();
+      const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
+      const day = String(parsedDate.getDate()).padStart(2, "0");
+
+      return `${year}-${month}-${day}`;
+    }
+
     const rawValue = String(value).trim();
 
     const isoMatch = rawValue.match(/^(\d{4})-(\d{2})-(\d{2})/);
