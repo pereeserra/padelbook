@@ -27,6 +27,8 @@ function AdminPage() {
   const usersSectionRef = useRef(null);
   const courtsSectionRef = useRef(null);
   const feedbackRef = useRef(null);
+  const userDetailCardRef = useRef(null);
+  const userRowRefs = useRef({});
 
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
 
@@ -66,6 +68,7 @@ function AdminPage() {
   const [editingCourtId, setEditingCourtId] = useState(null);
   const [highlightedCourtId, setHighlightedCourtId] = useState(null);
   const [updatingUserRoleId, setUpdatingUserRoleId] = useState(null);
+  const [confirmingUserRoleId, setConfirmingUserRoleId] = useState(null);
   const [activeTab, setActiveTab] = useState("dashboard");
 
   const [newCourt, setNewCourt] = useState(emptyCourt);
@@ -120,12 +123,26 @@ function AdminPage() {
   };
 
   const handleViewUserDetail = async (userId) => {
+    if (selectedUser?.id === userId) {
+      scrollToUserRow(userId);
+
+      window.setTimeout(() => {
+        setSelectedUser(null);
+      }, 140);
+
+      return;
+    }
+
     try {
       setLoadingUserDetail(true);
 
       const res = await api.get(`/admin/users/${userId}`);
 
       setSelectedUser(res.data.data);
+
+      window.setTimeout(() => {
+        scrollToUserDetailCard();
+      }, 80);
     } catch (err) {
       console.error(err);
 
@@ -167,16 +184,17 @@ function AdminPage() {
   }, []);
 
   // Funció per desplaçar-se a una targeta de pista específica i destacar-la temporalment
-  const scrollToCourtCard = (courtId) => {
-    const card = document.getElementById(`court-${courtId}`);
-    if (!card) return;
+  const scrollToUserRow = (userId) => {
+    const row = userRowRefs.current[userId];
+    if (!row) return;
 
-    scrollToElementWithOffset(card, 120);
-    setHighlightedCourtId(courtId);
+    scrollToElementWithOffset(row, 120);
+  };
 
-    setTimeout(() => {
-      setHighlightedCourtId(null);
-    }, 2500);
+  const scrollToUserDetailCard = () => {
+    if (!userDetailCardRef.current) return;
+
+    scrollToElementWithOffset(userDetailCardRef.current, 120);
   };
 
   // Funció per normalitzar les dades de visió general del dashboard, amb suport per diferents formats de resposta
@@ -776,6 +794,14 @@ function AdminPage() {
     }, 80);
   };
 
+  const handleStartUserRoleChange = (userId) => {
+    setConfirmingUserRoleId((current) => (current === userId ? null : userId));
+  };
+
+  const handleCancelUserRoleChange = () => {
+    setConfirmingUserRoleId(null);
+  };
+
   const handleToggleUserRole = async (user) => {
     try {
       setUpdatingUserRoleId(user.id);
@@ -786,6 +812,8 @@ function AdminPage() {
       await api.put(`/admin/users/${user.id}/role`, {
         rol: nextRole,
       });
+
+      setConfirmingUserRoleId(null);
 
       showFeedbackMessage(
         `El rol de ${user.nom} s'ha actualitzat correctament a "${nextRole}".`,
@@ -2322,9 +2350,22 @@ function AdminPage() {
                             {filteredUsers.map((user) => {
                               const isCurrentUser =
                                 Number(user.id) === Number(storedUser?.id);
+                              const isSelectedUser =
+                                Number(selectedUser?.id) === Number(user.id);
+                              const isConfirmingRoleChange =
+                                Number(confirmingUserRoleId) === Number(user.id);
 
                               return (
-                                <tr key={user.id}>
+                                <tr
+                                  key={user.id}
+                                  ref={(node) => {
+                                    if (node) {
+                                      userRowRefs.current[user.id] = node;
+                                    } else {
+                                      delete userRowRefs.current[user.id];
+                                    }
+                                  }}
+                                >
                                   <td>{user.id}</td>
                                   <td>{user.nom}</td>
                                   <td>{user.email}</td>
@@ -2344,25 +2385,52 @@ function AdminPage() {
                                     <div className="admin__table-actions">
                                       <button
                                         type="button"
-                                        className="btn btn-light btn-sm"
+                                        className={`btn btn-light btn-sm ${
+                                          isSelectedUser ? "admin__user-view-button--active" : ""
+                                        }`}
                                         onClick={() => handleViewUserDetail(user.id)}
                                       >
-                                        Veure
+                                        {isSelectedUser ? "Amagar" : "Veure"}
                                       </button>
 
-                                      <button
-                                        type="button"
-                                        className="btn btn-light btn-sm admin__user-role-button"
-                                        onClick={() => handleToggleUserRole(user)}
-                                        disabled={
-                                          updatingUserRoleId === user.id ||
-                                          isCurrentUser
-                                        }
-                                      >
-                                        {updatingUserRoleId === user.id
-                                          ? "Canviant..."
-                                          : "Canviar rol"}
-                                      </button>
+                                      {isConfirmingRoleChange ? (
+                                        <div className="admin__role-confirm-inline">
+                                          <button
+                                            type="button"
+                                            className="btn btn-primary btn-sm admin__user-role-button"
+                                            onClick={() => handleToggleUserRole(user)}
+                                            disabled={
+                                              updatingUserRoleId === user.id ||
+                                              isCurrentUser
+                                            }
+                                          >
+                                            {updatingUserRoleId === user.id
+                                              ? "Canviant..."
+                                              : "Confirmar rol"}
+                                          </button>
+
+                                          <button
+                                            type="button"
+                                            className="btn btn-light btn-sm"
+                                            onClick={handleCancelUserRoleChange}
+                                            disabled={updatingUserRoleId === user.id}
+                                          >
+                                            Cancel·lar
+                                          </button>
+                                        </div>
+                                      ) : (
+                                        <button
+                                          type="button"
+                                          className="btn btn-light btn-sm admin__user-role-button"
+                                          onClick={() => handleStartUserRoleChange(user.id)}
+                                          disabled={
+                                            updatingUserRoleId === user.id ||
+                                            isCurrentUser
+                                          }
+                                        >
+                                          Canviar rol
+                                        </button>
+                                      )}
                                     </div>
                                   </td>
                                 </tr>
@@ -2373,22 +2441,30 @@ function AdminPage() {
                       </div>
 
                       {selectedUser && (
-                        <div className="admin__user-detail-card">
+                        <div ref={userDetailCardRef} className="admin__user-detail-card">
                           <div className="admin__user-detail-header">
-                            <div>
+                            <div className="admin__user-detail-heading">
                               <span className="pb-kicker">Detall d'usuari</span>
                               <h3 className="admin__analytics-title">
                                 {selectedUser.nom}
                               </h3>
-                            </div>
 
-                            <button
-                              type="button"
-                              className="btn btn-light btn-sm"
-                              onClick={() => setSelectedUser(null)}
-                            >
-                              Tancar
-                            </button>
+                              <div className="admin__user-detail-summary">
+                                <span
+                                  className={`admin__role-badge ${
+                                    (selectedUser.rol || "").toLowerCase() === "admin"
+                                      ? "admin__role-badge--admin"
+                                      : "admin__role-badge--user"
+                                  }`}
+                                >
+                                  {selectedUser.rol}
+                                </span>
+
+                                <span className="admin__user-detail-summary-pill">
+                                  {selectedUser.total_reserves} reserves
+                                </span>
+                              </div>
+                            </div>
                           </div>
 
                           {loadingUserDetail ? (
@@ -2426,29 +2502,14 @@ function AdminPage() {
                               </div>
 
                               <div className="admin__user-detail-item">
-                                <span className="admin__user-detail-label">Rol</span>
-                                <span
-                                  className={`admin__role-badge ${
-                                    (selectedUser.rol || "").toLowerCase() === "admin"
-                                      ? "admin__role-badge--admin"
-                                      : "admin__role-badge--user"
-                                  }`}
-                                >
-                                  {selectedUser.rol}
-                                </span>
-                              </div>
-
-                              <div className="admin__user-detail-item">
                                 <span className="admin__user-detail-label">Registre</span>
                                 <strong className="admin__user-detail-value">
                                   {formatDateTime(selectedUser.created_at)}
                                 </strong>
                               </div>
 
-                              <div className="admin__user-detail-item admin__user-detail-item--full">
-                                <span className="admin__user-detail-label">
-                                  Total reserves
-                                </span>
+                              <div className="admin__user-detail-item">
+                                <span className="admin__user-detail-label">Total reserves</span>
                                 <strong className="admin__user-detail-value">
                                   {selectedUser.total_reserves}
                                 </strong>
