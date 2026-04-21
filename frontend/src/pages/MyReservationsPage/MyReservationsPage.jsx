@@ -150,27 +150,8 @@ function MyReservationsPage() {
         }
   };
 
-  const handleRepeatReservation = (reservation) => {
-    const today = new Date();
-    const todayIso = today.toISOString().split("T")[0];
-
-    const targetDate =
-      reservation.data_reserva < todayIso
-        ? todayIso
-        : reservation.data_reserva;
-
-    navigate("/availability", {
-      state: {
-        repeatReservation: {
-          data_reserva: targetDate,
-          nom_pista: reservation.nom_pista,
-          hora_inici: reservation.hora_inici,
-          hora_fi: reservation.hora_fi,
-          metode_pagament: reservation.metode_pagament || "online_simulat",
-          original_data_reserva: reservation.data_reserva,
-        },
-      },
-    });
+  const handleRepeatReservation = () => {
+    navigate("/availability");
   };
 
   const handleDeleteCancelled = async (id) => {

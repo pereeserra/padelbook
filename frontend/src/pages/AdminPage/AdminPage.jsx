@@ -35,6 +35,7 @@ function AdminPage() {
   const [loadingUserDetail, setLoadingUserDetail] = useState(false);
   const [reservations, setReservations] = useState([]);
   const [courts, setCourts] = useState([]);
+  const [timeSlots, setTimeSlots] = useState([]);
   const [maintenanceBlocks, setMaintenanceBlocks] = useState([]);
   const [editingMaintenanceId, setEditingMaintenanceId] = useState(null);
   const [savingMaintenance, setSavingMaintenance] = useState(false);
@@ -473,10 +474,11 @@ function AdminPage() {
       setLoading(true);
       setError("");
 
-      const [usersRes, reservationsRes, courtsRes, maintenanceRes] = await Promise.all([
+      const [usersRes, reservationsRes, courtsRes, timeSlotsRes, maintenanceRes] = await Promise.all([
         api.get("/admin/users"),
         api.get("/admin/reservations"),
         api.get("/courts"),
+        api.get("/time-slots"),
         api.get("/admin/maintenance"),
       ]);
 
@@ -485,6 +487,7 @@ function AdminPage() {
         reservationsRes.data
       );
       const normalizedCourts = normalizeCollectionResponse(courtsRes.data);
+      const normalizedTimeSlots = normalizeCollectionResponse(timeSlotsRes.data);
       const normalizedMaintenance = normalizeCollectionResponse(
         maintenanceRes.data
       ).map(normalizeMaintenanceBlock);
@@ -492,12 +495,14 @@ function AdminPage() {
       setUsers(normalizedUsers);
       setReservations(normalizedReservations);
       setCourts(normalizedCourts);
+      setTimeSlots(normalizedTimeSlots);
       setMaintenanceBlocks(normalizedMaintenance);
 
       return {
         users: normalizedUsers,
         reservations: normalizedReservations,
         courts: normalizedCourts,
+        timeSlots: normalizedTimeSlots,
         maintenanceBlocks: normalizedMaintenance,
       };
     } catch (err) {
@@ -1111,61 +1116,19 @@ function AdminPage() {
   }, [courts]);
 
   const maintenanceAvailableTimeSlots = useMemo(() => {
-    const uniqueSlots = new Map();
-
     const normalizeTime = (value) => {
       if (!value) return "";
       return String(value).slice(0, 5);
     };
 
-    reservations.forEach((reservation) => {
-      const timeSlotId =
-        reservation?.time_slot_id ??
-        reservation?.slot_id ??
-        reservation?.franja_id ??
-        reservation?.timeSlotId ??
-        null;
-
-      const startTime =
-        reservation?.hora_inici ??
-        reservation?.start_time ??
-        reservation?.startTime ??
-        "";
-
-      const endTime =
-        reservation?.hora_fi ??
-        reservation?.end_time ??
-        reservation?.endTime ??
-        "";
-
-      if (!timeSlotId || !startTime || !endTime) return;
-
-      if (!uniqueSlots.has(timeSlotId)) {
-        uniqueSlots.set(timeSlotId, {
-          id: timeSlotId,
-          label: `${normalizeTime(startTime)} - ${normalizeTime(endTime)}`,
-          startTime: normalizeTime(startTime),
-          endTime: normalizeTime(endTime),
-        });
-      }
-    });
-
-    maintenanceBlocks.forEach((block) => {
-      if (!block.timeSlotId || !block.startTime || !block.endTime) return;
-
-      if (!uniqueSlots.has(block.timeSlotId)) {
-        uniqueSlots.set(block.timeSlotId, {
-          id: block.timeSlotId,
-          label: `${normalizeTime(block.startTime)} - ${normalizeTime(block.endTime)}`,
-          startTime: normalizeTime(block.startTime),
-          endTime: normalizeTime(block.endTime),
-        });
-      }
-    });
-
-    const allSlots = Array.from(uniqueSlots.values()).sort((a, b) =>
-      a.label.localeCompare(b.label)
-    );
+    const allSlots = timeSlots
+      .map((slot) => ({
+        id: slot.id,
+        label: `${normalizeTime(slot.hora_inici)} - ${normalizeTime(slot.hora_fi)}`,
+        startTime: normalizeTime(slot.hora_inici),
+        endTime: normalizeTime(slot.hora_fi),
+      }))
+      .sort((a, b) => a.startTime.localeCompare(b.startTime));
 
     if (maintenanceForm.data_bloqueig !== todayString) {
       return allSlots;
@@ -1180,7 +1143,7 @@ function AdminPage() {
 
       return slotMinutes >= currentMinutes;
     });
-  }, [reservations, maintenanceBlocks, maintenanceForm.data_bloqueig, todayString]);
+  }, [timeSlots, maintenanceForm.data_bloqueig, todayString]);
 
   const resetUserFilters = () => {
     setUserSearch("");
@@ -2703,6 +2666,52 @@ function AdminPage() {
                     </div>
                   </div>
 
+                  {filteredCourts.length > 0 ? (
+                    <div
+                      className={`admin__cards admin__cards--courts ${
+                        isMobileView ? "admin__cards--mobile" : ""
+                      }`}
+                    >
+                      {filteredCourts.map((court) => (
+                        <CourtCard
+                          key={court.id}
+                          court={court}
+                          onEdit={() => handleStartEditCourt(court)}
+                          onStartDelete={() => {
+                            setConfirmingCourtId(court.id);
+
+                            setTimeout(() => {
+                              scrollToCourtCard(court.id);
+                            }, 150);
+                          }}
+                          onAbortDelete={() => setConfirmingCourtId(null)}
+                          onDelete={() => handleDeleteCourt(court.id)}
+                          confirmingDelete={confirmingCourtId === court.id}
+                          isDeleting={deletingCourtId === court.id}
+                          isHighlighted={highlightedCourtId === court.id}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="pb-surface-card admin__empty-filtered-state">
+                      <p className="admin__empty-filtered-title">
+                        No hi ha pistes que coincideixin
+                      </p>
+                      <p className="admin__empty-filtered-text">
+                        Revisa els filtres aplicats o neteja la cerca per tornar
+                        a veure totes les pistes.
+                      </p>
+
+                      <button
+                        type="button"
+                        className="btn btn-light"
+                        onClick={resetCourtFilters}
+                      >
+                        Mostrar totes les pistes
+                      </button>
+                    </div>
+                  )}
+
                   <div className="pb-surface-card admin__section-card admin__maintenance-editor">
                     <div
                       className={`admin__section-header ${
@@ -3155,52 +3164,6 @@ function AdminPage() {
                       </div>
                     )}
                   </div>
-
-                  {filteredCourts.length > 0 ? (
-                    <div
-                      className={`admin__cards admin__cards--courts ${
-                        isMobileView ? "admin__cards--mobile" : ""
-                      }`}
-                    >
-                      {filteredCourts.map((court) => (
-                        <CourtCard
-                          key={court.id}
-                          court={court}
-                          onEdit={() => handleStartEditCourt(court)}
-                          onStartDelete={() => {
-                            setConfirmingCourtId(court.id);
-
-                            setTimeout(() => {
-                              scrollToCourtCard(court.id);
-                            }, 150);
-                          }}
-                          onAbortDelete={() => setConfirmingCourtId(null)}
-                          onDelete={() => handleDeleteCourt(court.id)}
-                          confirmingDelete={confirmingCourtId === court.id}
-                          isDeleting={deletingCourtId === court.id}
-                          isHighlighted={highlightedCourtId === court.id}
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="pb-surface-card admin__empty-filtered-state">
-                      <p className="admin__empty-filtered-title">
-                        No hi ha pistes que coincideixin
-                      </p>
-                      <p className="admin__empty-filtered-text">
-                        Revisa els filtres aplicats o neteja la cerca per tornar
-                        a veure totes les pistes.
-                      </p>
-
-                      <button
-                        type="button"
-                        className="btn btn-light"
-                        onClick={resetCourtFilters}
-                      >
-                        Mostrar totes les pistes
-                      </button>
-                    </div>
-                  )}
                 </section>
               </>
             )}
