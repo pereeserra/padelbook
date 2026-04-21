@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import api from "../../api/axios";
 import "./AdminReservationsTable.css";
 
@@ -8,6 +8,7 @@ function AdminReservationsTable({ reservations = [] }) {
 
   const [selectedReservation, setSelectedReservation] = useState(null);
   const [detailLoadingId, setDetailLoadingId] = useState(null);
+  const reservationCardRefs = useRef({});
   const [closingReservationId, setClosingReservationId] = useState(null);
 
   // Normalitza i ordena les reserves per data i hora de forma descendente
@@ -140,9 +141,29 @@ function formatTime(time) {
     setStatusFilter("totes");
   };
 
+  const scrollToReservationCard = (reservationId) => {
+    window.requestAnimationFrame(() => {
+      window.setTimeout(() => {
+        const reservationCard = reservationCardRefs.current[reservationId];
+
+        if (reservationCard) {
+          const topOffset = 132;
+          const cardTop =
+            reservationCard.getBoundingClientRect().top + window.scrollY - topOffset;
+
+          window.scrollTo({
+            top: Math.max(cardTop, 0),
+            behavior: "smooth",
+          });
+        }
+      }, 80);
+    });
+  };
+
   const closeReservationDetail = (reservationId = selectedReservation?.id) => {
     if (!reservationId) return;
 
+    scrollToReservationCard(reservationId);
     setClosingReservationId(reservationId);
 
     window.setTimeout(() => {
@@ -166,8 +187,13 @@ function formatTime(time) {
       setClosingReservationId(null);
 
       const res = await api.get(`/admin/reservations/${id}`);
+      const reservationDetail = res.data?.data || res.data;
 
-      setSelectedReservation(res.data?.data || res.data);
+      setSelectedReservation(reservationDetail);
+
+      window.setTimeout(() => {
+        scrollToReservationCard(id);
+      }, 60);
     } catch (err) {
       console.error(err);
       alert("Error carregant el detall de la reserva");
@@ -444,7 +470,17 @@ function formatTime(time) {
             const isLoadingThisDetail = detailLoadingId === reservation.id;
 
             return (
-              <article key={reservation.id} className="admin-res__card">
+              <article
+                key={reservation.id}
+                className="admin-res__card"
+                ref={(node) => {
+                  if (node) {
+                    reservationCardRefs.current[reservation.id] = node;
+                  } else {
+                    delete reservationCardRefs.current[reservation.id];
+                  }
+                }}
+              >
                 <div className="admin-res__card-top">
                   <div className="admin-res__identity-block">
                     <span className="admin-res__code-badge">
