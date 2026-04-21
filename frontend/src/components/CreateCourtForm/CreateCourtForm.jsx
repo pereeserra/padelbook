@@ -21,6 +21,10 @@ function CreateCourtForm({
   // Resum de les dades clau per mostrar a la part superior del formulari i reforçar la informació principal de la pista
   const formSummary = [
     {
+      label: "Nom de la pista",
+      value: cleanName || "Sense nom",
+    },
+    {
       label: "Tipus",
       value: newCourt.tipus === "dobles" ? "Dobles" : "Individual",
     },
