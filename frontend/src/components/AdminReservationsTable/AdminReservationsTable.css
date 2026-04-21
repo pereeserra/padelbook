@@ -477,7 +477,11 @@
 
 .admin-res__expandable-wrap {
   overflow: hidden;
-  animation: adminResExpandWrap 0.3s ease;
+  animation: adminResExpandWrap 0.32s ease forwards;
+}
+
+.admin-res__expandable-wrap--closing {
+  animation: adminResCollapseWrap 0.28s ease forwards;
 }
 
 .admin-res__expandable-card {
@@ -586,6 +590,17 @@
   to {
     opacity: 1;
     max-height: 1200px;
+  }
+}
+
+@keyframes adminResCollapseWrap {
+  from {
+    opacity: 1;
+    max-height: 1200px;
+  }
+  to {
+    opacity: 0;
+    max-height: 0;
   }
 }
 

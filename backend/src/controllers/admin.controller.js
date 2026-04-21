@@ -193,32 +193,47 @@ exports.getAllReservations = async (req, res) => {
     const whereClause =
       whereClauses.length > 0 ? `WHERE ${whereClauses.join(" AND ")}` : "";
 
-    const orderClause = `ORDER BY r.${sort_by} ${order}`;
+    const orderClause =
+      sort_by === "data_reserva"
+        ? `ORDER BY r.data_reserva ${order}, MIN(t.hora_inici) ${order}`
+        : `ORDER BY MIN(r.created_at) ${order}`;
 
     // Query principal
     const query = `
       SELECT
-        r.id,
+        MIN(r.id) AS id,
         r.codi_reserva,
         r.data_reserva,
         r.estat,
         r.preu_total,
         r.estat_pagament,
         r.metode_pagament,
-        r.created_at,
+        MIN(r.created_at) AS created_at,
         r.user_id,
         r.court_id,
-        r.time_slot_id,
+        MIN(r.time_slot_id) AS time_slot_id,
         u.nom AS nom_usuari,
         u.email AS email,
         c.nom_pista,
-        t.hora_inici,
-        t.hora_fi
+        MIN(t.hora_inici) AS hora_inici,
+        MAX(t.hora_fi) AS hora_fi
       FROM reservations r
       JOIN users u ON r.user_id = u.id
       JOIN courts c ON r.court_id = c.id
       JOIN time_slots t ON r.time_slot_id = t.id
       ${whereClause}
+      GROUP BY
+        r.codi_reserva,
+        r.data_reserva,
+        r.estat,
+        r.preu_total,
+        r.estat_pagament,
+        r.metode_pagament,
+        r.user_id,
+        r.court_id,
+        u.nom,
+        u.email,
+        c.nom_pista
       ${orderClause}
       LIMIT ? OFFSET ?
     `;
@@ -227,7 +242,7 @@ exports.getAllReservations = async (req, res) => {
 
     // Query total per paginació
     const countQuery = `
-      SELECT COUNT(*) as total
+      SELECT COUNT(DISTINCT r.codi_reserva) as total
       FROM reservations r
       ${whereClause}
     `;
@@ -1220,16 +1235,32 @@ exports.getReservationByIdAdmin = async (req, res) => {
       return res.status(400).json({ error: "ID de reserva no vàlid" });
     }
 
+    const [reservationCodeRows] = await db.query(
+      `
+        SELECT codi_reserva
+        FROM reservations
+        WHERE id = ?
+        LIMIT 1
+      `,
+      [reservationId]
+    );
+
+    if (reservationCodeRows.length === 0) {
+      return res.status(404).json({ error: "Reserva no trobada" });
+    }
+
+    const reservationCode = reservationCodeRows[0].codi_reserva;
+
     const query = `
       SELECT
-        r.id,
+        MIN(r.id) AS id,
         r.codi_reserva,
         r.data_reserva,
         r.estat,
         r.preu_total,
         r.estat_pagament,
         r.metode_pagament,
-        r.created_at,
+        MIN(r.created_at) AS created_at,
 
         r.user_id,
         u.nom AS usuari_nom,
@@ -1241,19 +1272,34 @@ exports.getReservationByIdAdmin = async (req, res) => {
         c.tipus,
         c.coberta,
 
-        r.time_slot_id,
-        t.hora_inici,
-        t.hora_fi
+        MIN(r.time_slot_id) AS time_slot_id,
+        MIN(t.hora_inici) AS hora_inici,
+        MAX(t.hora_fi) AS hora_fi
 
       FROM reservations r
       JOIN users u ON r.user_id = u.id
       JOIN courts c ON r.court_id = c.id
       JOIN time_slots t ON r.time_slot_id = t.id
-      WHERE r.id = ?
+      WHERE r.codi_reserva = ?
+      GROUP BY
+        r.codi_reserva,
+        r.data_reserva,
+        r.estat,
+        r.preu_total,
+        r.estat_pagament,
+        r.metode_pagament,
+        r.user_id,
+        u.nom,
+        u.email,
+        u.telefon,
+        r.court_id,
+        c.nom_pista,
+        c.tipus,
+        c.coberta
       LIMIT 1
     `;
 
-    const [results] = await db.query(query, [reservationId]);
+    const [results] = await db.query(query, [reservationCode]);
 
     if (results.length === 0) {
       return res.status(404).json({ error: "Reserva no trobada" });
