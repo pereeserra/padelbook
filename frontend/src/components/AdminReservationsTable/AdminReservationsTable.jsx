@@ -8,6 +8,7 @@ function AdminReservationsTable({ reservations = [] }) {
 
   const [selectedReservation, setSelectedReservation] = useState(null);
   const [detailLoadingId, setDetailLoadingId] = useState(null);
+  const [closingReservationId, setClosingReservationId] = useState(null);
 
   // Normalitza i ordena les reserves per data i hora de forma descendente
   const normalizedReservations = useMemo(() => {
@@ -139,14 +140,30 @@ function formatTime(time) {
     setStatusFilter("totes");
   };
 
+  const closeReservationDetail = (reservationId = selectedReservation?.id) => {
+    if (!reservationId) return;
+
+    setClosingReservationId(reservationId);
+
+    window.setTimeout(() => {
+      setSelectedReservation((current) =>
+        current?.id === reservationId ? null : current
+      );
+      setClosingReservationId((current) =>
+        current === reservationId ? null : current
+      );
+    }, 280);
+  };
+
   const handleViewReservationDetail = async (id) => {
     if (selectedReservation?.id === id) {
-      setSelectedReservation(null);
+      closeReservationDetail(id);
       return;
     }
 
     try {
       setDetailLoadingId(id);
+      setClosingReservationId(null);
 
       const res = await api.get(`/admin/reservations/${id}`);
 
@@ -157,10 +174,6 @@ function formatTime(time) {
     } finally {
       setDetailLoadingId(null);
     }
-  };
-
-  const closeReservationDetail = () => {
-    setSelectedReservation(null);
   };
 
   // Funcions per determinar les classes CSS basades en els valors dels camps, permetent una estilització condicional que millora la llegibilitat i l'impacte visual de la informació mostrada
@@ -202,12 +215,24 @@ function formatTime(time) {
   }
 
   const renderExpandedDetail = (reservationId) => {
-    if (selectedReservation?.id !== reservationId) return null;
+    const shouldRender =
+      selectedReservation?.id === reservationId ||
+      closingReservationId === reservationId;
+
+    if (!shouldRender) return null;
 
     const r = selectedReservation;
 
+    if (!r || r.id !== reservationId) return null;
+
     return (
-      <div className="admin-res__expandable-wrap">
+      <div
+        className={`admin-res__expandable-wrap ${
+          closingReservationId === reservationId
+            ? "admin-res__expandable-wrap--closing"
+            : ""
+        }`}
+      >
         <div className="admin-res__expandable-card">
           <div className="admin-res__expandable-head">
             <div className="admin-res__expandable-title-block">
@@ -222,7 +247,7 @@ function formatTime(time) {
             <button
               type="button"
               className="btn btn-light btn-sm admin-res__expandable-close"
-              onClick={closeReservationDetail}
+              onClick={() => closeReservationDetail(reservationId)}
             >
               Amagar detall
             </button>

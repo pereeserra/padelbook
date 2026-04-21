@@ -482,6 +482,7 @@
 
 .admin-res__expandable-wrap--closing {
   animation: adminResCollapseWrap 0.28s ease forwards;
+  pointer-events: none;
 }
 
 .admin-res__expandable-card {
