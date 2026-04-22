@@ -1083,13 +1083,16 @@
   }
 
   .ap-slots-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.65rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.4rem;
   }
 
   .ap-slot-pill {
-    min-height: 52px;
-    font-size: 0.95rem;
+    min-height: 40px;
+    padding: 0.3rem;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
   }
 
   .ap-floating-action {
@@ -1186,7 +1189,7 @@
   }
 
   .ap-bottom-spacing {
-    height: 190px;
+    height: 80px;
   }
 }
 
