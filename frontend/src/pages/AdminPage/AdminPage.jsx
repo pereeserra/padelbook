@@ -418,28 +418,6 @@ function AdminPage() {
     endTime: item?.hora_fi ?? item?.end_time ?? item?.endTime ?? "",
   });
 
-  const maintenanceStartSlots = useMemo(() => {
-    return maintenanceAvailableTimeSlots
-      .map((slot) => slot.startTime)
-      .filter((time) => time && time !== "21:00");
-  }, [maintenanceAvailableTimeSlots]);
-
-  const maintenanceEndSlots = useMemo(() => {
-    return maintenanceAvailableTimeSlots
-      .map((slot) => slot.endTime)
-      .filter((time) => time && time !== "08:00");
-  }, [maintenanceAvailableTimeSlots]);
-
-  const filteredMaintenanceEndSlots = useMemo(() => {
-    if (!maintenanceForm.hora_inici) {
-      return maintenanceEndSlots;
-    }
-
-    return maintenanceEndSlots.filter(
-      (time) => time > maintenanceForm.hora_inici
-    );
-  }, [maintenanceEndSlots, maintenanceForm.hora_inici]);
-
   // Funció per mostrar missatges de feedback a l'usuari, amb opcions de tipus i accions associades, i desplaçament automàtic al missatge
   const showFeedbackMessage = (message, type = "success", action = null) => {
     setFeedback(message);
@@ -1210,6 +1188,28 @@ function AdminPage() {
       return slotMinutes >= currentMinutes;
     });
   }, [timeSlots, maintenanceForm.data_bloqueig, todayString]);
+
+  const maintenanceStartSlots = useMemo(() => {
+    return maintenanceAvailableTimeSlots
+      .map((slot) => slot.startTime)
+      .filter((time) => time && time !== "21:00");
+  }, [maintenanceAvailableTimeSlots]);
+
+  const maintenanceEndSlots = useMemo(() => {
+    return maintenanceAvailableTimeSlots
+      .map((slot) => slot.endTime)
+      .filter((time) => time && time !== "08:00");
+  }, [maintenanceAvailableTimeSlots]);
+
+  const filteredMaintenanceEndSlots = useMemo(() => {
+    if (!maintenanceForm.hora_inici) {
+      return maintenanceEndSlots;
+    }
+
+    return maintenanceEndSlots.filter(
+      (time) => time > maintenanceForm.hora_inici
+    );
+  }, [maintenanceEndSlots, maintenanceForm.hora_inici]);
 
   const resetUserFilters = () => {
     setUserSearch("");
