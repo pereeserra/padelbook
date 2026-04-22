@@ -273,6 +273,8 @@ function ProfilePage() {
     },
   ];
 
+  const phoneStatusLabel = profile?.telefon ? "No verificat" : null;
+
   const accountDetailItems = [
     {
       label: "Nom",
@@ -285,6 +287,11 @@ function ProfilePage() {
     {
       label: "Correu",
       value: profile?.email || "-",
+    },
+    {
+      label: "Telèfon",
+      value: profile?.telefon || "No definit",
+      badge: phoneStatusLabel,
     },
     {
       label: "Verificació",
@@ -1082,7 +1089,14 @@ function ProfilePage() {
                       {accountDetailItems.map((item) => (
                         <div key={item.label} className="profile__account-list-item">
                           <span className="profile__account-list-label">{item.label}</span>
-                          <span className="profile__account-list-value">{item.value}</span>
+                          <span className="profile__account-list-value">
+                            {item.value}
+                            {item.badge && (
+                              <span className="profile__phone-status">
+                                {item.badge}
+                              </span>
+                            )}
+                          </span>
                         </div>
                       ))}
                     </div>

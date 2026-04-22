@@ -719,3 +719,17 @@
   color: #b91c1c;
   font-weight: 700;
 }
+
+.profile__phone-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.5rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  background: #fef3c7;
+  color: #92400e;
+  white-space: nowrap;
+}
