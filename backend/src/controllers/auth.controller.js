@@ -18,22 +18,23 @@ const {
   validateProfileData,
 } = require("../utils/validators");
 
+const createPhoneVerificationCode = async (userId) => {
+  await db.query(
+    "DELETE FROM verification_codes WHERE user_id = ? AND type = 'phone_verification'",
+    [userId]
+  );
+
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+  await db.query(
+    "INSERT INTO verification_codes (user_id, code, type, expires_at) VALUES (?, ?, 'phone_verification', DATE_ADD(NOW(), INTERVAL 10 MINUTE))",
+    [userId, code]
+  );
+
+  return code;
+};
+
 const createAndSendVerificationEmail = async ({ userId, nom, email, subject }) => {
-  const createPhoneVerificationCode = async (userId) => {
-    await db.query(
-      "DELETE FROM verification_codes WHERE user_id = ? AND type = 'phone_verification'",
-      [userId]
-    );
-
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-
-    await db.query(
-      "INSERT INTO verification_codes (user_id, code, type, expires_at) VALUES (?, ?, 'phone_verification', DATE_ADD(NOW(), INTERVAL 10 MINUTE))",
-      [userId, code]
-    );
-
-    return code;
-  };
   await db.query(
     "DELETE FROM verification_codes WHERE user_id = ? AND type = 'email_verification'",
     [userId]
