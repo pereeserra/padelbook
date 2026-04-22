@@ -43,6 +43,7 @@ function ProfilePage() {
   const [verifyingPhone, setVerifyingPhone] = useState(false);
   const [phoneVerificationCode, setPhoneVerificationCode] = useState("");
   const [phoneCodeSent, setPhoneCodeSent] = useState(false);
+  const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
   const [phoneVerifiedInSession, setPhoneVerifiedInSession] = useState(false);
 
   useEffect(() => {
@@ -280,11 +281,14 @@ function ProfilePage() {
 
   const phoneStatusLabel = !profile?.telefon
     ? null
-    : phoneVerifiedInSession
+    : profile?.telefon_verificat === 1
     ? "Verificat"
     : phoneCodeSent
     ? "Codi enviat"
     : "No verificat";
+
+  const isVerifiedPhoneLocked =
+    profile?.telefon_verificat === 1 && !editingVerifiedPhone;
 
   const accountDetailItems = [
     {
@@ -410,6 +414,10 @@ function ProfilePage() {
       telefon: profile.telefon || "",
     });
 
+    setPhoneCodeSent(false);
+    setPhoneVerificationCode("");
+    setEditingVerifiedPhone(false);
+
     showFeedbackMessage("S'han restablert els canvis pendents del perfil.", "success");
   };
 
@@ -465,6 +473,10 @@ function ProfilePage() {
         email: updatedUser.email || payload.email,
         telefon: updatedUser.telefon || payload.telefon,
       });
+
+      setPhoneCodeSent(false);
+      setPhoneVerificationCode("");
+      setEditingVerifiedPhone(false);
 
       localStorage.setItem("user", JSON.stringify(updatedUser));
       window.dispatchEvent(new Event("profile-updated"));
@@ -596,7 +608,6 @@ function ProfilePage() {
         "Codi de verificació enviat.";
 
       setPhoneCodeSent(true);
-      setPhoneVerifiedInSession(false);
       showFeedbackMessage(successMessage, "success");
     } catch (err) {
       console.error(err);
@@ -631,9 +642,11 @@ function ProfilePage() {
         response?.data?.data?.message ||
         "Telèfon verificat correctament.";
 
-      setPhoneVerifiedInSession(true);
       setPhoneCodeSent(false);
       setPhoneVerificationCode("");
+      setEditingVerifiedPhone(false);
+
+      await fetchProfile();
       showFeedbackMessage(successMessage, "success");
     } catch (err) {
       console.error(err);
@@ -897,11 +910,28 @@ function ProfilePage() {
                           inputMode="numeric"
                           autoComplete="tel"
                           maxLength={9}
+                          disabled={isVerifiedPhoneLocked}
                         />
                         {phoneValidationMessage && (
                           <span className="pb-form-help pb-form-help--error">
                             {phoneValidationMessage}
                           </span>
+                        )}
+
+                        {isVerifiedPhoneLocked && (
+                          <div className="profile__verified-phone-lock">
+                            <span className="profile__verified-phone-lock-text">
+                              Aquest número ja està verificat. Si el canvies, hauràs de tornar-lo a verificar.
+                            </span>
+
+                            <button
+                              type="button"
+                              className="btn btn-light btn-sm"
+                              onClick={() => setEditingVerifiedPhone(true)}
+                            >
+                              Canviar número
+                            </button>
+                          </div>
                         )}
                       </div>
                     </div>
@@ -924,7 +954,7 @@ function ProfilePage() {
                       </div>
                     </div>
 
-                    {profile?.telefon && (
+                    {formData.telefon && !isVerifiedPhoneLocked && (
                       <div className="profile__phone-verification-card">
                         <div className="profile__phone-verification-header">
                           <div>
@@ -938,14 +968,14 @@ function ProfilePage() {
 
                           <span
                             className={`profile__phone-verification-badge ${
-                              phoneVerifiedInSession
+                              profile?.telefon_verificat === 1
                                 ? "profile__phone-verification-badge--success"
                                 : phoneCodeSent
                                 ? "profile__phone-verification-badge--pending"
                                 : "profile__phone-verification-badge--idle"
                             }`}
                           >
-                            {phoneVerifiedInSession
+                            {profile?.telefon_verificat === 1
                               ? "Verificat"
                               : phoneCodeSent
                               ? "Codi enviat"
@@ -962,7 +992,12 @@ function ProfilePage() {
                             type="button"
                             className="btn btn-secondary"
                             onClick={handleSendPhoneVerification}
-                            disabled={sendingPhoneVerification || !isPhoneValid || !formData.telefon}
+                            disabled={
+                              sendingPhoneVerification ||
+                              !isPhoneValid ||
+                              !formData.telefon ||
+                              profile?.telefon_verificat === 1
+                            }
                           >
                             {sendingPhoneVerification
                               ? "Enviant codi..."

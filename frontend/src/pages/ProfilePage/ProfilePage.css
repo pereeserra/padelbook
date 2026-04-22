@@ -809,3 +809,23 @@
 .profile__phone-verification-input {
   min-width: 0;
 }
+
+.profile__verified-phone-lock {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  padding: 0.85rem 0.95rem;
+  border-radius: 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+}
+
+.profile__verified-phone-lock-text {
+  color: #475569;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  font-weight: 600;
+}

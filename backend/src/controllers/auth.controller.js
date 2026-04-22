@@ -229,6 +229,7 @@ exports.login = async (req, res) => {
         email: user.email,
         rol: user.rol,
         telefon: user.telefon,
+        telefon_verificat: user.telefon_verificat,
         email_verificat: user.email_verificat,
         created_at: user.created_at
       }
@@ -252,7 +253,7 @@ exports.getMe = async (req, res) => {
     const userId = req.user.id;
 
     const [rows] = await db.query(
-      "SELECT id, nom, llinatges, email, rol, telefon, email_verificat, created_at FROM users WHERE id = ? LIMIT 1",
+      "SELECT id, nom, llinatges, email, rol, telefon, telefon_verificat, email_verificat, created_at FROM users WHERE id = ? LIMIT 1",
       [userId]
     );
 
