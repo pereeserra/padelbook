@@ -39,6 +39,11 @@ function ProfilePage() {
   const [feedback, setFeedback] = useState("");
   const [feedbackType, setFeedbackType] = useState("success");
   const [resendingVerification, setResendingVerification] = useState(false);
+  const [sendingPhoneVerification, setSendingPhoneVerification] = useState(false);
+  const [verifyingPhone, setVerifyingPhone] = useState(false);
+  const [phoneVerificationCode, setPhoneVerificationCode] = useState("");
+  const [phoneCodeSent, setPhoneCodeSent] = useState(false);
+  const [phoneVerifiedInSession, setPhoneVerifiedInSession] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -273,7 +278,13 @@ function ProfilePage() {
     },
   ];
 
-  const phoneStatusLabel = profile?.telefon ? "No verificat" : null;
+  const phoneStatusLabel = !profile?.telefon
+    ? null
+    : phoneVerifiedInSession
+    ? "Verificat"
+    : phoneCodeSent
+    ? "Codi enviat"
+    : "No verificat";
 
   const accountDetailItems = [
     {
@@ -573,6 +584,71 @@ function ProfilePage() {
     }
   };
 
+  const handleSendPhoneVerification = async () => {
+    try {
+      setSendingPhoneVerification(true);
+      clearFeedback();
+
+      const response = await api.post("/auth/send-phone-verification");
+      const successMessage =
+        response?.data?.message ||
+        response?.data?.data?.message ||
+        "Codi de verificació enviat.";
+
+      setPhoneCodeSent(true);
+      setPhoneVerifiedInSession(false);
+      showFeedbackMessage(successMessage, "success");
+    } catch (err) {
+      console.error(err);
+
+      const backendError =
+        err.response?.data?.error ||
+        err.response?.data?.message ||
+        "No s'ha pogut enviar el codi de verificació.";
+
+      showFeedbackMessage(backendError, "error");
+    } finally {
+      setSendingPhoneVerification(false);
+    }
+  };
+
+  const handleVerifyPhone = async () => {
+    if (!phoneVerificationCode.trim()) {
+      showFeedbackMessage("Has d'introduir el codi de verificació.", "error");
+      return;
+    }
+
+    try {
+      setVerifyingPhone(true);
+      clearFeedback();
+
+      const response = await api.post("/auth/verify-phone", {
+        code: phoneVerificationCode.trim(),
+      });
+
+      const successMessage =
+        response?.data?.message ||
+        response?.data?.data?.message ||
+        "Telèfon verificat correctament.";
+
+      setPhoneVerifiedInSession(true);
+      setPhoneCodeSent(false);
+      setPhoneVerificationCode("");
+      showFeedbackMessage(successMessage, "success");
+    } catch (err) {
+      console.error(err);
+
+      const backendError =
+        err.response?.data?.error ||
+        err.response?.data?.message ||
+        "No s'ha pogut verificar el telèfon.";
+
+      showFeedbackMessage(backendError, "error");
+    } finally {
+      setVerifyingPhone(false);
+    }
+  };
+
   if (loadingProfile) {
     return (
       <LoadingSpinner
@@ -847,6 +923,73 @@ function ProfilePage() {
                         </p>
                       </div>
                     </div>
+
+                    {profile?.telefon && (
+                      <div className="profile__phone-verification-card">
+                        <div className="profile__phone-verification-header">
+                          <div>
+                            <p className="profile__phone-verification-title">
+                              Verificació del telèfon
+                            </p>
+                            <p className="profile__phone-verification-text">
+                              Envia un codi al teu número actual i introdueix-lo per verificar-lo.
+                            </p>
+                          </div>
+
+                          <span
+                            className={`profile__phone-verification-badge ${
+                              phoneVerifiedInSession
+                                ? "profile__phone-verification-badge--success"
+                                : phoneCodeSent
+                                ? "profile__phone-verification-badge--pending"
+                                : "profile__phone-verification-badge--idle"
+                            }`}
+                          >
+                            {phoneVerifiedInSession
+                              ? "Verificat"
+                              : phoneCodeSent
+                              ? "Codi enviat"
+                              : "Pendent"}
+                          </span>
+                        </div>
+
+                        <div
+                          className={`profile__phone-verification-actions ${
+                            isTabletOrMobile ? "profile__phone-verification-actions--mobile" : ""
+                          }`}
+                        >
+                          <button
+                            type="button"
+                            className="btn btn-secondary"
+                            onClick={handleSendPhoneVerification}
+                            disabled={sendingPhoneVerification || !isPhoneValid || !formData.telefon}
+                          >
+                            {sendingPhoneVerification
+                              ? "Enviant codi..."
+                              : "Enviar codi"}
+                          </button>
+
+                          <input
+                            type="text"
+                            value={phoneVerificationCode}
+                            onChange={(e) => setPhoneVerificationCode(e.target.value)}
+                            placeholder="Introdueix el codi"
+                            className="pb-input profile__phone-verification-input"
+                            inputMode="numeric"
+                            maxLength={6}
+                          />
+
+                          <button
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={handleVerifyPhone}
+                            disabled={verifyingPhone || !phoneVerificationCode.trim()}
+                          >
+                            {verifyingPhone ? "Verificant..." : "Verificar telèfon"}
+                          </button>
+                        </div>
+                      </div>
+                    )}
 
                     <div
                       className={`profile__actions ${isTabletOrMobile ? "profile__actions--mobile" : ""}`}
