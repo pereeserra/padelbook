@@ -45,3 +45,4 @@ ADD COLUMN preu_total DECIMAL(10,2) NOT NULL DEFAULT 0.00;
 UPDATE courts
 SET preu_reserva = 12.00
 WHERE preu_reserva = 0.00;
+ALTER TABLE users ADD COLUMN telefon_verificat TINYINT(1) DEFAULT 0;

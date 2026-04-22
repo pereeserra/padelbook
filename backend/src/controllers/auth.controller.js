@@ -316,7 +316,7 @@ exports.updateMe = async (req, res) => {
     }
 
     await db.query(
-      "UPDATE users SET nom = ?, llinatges = ?, email = ?, telefon = ?, email_verificat = ? WHERE id = ?",
+      "UPDATE users SET nom = ?, llinatges = ?, email = ?, telefon = ?, telefon_verificat = 0, email_verificat = ? WHERE id = ?",
       [
         nom,
         llinatges,
@@ -337,7 +337,7 @@ exports.updateMe = async (req, res) => {
     }
 
     const [updatedRows] = await db.query(
-      "SELECT id, nom, llinatges, email, rol, telefon, email_verificat, created_at FROM users WHERE id = ? LIMIT 1",
+      "SELECT id, nom, llinatges, email, rol, telefon, telefon_verificat, email_verificat, created_at FROM users WHERE id = ? LIMIT 1",
       [userId]
     );
 
@@ -611,6 +611,11 @@ exports.verifyPhone = async (req, res) => {
     await db.query(
       "DELETE FROM verification_codes WHERE id = ?",
       [verification.id]
+    );
+
+    await db.query(
+      "UPDATE users SET telefon_verificat = 1 WHERE id = ?",
+      [userId]
     );
 
     return message(res, "Telèfon verificat correctament.");

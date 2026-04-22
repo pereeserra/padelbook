@@ -11,6 +11,7 @@ CREATE TABLE users (
   rol VARCHAR(20) NOT NULL,
   telefon VARCHAR(20),
   email_verificat TINYINT(1) DEFAULT 0,
+  telefon_verificat TINYINT(1) DEFAULT 0,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
