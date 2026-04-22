@@ -19,6 +19,21 @@ const {
 } = require("../utils/validators");
 
 const createAndSendVerificationEmail = async ({ userId, nom, email, subject }) => {
+  const createPhoneVerificationCode = async (userId) => {
+    await db.query(
+      "DELETE FROM verification_codes WHERE user_id = ? AND type = 'phone_verification'",
+      [userId]
+    );
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+    await db.query(
+      "INSERT INTO verification_codes (user_id, code, type, expires_at) VALUES (?, ?, 'phone_verification', DATE_ADD(NOW(), INTERVAL 10 MINUTE))",
+      [userId, code]
+    );
+
+    return code;
+  };
   await db.query(
     "DELETE FROM verification_codes WHERE user_id = ? AND type = 'email_verification'",
     [userId]
@@ -535,5 +550,71 @@ exports.resendVerification = async (req, res) => {
   } catch (error) {
     console.error("Error resendVerification:", error);
     return fail(res, "No s'ha pogut reenviar el correu de verificació.");
+  }
+};
+
+exports.sendPhoneVerification = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const [rows] = await db.query(
+      "SELECT telefon FROM users WHERE id = ? LIMIT 1",
+      [userId]
+    );
+
+    if (rows.length === 0) {
+      return fail(res, "Usuari no trobat.", 404);
+    }
+
+    const telefon = rows[0].telefon;
+
+    if (!telefon) {
+      return fail(res, "No hi ha cap telèfon associat.", 400);
+    }
+
+    const code = await createPhoneVerificationCode(userId);
+
+    console.log("CODI SMS (mock):", code);
+
+    return message(res, "Codi de verificació enviat (mock).");
+  } catch (error) {
+    console.error("Error sendPhoneVerification:", error);
+    return fail(res, "Error enviant el codi.");
+  }
+};
+
+exports.verifyPhone = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { code } = req.body;
+
+    if (!code) {
+      return fail(res, "Codi no proporcionat.", 400);
+    }
+
+    const [rows] = await db.query(
+      "SELECT * FROM verification_codes WHERE user_id = ? AND code = ? AND type = 'phone_verification' LIMIT 1",
+      [userId, code]
+    );
+
+    if (rows.length === 0) {
+      return fail(res, "Codi invàlid o expirat.", 400);
+    }
+
+    const verification = rows[0];
+
+    if (new Date(verification.expires_at) < new Date()) {
+      return fail(res, "Codi expirat.", 400);
+    }
+
+    await db.query(
+      "DELETE FROM verification_codes WHERE id = ?",
+      [verification.id]
+    );
+
+    return message(res, "Telèfon verificat correctament.");
+  } catch (error) {
+    console.error("Error verifyPhone:", error);
+    return fail(res, "Error verificant el telèfon.");
   }
 };

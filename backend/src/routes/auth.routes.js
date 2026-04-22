@@ -30,4 +30,8 @@ router.put("/me", authMiddleware, authController.updateMe);
 // Ruta protegida per canviar la contrasenya d'un usuari autenticat
 router.put("/change-password", authMiddleware, authController.changePassword);
 
+// Verificació telèfon
+router.post("/send-phone-verification", authMiddleware, authController.sendPhoneVerification);
+router.post("/verify-phone", authMiddleware, authController.verifyPhone);
+
 module.exports = router;
