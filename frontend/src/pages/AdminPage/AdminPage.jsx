@@ -2870,8 +2870,8 @@ function AdminPage() {
                         >
                           <option value="">Selecciona hora inici</option>
                           {maintenanceAvailableTimeSlots.map((slot) => (
-                            <option key={slot.id} value={slot.hora_inici}>
-                              {slot.hora_inici}
+                            <option key={slot.id} value={slot.startTime}>
+                              {slot.startTime}
                             </option>
                           ))}
                         </select>
@@ -2891,8 +2891,8 @@ function AdminPage() {
                         >
                           <option value="">Selecciona hora final</option>
                           {maintenanceAvailableTimeSlots.map((slot) => (
-                            <option key={slot.id} value={slot.hora_fi}>
-                              {slot.hora_fi}
+                            <option key={slot.id} value={slot.endTime}>
+                              {slot.endTime}
                             </option>
                           ))}
                         </select>
