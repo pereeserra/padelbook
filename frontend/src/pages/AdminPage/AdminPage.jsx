@@ -575,7 +575,8 @@ function AdminPage() {
     setSavingMaintenance(false);
     setMaintenanceForm({
       court_id: "",
-      time_slot_id: "",
+      hora_inici: "",
+      hora_fi: "",
       data_bloqueig: "",
       motiu: "",
     });
@@ -585,7 +586,8 @@ function AdminPage() {
     setEditingMaintenanceId(block.id);
     setMaintenanceForm({
       court_id: String(block.courtId ?? ""),
-      time_slot_id: String(block.timeSlotId ?? ""),
+      hora_inici: block.startTime || "",
+      hora_fi: block.endTime || "",
       data_bloqueig: block.date || "",
       motiu: block.reason || "",
     });
@@ -611,8 +613,13 @@ function AdminPage() {
         return;
       }
 
-      if (!maintenanceForm.time_slot_id) {
-        showFeedbackMessage("Has de seleccionar una franja horària.", "error");
+      if (!maintenanceForm.hora_inici || !maintenanceForm.hora_fi) {
+        showFeedbackMessage("Has de seleccionar una hora d'inici i una hora final.", "error");
+        return;
+      }
+
+      if (maintenanceForm.hora_inici >= maintenanceForm.hora_fi) {
+        showFeedbackMessage("L'hora final ha de ser posterior a l'hora d'inici.", "error");
         return;
       }
 
@@ -620,7 +627,8 @@ function AdminPage() {
 
       await api.put(`/admin/maintenance/${editingMaintenanceId}`, {
         court_id: Number(maintenanceForm.court_id),
-        time_slot_id: Number(maintenanceForm.time_slot_id),
+        hora_inici: maintenanceForm.hora_inici,
+        hora_fi: maintenanceForm.hora_fi,
         data_bloqueig: maintenanceForm.data_bloqueig,
         motiu: maintenanceForm.motiu,
       });
@@ -652,8 +660,13 @@ function AdminPage() {
         return;
       }
 
-      if (!maintenanceForm.time_slot_id) {
-        showFeedbackMessage("Has de seleccionar una franja horària.", "error");
+      if (!maintenanceForm.hora_inici || !maintenanceForm.hora_fi) {
+        showFeedbackMessage("Has de seleccionar una hora d'inici i una hora final.", "error");
+        return;
+      }
+
+      if (maintenanceForm.hora_inici >= maintenanceForm.hora_fi) {
+        showFeedbackMessage("L'hora final ha de ser posterior a l'hora d'inici.", "error");
         return;
       }
 
@@ -676,7 +689,8 @@ function AdminPage() {
 
       await api.post("/admin/maintenance", {
         court_id: Number(maintenanceForm.court_id),
-        time_slot_id: Number(maintenanceForm.time_slot_id),
+        hora_inici: maintenanceForm.hora_inici,
+        hora_fi: maintenanceForm.hora_fi,
         data_bloqueig: maintenanceForm.data_bloqueig,
         motiu: maintenanceForm.motiu,
       });
@@ -2843,28 +2857,49 @@ function AdminPage() {
                       </div>
 
                       <div className="admin__court-filter-field">
-                        <label className="admin__filter-label" htmlFor="maintenanceCreateSlot">
-                          Franja horària
+                        <label className="admin__filter-label" htmlFor="maintenanceCreateStartTime">
+                          Hora inici
                         </label>
                         <select
-                          id="maintenanceCreateSlot"
+                          id="maintenanceCreateStartTime"
                           className="pb-input"
-                          value={maintenanceForm.time_slot_id}
+                          value={maintenanceForm.hora_inici}
                           onChange={(e) =>
-                            handleMaintenanceFormChange("time_slot_id", e.target.value)
+                            handleMaintenanceFormChange("hora_inici", e.target.value)
                           }
                         >
-                          <option value="">Selecciona franja</option>
+                          <option value="">Selecciona hora inici</option>
                           {maintenanceAvailableTimeSlots.map((slot) => (
-                            <option key={slot.id} value={slot.id}>
-                              {slot.label}
+                            <option key={slot.id} value={slot.hora_inici}>
+                              {slot.hora_inici}
                             </option>
                           ))}
                         </select>
                       </div>
 
                       <div className="admin__court-filter-field">
-                        <label className="admin__filter-label" htmlFor="maintenanceEditDate">
+                        <label className="admin__filter-label" htmlFor="maintenanceCreateEndTime">
+                          Hora final
+                        </label>
+                        <select
+                          id="maintenanceCreateEndTime"
+                          className="pb-input"
+                          value={maintenanceForm.hora_fi}
+                          onChange={(e) =>
+                            handleMaintenanceFormChange("hora_fi", e.target.value)
+                          }
+                        >
+                          <option value="">Selecciona hora final</option>
+                          {maintenanceAvailableTimeSlots.map((slot) => (
+                            <option key={slot.id} value={slot.hora_fi}>
+                              {slot.hora_fi}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="admin__court-filter-field">
+                        <label className="admin__filter-label" htmlFor="maintenanceCreateDate">
                           Data
                         </label>
                         <input
@@ -2966,21 +3001,42 @@ function AdminPage() {
                         </div>
 
                         <div className="admin__court-filter-field">
-                          <label className="admin__filter-label" htmlFor="maintenanceEditSlot">
-                            Franja horària
+                          <label className="admin__filter-label" htmlFor="maintenanceEditStartTime">
+                            Hora inici
                           </label>
                           <select
-                            id="maintenanceEditSlot"
+                            id="maintenanceEditStartTime"
                             className="pb-input"
-                            value={maintenanceForm.time_slot_id}
+                            value={maintenanceForm.hora_inici}
                             onChange={(e) =>
-                              handleMaintenanceFormChange("time_slot_id", e.target.value)
+                              handleMaintenanceFormChange("hora_inici", e.target.value)
                             }
                           >
-                            <option value="">Selecciona franja</option>
+                            <option value="">Selecciona hora inici</option>
                             {maintenanceAvailableTimeSlots.map((slot) => (
-                              <option key={slot.id} value={slot.id}>
-                                {slot.label}
+                              <option key={slot.id} value={slot.hora_inici}>
+                                {slot.hora_inici}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div className="admin__court-filter-field">
+                          <label className="admin__filter-label" htmlFor="maintenanceEditEndTime">
+                            Hora final
+                          </label>
+                          <select
+                            id="maintenanceEditEndTime"
+                            className="pb-input"
+                            value={maintenanceForm.hora_fi}
+                            onChange={(e) =>
+                              handleMaintenanceFormChange("hora_fi", e.target.value)
+                            }
+                          >
+                            <option value="">Selecciona hora final</option>
+                            {maintenanceAvailableTimeSlots.map((slot) => (
+                              <option key={slot.id} value={slot.hora_fi}>
+                                {slot.hora_fi}
                               </option>
                             ))}
                           </select>

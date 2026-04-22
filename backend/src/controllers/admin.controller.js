@@ -672,15 +672,16 @@ exports.updateMaintenanceBlock = async (req, res) => {
 // Controlador per crear un bloqueig de manteniment
 exports.createMaintenanceBlock = async (req, res) => {
   try {
-    let { court_id, time_slot_id, data_bloqueig, motiu } = req.body;
+    let { court_id, hora_inici, hora_fi, data_bloqueig, motiu } = req.body;
 
     court_id = parsePositiveInteger(court_id);
-    time_slot_id = parsePositiveInteger(time_slot_id);
+    hora_inici = typeof hora_inici === "string" ? hora_inici.trim() : "";
+    hora_fi = typeof hora_fi === "string" ? hora_fi.trim() : "";
     data_bloqueig =
       typeof data_bloqueig === "string" ? data_bloqueig.trim() : "";
     motiu = normalizeText(motiu);
 
-    if (!court_id || !time_slot_id || !data_bloqueig || !motiu) {
+    if (!court_id || !hora_inici || !hora_fi || !data_bloqueig || !motiu) {
       return res.status(400).json({
         error: "Falten dades obligatòries per crear el bloqueig",
       });
@@ -692,9 +693,9 @@ exports.createMaintenanceBlock = async (req, res) => {
       });
     }
 
-    if (!Number.isInteger(time_slot_id) || time_slot_id <= 0) {
+    if (hora_inici >= hora_fi) {
       return res.status(400).json({
-        error: "La franja horària indicada no és vàlida",
+        error: "L'hora final ha de ser posterior a l'hora d'inici",
       });
     }
 
@@ -733,26 +734,53 @@ exports.createMaintenanceBlock = async (req, res) => {
       });
     }
 
-    const [timeSlot] = await db.query(
-      "SELECT * FROM time_slots WHERE id = ?",
-      [time_slot_id]
+    const [timeSlots] = await db.query(
+      `SELECT id, hora_inici, hora_fi
+       FROM time_slots
+       WHERE hora_inici >= ? AND hora_fi <= ?
+       ORDER BY hora_inici ASC`,
+      [hora_inici, hora_fi]
     );
 
-    if (timeSlot.length === 0) {
+    if (timeSlots.length === 0) {
       return res.status(404).json({
-        error: "Franja horària no trobada",
+        error: "No s'han trobat franges horàries dins aquest rang",
       });
     }
 
-    const [result] = await db.query(
-      `INSERT INTO maintenance_blocks (court_id, time_slot_id, data_bloqueig, motiu)
-       VALUES (?, ?, ?, ?)`,
-      [court_id, time_slot_id, data_bloqueig, motiu]
+    const [duplicated] = await db.query(
+      `SELECT mb.id
+       FROM maintenance_blocks mb
+       JOIN time_slots ts ON ts.id = mb.time_slot_id
+       WHERE mb.court_id = ?
+         AND mb.data_bloqueig = ?
+         AND ts.hora_inici >= ?
+         AND ts.hora_fi <= ?
+       LIMIT 1`,
+      [court_id, data_bloqueig, hora_inici, hora_fi]
     );
 
+    if (duplicated.length > 0) {
+      return res.status(400).json({
+        error: "Ja existeix almenys un bloqueig per aquesta pista, data i rang horari",
+      });
+    }
+
+    let firstInsertedId = null;
+
+    for (const slot of timeSlots) {
+      const [result] = await db.query(
+        `INSERT INTO maintenance_blocks (court_id, time_slot_id, data_bloqueig, motiu)
+         VALUES (?, ?, ?, ?)`,
+        [court_id, slot.id, data_bloqueig, motiu]
+      );
+
+      if (!firstInsertedId) {
+        firstInsertedId = result.insertId;
+      }
+    }
+
     const courtName = court[0].nom_pista;
-    const horaInici = timeSlot[0].hora_inici;
-    const horaFi = timeSlot[0].hora_fi;
 
     await db.query(
       `INSERT INTO admin_logs (admin_id, accio, entitat, entitat_id, descripcio)
@@ -761,15 +789,15 @@ exports.createMaintenanceBlock = async (req, res) => {
         req.user.id,
         "CREATE_MAINTENANCE",
         "maintenance_block",
-        result.insertId,
-        `L'admin ha creat un bloqueig de manteniment per a la pista "${courtName}" el dia ${data_bloqueig} de ${horaInici} a ${horaFi}. Motiu: ${motiu}`,
+        firstInsertedId,
+        `L'admin ha creat un bloqueig de manteniment per a la pista "${courtName}" el dia ${data_bloqueig} de ${hora_inici} a ${hora_fi}. Motiu: ${motiu}`,
       ]
     );
 
     return res.status(201).json({
       message: "Bloqueig de manteniment creat correctament",
       data: {
-        id: result.insertId,
+        id: firstInsertedId,
       },
     });
   } catch (error) {
