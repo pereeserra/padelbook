@@ -651,3 +651,56 @@
   position: relative;
   z-index: 2;
 }
+
+/* =========================
+   MOBILE RESPONSIVE FIX
+========================= */
+
+@media (max-width: 768px) {
+
+  /* 🔹 GRID PRINCIPALS */
+  .home__feature-grid,
+  .home__gallery-grid,
+  .home__steps-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* 🔹 HERO */
+  .home__hero {
+    padding: 1rem;
+    border-radius: 20px;
+  }
+
+  .home__title {
+    font-size: 1.8rem;
+    line-height: 1.1;
+  }
+
+  .home__subtitle {
+    font-size: 0.95rem;
+  }
+
+  /* 🔹 MOCKUP */
+  .home__mockup-card {
+    max-width: 100%;
+  }
+
+  /* 🔹 CARDS */
+  .home__feature-card,
+  .home__step-card {
+    padding: 1.1rem;
+  }
+
+  /* 🔹 CTA */
+  .home__cta-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.2rem;
+  }
+
+  /* 🔹 ESPAIS */
+  .home__section {
+    margin-top: 2rem;
+  }
+
+}
