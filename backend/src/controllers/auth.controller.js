@@ -229,7 +229,6 @@ exports.login = async (req, res) => {
         email: user.email,
         rol: user.rol,
         telefon: user.telefon,
-        telefon_verificat: user.telefon_verificat,
         email_verificat: user.email_verificat,
         created_at: user.created_at
       }
@@ -250,10 +249,20 @@ exports.login = async (req, res) => {
 // OBTENIR DADES DE L'USUARI AUTENTICAT
 exports.getMe = async (req, res) => {
   try {
+    if (!req.user || !req.user.id) {
+      return fail(res, "Usuari no autenticat", 401);
+    }
+
+    if (!req.user || !req.user.id) {
+      console.error("req.user no definit:", req.user);
+      return fail(res, "Usuari no autenticat", 401);
+    }
+
     const userId = req.user.id;
+    console.log("USER ID getMe:", userId);
 
     const [rows] = await db.query(
-      "SELECT id, nom, llinatges, email, rol, telefon, telefon_verificat, email_verificat, created_at FROM users WHERE id = ? LIMIT 1",
+      "SELECT id, nom, llinatges, email, rol, telefon, email_verificat, created_at FROM users WHERE id = ? LIMIT 1",
       [userId]
     );
 
@@ -317,7 +326,7 @@ exports.updateMe = async (req, res) => {
     }
 
     await db.query(
-      "UPDATE users SET nom = ?, llinatges = ?, email = ?, telefon = ?, telefon_verificat = 0, email_verificat = ? WHERE id = ?",
+      "UPDATE users SET nom = ?, llinatges = ?, email = ?, telefon = ?, email_verificat = ? WHERE id = ?",
       [
         nom,
         llinatges,
@@ -338,7 +347,7 @@ exports.updateMe = async (req, res) => {
     }
 
     const [updatedRows] = await db.query(
-      "SELECT id, nom, llinatges, email, rol, telefon, telefon_verificat, email_verificat, created_at FROM users WHERE id = ? LIMIT 1",
+      "SELECT id, nom, llinatges, email, rol, telefon, email_verificat, created_at FROM users WHERE id = ? LIMIT 1",
       [userId]
     );
 
@@ -614,10 +623,7 @@ exports.verifyPhone = async (req, res) => {
       [verification.id]
     );
 
-    await db.query(
-      "UPDATE users SET telefon_verificat = 1 WHERE id = ?",
-      [userId]
-    );
+    return fail(res, "La verificació de telèfon no està disponible actualment.", 501);
 
     return message(res, "Telèfon verificat correctament.");
   } catch (error) {
