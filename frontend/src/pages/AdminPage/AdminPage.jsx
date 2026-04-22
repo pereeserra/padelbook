@@ -90,7 +90,7 @@ function AdminPage() {
   const [courtTypeFilter, setCourtTypeFilter] = useState("tots");
 
   const [maintenanceSearch, setMaintenanceSearch] = useState("");
-  const [maintenancePeriodFilter, setMaintenancePeriodFilter] = useState("futurs");
+  const [maintenancePeriodFilter, setMaintenancePeriodFilter] = useState("tots");
 
   const [showAllActivity, setShowAllActivity] = useState(false);
   const [showAllCourtStats, setShowAllCourtStats] = useState(false);
@@ -567,7 +567,7 @@ function AdminPage() {
 
   const resetMaintenanceFilters = () => {
     setMaintenanceSearch("");
-    setMaintenancePeriodFilter("futurs");
+    setMaintenancePeriodFilter("tots");
   };
 
   const resetMaintenanceEditor = () => {
@@ -3178,10 +3178,10 @@ function AdminPage() {
                           }
                           className="pb-input"
                         >
+                          <option value="tots">Tots</option>
                           <option value="futurs">Avui i futurs</option>
                           <option value="avui">Només avui</option>
                           <option value="passats">Passats</option>
-                          <option value="tots">Tots</option>
                         </select>
                       </div>
 

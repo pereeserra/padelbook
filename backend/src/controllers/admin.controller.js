@@ -509,7 +509,7 @@ exports.getAllMaintenanceBlocks = async (req, res) => {
         ON al.entitat = 'maintenance_block'
         AND al.entitat_id = m.id
         AND al.accio = 'CREATE_MAINTENANCE'
-      ORDER BY m.data_bloqueig ASC, t.hora_inici ASC, m.id DESC
+      ORDER BY m.data_bloqueig DESC, t.hora_inici DESC, m.id DESC
     `);
 
     return res.json({
