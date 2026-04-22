@@ -18,22 +18,6 @@ const {
   validateProfileData,
 } = require("../utils/validators");
 
-const createPhoneVerificationCode = async (userId) => {
-  await db.query(
-    "DELETE FROM verification_codes WHERE user_id = ? AND type = 'phone_verification'",
-    [userId]
-  );
-
-  const code = Math.floor(100000 + Math.random() * 900000).toString();
-
-  await db.query(
-    "INSERT INTO verification_codes (user_id, code, type, expires_at) VALUES (?, ?, 'phone_verification', DATE_ADD(NOW(), INTERVAL 10 MINUTE))",
-    [userId, code]
-  );
-
-  return code;
-};
-
 const createAndSendVerificationEmail = async ({ userId, nom, email, subject }) => {
   await db.query(
     "DELETE FROM verification_codes WHERE user_id = ? AND type = 'email_verification'",
@@ -561,36 +545,6 @@ exports.resendVerification = async (req, res) => {
   } catch (error) {
     console.error("Error resendVerification:", error);
     return fail(res, "No s'ha pogut reenviar el correu de verificació.");
-  }
-};
-
-exports.sendPhoneVerification = async (req, res) => {
-  try {
-    const userId = req.user.id;
-
-    const [rows] = await db.query(
-      "SELECT telefon FROM users WHERE id = ? LIMIT 1",
-      [userId]
-    );
-
-    if (rows.length === 0) {
-      return fail(res, "Usuari no trobat.", 404);
-    }
-
-    const telefon = rows[0].telefon;
-
-    if (!telefon) {
-      return fail(res, "No hi ha cap telèfon associat.", 400);
-    }
-
-    const code = await createPhoneVerificationCode(userId);
-
-    console.log("CODI SMS (mock):", code);
-
-    return message(res, "Codi de verificació enviat (mock).");
-  } catch (error) {
-    console.error("Error sendPhoneVerification:", error);
-    return fail(res, "Error enviant el codi.");
   }
 };
 
