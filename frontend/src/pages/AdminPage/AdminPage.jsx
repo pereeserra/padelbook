@@ -1419,7 +1419,7 @@ function AdminPage() {
             className={`admin__hero-grid ${
               isMobileView ? "admin__hero-grid--mobile" : ""
             }`}
-          />
+          >
             <div className="admin__hero-content">
               <span className="pb-chip">Administració</span>
 
@@ -1436,83 +1436,55 @@ function AdminPage() {
                 d’un espai més complet, més ordenat i amb millor lectura visual.
               </p>
 
-          <nav
-            className={`admin__hero-tabs ${
-              isMobileView ? "admin__hero-tabs--mobile" : ""
-            }`}
-            aria-label="Navegació del panell d'administració"
-          >
-            <button
-              type="button"
-              className={`admin__hero-tab ${
-                activeTab === "dashboard" ? "is-active" : ""
-              }`}
-              onClick={() => setActiveTab("dashboard")}
-            >
-              <span className="admin__hero-tab-top">
-                <span className="admin__hero-tab-index">01</span>
-                <span className="admin__hero-tab-kicker">Vista general</span>
-              </span>
-              <span className="admin__hero-tab-label">Dashboard</span>
-              <span className="admin__hero-tab-description">
-                Estadístiques i resum executiu
-              </span>
-            </button>
+              <div
+                className={`admin__hero-tabs ${
+                  isMobileView ? "admin__hero-tabs--mobile" : ""
+                }`}
+              >
+                <button
+                  type="button"
+                  className={`admin__hero-tab ${
+                    activeTab === "dashboard" ? "is-active" : ""
+                  }`}
+                  onClick={() => setActiveTab("dashboard")}
+                >
+                  <span className="admin__hero-tab-label">Dashboard</span>
+                </button>
 
-            <button
-              type="button"
-              className={`admin__hero-tab ${
-                activeTab === "courts" ? "is-active" : ""
-              }`}
-              onClick={() => {
-                setActiveTab("courts");
-                setEditingCourtId(null);
-              }}
-            >
-              <span className="admin__hero-tab-top">
-                <span className="admin__hero-tab-index">02</span>
-                <span className="admin__hero-tab-kicker">Espais</span>
-              </span>
-              <span className="admin__hero-tab-label">Gestió de pistes</span>
-              <span className="admin__hero-tab-description">
-                Control i configuració de pistes
-              </span>
-            </button>
+                <button
+                  type="button"
+                  className={`admin__hero-tab ${
+                    activeTab === "courts" ? "is-active" : ""
+                  }`}
+                  onClick={() => {
+                    setActiveTab("courts");
+                    setEditingCourtId(null);
+                  }}
+                >
+                  <span className="admin__hero-tab-label">Gestió de pistes</span>
+                </button>
 
-            <button
-              type="button"
-              className={`admin__hero-tab ${
-                activeTab === "reservations" ? "is-active" : ""
-              }`}
-              onClick={() => setActiveTab("reservations")}
-            >
-              <span className="admin__hero-tab-top">
-                <span className="admin__hero-tab-index">03</span>
-                <span className="admin__hero-tab-kicker">Operativa</span>
-              </span>
-              <span className="admin__hero-tab-label">Reserves</span>
-              <span className="admin__hero-tab-description">
-                Seguiment de reserves i activitat
-              </span>
-            </button>
+                <button
+                  type="button"
+                  className={`admin__hero-tab ${
+                    activeTab === "reservations" ? "is-active" : ""
+                  }`}
+                  onClick={() => setActiveTab("reservations")}
+                >
+                  <span className="admin__hero-tab-label">Reserves</span>
+                </button>
 
-            <button
-              type="button"
-              className={`admin__hero-tab ${
-                activeTab === "users" ? "is-active" : ""
-              }`}
-              onClick={() => setActiveTab("users")}
-            >
-              <span className="admin__hero-tab-top">
-                <span className="admin__hero-tab-index">04</span>
-                <span className="admin__hero-tab-kicker">Comunitat</span>
-              </span>
-              <span className="admin__hero-tab-label">Usuaris</span>
-              <span className="admin__hero-tab-description">
-                Rols, comptes i administració
-              </span>
-            </button>
-          </nav>
+                <button
+                  type="button"
+                  className={`admin__hero-tab ${
+                    activeTab === "users" ? "is-active" : ""
+                  }`}
+                  onClick={() => setActiveTab("users")}
+                >
+                  <span className="admin__hero-tab-label">Usuaris</span>
+                </button>
+              </div>
+            </div>
 
             {!error && (
               <div className="admin__hero-panel">
