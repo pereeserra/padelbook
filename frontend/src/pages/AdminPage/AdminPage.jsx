@@ -3247,7 +3247,7 @@ function AdminPage() {
                               </div>
 
                               <span className="admin__maintenance-slot">
-                                {block.startTime} - {block.endTime}
+                                {String(block.startTime).slice(0, 5)} - {String(block.endTime).slice(0, 5)}
                               </span>
                             </div>
 
