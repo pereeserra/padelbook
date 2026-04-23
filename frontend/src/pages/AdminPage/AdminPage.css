@@ -70,6 +70,8 @@
   gap: 0.4rem;
   flex-wrap: nowrap;
   margin-top: 1.15rem;
+  margin-left: auto;
+  margin-right: auto;
   padding: 0.3rem;
   border-radius: 18px;
   background: linear-gradient(135deg, rgba(8, 15, 32, 0.34), rgba(30, 41, 59, 0.22));
