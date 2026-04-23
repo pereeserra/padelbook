@@ -2219,33 +2219,6 @@ function AdminPage() {
                     isMobileView ? "admin__section-card--mobile" : ""
                   }`}
                 >
-                  <div
-                    className={`admin__summary-inline-grid ${
-                      isMobileView ? "admin__summary-inline-grid--mobile" : ""
-                    }`}
-                  >
-                    <div className="admin__summary-inline-card">
-                      <span className="admin__summary-inline-label">Totals</span>
-                      <span className="admin__summary-inline-value">
-                        {reservations.length}
-                      </span>
-                    </div>
-
-                    <div className="admin__summary-inline-card">
-                      <span className="admin__summary-inline-label">Actives</span>
-                      <span className="admin__summary-inline-value">
-                        {activeReservationsCount}
-                      </span>
-                    </div>
-
-                    <div className="admin__summary-inline-card">
-                      <span className="admin__summary-inline-label">Cancel·lades</span>
-                      <span className="admin__summary-inline-value">
-                        {cancelledReservationsCount}
-                      </span>
-                    </div>
-                  </div>
-
                   <AdminReservationsTable reservations={reservations} />
                 </div>
               </section>
