@@ -94,6 +94,7 @@ function AdminPage() {
   const [showAllCourtCards, setShowAllCourtCards] = useState(false);
 
   const [maintenanceSearch, setMaintenanceSearch] = useState("");
+  const [showAllMaintenances, setShowAllMaintenances] = useState(false);
   const [maintenancePeriodFilter, setMaintenancePeriodFilter] = useState("tots");
   const [showAllMaintenanceBlocks, setShowAllMaintenanceBlocks] = useState(false);
 
@@ -1174,10 +1175,10 @@ function AdminPage() {
   }, [maintenanceBlocks, maintenanceSearch, maintenancePeriodFilter, todayString]);
 
   const visibleMaintenanceBlocks = useMemo(() => {
-    return showAllMaintenanceBlocks
+    return showAllMaintenances
       ? filteredMaintenanceBlocks
-      : filteredMaintenanceBlocks.slice(0, 5);
-  }, [filteredMaintenanceBlocks, showAllMaintenanceBlocks]);
+      : filteredMaintenanceBlocks.slice(0, 4);
+  }, [filteredMaintenanceBlocks, showAllMaintenances]);
 
   const maintenanceTodayCount = useMemo(() => {
     return maintenanceBlocks.filter((block) => block.date === todayString).length;
@@ -3364,7 +3365,7 @@ function AdminPage() {
                           </article>
                         ))}
 
-                        {filteredMaintenanceBlocks.length > 5 && (
+                        {filteredMaintenanceBlocks.length > 4 && (
                           <div className="admin__maintenance-toggle">
                             <button
                               type="button"
