@@ -1433,7 +1433,13 @@
 
 .admin__maintenance-list {
   display: grid;
-  gap: 1rem;
+  gap: 0.8rem;
+}
+
+.admin__maintenance-toggle {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.35rem;
 }
 
 .admin__maintenance-card {

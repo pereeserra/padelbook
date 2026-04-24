@@ -94,6 +94,7 @@ function AdminPage() {
 
   const [maintenanceSearch, setMaintenanceSearch] = useState("");
   const [maintenancePeriodFilter, setMaintenancePeriodFilter] = useState("tots");
+  const [showAllMaintenanceBlocks, setShowAllMaintenanceBlocks] = useState(false);
 
   const [showAllActivity, setShowAllActivity] = useState(false);
   const [showAllCourtStats, setShowAllCourtStats] = useState(false);
@@ -1166,6 +1167,12 @@ function AdminPage() {
       return matchesQuery && matchesPeriod;
     });
   }, [maintenanceBlocks, maintenanceSearch, maintenancePeriodFilter, todayString]);
+
+  const visibleMaintenanceBlocks = useMemo(() => {
+    return showAllMaintenanceBlocks
+      ? filteredMaintenanceBlocks
+      : filteredMaintenanceBlocks.slice(0, 5);
+  }, [filteredMaintenanceBlocks, showAllMaintenanceBlocks]);
 
   const maintenanceTodayCount = useMemo(() => {
     return maintenanceBlocks.filter((block) => block.date === todayString).length;
@@ -3242,7 +3249,7 @@ function AdminPage() {
 
                     {filteredMaintenanceBlocks.length > 0 ? (
                       <div className="admin__maintenance-list">
-                        {filteredMaintenanceBlocks.map((block) => (
+                        {visibleMaintenanceBlocks.map((block) => (
                           <article
                             key={block.id}
                             className="admin__maintenance-card"
@@ -3335,6 +3342,22 @@ function AdminPage() {
                             </div>
                           </article>
                         ))}
+
+                        {filteredMaintenanceBlocks.length > 5 && (
+                          <div className="admin__maintenance-toggle">
+                            <button
+                              type="button"
+                              className="btn btn-light"
+                              onClick={() =>
+                                setShowAllMaintenanceBlocks((currentValue) => !currentValue)
+                              }
+                            >
+                              {showAllMaintenanceBlocks
+                                ? "Veure menys manteniments"
+                                : `Veure tots els manteniments (${filteredMaintenanceBlocks.length})`}
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <div className="admin__empty-filtered-state admin__maintenance-empty-state">
