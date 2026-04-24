@@ -3305,10 +3305,10 @@ function AdminPage() {
                                 </button>
 
                                 {confirmingMaintenanceId === block.id ? (
-                                  <>
+                                  <div className="admin__maintenance-confirm-actions">
                                     <button
                                       type="button"
-                                      className="btn btn-danger"
+                                      className="btn btn-danger admin__maintenance-confirm-button"
                                       onClick={() => handleDeleteMaintenance(block.id)}
                                     >
                                       Confirmar
@@ -3316,12 +3316,12 @@ function AdminPage() {
 
                                     <button
                                       type="button"
-                                      className="btn btn-light"
+                                      className="btn btn-light admin__maintenance-cancel-button"
                                       onClick={() => setConfirmingMaintenanceId(null)}
                                     >
                                       Cancel·lar
                                     </button>
-                                  </>
+                                  </div>
                                 ) : (
                                   <button
                                     type="button"
