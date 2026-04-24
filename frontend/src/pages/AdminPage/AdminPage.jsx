@@ -1234,6 +1234,14 @@ function AdminPage() {
     );
   }, [maintenanceEndSlots, maintenanceForm.hora_inici]);
 
+  const editingMaintenanceCourtName = useMemo(() => {
+    const selectedCourt = courts.find(
+      (court) => String(court.id) === String(maintenanceForm.court_id)
+    );
+
+    return selectedCourt?.nom_pista || "Manteniment seleccionat";
+  }, [courts, maintenanceForm.court_id]);
+
   const resetUserFilters = () => {
     setUserSearch("");
     setUserRoleFilter("tots");
@@ -2995,7 +3003,7 @@ function AdminPage() {
                         </div>
 
                         <span className="pb-badge-pill pb-badge-pill--blue">
-                          ID {editingMaintenanceId}
+                          {editingMaintenanceCourtName}
                         </span>
                       </div>
 
