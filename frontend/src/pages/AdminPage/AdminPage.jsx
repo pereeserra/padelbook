@@ -11,6 +11,24 @@ import {
 import "./AdminPage.css";
 
 function AdminPage() {
+
+  const scrollToCourtCard = (courtId) => {
+    const element = document.getElementById(`court-card-${courtId}`);
+
+    if (element) {
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+
+      element.style.boxShadow = "0 0 0 3px rgba(59,130,246,0.5)";
+
+      setTimeout(() => {
+        element.style.boxShadow = "";
+      }, 2000);
+    }
+  };
+
   const emptyCourt = {
     nom_pista: "",
     tipus: "dobles",
@@ -197,6 +215,27 @@ function AdminPage() {
     if (!userDetailCardRef.current) return;
 
     scrollToElementWithOffset(userDetailCardRef.current, 190);
+  };
+
+  const scrollToCourtCard = (courtId) => {
+    if (!courtId) return;
+
+    setActiveTab("courts");
+    setHighlightedCourtId(courtId);
+
+    window.setTimeout(() => {
+      const courtCard = document.getElementById(`admin-court-card-${courtId}`);
+
+      if (courtCard) {
+        scrollToElementWithOffset(courtCard, 170);
+      }
+    }, 140);
+
+    window.setTimeout(() => {
+      setHighlightedCourtId((currentCourtId) =>
+        currentCourtId === courtId ? null : currentCourtId
+      );
+    }, 2200);
   };
 
   // Funció per normalitzar les dades de visió general del dashboard, amb suport per diferents formats de resposta
@@ -2765,23 +2804,27 @@ function AdminPage() {
                       }`}
                     >
                       {filteredCourts.map((court) => (
-                        <CourtCard
+                        <div
                           key={court.id}
-                          court={court}
-                          onEdit={() => handleStartEditCourt(court)}
-                          onStartDelete={() => {
-                            setConfirmingCourtId(court.id);
+                          id={`admin-court-card-${court.id}`}
+                        >
+                          <CourtCard
+                            court={court}
+                            onEdit={() => handleStartEditCourt(court)}
+                            onStartDelete={() => {
+                              setConfirmingCourtId(court.id);
 
-                            setTimeout(() => {
-                              scrollToCourtCard(court.id);
-                            }, 150);
-                          }}
-                          onAbortDelete={() => setConfirmingCourtId(null)}
-                          onDelete={() => handleDeleteCourt(court.id)}
-                          confirmingDelete={confirmingCourtId === court.id}
-                          isDeleting={deletingCourtId === court.id}
-                          isHighlighted={highlightedCourtId === court.id}
-                        />
+                              setTimeout(() => {
+                                scrollToCourtCard(court.id);
+                              }, 150);
+                            }}
+                            onAbortDelete={() => setConfirmingCourtId(null)}
+                            onDelete={() => handleDeleteCourt(court.id)}
+                            confirmingDelete={confirmingCourtId === court.id}
+                            isDeleting={deletingCourtId === court.id}
+                            isHighlighted={highlightedCourtId === court.id}
+                          />
+                        </div>
                       ))}
                     </div>
                   ) : (
