@@ -30,14 +30,22 @@ function HomePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const courtsRes = await fetch("http://localhost:3000/api/courts");
+        const courtsRes = await fetch("http://localhost:3000/courts", {
+                                    headers: {
+                                      Authorization: `Bearer ${localStorage.getItem("token")}`
+                                    }
+                                  });
         const courtsData = await courtsRes.json();
 
-        const slotsRes = await fetch("http://localhost:3000/api/timeslots");
+        const slotsRes = await fetch("http://localhost:3000/time-slots", {
+                                    headers: {
+                                      Authorization: `Bearer ${localStorage.getItem("token")}`
+                                    }
+                                  });
         const slotsData = await slotsRes.json();
 
-        setCourts(courtsData);
-        setSlots(slotsData);
+      setCourts(Array.isArray(courtsData) ? courtsData : courtsData.data || []);
+      setSlots(Array.isArray(slotsData) ? slotsData : slotsData.data || []);
       } catch (error) {
         console.error(error);
       }
