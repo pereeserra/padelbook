@@ -80,7 +80,7 @@ function AdminPage() {
     try {
       const rawUser = localStorage.getItem("user");
       return rawUser ? JSON.parse(rawUser) : null;
-    } catch (error) {
+    } catch {
       return null;
     }
   }, []);
@@ -94,7 +94,6 @@ function AdminPage() {
   const [showAllCourtCards, setShowAllCourtCards] = useState(false);
 
   const [maintenanceSearch, setMaintenanceSearch] = useState("");
-  const [showAllMaintenances, setShowAllMaintenances] = useState(false);
   const [showCreateMaintenanceForm, setShowCreateMaintenanceForm] = useState(false);
   const [maintenancePeriodFilter, setMaintenancePeriodFilter] = useState("tots");
   const [showAllMaintenanceBlocks, setShowAllMaintenanceBlocks] = useState(false);
@@ -107,27 +106,6 @@ function AdminPage() {
   const [logActionFilter, setLogActionFilter] = useState("totes");
   const [logAdminFilter, setLogAdminFilter] = useState("tots");
   const [logSearch, setLogSearch] = useState("");
-
-  const handleToggleRole = async (user) => {
-    try {
-      const newRole = user.rol === "admin" ? "usuari" : "admin";
-
-      await api.put(`/admin/users/${user.id}/role`, {
-        rol: newRole,
-      });
-
-      showFeedbackMessage("Rol actualitzat correctament");
-
-      await refreshAllAdminData();
-    } catch (err) {
-      console.error(err);
-
-      const errorMsg =
-        err.response?.data?.error || "Error canviant rol";
-
-      showFeedbackMessage(errorMsg, "error");
-    }
-  };
 
   const handleViewUserDetail = async (userId) => {
     if (selectedUser?.id === userId) {
@@ -408,7 +386,7 @@ function AdminPage() {
       null,
   });
 
-  const formatLogDescription = (log) => {
+  const _formatLogDescription = (log) => {
     const action = log?.accio || log?.action;
 
     switch (action) {
@@ -1176,10 +1154,10 @@ function AdminPage() {
   }, [maintenanceBlocks, maintenanceSearch, maintenancePeriodFilter, todayString]);
 
   const visibleMaintenanceBlocks = useMemo(() => {
-    return showAllMaintenances
+    return showAllMaintenanceBlocks
       ? filteredMaintenanceBlocks
       : filteredMaintenanceBlocks.slice(0, 4);
-  }, [filteredMaintenanceBlocks, showAllMaintenances]);
+  }, [filteredMaintenanceBlocks, showAllMaintenanceBlocks]);
 
   const maintenanceTodayCount = useMemo(() => {
     return maintenanceBlocks.filter((block) => block.date === todayString).length;
@@ -2899,12 +2877,13 @@ function AdminPage() {
                     </div>
 
                     {showCreateMaintenanceForm && (
-                      <div
-                        className={`admin__maintenance-edit-grid ${
-                          isMobileView ? "admin__maintenance-edit-grid--mobile" : ""
-                        }`}
-                      >
-                      <div className="admin__court-filter-field">
+                      <>
+                        <div
+                          className={`admin__maintenance-edit-grid ${
+                            isMobileView ? "admin__maintenance-edit-grid--mobile" : ""
+                          }`}
+                        >
+                          <div className="admin__court-filter-field">
                         <label className="admin__filter-label" htmlFor="maintenanceCreateCourt">
                           Pista
                         </label>
@@ -2925,100 +2904,101 @@ function AdminPage() {
                         </select>
                       </div>
 
-                      <div className="admin__court-filter-field">
-                        <label className="admin__filter-label" htmlFor="maintenanceCreateStartTime">
-                          Hora inici
-                        </label>
-                        <select
-                          id="maintenanceCreateStartTime"
-                          className="pb-input"
-                          value={maintenanceForm.hora_inici}
-                          onChange={(e) =>
-                            handleMaintenanceFormChange("hora_inici", e.target.value)
-                          }
-                        >
-                          <option value="">Selecciona hora inici</option>
-                          {maintenanceStartSlots.map((time) => (
-                            <option key={time} value={time}>
-                              {time}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+                          <div className="admin__court-filter-field">
+                            <label className="admin__filter-label" htmlFor="maintenanceCreateStartTime">
+                              Hora inici
+                            </label>
+                            <select
+                              id="maintenanceCreateStartTime"
+                              className="pb-input"
+                              value={maintenanceForm.hora_inici}
+                              onChange={(e) =>
+                                handleMaintenanceFormChange("hora_inici", e.target.value)
+                              }
+                            >
+                              <option value="">Selecciona hora inici</option>
+                              {maintenanceStartSlots.map((time) => (
+                                <option key={time} value={time}>
+                                  {time}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
 
-                      <div className="admin__court-filter-field">
-                        <label className="admin__filter-label" htmlFor="maintenanceCreateEndTime">
-                          Hora final
-                        </label>
-                        <select
-                          id="maintenanceCreateEndTime"
-                          className="pb-input"
-                          value={maintenanceForm.hora_fi}
-                          onChange={(e) =>
-                            handleMaintenanceFormChange("hora_fi", e.target.value)
-                          }
-                        >
-                          <option value="">Selecciona hora final</option>
-                          {filteredMaintenanceEndSlots.map((time) => (
-                            <option key={time} value={time}>
-                              {time}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+                          <div className="admin__court-filter-field">
+                            <label className="admin__filter-label" htmlFor="maintenanceCreateEndTime">
+                              Hora final
+                            </label>
+                            <select
+                              id="maintenanceCreateEndTime"
+                              className="pb-input"
+                              value={maintenanceForm.hora_fi}
+                              onChange={(e) =>
+                                handleMaintenanceFormChange("hora_fi", e.target.value)
+                              }
+                            >
+                              <option value="">Selecciona hora final</option>
+                              {filteredMaintenanceEndSlots.map((time) => (
+                                <option key={time} value={time}>
+                                  {time}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
 
-                      <div className="admin__court-filter-field">
-                        <label className="admin__filter-label" htmlFor="maintenanceCreateDate">
-                          Data
-                        </label>
-                        <input
-                          id="maintenanceCreateDate"
-                          type="date"
-                          className="pb-input"
-                          min={todayString}
-                          value={maintenanceForm.data_bloqueig}
-                          onChange={(e) =>
-                            handleMaintenanceFormChange("data_bloqueig", e.target.value)
-                          }
-                        />
-                      </div>
+                          <div className="admin__court-filter-field">
+                            <label className="admin__filter-label" htmlFor="maintenanceCreateDate">
+                              Data
+                            </label>
+                            <input
+                              id="maintenanceCreateDate"
+                              type="date"
+                              className="pb-input"
+                              min={todayString}
+                              value={maintenanceForm.data_bloqueig}
+                              onChange={(e) =>
+                                handleMaintenanceFormChange("data_bloqueig", e.target.value)
+                              }
+                            />
+                          </div>
 
-                      <div className="admin__court-filter-field admin__maintenance-edit-field-full">
-                        <label className="admin__filter-label" htmlFor="maintenanceCreateReason">
-                          Motiu
-                        </label>
-                        <textarea
-                          id="maintenanceCreateReason"
-                          className="pb-input admin__maintenance-textarea"
-                          rows="4"
-                          value={maintenanceForm.motiu}
-                          onChange={(e) =>
-                            handleMaintenanceFormChange("motiu", e.target.value)
-                          }
-                          placeholder="Explica el motiu del manteniment..."
-                        />
-                      </div>
-                    </div>
+                          <div className="admin__court-filter-field admin__maintenance-edit-field-full">
+                            <label className="admin__filter-label" htmlFor="maintenanceCreateReason">
+                              Motiu
+                            </label>
+                            <textarea
+                              id="maintenanceCreateReason"
+                              className="pb-input admin__maintenance-textarea"
+                              rows="4"
+                              value={maintenanceForm.motiu}
+                              onChange={(e) =>
+                                handleMaintenanceFormChange("motiu", e.target.value)
+                              }
+                              placeholder="Explica el motiu del manteniment..."
+                            />
+                          </div>
+                        </div>
 
-                      <div className="admin__maintenance-edit-actions">
-                        <button
-                          type="button"
-                          className="btn btn-primary"
-                          onClick={handleCreateMaintenance}
-                          disabled={savingMaintenance}
-                        >
-                          {savingMaintenance ? "Creant..." : "Crear manteniment"}
-                        </button>
+                        <div className="admin__maintenance-edit-actions">
+                          <button
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={handleCreateMaintenance}
+                            disabled={savingMaintenance}
+                          >
+                            {savingMaintenance ? "Creant..." : "Crear manteniment"}
+                          </button>
 
-                        <button
-                          type="button"
-                          className="btn btn-light"
-                          onClick={resetMaintenanceEditor}
-                          disabled={savingMaintenance}
-                        >
-                          Netejar camps
-                        </button>
-                      </div>
+                          <button
+                            type="button"
+                            className="btn btn-light"
+                            onClick={resetMaintenanceEditor}
+                            disabled={savingMaintenance}
+                          >
+                            Netejar camps
+                          </button>
+                        </div>
+                      </>
                     )}
                   </div>
 
