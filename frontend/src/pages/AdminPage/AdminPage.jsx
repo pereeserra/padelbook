@@ -23,6 +23,7 @@ function AdminPage() {
   };
 
   const editSectionRef = useRef(null);
+  const maintenanceEditorRef = useRef(null);
   const dashboardSectionRef = useRef(null);
   const reservationsSectionRef = useRef(null);
   const usersSectionRef = useRef(null);
@@ -615,7 +616,7 @@ function AdminPage() {
     });
 
     setTimeout(() => {
-      scrollToElementWithOffset(feedbackRef.current, 120);
+      scrollToElementWithOffset(maintenanceEditorRef.current, 120);
     }, 80);
   };
 
@@ -2924,7 +2925,7 @@ function AdminPage() {
                           Data
                         </label>
                         <input
-                          id="maintenanceEditDate"
+                          id="maintenanceCreateDate"
                           type="date"
                           className="pb-input"
                           min={todayString}
@@ -2974,7 +2975,10 @@ function AdminPage() {
                   </div>
 
                   {editingMaintenanceId && (
-                    <div className="pb-surface-card admin__section-card admin__maintenance-editor">
+                    <div
+                      ref={maintenanceEditorRef}
+                      className="pb-surface-card admin__section-card admin__maintenance-editor"
+                    >
                       <div
                         className={`admin__section-header ${
                           isMobileView ? "admin__section-header--mobile" : ""
