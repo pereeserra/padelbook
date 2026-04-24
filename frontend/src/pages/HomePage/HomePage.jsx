@@ -9,6 +9,8 @@ import padelCourtMockup from "../../assets/images/padelcourt.png";
 
 function HomePage() {
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 900);
+  const [courts, setCourts] = useState([]);
+  const [slots, setSlots] = useState([]);
 
   // Comprovem si l'usuari està loguejat només una vegada al carregar la pàgina
   const isLoggedIn = useMemo(() => {
@@ -24,6 +26,30 @@ function HomePage() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const courtsRes = await fetch("http://localhost:3000/api/courts");
+        const courtsData = await courtsRes.json();
+
+        const slotsRes = await fetch("http://localhost:3000/api/timeslots");
+        const slotsData = await slotsRes.json();
+
+        setCourts(courtsData);
+        setSlots(slotsData);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const court = courts[0];
+  const courtSlots = slots
+    .filter((s) => s.court_id === court?.id)
+    .slice(0, 3);
 
   return (
     <div className="home__page">
@@ -103,7 +129,9 @@ function HomePage() {
             <div className="home__hero-visual">
               <div className="home__mockup-card">
                 <div className="home__mockup-top">
-                  <span className="home__mockup-court-badge">Pista 2 · Disponible</span>
+                  <span className="home__mockup-court-badge">
+                    {court ? `${court.name} · Disponible` : "Carregant..."}
+                  </span>
                   <span className="home__mockup-today">Avui</span>
                 </div>
 
@@ -112,20 +140,23 @@ function HomePage() {
                 </div>
 
                 <div className="home__mockup-slots">
-                  <div className="home__mockup-slot-row">
-                    <span className="home__mockup-hour">17:00</span>
-                    <span className="home__slot-free">Lliure</span>
-                  </div>
+                  {courtSlots.map((slot) => (
+                    <div key={slot.id} className="home__mockup-slot-row">
+                      <span className="home__mockup-hour">
+                        {slot.start_time}
+                      </span>
 
-                  <div className="home__mockup-slot-row">
-                    <span className="home__mockup-hour">18:30</span>
-                    <span className="home__slot-reserved">Reservada</span>
-                  </div>
-
-                  <div className="home__mockup-slot-row">
-                    <span className="home__mockup-hour">20:00</span>
-                    <span className="home__slot-free">Lliure</span>
-                  </div>
+                      <span
+                        className={
+                          slot.is_reserved
+                            ? "home__slot-reserved"
+                            : "home__slot-free"
+                        }
+                      >
+                        {slot.is_reserved ? "Reservada" : "Lliure"}
+                      </span>
+                    </div>
+                  ))}
                 </div>
 
                 <div className="home__mockup-bottom-cards">
