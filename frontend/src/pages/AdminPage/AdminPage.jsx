@@ -12,23 +12,6 @@ import "./AdminPage.css";
 
 function AdminPage() {
 
-  const scrollToCourtCard = (courtId) => {
-    const element = document.getElementById(`court-card-${courtId}`);
-
-    if (element) {
-      element.scrollIntoView({
-        behavior: "smooth",
-        block: "center"
-      });
-
-      element.style.boxShadow = "0 0 0 3px rgba(59,130,246,0.5)";
-
-      setTimeout(() => {
-        element.style.boxShadow = "";
-      }, 2000);
-    }
-  };
-
   const emptyCourt = {
     nom_pista: "",
     tipus: "dobles",
