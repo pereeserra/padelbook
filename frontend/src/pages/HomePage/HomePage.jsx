@@ -44,7 +44,39 @@ function HomePage() {
   }, []);
 
   const homeCourt = homeAvailabilityCourts[0];
-  const homeCourtSlots = homeCourt?.slots?.slice(0, 3) || [];
+  const homeCourtSlots = useMemo(() => {
+    if (!homeCourt?.slots) {
+      return [];
+    }
+
+    const now = new Date();
+    const roundedNow = new Date(now);
+    const currentMinutes = roundedNow.getMinutes();
+
+    if (currentMinutes > 0 && currentMinutes <= 30) {
+      roundedNow.setMinutes(30);
+    } else if (currentMinutes > 30) {
+      roundedNow.setHours(roundedNow.getHours() + 1);
+      roundedNow.setMinutes(0);
+    }
+
+    roundedNow.setSeconds(0);
+    roundedNow.setMilliseconds(0);
+
+    return homeCourt.slots
+      .filter((slot) => {
+        const [hours, minutes] = String(slot.hora_inici).split(":").map(Number);
+        const slotDate = new Date();
+
+        slotDate.setHours(hours);
+        slotDate.setMinutes(minutes);
+        slotDate.setSeconds(0);
+        slotDate.setMilliseconds(0);
+
+        return slot.disponible && slotDate >= roundedNow;
+      })
+      .slice(0, 3);
+  }, [homeCourt]);
 
   return (
     <div className="home__page">

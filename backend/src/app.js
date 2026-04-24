@@ -39,7 +39,12 @@ const registerLimiter = rateLimit({
 // Configuració de CORS per permetre només el frontend de Vite
 const allowedOrigins = process.env.CORS_ORIGINS
   ? process.env.CORS_ORIGINS.split(",")
-  : ["http://localhost:5173"];
+  : [
+      "http://localhost:5173",
+      "http://127.0.0.1:5173",
+      "http://localhost:5174",
+      "http://127.0.0.1:5174",
+    ];
 
 app.use(
   cors({

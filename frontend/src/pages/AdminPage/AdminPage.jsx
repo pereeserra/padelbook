@@ -31,6 +31,8 @@ function AdminPage() {
   const feedbackRef = useRef(null);
   const userDetailCardRef = useRef(null);
   const userRowRefs = useRef({});
+  const hasLoadedInitialDataRef = useRef(false);
+  const refreshAllAdminDataRef = useRef(null);
 
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
 
@@ -556,6 +558,8 @@ function AdminPage() {
     await fetchDashboardData(safeReservations, safeCourts);
   };
 
+  refreshAllAdminDataRef.current = refreshAllAdminData;
+
   // Funció per reiniciar el formulari de creació/edició de pista a l'estat inicial, netejant les dades i sortint del mode d'edició si s'estava editant una pista
   const resetCourtForm = () => {
     setNewCourt(emptyCourt);
@@ -921,7 +925,10 @@ function AdminPage() {
 
   // Carregar les dades d'administració inicials en muntar el component i configurar el dashboard, assegurant que les dades mostrades estiguin actualitzades i consistents des del principi
   useEffect(() => {
-    refreshAllAdminData();
+    if (hasLoadedInitialDataRef.current) return;
+
+    hasLoadedInitialDataRef.current = true;
+    refreshAllAdminDataRef.current?.();
   }, []);
 
   // Memoritzar les pistes disponibles i cobertes per optimitzar el rendiment en la renderització i càlculs relacionats, evitant càlculs innecessaris en cada renderitzat
