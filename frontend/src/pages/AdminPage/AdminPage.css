@@ -783,6 +783,13 @@
   grid-template-columns: 1fr;
 }
 
+.admin__courts-toggle {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  margin-top: 0.25rem;
+}
+
 .admin__empty-filtered-state {
   border-radius: 24px;
   padding: 1.3rem;

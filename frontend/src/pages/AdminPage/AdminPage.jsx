@@ -91,6 +91,7 @@ function AdminPage() {
   const [courtSearch, setCourtSearch] = useState("");
   const [courtStatusFilter, setCourtStatusFilter] = useState("totes");
   const [courtTypeFilter, setCourtTypeFilter] = useState("tots");
+  const [showAllCourtCards, setShowAllCourtCards] = useState(false);
 
   const [maintenanceSearch, setMaintenanceSearch] = useState("");
   const [maintenancePeriodFilter, setMaintenancePeriodFilter] = useState("tots");
@@ -1132,6 +1133,10 @@ function AdminPage() {
       return matchesQuery && matchesStatus && matchesType;
     });
   }, [courts, courtSearch, courtStatusFilter, courtTypeFilter]);
+
+  const visibleCourtCards = useMemo(() => {
+    return showAllCourtCards ? filteredCourts : filteredCourts.slice(0, 4);
+  }, [filteredCourts, showAllCourtCards]);
 
   // Memoritzar el nombre de pistes disponibles després d'aplicar els filtres de cerca i filtrat, assegurant que els valors estiguin actualitzats quan les dades de les pistes o els criteris de filtrat canviïn i evitant càlculs innecessaris en cada renderitzat
   const filteredAvailableCourtsCount = useMemo(() => {
@@ -2802,7 +2807,7 @@ function AdminPage() {
                         isMobileView ? "admin__cards--mobile" : ""
                       }`}
                     >
-                      {filteredCourts.map((court) => (
+                      {visibleCourtCards.map((court) => (
                         <div
                           key={court.id}
                           id={`admin-court-card-${court.id}`}
@@ -2825,6 +2830,22 @@ function AdminPage() {
                           />
                         </div>
                       ))}
+
+                      {filteredCourts.length > 4 && (
+                        <div className="admin__courts-toggle">
+                          <button
+                            type="button"
+                            className="btn btn-light"
+                            onClick={() =>
+                              setShowAllCourtCards((currentValue) => !currentValue)
+                            }
+                          >
+                            {showAllCourtCards
+                              ? "Veure menys pistes"
+                              : `Veure totes les pistes (${filteredCourts.length})`}
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div className="pb-surface-card admin__empty-filtered-state">
