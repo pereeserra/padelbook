@@ -95,6 +95,7 @@ function AdminPage() {
 
   const [maintenanceSearch, setMaintenanceSearch] = useState("");
   const [showAllMaintenances, setShowAllMaintenances] = useState(false);
+  const [showCreateMaintenanceForm, setShowCreateMaintenanceForm] = useState(false);
   const [maintenancePeriodFilter, setMaintenancePeriodFilter] = useState("tots");
   const [showAllMaintenanceBlocks, setShowAllMaintenanceBlocks] = useState(false);
 
@@ -2884,16 +2885,25 @@ function AdminPage() {
                         </p>
                       </div>
 
-                      <span className="pb-badge-pill pb-badge-pill--amber">
-                        Nou
-                      </span>
+                      <button
+                        type="button"
+                        className="btn btn-light"
+                        onClick={() =>
+                          setShowCreateMaintenanceForm((currentValue) => !currentValue)
+                        }
+                      >
+                        {showCreateMaintenanceForm
+                          ? "Amagar formulari"
+                          : "Crear manteniment"}
+                      </button>
                     </div>
 
-                    <div
-                      className={`admin__maintenance-edit-grid ${
-                        isMobileView ? "admin__maintenance-edit-grid--mobile" : ""
-                      }`}
-                    >
+                    {showCreateMaintenanceForm && (
+                      <div
+                        className={`admin__maintenance-edit-grid ${
+                          isMobileView ? "admin__maintenance-edit-grid--mobile" : ""
+                        }`}
+                      >
                       <div className="admin__court-filter-field">
                         <label className="admin__filter-label" htmlFor="maintenanceCreateCourt">
                           Pista
@@ -2990,25 +3000,26 @@ function AdminPage() {
                       </div>
                     </div>
 
-                    <div className="admin__maintenance-edit-actions">
-                      <button
-                        type="button"
-                        className="btn btn-primary"
-                        onClick={handleCreateMaintenance}
-                        disabled={savingMaintenance}
-                      >
-                        {savingMaintenance ? "Creant..." : "Crear manteniment"}
-                      </button>
+                      <div className="admin__maintenance-edit-actions">
+                        <button
+                          type="button"
+                          className="btn btn-primary"
+                          onClick={handleCreateMaintenance}
+                          disabled={savingMaintenance}
+                        >
+                          {savingMaintenance ? "Creant..." : "Crear manteniment"}
+                        </button>
 
-                      <button
-                        type="button"
-                        className="btn btn-light"
-                        onClick={resetMaintenanceEditor}
-                        disabled={savingMaintenance}
-                      >
-                        Netejar camps
-                      </button>
-                    </div>
+                        <button
+                          type="button"
+                          className="btn btn-light"
+                          onClick={resetMaintenanceEditor}
+                          disabled={savingMaintenance}
+                        >
+                          Netejar camps
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   {editingMaintenanceId && (
