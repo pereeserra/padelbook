@@ -9,8 +9,7 @@ import padelCourtMockup from "../../assets/images/padelcourt.png";
 
 function HomePage() {
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 900);
-  const [courts, setCourts] = useState([]);
-  const [slots, setSlots] = useState([]);
+  const [homeAvailabilityCourts, setHomeAvailabilityCourts] = useState([]);
 
   // Comprovem si l'usuari està loguejat només una vegada al carregar la pàgina
   const isLoggedIn = useMemo(() => {
@@ -28,36 +27,24 @@ function HomePage() {
   }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchHomeAvailability = async () => {
       try {
-        const courtsRes = await fetch("http://localhost:3000/courts", {
-                                    headers: {
-                                      Authorization: `Bearer ${localStorage.getItem("token")}`
-                                    }
-                                  });
-        const courtsData = await courtsRes.json();
+        const today = new Date().toISOString().slice(0, 10);
+        const response = await fetch(`http://localhost:3000/availability?date=${today}`);
+        const result = await response.json();
 
-        const slotsRes = await fetch("http://localhost:3000/time-slots", {
-                                    headers: {
-                                      Authorization: `Bearer ${localStorage.getItem("token")}`
-                                    }
-                                  });
-        const slotsData = await slotsRes.json();
-
-      setCourts(Array.isArray(courtsData) ? courtsData : courtsData.data || []);
-      setSlots(Array.isArray(slotsData) ? slotsData : slotsData.data || []);
+        setHomeAvailabilityCourts(result.data?.courts || []);
       } catch (error) {
         console.error(error);
+        setHomeAvailabilityCourts([]);
       }
     };
 
-    fetchData();
+    fetchHomeAvailability();
   }, []);
 
-  const court = courts[0];
-  const courtSlots = slots
-    .filter((s) => s.court_id === court?.id)
-    .slice(0, 3);
+  const homeCourt = homeAvailabilityCourts[0];
+  const homeCourtSlots = homeCourt?.slots?.slice(0, 3) || [];
 
   return (
     <div className="home__page">
@@ -138,7 +125,7 @@ function HomePage() {
               <div className="home__mockup-card">
                 <div className="home__mockup-top">
                   <span className="home__mockup-court-badge">
-                    {court ? `${court.name} · Disponible` : "Carregant..."}
+                    {homeCourt ? `${homeCourt.nom_pista} · Disponible` : "Carregant..."}
                   </span>
                   <span className="home__mockup-today">Avui</span>
                 </div>
@@ -148,20 +135,20 @@ function HomePage() {
                 </div>
 
                 <div className="home__mockup-slots">
-                  {courtSlots.map((slot) => (
-                    <div key={slot.id} className="home__mockup-slot-row">
+                  {homeCourtSlots.map((slot) => (
+                    <div key={slot.time_slot_id} className="home__mockup-slot-row">
                       <span className="home__mockup-hour">
-                        {slot.start_time}
+                        {String(slot.hora_inici).slice(0, 5)}
                       </span>
 
                       <span
                         className={
-                          slot.is_reserved
-                            ? "home__slot-reserved"
-                            : "home__slot-free"
+                          slot.disponible
+                            ? "home__slot-free"
+                            : "home__slot-reserved"
                         }
                       >
-                        {slot.is_reserved ? "Reservada" : "Lliure"}
+                        {slot.disponible ? "Lliure" : "Reservada"}
                       </span>
                     </div>
                   ))}
