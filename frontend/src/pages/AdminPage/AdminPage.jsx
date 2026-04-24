@@ -609,8 +609,8 @@ function AdminPage() {
     setConfirmingMaintenanceId(null);
     setMaintenanceForm({
       court_id: String(block.courtId ?? ""),
-      hora_inici: block.startTime || "",
-      hora_fi: block.endTime || "",
+      hora_inici: block.startTime ? String(block.startTime).slice(0, 5) : "",
+      hora_fi: block.endTime ? String(block.endTime).slice(0, 5) : "",
       data_bloqueig: block.date ? String(block.date).slice(0, 10) : "",
       motiu: block.reason || "",
     });
@@ -3038,9 +3038,9 @@ function AdminPage() {
                             }
                           >
                             <option value="">Selecciona hora inici</option>
-                            {maintenanceAvailableTimeSlots.map((slot) => (
-                              <option key={slot.id} value={slot.hora_inici}>
-                                {slot.hora_inici}
+                            {maintenanceStartSlots.map((time) => (
+                              <option key={time} value={time}>
+                                {time}
                               </option>
                             ))}
                           </select>
@@ -3059,9 +3059,9 @@ function AdminPage() {
                             }
                           >
                             <option value="">Selecciona hora final</option>
-                            {maintenanceAvailableTimeSlots.map((slot) => (
-                              <option key={slot.id} value={slot.hora_fi}>
-                                {slot.hora_fi}
+                            {filteredMaintenanceEndSlots.map((time) => (
+                              <option key={time} value={time}>
+                                {time}
                               </option>
                             ))}
                           </select>
