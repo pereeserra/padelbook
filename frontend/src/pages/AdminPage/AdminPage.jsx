@@ -64,6 +64,7 @@ function AdminPage() {
   const [feedbackAction, setFeedbackAction] = useState(null);
 
   const [confirmingCourtId, setConfirmingCourtId] = useState(null);
+  const [confirmingMaintenanceId, setConfirmingMaintenanceId] = useState(null);
   const [deletingCourtId, setDeletingCourtId] = useState(null);
   const [creatingCourt, setCreatingCourt] = useState(false);
   const [editingCourtId, setEditingCourtId] = useState(null);
@@ -159,11 +160,10 @@ function AdminPage() {
   };
 
   const handleDeleteMaintenance = async (id) => {
-    if (!window.confirm("Segur que vols eliminar aquest manteniment?")) return;
-
     try {
       await api.delete(`/admin/maintenance/${id}`);
 
+      setConfirmingMaintenanceId(null);
       showFeedbackMessage("Manteniment eliminat correctament");
       await refreshAllAdminData();
     } catch (err) {
@@ -175,7 +175,6 @@ function AdminPage() {
       showFeedbackMessage(errorMsg, "error");
     }
   };
-
   // Detectar canvis en la mida de la finestra per adaptar la vista
   useEffect(() => {
     const handleResize = () => {
@@ -606,11 +605,12 @@ function AdminPage() {
 
   const handleStartEditMaintenance = (block) => {
     setEditingMaintenanceId(block.id);
+    setConfirmingMaintenanceId(null);
     setMaintenanceForm({
       court_id: String(block.courtId ?? ""),
       hora_inici: block.startTime || "",
       hora_fi: block.endTime || "",
-      data_bloqueig: block.date || "",
+      data_bloqueig: block.date ? String(block.date).slice(0, 10) : "",
       motiu: block.reason || "",
     });
 
@@ -3292,13 +3292,33 @@ function AdminPage() {
                                   Editar
                                 </button>
 
-                                <button
-                                  type="button"
-                                  className="btn btn-danger"
-                                  onClick={() => handleDeleteMaintenance(block.id)}
-                                >
-                                  Eliminar
-                                </button>
+                                {confirmingMaintenanceId === block.id ? (
+                                  <>
+                                    <button
+                                      type="button"
+                                      className="btn btn-danger"
+                                      onClick={() => handleDeleteMaintenance(block.id)}
+                                    >
+                                      Confirmar
+                                    </button>
+
+                                    <button
+                                      type="button"
+                                      className="btn btn-light"
+                                      onClick={() => setConfirmingMaintenanceId(null)}
+                                    >
+                                      Cancel·lar
+                                    </button>
+                                  </>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    className="btn btn-danger"
+                                    onClick={() => setConfirmingMaintenanceId(block.id)}
+                                  >
+                                    Eliminar
+                                  </button>
+                                )}
                               </div>
                             </div>
                           </article>
