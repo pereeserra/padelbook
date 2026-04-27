@@ -662,6 +662,12 @@ function AvailabilityPage() {
 
     const endTime = getReservationEndTime(slot, selectedDuration, clickedCourtSlots);
 
+    setSuccess("");
+    setError("");
+    setShowAuthHelp(false);
+    setShowVerificationHelp(false);
+    setReservationSummary(null);
+
     setSlotHelpMessage(
       endTime
         ? `Reserva possible: de ${formatTimeShort(slot.hora_inici)} a ${formatTimeShort(endTime)}`
