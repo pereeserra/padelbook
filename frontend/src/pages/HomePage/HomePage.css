@@ -184,11 +184,10 @@
 }
 
 .home__mockup-top {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 34px;
   align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
+  gap: 0.55rem;
 }
 
 .home__mockup-court-badge {
