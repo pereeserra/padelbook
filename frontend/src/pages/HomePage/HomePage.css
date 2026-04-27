@@ -193,6 +193,10 @@
 .home__mockup-court-badge {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  justify-self: center;
+  width: fit-content;
+  min-width: 165px;
   padding: 0.5rem 0.9rem;
   border-radius: 999px;
   background: #e0f2fe;
