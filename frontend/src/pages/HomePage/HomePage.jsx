@@ -64,7 +64,17 @@ function HomePage() {
     roundedNow.setMilliseconds(0);
 
     return homeCourt.slots
-      .filter((slot) => {
+      .filter((slot, index, slots) => {
+        const nextSlot = slots[index + 1];
+
+        if (!slot.disponible || !nextSlot?.disponible) {
+          return false;
+        }
+
+        if (slot.hora_fi !== nextSlot.hora_inici) {
+          return false;
+        }
+
         const [hours, minutes] = String(slot.hora_inici).split(":").map(Number);
         const slotDate = new Date();
 
@@ -73,7 +83,7 @@ function HomePage() {
         slotDate.setSeconds(0);
         slotDate.setMilliseconds(0);
 
-        return slot.disponible && slotDate >= roundedNow;
+        return slotDate >= roundedNow;
       })
       .slice(0, 3);
   }, [homeCourt]);
