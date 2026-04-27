@@ -148,12 +148,4 @@ router.delete(
   adminController.deleteMaintenanceBlock
 );
 
-// Ruta per canviar el rol d’un usuari
-router.put(
-  "/users/:id/role",
-  authMiddleware,
-  roleMiddleware("admin"),
-  adminController.updateUserRole
-);
-
 module.exports = router;

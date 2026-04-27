@@ -10,7 +10,6 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [capsLock, setCapsLock] = useState(false);
@@ -241,8 +240,6 @@ function LoginPage() {
 
       window.dispatchEvent(new Event("profile-updated"));
 
-      setSuccess("Inici de sessió correcte. Redirigint...");
-
       setTimeout(() => {
         navigate("/availability");
       }, 800);
@@ -455,7 +452,6 @@ function LoginPage() {
                 onChange={(e) => {
                   setEmail(e.target.value);
                   setError("");
-                  setSuccess("");
                   setShowVerificationHelp(false);
                   setVerificationInfo("");
                 }}
@@ -483,7 +479,6 @@ function LoginPage() {
                   onChange={(e) => {
                     setPassword(e.target.value);
                     setError("");
-                    setSuccess("");
                   }}
                   onKeyDown={handleCapsLock}
                   onKeyUp={handleCapsLock}
