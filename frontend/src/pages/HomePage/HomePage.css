@@ -771,3 +771,36 @@
   text-transform: uppercase;
   margin-bottom: 0.25rem;
 }
+
+.home__mockup-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  margin-top: -0.15rem;
+  margin-bottom: 0.15rem;
+}
+
+.home__mockup-dot {
+  width: 6px;
+  height: 6px;
+  border: none;
+  border-radius: 999px;
+  background: #cbd5e1;
+  cursor: pointer;
+  padding: 0;
+  transition:
+    width 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.home__mockup-dot:hover {
+  transform: scale(1.2);
+  background: #93c5fd;
+}
+
+.home__mockup-dot--active {
+  width: 18px;
+  background: #2563eb;
+}

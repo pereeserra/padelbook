@@ -221,6 +221,20 @@ function HomePage() {
                   </button>
                 </div>
 
+                <div className="home__mockup-dots">
+                  {homeAvailabilityCourts.map((court, index) => (
+                    <button
+                      key={court.court_id}
+                      type="button"
+                      className={`home__mockup-dot ${
+                        index === homeCourtIndex ? "home__mockup-dot--active" : ""
+                      }`}
+                      onClick={() => setHomeCourtIndex(index)}
+                      aria-label={`Veure ${court.nom_pista}`}
+                    />
+                  ))}
+                </div>
+
                 <div
                   key={homeCourt?.court_id || homeCourtIndex}
                   className="home__mockup-carousel-content"
