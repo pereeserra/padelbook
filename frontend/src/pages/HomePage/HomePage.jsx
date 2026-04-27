@@ -192,6 +192,9 @@ function HomePage() {
 
             <div className="home__hero-visual">
               <div className="home__mockup-card">
+                <div className="home__mockup-header-title">
+                  Disponibilitat de pistes
+                </div>
                 <div className="home__mockup-top">
                   <button
                     type="button"
@@ -247,16 +250,6 @@ function HomePage() {
                   )}
                 </div>
 
-                </div>
-
-                <div className="home__mockup-bottom-cards">
-                  <div className="home__mockup-mini-card">
-                    <span className="home__mockup-mini-eyebrow">Experiència</span>
-                    <h4 className="home__mockup-mini-title">Visual i intuïtiva</h4>
-                    <p className="home__mockup-mini-text">
-                      Tot més ordenat, més net i amb millor sensació d’ús.
-                    </p>
-                  </div>
                 </div>
               </div>
             </div>

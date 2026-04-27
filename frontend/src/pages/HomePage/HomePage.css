@@ -761,3 +761,13 @@
     transform: translateX(0);
   }
 }
+
+.home__mockup-header-title {
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #64748b;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
