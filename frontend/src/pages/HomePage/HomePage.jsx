@@ -177,23 +177,22 @@ function HomePage() {
                 </div>
 
                 <div className="home__mockup-slots">
-                  {homeCourtSlots.map((slot) => (
-                    <div key={slot.time_slot_id} className="home__mockup-slot-row">
-                      <span className="home__mockup-hour">
-                        {String(slot.hora_inici).slice(0, 5)}
-                      </span>
+                  {homeCourtSlots.length > 0 ? (
+                    homeCourtSlots.map((slot) => (
+                      <div key={slot.time_slot_id} className="home__mockup-slot-row">
+                        <span className="home__mockup-hour">
+                          {String(slot.hora_inici).slice(0, 5)}
+                        </span>
 
-                      <span
-                        className={
-                          slot.disponible
-                            ? "home__slot-free"
-                            : "home__slot-reserved"
-                        }
-                      >
-                        {slot.disponible ? "Lliure" : "Reservada"}
-                      </span>
+                        <span className="home__slot-free">Lliure</span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="home__mockup-slot-row">
+                      <span className="home__mockup-hour">Avui</span>
+                      <span className="home__slot-reserved">Sense disponibilitat</span>
                     </div>
-                  ))}
+                  )}
                 </div>
 
                 <div className="home__mockup-bottom-cards">
