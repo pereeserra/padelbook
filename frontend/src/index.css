@@ -299,14 +299,20 @@ p {
 }
 
 .pb-kicker {
-  display: inline-block;
-  margin-bottom: 0.45rem;
-  padding: 0.38rem 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0.35rem 0.9rem;
   border-radius: 999px;
-  background: rgba(37, 99, 235, 0.08);
-  color: #1d4ed8;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.94);
+  font-size: 0.84rem;
   font-weight: 800;
-  font-size: 0.8rem;
+  letter-spacing: -0.01em;
+  backdrop-filter: blur(8px);
+  width: fit-content;
 }
 
 .pb-form-field {

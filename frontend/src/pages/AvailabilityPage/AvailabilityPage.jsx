@@ -683,7 +683,7 @@ function AvailabilityPage() {
         <header className="fade-in-up ap-hero-card">
           <div className="ap-hero-card__grid">
             <div className="ap-hero-card__main">
-              <span className="kicker">Disponibilitat en temps real</span>
+              <span className="pb-kicker">Disponibilitat en temps real</span>
               <h1 className="ap-hero-card__title">Reserva de pistes</h1>
               <p className="ap-hero-card__subtitle">
                 Selecciona el dia, explora les pistes disponibles i confirma la teva

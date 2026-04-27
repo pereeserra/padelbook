@@ -1451,7 +1451,7 @@ function AdminPage() {
             }`}
           >
             <div className="admin__hero-content">
-              <span className="kicker">Administració</span>
+              <span className="pb-kicker">Administració</span>
 
               <h1
                 className={`admin__title ${

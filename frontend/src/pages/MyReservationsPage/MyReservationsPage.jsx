@@ -401,7 +401,7 @@ function MyReservationsPage() {
             className={`my-res__hero-grid ${isMobileView ? "my-res__hero-grid--mobile" : ""}`}
           >
             <div>
-              <span className="kicker">Gestió de reserves</span>
+              <span className="pb-kicker">Gestió de reserves</span>
               <h1
                 className={`my-res__title ${isMobileView ? "my-res__title--mobile" : ""}`}
               >
