@@ -10,6 +10,7 @@ import padelCourtMockup from "../../assets/images/padelcourt.png";
 function HomePage() {
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 900);
   const [homeAvailabilityCourts, setHomeAvailabilityCourts] = useState([]);
+  const [homeCourtIndex, setHomeCourtIndex] = useState(0);
 
   // Comprovem si l'usuari està loguejat només una vegada al carregar la pàgina
   const isLoggedIn = useMemo(() => {
@@ -43,7 +44,33 @@ function HomePage() {
     fetchHomeAvailability();
   }, []);
 
-  const homeCourt = homeAvailabilityCourts[0];
+  useEffect(() => {
+    if (homeAvailabilityCourts.length <= 1) {
+      return;
+    }
+
+    const carouselInterval = setInterval(() => {
+      setHomeCourtIndex((currentIndex) =>
+        currentIndex === homeAvailabilityCourts.length - 1 ? 0 : currentIndex + 1
+      );
+    }, 4500);
+
+    return () => clearInterval(carouselInterval);
+  }, [homeAvailabilityCourts.length]);
+
+  const handlePreviousHomeCourt = () => {
+    setHomeCourtIndex((currentIndex) =>
+      currentIndex === 0 ? homeAvailabilityCourts.length - 1 : currentIndex - 1
+    );
+  };
+
+  const handleNextHomeCourt = () => {
+    setHomeCourtIndex((currentIndex) =>
+      currentIndex === homeAvailabilityCourts.length - 1 ? 0 : currentIndex + 1
+    );
+  };
+
+  const homeCourt = homeAvailabilityCourts[homeCourtIndex] || homeAvailabilityCourts[0];
   const homeCourtSlots = useMemo(() => {
     if (!homeCourt?.slots) {
       return [];
@@ -166,15 +193,40 @@ function HomePage() {
             <div className="home__hero-visual">
               <div className="home__mockup-card">
                 <div className="home__mockup-top">
+                  <button
+                    type="button"
+                    className="home__mockup-carousel-button"
+                    onClick={handlePreviousHomeCourt}
+                    disabled={homeAvailabilityCourts.length <= 1}
+                    aria-label="Veure pista anterior"
+                  >
+                    ‹
+                  </button>
+
                   <span className="home__mockup-court-badge">
                     {homeCourt ? `${homeCourt.nom_pista} · Disponible` : "Carregant..."}
                   </span>
-                  <span className="home__mockup-today">Avui</span>
+
+                  <button
+                    type="button"
+                    className="home__mockup-carousel-button"
+                    onClick={handleNextHomeCourt}
+                    disabled={homeAvailabilityCourts.length <= 1}
+                    aria-label="Veure pista següent"
+                  >
+                    ›
+                  </button>
                 </div>
 
-                <div className="home__mockup-court">
-                  <img src={padelCourtMockup} alt="Pista de pàdel" />
-                </div>
+                <div
+                  key={homeCourt?.court_id || homeCourtIndex}
+                  className="home__mockup-carousel-content"
+                >
+                  <span className="home__mockup-today">Avui</span>
+
+                  <div className="home__mockup-court">
+                    <img src={padelCourtMockup} alt="Pista de pàdel" />
+                  </div>
 
                 <div className="home__mockup-slots">
                   {homeCourtSlots.length > 0 ? (
@@ -193,6 +245,8 @@ function HomePage() {
                       <span className="home__slot-reserved">Sense disponibilitat</span>
                     </div>
                   )}
+                </div>
+
                 </div>
 
                 <div className="home__mockup-bottom-cards">
