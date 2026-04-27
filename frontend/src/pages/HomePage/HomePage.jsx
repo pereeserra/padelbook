@@ -204,7 +204,7 @@ function HomePage() {
                   </button>
 
                   <span className="home__mockup-court-badge">
-                    {homeCourt ? `${homeCourt.nom_pista} · Disponible` : "Carregant..."}
+                    {homeCourt ? homeCourt.nom_pista : "Carregant..."}
                   </span>
 
                   <button
