@@ -768,13 +768,13 @@
   justify-content: center;
   align-self: center;
   width: fit-content;
-  padding: 0.4rem 0.9rem;
+  padding: 0.38rem 0.85rem;
   border-radius: 999px;
-  background: rgba(37, 99, 235, 0.08);
-  color: #2563eb;
-  font-size: 0.86rem;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: 0.82rem;
   font-weight: 900;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.035em;
   text-transform: uppercase;
   margin-bottom: 0.2rem;
 }
