@@ -763,13 +763,20 @@
 }
 
 .home__mockup-header-title {
-  text-align: center;
-  font-size: 0.8rem;
-  font-weight: 800;
-  color: #64748b;
-  letter-spacing: 0.05em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  width: fit-content;
+  padding: 0.32rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.08);
+  color: #2563eb;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.15rem;
 }
 
 .home__mockup-dots {
