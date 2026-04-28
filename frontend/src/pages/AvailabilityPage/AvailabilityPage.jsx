@@ -958,6 +958,11 @@ function AvailabilityPage() {
           </div>
         ) : (
           <>
+            <div className="ap-court-help">
+              <span className="ap-court-help__icon">▾</span>
+              <span>Desplega una pista per veure les hores disponibles.</span>
+            </div>
+
             <div className="ap-courts-grid">
             {courtsData.length === 0 && !error && !success ? (
               <div className="ap-empty-state">
@@ -1001,7 +1006,9 @@ function AvailabilityPage() {
                 return (
                   <div
                     key={court.court_id}
-                    className={`ap-court-card fade-in-up ap-delay-${(courtIndex % 3) + 1}`}
+                    className={`ap-court-card fade-in-up ap-delay-${(courtIndex % 3) + 1} ${
+                      openCourtId === court.court_id ? "is-open" : ""
+                    }`}
                   >
                     <div className="ap-court-header">
                       <div>
