@@ -802,6 +802,20 @@ function AvailabilityPage() {
             </div>
           </div>
 
+          <div className="ap-mobile-date-actions">
+            <span className="ap-mobile-date-hint">
+              Llisca lateralment per veure més dies
+            </span>
+
+            <button
+              type="button"
+              onClick={handleOpenDatePicker}
+              className="ap-mobile-calendar-btn"
+            >
+              📅 Obrir calendari
+            </button>
+          </div>
+
           <div className="ap-legend">
             <span className="ap-legend__item">
               <span className="ap-legend__dot ap-legend__dot--available"></span>
