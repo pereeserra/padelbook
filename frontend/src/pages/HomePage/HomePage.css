@@ -672,8 +672,8 @@
   }
 
   .home__hero {
-    padding: 0.75rem;
-    border-radius: 18px;
+    padding: 0.6rem;
+    border-radius: 16px;
   }
 
   .home__hero--mobile {
@@ -694,9 +694,9 @@
 
   .home__title,
   .home__title--mobile {
-    font-size: 1.45rem;
-    line-height: 1.16;
-    margin-bottom: 0.65rem;
+    font-size: 1.25rem;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
   }
 
   .home__subtitle {
@@ -727,7 +727,7 @@
 
   .home__hero-visual {
     padding: 0;
-    margin-top: 0.15rem;
+    margin-top: 0.4rem;
   }
 
   .home__mockup-card {
@@ -737,7 +737,7 @@
   }
 
   .home__mockup-court {
-    height: 86px;
+    height: 110px;
     border-radius: 14px;
   }
 
@@ -758,7 +758,8 @@
   }
 
   .home__cta-section {
-    margin-top: 1.2rem;
+    margin-top: 1.4rem;
+    margin-bottom: 2rem;
   }
 
   .home__cta-card,
@@ -904,4 +905,16 @@
   background: #2563eb;
   opacity: 1;
   transform: scaleX(1.1);
+}
+
+@media (max-width: 768px) {
+
+  .home__sticky-cta {
+    position: fixed;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    z-index: 999;
+  }
+
 }
