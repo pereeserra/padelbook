@@ -1081,10 +1081,13 @@ function AvailabilityPage() {
                       const allCourtSlots =
                         allCourtsData.find((c) => c.court_id === court.court_id)?.slots || [];
 
-                      if (openCourtId !== court.court_id) return null;
-
                       return (
-                        <div className="ap-slots-grid">
+                        <div
+                          className={`ap-slots-panel ${
+                            openCourtId === court.court_id ? "is-open" : ""
+                          }`}
+                        >
+                          <div className="ap-slots-grid">
                           {court.slots.map((slot) => {
                             const isSelected =
                               selectedSlot?.time_slot_id === slot.time_slot_id &&
@@ -1149,6 +1152,7 @@ function AvailabilityPage() {
                           </div>
                         );
                       })}
+                          </div>
                         </div>
                       );
                     })()}
