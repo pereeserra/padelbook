@@ -661,71 +661,139 @@
 
 @media (max-width: 768px) {
 
-  /* 🔹 GRID PRINCIPALS */
-  .home__feature-grid,
-  .home__gallery-grid,
-  .home__steps-grid {
-    grid-template-columns: 1fr;
+  .home__page {
+    padding: 0.9rem 0 1.6rem;
+    background-attachment: scroll;
   }
 
-  /* 🔹 HERO */
+  .home__container,
+  .home__container--mobile {
+    padding: 0 0.85rem;
+  }
+
   .home__hero {
-    padding: 0.85rem;
+    padding: 0.75rem;
     border-radius: 18px;
   }
 
-  .home__title {
-    font-size: 1.55rem;
-    line-height: 1.15;
+  .home__hero--mobile {
+    padding: 0.75rem;
+    border-radius: 18px;
+  }
+
+  .home__hero-grid,
+  .home__hero-grid--mobile {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  .home__hero-top-line {
+    gap: 0.45rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .home__title,
+  .home__title--mobile {
+    font-size: 1.45rem;
+    line-height: 1.16;
+    margin-bottom: 0.65rem;
   }
 
   .home__subtitle {
-    font-size: 0.95rem;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    margin-bottom: 0.85rem;
   }
 
-  /* 🔹 MOCKUP */
+  .home__actions,
+  .home__actions--mobile {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.55rem;
+    margin-bottom: 0;
+  }
+
+  .home__metrics,
+  .home__feature-grid,
+  .home__gallery-grid,
+  .home__steps-grid,
+  .home__section-header {
+    display: none;
+  }
+
+  .home__section {
+    margin-top: 1rem;
+  }
+
+  .home__hero-visual {
+    padding: 0;
+    margin-top: 0.15rem;
+  }
+
   .home__mockup-card {
     max-width: 100%;
     padding: 0.5rem;
+    border-radius: 20px;
   }
 
-  /* 🔹 CARDS */
-  .home__feature-card,
-  .home__step-card {
-    padding: 1.1rem;
+  .home__mockup-court {
+    height: 86px;
+    border-radius: 14px;
   }
 
-  /* 🔹 CTA */
-  .home__cta-card {
+  .home__mockup-slot-row {
+    padding: 0.42rem 0.62rem;
+    border-radius: 14px;
+  }
+
+  .home__mockup-hour {
+    font-size: 0.9rem;
+  }
+
+  .home__slot-free,
+  .home__slot-reserved {
+    min-width: 72px;
+    padding: 0.28rem 0.58rem;
+    font-size: 0.76rem;
+  }
+
+  .home__cta-section {
+    margin-top: 1.2rem;
+  }
+
+  .home__cta-card,
+  .home__cta-card--mobile {
     flex-direction: column;
-    align-items: flex-start;
-    padding: 0.9rem;
+    align-items: stretch;
+    padding: 0.95rem;
     border-radius: 18px;
+    gap: 0.85rem;
   }
 
-  /* 🔹 ESPAIS */
-  .home__section {
-    margin-top: 1.4rem;
+  .home__cta-kicker {
+    margin-bottom: 0.65rem;
+    padding: 0.38rem 0.68rem;
+    font-size: 0.75rem;
   }
 
-    /* =========================
-     OCULTAR SECCIONS PESADES (MÒBIL)
-  ========================= */
-
-  .home__feature-grid {
-    display: none;
+  .home__cta-title {
+    font-size: 1.25rem;
+    line-height: 1.18;
+    margin-bottom: 0.45rem;
   }
 
-  .home__gallery-grid {
-    display: none;
+  .home__cta-text {
+    font-size: 0.9rem;
+    line-height: 1.5;
   }
 
-  .home__steps-grid {
-    display: none;
+  .home__cta-actions {
+    width: 100%;
   }
 
-  .home__section-header {
-    display: none;
+  .home__cta-actions a,
+  .home__cta-actions button {
+    width: 100%;
   }
 
 }
