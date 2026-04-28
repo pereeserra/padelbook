@@ -213,7 +213,7 @@
 
 .home__mockup-court {
   position: relative;
-  height: 112px;
+  height: 90px;
   border-radius: 16px;
   overflow: hidden;
   border: 2px solid rgba(255, 255, 255, 0.7);
@@ -670,13 +670,13 @@
 
   /* 🔹 HERO */
   .home__hero {
-    padding: 1rem;
-    border-radius: 20px;
+    padding: 0.85rem;
+    border-radius: 18px;
   }
 
   .home__title {
-    font-size: 1.8rem;
-    line-height: 1.1;
+    font-size: 1.55rem;
+    line-height: 1.15;
   }
 
   .home__subtitle {
@@ -686,6 +686,7 @@
   /* 🔹 MOCKUP */
   .home__mockup-card {
     max-width: 100%;
+    padding: 0.5rem;
   }
 
   /* 🔹 CARDS */
@@ -698,12 +699,33 @@
   .home__cta-card {
     flex-direction: column;
     align-items: flex-start;
-    padding: 1.2rem;
+    padding: 0.9rem;
+    border-radius: 18px;
   }
 
   /* 🔹 ESPAIS */
   .home__section {
-    margin-top: 2rem;
+    margin-top: 1.4rem;
+  }
+
+    /* =========================
+     OCULTAR SECCIONS PESADES (MÒBIL)
+  ========================= */
+
+  .home__feature-grid {
+    display: none;
+  }
+
+  .home__gallery-grid {
+    display: none;
+  }
+
+  .home__steps-grid {
+    display: none;
+  }
+
+  .home__section-header {
+    display: none;
   }
 
 }
