@@ -699,12 +699,6 @@
     margin-bottom: 0.5rem;
   }
 
-  .home__subtitle {
-    font-size: 0.92rem;
-    line-height: 1.55;
-    margin-bottom: 0.85rem;
-  }
-
   .home__actions,
   .home__actions--mobile {
     flex-direction: column;
@@ -915,6 +909,34 @@
     left: 12px;
     right: 12px;
     z-index: 999;
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  .home__subtitle {
+    display: none;
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  .home__actions {
+    margin-top: 0.4rem;
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  .home__cta-title {
+    font-size: 1.1rem;
+  }
+
+  .home__cta-text {
+    font-size: 0.85rem;
   }
 
 }
