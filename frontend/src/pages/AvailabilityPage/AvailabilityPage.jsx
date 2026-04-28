@@ -40,6 +40,7 @@ function AvailabilityPage() {
   const [paymentMethod, setPaymentMethod] = useState("online_simulat");
   const [selectedDuration, setSelectedDuration] = useState(2);
   const [selectedSlot, setSelectedSlot] = useState(null);
+  const [openCourtId, setOpenCourtId] = useState(null);
   const [reservationSummary, setReservationSummary] = useState(null);
   const [reserving, setReserving] = useState(false);
   const [repeatReservationInfo, setRepeatReservationInfo] = useState(null);
@@ -1031,12 +1032,24 @@ function AvailabilityPage() {
                         >
                           {formatCourtEnvironment(court.slots[0]?.coberta)}
                         </span>
+
+                        <button
+                          onClick={() =>
+                            setOpenCourtId(openCourtId === court.court_id ? null : court.court_id)
+                          }
+                          className={`ap-court-toggle-btn ${openCourtId === court.court_id ? "is-open" : ""}`}
+                          aria-label={openCourtId === court.court_id ? "Amagar horaris" : "Veure horaris"}
+                        >
+                          <span>▾</span>
+                        </button>
                       </div>
                     </div>
 
                     {(() => {
                       const allCourtSlots =
                         allCourtsData.find((c) => c.court_id === court.court_id)?.slots || [];
+
+                      if (openCourtId !== court.court_id) return null;
 
                       return (
                         <div className="ap-slots-grid">
