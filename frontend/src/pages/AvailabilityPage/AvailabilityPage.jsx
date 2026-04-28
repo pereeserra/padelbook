@@ -9,6 +9,7 @@ import { getErrorMessage } from "../../utils/errorHandler";
 function AvailabilityPage() {
   const hiddenDateInputRef = useRef(null);
   const topFeedbackRef = useRef(null);
+  const courtRefs = useRef({});
   const repeatReservationHandledRef = useRef(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -625,6 +626,29 @@ function AvailabilityPage() {
     return true;
   };
 
+  const handleCourtToggle = (courtId) => {
+    const nextOpenCourtId = openCourtId === courtId ? null : courtId;
+
+    setOpenCourtId(nextOpenCourtId);
+
+    if (!nextOpenCourtId) return;
+
+    window.setTimeout(() => {
+      const courtElement = courtRefs.current[nextOpenCourtId];
+
+      if (!courtElement) return;
+
+      const navbarOffset = 92;
+      const elementTop =
+        courtElement.getBoundingClientRect().top + window.scrollY - navbarOffset;
+
+      window.scrollTo({
+        top: elementTop,
+        behavior: "smooth",
+      });
+    }, 80);
+  };
+
   const handleSlotClick = (slot, isSelected, isPastSlot, isValid) => {
     if (isPastSlot || !slot.disponible || !isValid) {
       setSelectedSlot(null);
@@ -1006,6 +1030,9 @@ function AvailabilityPage() {
                 return (
                   <div
                     key={court.court_id}
+                    ref={(element) => {
+                      courtRefs.current[court.court_id] = element;
+                    }}
                     className={`ap-court-card fade-in-up ap-delay-${(courtIndex % 3) + 1} ${
                       openCourtId === court.court_id ? "is-open" : ""
                     }`}
@@ -1041,13 +1068,11 @@ function AvailabilityPage() {
                         </span>
 
                         <button
-                          onClick={() =>
-                            setOpenCourtId(openCourtId === court.court_id ? null : court.court_id)
-                          }
+                          onClick={() => handleCourtToggle(court.court_id)}
                           className={`ap-court-toggle-btn ${openCourtId === court.court_id ? "is-open" : ""}`}
                           aria-label={openCourtId === court.court_id ? "Amagar horaris" : "Veure horaris"}
                         >
-                          <span>▾</span>
+                          <span className="ap-court-help__icon">▾</span>
                         </button>
                       </div>
                     </div>
