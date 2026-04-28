@@ -3,7 +3,7 @@
     radial-gradient(circle at top, rgba(37, 99, 235, 0.08), transparent 30%),
     linear-gradient(180deg, #f8fafc 0%, #eef4ff 100%);
   min-height: 100vh;
-  padding: 0.8rem 0 2rem;
+  padding: 0.6rem 0 1.2rem;
   color: #0f172a;
 }
 
@@ -421,8 +421,8 @@
 .ap-court-card {
   min-width: 0;
   background: rgba(255, 255, 255, 0.9);
-  border-radius: 18px;
-  padding: 0.75rem;
+  border-radius: 16px;
+  padding: 0.6rem;
   border: 1px solid rgba(148, 163, 184, 0.14);
   box-shadow: 0 6px 14px rgba(15, 23, 42, 0.04);
   backdrop-filter: blur(10px);
@@ -662,7 +662,7 @@
   backdrop-filter: blur(16px);
   border-top: 1px solid rgba(226, 232, 240, 0.9);
   box-shadow: 0 -14px 40px rgba(15, 23, 42, 0.08);
-  padding: 1.1rem 1.5rem;
+  padding: 0.7rem 1rem;
   z-index: 100;
 }
 
@@ -828,7 +828,7 @@
 }
 
 .ap-bottom-spacing {
-  height: 80px;
+  height: 60px;
 }
 
 .ap-loading,
@@ -1139,8 +1139,8 @@
   }
 
   .ap-slots-grid {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 0.4rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
   }
 
   .ap-slot-pill {

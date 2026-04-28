@@ -745,7 +745,6 @@ function AvailabilityPage() {
         <section className="ap-dates-card fade-in-up">
           <div className="ap-dates-card__top">
             <div>
-              <span className="ap-section-kicker">Selecciona el dia</span>
               <h2 className="ap-section-title">Tria la data que t’interessa</h2>
               <p className="ap-section-text">
                 Pots reservar ràpidament des dels propers dies o obrir el calendari
