@@ -438,51 +438,7 @@ function Navbar() {
             ))}
           </div>
 
-          {user ? (
-            <div className="pb-navbar__mobile-account">
-              <div className="pb-navbar__mobile-account-card">
-                <span className="pb-navbar__mobile-account-label">Compte</span>
-                <span className="pb-navbar__mobile-account-name">
-                  {fullUserName || "Usuari"}
-                </span>
-                {userEmail && (
-                  <span className="pb-navbar__mobile-account-email">{userEmail}</span>
-                )}
-              </div>
-
-              <div className="pb-navbar__mobile-actions">
-                <button
-                  type="button"
-                  className={`pb-navbar__mobile-link ${
-                    isAccountRouteActive() ? "is-active" : ""
-                  }`}
-                  onClick={() => handleNavigateWithTop("/my-account")}
-                >
-                  El meu compte
-                </button>
-
-                {user?.rol === "admin" && (
-                  <button
-                    type="button"
-                    className={`pb-navbar__mobile-link ${
-                      isActive("/admin") ? "is-active" : ""
-                    }`}
-                    onClick={() => handleNavigateWithTop("/admin")}
-                  >
-                    Administració
-                  </button>
-                )}
-
-                <button
-                  type="button"
-                  className="pb-navbar__mobile-link pb-navbar__mobile-link--danger"
-                  onClick={handleLogout}
-                >
-                  Tancar sessió
-                </button>
-              </div>
-            </div>
-          ) : (
+          {!user && (
             <div className="pb-navbar__mobile-actions">
               <Link
                 to="/login"
