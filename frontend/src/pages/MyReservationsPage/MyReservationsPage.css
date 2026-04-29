@@ -205,6 +205,10 @@
   font-weight: 800;
 }
 
+.my-res__results-head .pb-kicker {
+  display: none;
+}
+
 .my-res__results-title {
   margin: 0;
   font-size: 1.35rem;
