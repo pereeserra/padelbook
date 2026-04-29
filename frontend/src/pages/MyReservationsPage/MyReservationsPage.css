@@ -573,6 +573,10 @@
     font-size: 0.86rem;
   }
 
+  .my-res__results-head .pb-kicker {
+    display: none;
+  }
+
   .my-res__results-title {
     font-size: 1.12rem;
   }
