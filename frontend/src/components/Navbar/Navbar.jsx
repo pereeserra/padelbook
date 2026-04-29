@@ -157,6 +157,10 @@ function Navbar() {
 
   // Comprovar si una ruta és activa per aplicar estils d'enllaç actiu
   const isActive = (path) => location.pathname === path;
+  const isLoginPage = location.pathname === "/login";
+  const isRegisterPage = location.pathname === "/register";
+  const isAuthPage = isLoginPage || isRegisterPage;
+  const shouldShowMobileNavigation = isMobileView;
 
   const isAccountRouteActive = () => {
     return location.pathname === "/my-account";
@@ -203,6 +207,11 @@ function Navbar() {
 
     return links;
   }, [user]);
+
+  const mobileNavLinks = isAuthPage
+    ? navLinks.filter((link) => link.to === "/" || link.to === "/availability")
+    : navLinks;
+  const shouldShowGuestMobileActions = !user || isAuthPage;
 
   return (
     <nav className="pb-navbar">
@@ -404,7 +413,7 @@ function Navbar() {
             )
           )}
 
-          {isMobileView && (
+          {shouldShowMobileNavigation && (
             <button
               type="button"
               className={`pb-navbar__mobile-toggle ${isMobileMenuOpen ? "is-open" : ""}`}
@@ -420,13 +429,13 @@ function Navbar() {
         </div>
       </div>
 
-      {isMobileView && (
+      {shouldShowMobileNavigation && (
         <div
           className={`pb-navbar__mobile-panel ${isMobileMenuOpen ? "is-open" : ""}`}
           aria-hidden={!isMobileMenuOpen}
         >
           <div className="pb-navbar__mobile-links">
-            {navLinks.map((link) => (
+            {mobileNavLinks.map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
@@ -441,22 +450,26 @@ function Navbar() {
             ))}
           </div>
 
-          {!user && (
+          {shouldShowGuestMobileActions && (
             <div className="pb-navbar__mobile-actions">
-              <Link
-                to="/login"
-                className="btn btn-light btn-full"
-                onClick={(event) => handleNavClick(event, "/login")}
-              >
-                Iniciar sessió
-              </Link>
-              <Link
-                to="/register"
-                className="btn btn-primary btn-full"
-                onClick={(event) => handleNavClick(event, "/register")}
-              >
-                Crear compte
-              </Link>
+              {!isLoginPage && (
+                <Link
+                  to="/login"
+                  className="btn btn-light btn-full"
+                  onClick={(event) => handleNavClick(event, "/login")}
+                >
+                  Iniciar sessió
+                </Link>
+              )}
+              {!isRegisterPage && (
+                <Link
+                  to="/register"
+                  className="btn btn-primary btn-full"
+                  onClick={(event) => handleNavClick(event, "/register")}
+                >
+                  Crear compte
+                </Link>
+              )}
             </div>
           )}
         </div>

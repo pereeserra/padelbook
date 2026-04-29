@@ -457,6 +457,7 @@ function LoginPage() {
                 }}
                 className="login__input"
                 autoComplete="email"
+                autoFocus
                 required
               />
             </div>
@@ -482,7 +483,7 @@ function LoginPage() {
                   }}
                   onKeyDown={handleCapsLock}
                   onKeyUp={handleCapsLock}
-                  className="login__input"
+                  className="login__input login__input--password"
                   autoComplete="current-password"
                   required
                 />
@@ -493,6 +494,7 @@ function LoginPage() {
                     isMobileView ? "login__show-button--mobile" : ""
                   }`}
                   onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={showPassword ? "Ocultar contrasenya" : "Mostrar contrasenya"}
                 >
                   {showPassword ? "Ocultar" : "Mostrar"}
                 </button>
