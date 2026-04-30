@@ -146,6 +146,26 @@ function Navbar() {
   };
 
   // Gestionar tancament de sessió eliminant dades d'autenticació i redirigint a la pàgina de login
+  const handleUserMenuToggle = () => {
+    if (isUserMenuOpen) {
+      setIsUserMenuOpen(false);
+      return;
+    }
+
+    setIsMobileMenuOpen(false);
+    setIsUserMenuOpen(true);
+  };
+
+  const handleMobileMenuToggle = () => {
+    if (isMobileMenuOpen) {
+      setIsMobileMenuOpen(false);
+      return;
+    }
+
+    setIsUserMenuOpen(false);
+    setIsMobileMenuOpen(true);
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -250,7 +270,7 @@ function Navbar() {
               <button
                 type="button"
                 className={`pb-navbar__user-trigger ${isUserMenuOpen ? "is-open" : ""}`}
-                onClick={() => setIsUserMenuOpen((prev) => !prev)}
+                onClick={handleUserMenuToggle}
                 aria-label="Obrir menú d'usuari"
                 aria-haspopup="menu"
                 aria-expanded={isUserMenuOpen}
@@ -417,7 +437,7 @@ function Navbar() {
             <button
               type="button"
               className={`pb-navbar__mobile-toggle ${isMobileMenuOpen ? "is-open" : ""}`}
-              onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+              onClick={handleMobileMenuToggle}
               aria-label={isMobileMenuOpen ? "Tancar menú" : "Obrir menú"}
               aria-expanded={isMobileMenuOpen}
             >
