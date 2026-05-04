@@ -420,6 +420,7 @@
 
 .ap-court-card {
   min-width: 0;
+  scroll-margin-top: 96px;
   background: rgba(255, 255, 255, 0.9);
   border-radius: 16px;
   padding: 0.6rem;
@@ -1124,6 +1125,10 @@
 
   .ap-courts-grid {
     grid-template-columns: 1fr;
+  }
+
+  .ap-court-card {
+    scroll-margin-top: 92px;
   }
 
   .ap-court-header {

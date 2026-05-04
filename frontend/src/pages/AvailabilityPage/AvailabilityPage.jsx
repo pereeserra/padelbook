@@ -6,6 +6,22 @@ import { scrollToElementWithOffset } from "../../utils/helpers";
 import "./AvailabilityPage.css";
 import { getErrorMessage } from "../../utils/errorHandler";
 
+const COURT_SCROLL_EXTRA_OFFSET = 18;
+
+const getCourtScrollOffset = () => {
+  const navbar = document.querySelector(".pb-navbar");
+  const navbarHeight = navbar?.getBoundingClientRect().height || 74;
+
+  return navbarHeight + COURT_SCROLL_EXTRA_OFFSET;
+};
+
+const getCourtPanelHeight = (courtElement) => {
+  const slotsPanel = courtElement?.querySelector(".ap-slots-panel.is-open");
+  const slotsGrid = slotsPanel?.querySelector(".ap-slots-grid");
+
+  return slotsGrid?.getBoundingClientRect().height || 0;
+};
+
 function AvailabilityPage() {
   const hiddenDateInputRef = useRef(null);
   const topFeedbackRef = useRef(null);
@@ -629,24 +645,41 @@ function AvailabilityPage() {
   const handleCourtToggle = (courtId) => {
     const nextOpenCourtId = openCourtId === courtId ? null : courtId;
 
-    setOpenCourtId(nextOpenCourtId);
+    if (!nextOpenCourtId) {
+      setOpenCourtId(null);
+      return;
+    }
 
-    if (!nextOpenCourtId) return;
+    const courtElement = courtRefs.current[nextOpenCourtId];
+    let targetTop = null;
 
-    window.setTimeout(() => {
-      const courtElement = courtRefs.current[nextOpenCourtId];
+    if (courtElement) {
+      const currentOpenCourtElement = openCourtId
+        ? courtRefs.current[openCourtId]
+        : null;
+      const courtRect = courtElement.getBoundingClientRect();
+      const currentOpenCourtRect =
+        currentOpenCourtElement?.getBoundingClientRect();
+      const closingPanelAboveTarget =
+        currentOpenCourtRect &&
+        currentOpenCourtElement !== courtElement &&
+        currentOpenCourtRect.top < courtRect.top;
 
-      if (!courtElement) return;
+      targetTop = courtRect.top + window.scrollY - getCourtScrollOffset();
 
-      const navbarOffset = 92;
-      const elementTop =
-        courtElement.getBoundingClientRect().top + window.scrollY - navbarOffset;
+      if (closingPanelAboveTarget) {
+        targetTop -= getCourtPanelHeight(currentOpenCourtElement);
+      }
+    }
 
+    if (targetTop != null) {
       window.scrollTo({
-        top: elementTop,
+        top: Math.max(targetTop, 0),
         behavior: "smooth",
       });
-    }, 80);
+    }
+
+    setOpenCourtId(nextOpenCourtId);
   };
 
   const handleSlotClick = (slot, isSelected, isPastSlot, isValid) => {
