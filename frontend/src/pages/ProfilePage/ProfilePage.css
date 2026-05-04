@@ -1105,8 +1105,8 @@
   body:has(.profile__page) .backToTop {
     width: 36px;
     height: 36px;
-    right: -8px;
-    bottom: calc(env(safe-area-inset-bottom) + 10px);
+    right: max(18px, calc(env(safe-area-inset-right) + 18px));
+    bottom: max(28px, calc(env(safe-area-inset-bottom) + 28px));
     font-size: 0.82rem;
     box-shadow: 0 10px 22px rgba(37, 99, 235, 0.22);
   }
