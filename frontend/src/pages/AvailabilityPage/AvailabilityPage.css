@@ -912,8 +912,8 @@
 
 .ap-floating-close {
   grid-column: 5;
-  place-self: start end;
-  margin-top: 0.28rem;
+  place-self: center end;
+  margin-top: 0;
 }
 
 .ap-reserve-btn:hover:not(:disabled) {
@@ -1248,7 +1248,7 @@
     grid-column: 2;
     grid-row: 1;
     place-self: start end;
-    margin-top: 0.35rem;
+    margin-top: 2.05rem;
     width: 34px;
     height: 34px;
   }
