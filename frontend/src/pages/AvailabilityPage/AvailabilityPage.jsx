@@ -61,7 +61,6 @@ function AvailabilityPage() {
   const [reservationSummary, setReservationSummary] = useState(null);
   const [reserving, setReserving] = useState(false);
   const [repeatReservationInfo, setRepeatReservationInfo] = useState(null);
-  const [slotHelpMessage, setSlotHelpMessage] = useState("");
 
   // Funció per formatar el preu, mostrant "Preu no disponible" si no hi ha valor vàlid
   const formatPrice = (value) => {
@@ -204,7 +203,6 @@ function AvailabilityPage() {
     setShowAuthHelp(false);
     setShowVerificationHelp(false);
     setReservationSummary(null);
-    setSlotHelpMessage("");
     setSelectedDuration(2);
   };
 
@@ -331,30 +329,10 @@ function AvailabilityPage() {
     if (slotIndex === -1) {
       setSelectedSlot(null);
       setReservationSummary(null);
-      setSlotHelpMessage("La franja seleccionada ja no està disponible.");
       return;
     }
 
-    const stillValid = isSlotValidForDuration(
-      selectedSlot,
-      selectedCourtSlots,
-      slotIndex
-    );
-
-    if (!stillValid) {
-      setSelectedSlot(null);
-      setReservationSummary(null);
-
-      if (selectedDuration === 3) {
-        setSlotHelpMessage(
-          "Per reservar 1h30 necessites tres franges consecutives disponibles."
-        );
-      } else {
-        setSlotHelpMessage(
-          "La duració seleccionada no és compatible amb aquesta franja."
-        );
-      }
-    }
+    setSelectedSlot(selectedCourtSlots[slotIndex]);
   }, [selectedDuration, availability, courtTypeFilter, courtEnvironmentFilter, showOnlyAvailable]);
 
   // Funció per manejar la reserva d'una pista, amb validació d'autenticació, maneig d'errors i actualització de l'estat de la reserva
@@ -362,6 +340,16 @@ function AvailabilityPage() {
     if (!selectedSlot) return;
 
     try {
+      const selectedCourtSlots = getSelectedCourtSlots();
+      const slotIndex = selectedCourtSlots.findIndex(
+        (courtSlot) => courtSlot.time_slot_id === selectedSlot.time_slot_id
+      );
+      const canReserveSelectedSlot =
+        slotIndex !== -1 &&
+        isSlotValidForDuration(selectedSlot, selectedCourtSlots, slotIndex);
+
+      if (!canReserveSelectedSlot) return;
+
       const token = localStorage.getItem("token");
 
       if (!token) {
@@ -682,58 +670,99 @@ function AvailabilityPage() {
     setOpenCourtId(nextOpenCourtId);
   };
 
-  const handleSlotClick = (slot, isSelected, isPastSlot, isValid) => {
-    if (isPastSlot || !slot.disponible || !isValid) {
-      setSelectedSlot(null);
-      setReservationSummary(null);
-
-      if (isPastSlot) {
-        setSlotHelpMessage("Aquesta hora ja ha passat.");
-      } else if (!slot.disponible) {
-        if (slot.motiu_no_disponible === "reserva") {
-          setSlotHelpMessage("Aquesta franja ja està reservada.");
-        } else if (slot.motiu_no_disponible === "manteniment") {
-          setSlotHelpMessage("Aquesta franja està bloquejada per manteniment.");
-        } else {
-          setSlotHelpMessage("Aquesta franja no està disponible.");
-        }
-      } else if (!isValid) {
-        if (selectedDuration === 3) {
-          setSlotHelpMessage(
-            "Aquesta franja no permet iniciar una reserva de 1h30 fins a les 21:00."
-          );
-        } else {
-          setSlotHelpMessage(
-            "Aquesta franja no permet completar una reserva d'1 hora fins a les 21:00."
-          );
-        }
-      } else {
-        setSlotHelpMessage(getSlotTitle(slot, isPastSlot));
-      }
-
-      scrollToElementWithOffset(topFeedbackRef.current, 120);
-      return;
-    }
-
-    const clickedCourtSlots =
-      allCourtsData.find((court) => court.court_id === slot.court_id)?.slots || [];
-
-    const endTime = getReservationEndTime(slot, selectedDuration, clickedCourtSlots);
-
+  const handleSlotClick = (slot, isSelected) => {
     setSuccess("");
     setError("");
     setShowAuthHelp(false);
     setShowVerificationHelp(false);
     setReservationSummary(null);
 
-    setSlotHelpMessage(
-      endTime
-        ? `Reserva possible: de ${formatTimeShort(slot.hora_inici)} a ${formatTimeShort(endTime)}`
-        : "No s'ha pogut calcular l'hora final de la reserva."
-    );
-
     setSelectedSlot(isSelected ? null : slot);
   };
+
+  const getCourtClosingTime = (courtSlots) => {
+    return courtSlots[courtSlots.length - 1]?.hora_fi || "";
+  };
+
+  const getSelectedSlotUnavailableMessage = (
+    slot,
+    courtSlots,
+    slotIndex,
+    isPastSlot
+  ) => {
+    if (slotIndex === -1) {
+      return "Aquesta franja ja no està disponible amb els filtres actuals.";
+    }
+
+    if (isPastSlot) {
+      return "No es pot reservar aquesta hora perquè la franja ja ha passat.";
+    }
+
+    if (!slot.disponible) {
+      if (slot.motiu_no_disponible === "manteniment") {
+        return "No es pot reservar aquesta hora perquè la pista està en manteniment.";
+      }
+
+      if (slot.motiu_no_disponible === "reserva") {
+        return "No es pot reservar aquesta hora perquè la franja ja està reservada.";
+      }
+
+      return slot.detall_no_disponible || "Aquesta franja no està disponible.";
+    }
+
+    const slotsNeeded = Number(selectedDuration);
+    const closingTime = formatTimeShort(getCourtClosingTime(courtSlots));
+
+    for (let i = 0; i < slotsNeeded; i += 1) {
+      const currentSlot = courtSlots[slotIndex + i];
+
+      if (!currentSlot) {
+        return `No es pot reservar ${formatDurationLabel(
+          selectedDuration
+        )} a les ${formatTimeShort(
+          slot.hora_inici
+        )} perquè les pistes tanquen a les ${closingTime}.`;
+      }
+
+      if (isPastTimeSlot(currentSlot)) {
+        return "No es pot reservar aquesta hora perquè la franja ja ha passat.";
+      }
+
+      if (!currentSlot.disponible) {
+        return `No es pot reservar ${formatDurationLabel(
+          selectedDuration
+        )} a les ${formatTimeShort(
+          slot.hora_inici
+        )} perquè una de les franges del tram ja no està disponible.`;
+      }
+    }
+
+    return "Aquesta franja no es pot reservar amb la duració seleccionada.";
+  };
+
+  const selectedCourtSlots = selectedSlot ? getSelectedCourtSlots() : [];
+  const selectedSlotIndex = selectedSlot
+    ? selectedCourtSlots.findIndex(
+        (courtSlot) => courtSlot.time_slot_id === selectedSlot.time_slot_id
+      )
+    : -1;
+  const selectedSlotIsPast = selectedSlot ? isPastTimeSlot(selectedSlot) : false;
+  const selectedSlotCanReserve =
+    selectedSlot &&
+    selectedSlotIndex !== -1 &&
+    isSlotValidForDuration(selectedSlot, selectedCourtSlots, selectedSlotIndex);
+  const selectedSlotUnavailableMessage =
+    selectedSlot && !selectedSlotCanReserve
+      ? getSelectedSlotUnavailableMessage(
+          selectedSlot,
+          selectedCourtSlots,
+          selectedSlotIndex,
+          selectedSlotIsPast
+        )
+      : "";
+  const selectedReservationEndTime = selectedSlot
+    ? getReservationEndTime(selectedSlot, selectedDuration, selectedCourtSlots)
+    : "";
 
   return (
     <div className="ap-wrapper">
@@ -949,13 +978,6 @@ function AvailabilityPage() {
           </div>
         )}
 
-        {slotHelpMessage && (
-          <div className="ap-inline-help fade-in">
-            <strong>Informació de la franja:</strong>
-            <span>{slotHelpMessage}</span>
-          </div>
-        )}
-
         {success && reservationSummary && (
           <div className="pb-feedback pb-feedback--success ap-success-feedback fade-in fade-in-up">
             <div className="ap-success-header">
@@ -1155,9 +1177,7 @@ function AvailabilityPage() {
                             }`}
                           >
                             <button
-                              onClick={() =>
-                                handleSlotClick(slot, isSelected, isPastSlot, isValid)
-                              }
+                              onClick={() => handleSlotClick(slot, isSelected)}
                               title={getSlotTitle(slot, isPastSlot)}
                               className={`ap-slot-pill ${
                                 isPastSlot
@@ -1197,20 +1217,12 @@ function AvailabilityPage() {
         )}
       </div>
 
-      {selectedSlot &&
-        !success &&
-        (() => {
-          const selectedCourtSlots = getSelectedCourtSlots();
-          const slotIndex = selectedCourtSlots.findIndex(
-            (courtSlot) => courtSlot.time_slot_id === selectedSlot.time_slot_id
-          );
-
-          return (
-            slotIndex !== -1 &&
-            isSlotValidForDuration(selectedSlot, selectedCourtSlots, slotIndex)
-          );
-        })() && (
-        <div className="ap-floating-action slide-up">
+      {selectedSlot && !success && (
+        <div
+          className={`ap-floating-action slide-up ${
+            selectedSlotCanReserve ? "" : "ap-floating-action--disabled"
+          }`}
+        >
           <div className="ap-floating-inner">
             <button
               type="button"
@@ -1227,26 +1239,30 @@ function AvailabilityPage() {
               <span className="ap-floating-court">{selectedSlot.nom_pista}</span>
 
               <strong className="ap-floating-time">
-                {formatDisplayDate(date)} • {formatTimeShort(selectedSlot.hora_inici)} a{" "}
-                {formatTimeShort(
-                  getReservationEndTime(
-                    selectedSlot,
-                    selectedDuration,
-                    getSelectedCourtSlots()
-                  )
+                {formatDisplayDate(date)} • {formatTimeShort(selectedSlot.hora_inici)}
+                {selectedReservationEndTime ? (
+                  <> a {formatTimeShort(selectedReservationEndTime)}</>
+                ) : (
+                  <> · {formatDurationLabel(selectedDuration)}</>
                 )}
               </strong>
 
-              <div className="ap-floating-price-group">
-                <span className="ap-floating-price">
-                  {formatPrice(getPerPersonPrice(selectedSlot, selectedDuration))} / persona
-                </span>
-                <span className="ap-floating-total">
-                  Total reserva: {formatPrice(
-                    getReservationTotalPrice(selectedSlot, selectedDuration)
-                  )}
-                </span>
-              </div>
+              {selectedSlotCanReserve ? (
+                <div className="ap-floating-price-group">
+                  <span className="ap-floating-price">
+                    {formatPrice(getPerPersonPrice(selectedSlot, selectedDuration))} / persona
+                  </span>
+                  <span className="ap-floating-total">
+                    Total reserva: {formatPrice(
+                      getReservationTotalPrice(selectedSlot, selectedDuration)
+                    )}
+                  </span>
+                </div>
+              ) : (
+                <p className="ap-floating-disabled-message">
+                  {selectedSlotUnavailableMessage}
+                </p>
+              )}
             </div>
 
             <div className="ap-floating-controls">
@@ -1288,7 +1304,7 @@ function AvailabilityPage() {
                       paymentMethod === "online_simulat" ? "is-active" : ""
                     }`}
                     onClick={() => setPaymentMethod("online_simulat")}
-                    disabled={reserving}
+                    disabled={reserving || !selectedSlotCanReserve}
                   >
                     Pagament online
                   </button>
@@ -1299,7 +1315,7 @@ function AvailabilityPage() {
                       paymentMethod === "al_club" ? "is-active" : ""
                     }`}
                     onClick={() => setPaymentMethod("al_club")}
-                    disabled={reserving}
+                    disabled={reserving || !selectedSlotCanReserve}
                   >
                     Pagament al club
                   </button>
@@ -1308,32 +1324,20 @@ function AvailabilityPage() {
 
               <button
                 onClick={handleReserve}
-                disabled={reserving}
+                disabled={reserving || !selectedSlotCanReserve}
                 className={`btn btn-primary ap-reserve-btn ${
                   reserving ? "ap-reserve-btn--loading" : ""
                 }`}
                 aria-busy={reserving}
               >
-                {reserving ? "Reservant..." : "Confirmar Reserva"}
+                {reserving ? "Reservant..." : "Confirmar reserva"}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {selectedSlot &&
-        !success &&
-        (() => {
-          const selectedCourtSlots = getSelectedCourtSlots();
-          const slotIndex = selectedCourtSlots.findIndex(
-            (courtSlot) => courtSlot.time_slot_id === selectedSlot.time_slot_id
-          );
-
-          return (
-            slotIndex !== -1 &&
-            isSlotValidForDuration(selectedSlot, selectedCourtSlots, slotIndex)
-          );
-        })() && <div className="ap-bottom-spacing"></div>}
+      {selectedSlot && !success && <div className="ap-bottom-spacing"></div>}
     </div>
   );
 }
