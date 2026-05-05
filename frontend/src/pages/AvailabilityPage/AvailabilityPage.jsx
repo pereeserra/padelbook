@@ -1247,22 +1247,25 @@ function AvailabilityPage() {
                 )}
               </strong>
 
-              {selectedSlotCanReserve ? (
-                <div className="ap-floating-price-group">
-                  <span className="ap-floating-price">
-                    {formatPrice(getPerPersonPrice(selectedSlot, selectedDuration))} / persona
-                  </span>
-                  <span className="ap-floating-total">
-                    Total reserva: {formatPrice(
-                      getReservationTotalPrice(selectedSlot, selectedDuration)
-                    )}
-                  </span>
-                </div>
-              ) : (
-                <p className="ap-floating-disabled-message">
-                  {selectedSlotUnavailableMessage}
-                </p>
-              )}
+              <div className="ap-floating-price-group">
+                <span className="ap-floating-price">
+                  {formatPrice(getPerPersonPrice(selectedSlot, selectedDuration))} / persona
+                </span>
+                <span className="ap-floating-total">
+                  Total reserva: {formatPrice(
+                    getReservationTotalPrice(selectedSlot, selectedDuration)
+                  )}
+                </span>
+              </div>
+
+              <p
+                className={`ap-floating-feedback ${
+                  selectedSlotCanReserve ? "is-empty" : ""
+                }`}
+                aria-live="polite"
+              >
+                {selectedSlotCanReserve ? "\u00a0" : selectedSlotUnavailableMessage}
+              </p>
             </div>
 
             <div className="ap-floating-controls">
