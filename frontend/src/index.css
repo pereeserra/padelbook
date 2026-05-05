@@ -616,7 +616,7 @@ p {
 }
 
 body:has(.ap-floating-action) .backToTop {
-  bottom: max(88px, calc(env(safe-area-inset-bottom) + 88px));
+  bottom: max(256px, calc(env(safe-area-inset-bottom) + 256px));
 }
 
 /* ===============================
@@ -757,7 +757,7 @@ body:has(.ap-floating-action) .backToTop {
   }
 
   body:has(.ap-floating-action) .backToTop {
-    bottom: max(108px, calc(env(safe-area-inset-bottom) + 108px));
+    bottom: max(456px, calc(env(safe-area-inset-bottom) + 456px));
   }
 
   .pb-loading-shell {
