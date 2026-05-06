@@ -273,6 +273,7 @@ exports.createReservation = async (req, res) => {
             hora_fi: detail.hora_fi,
             preu_total,
             estat_pagament,
+            metode_pagament,
           }),
         });
       } catch (emailError) {
@@ -416,26 +417,39 @@ exports.deleteReservation = async (req, res) => {
     const [reservationRows] = await db.query(
       `
         SELECT
-          r.id,
+          MIN(r.id) AS id,
           r.codi_reserva,
           r.user_id,
           r.court_id,
-          r.time_slot_id,
           r.data_reserva,
           r.estat,
+          MAX(r.preu_total) AS preu_total,
+          r.estat_pagament,
+          r.metode_pagament,
           u.nom,
           u.email,
           c.nom_pista,
-          t.hora_inici,
-          t.hora_fi
+          MIN(t.hora_inici) AS hora_inici,
+          MAX(t.hora_fi) AS hora_fi
         FROM reservations r
         JOIN users u ON r.user_id = u.id
         JOIN courts c ON r.court_id = c.id
         JOIN time_slots t ON r.time_slot_id = t.id
-        WHERE r.id = ?
+        WHERE r.codi_reserva = ?
+        GROUP BY
+          r.codi_reserva,
+          r.user_id,
+          r.court_id,
+          r.data_reserva,
+          r.estat,
+          r.estat_pagament,
+          r.metode_pagament,
+          u.nom,
+          u.email,
+          c.nom_pista
         LIMIT 1
       `,
-      [reservationId]
+      [reservationBase.codi_reserva]
     );
 
     const reservationDetails = reservationRows[0];
@@ -453,6 +467,9 @@ exports.deleteReservation = async (req, res) => {
             data_reserva: reservationDetails.data_reserva,
             hora_inici: reservationDetails.hora_inici,
             hora_fi: reservationDetails.hora_fi,
+            preu_total: reservationDetails.preu_total,
+            estat_pagament: reservationDetails.estat_pagament,
+            metode_pagament: reservationDetails.metode_pagament,
           }),
         });
       } catch (emailError) {
