@@ -294,9 +294,58 @@ const buildReservationCancelledEmail = ({
   });
 };
 
+const buildWelcomeEmail = ({ nom }) => {
+  return `
+    <div style="margin: 0; padding: 32px 16px; background: #f1f5f9; font-family: Arial, Helvetica, sans-serif; color: #0f172a;">
+      <div style="max-width: 640px; margin: 0 auto;">
+        <div style="background: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);">
+          <div style="background: linear-gradient(135deg, #0f172a, #2563eb); color: #ffffff; padding: 30px;">
+            <div style="font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.82); margin-bottom: 14px;">
+              PadelBook · Compte activat
+            </div>
+
+            <div style="display: inline-block; background: rgba(219, 234, 254, 0.18); color: #dbeafe; border-radius: 999px; padding: 7px 12px; font-size: 12px; font-weight: 800; margin-bottom: 14px;">
+              Benvingut/da
+            </div>
+
+            <h1 style="margin: 0; font-size: 28px; line-height: 1.18; font-weight: 800;">
+              Ja tens el compte verificat
+            </h1>
+
+            <p style="margin: 12px 0 0; color: rgba(255,255,255,0.88); font-size: 15px; line-height: 1.6;">
+              El teu compte de PadelBook ja està activat i preparat per començar a reservar pistes.
+            </p>
+          </div>
+
+          <div style="padding: 28px 30px 30px;">
+            <p style="margin: 0 0 16px; color: #334155; font-size: 16px; line-height: 1.6;">
+              Hola <strong style="color: #0f172a;">${escapeHtml(nom)}</strong>,
+            </p>
+
+            <p style="margin: 0 0 18px; color: #475569; font-size: 15px; line-height: 1.7;">
+              Gràcies per verificar el teu correu electrònic. A partir d’ara ja pots iniciar sessió, consultar disponibilitat i gestionar les teves reserves des de la plataforma.
+            </p>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px;">
+              <p style="margin: 0; color: #475569; font-size: 14px; line-height: 1.6;">
+                Et recomanam revisar la disponibilitat de pistes i fer la teva primera reserva quan vulguis.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <p style="margin: 18px 0 0; color: #64748b; font-size: 13px; text-align: center;">
+          PadelBook
+        </p>
+      </div>
+    </div>
+  `;
+};
+
 module.exports = {
   sendEmail,
   buildVerificationEmail,
+  buildWelcomeEmail,
   buildReservationCreatedEmail,
   buildReservationCancelledEmail,
   formatEmailTime,

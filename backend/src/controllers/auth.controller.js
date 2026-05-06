@@ -5,6 +5,7 @@ const crypto = require("crypto");
 const {
   sendEmail,
   buildVerificationEmail,
+  buildWelcomeEmail,
 } = require("../services/email.service");
 
 const { ok, message, fail } = require("../utils/response");
@@ -458,7 +459,7 @@ exports.verifyEmail = async (req, res) => {
     }
 
     const [userRows] = await db.query(
-      "SELECT id, email_verificat FROM users WHERE id = ? LIMIT 1",
+      "SELECT id, nom, email, email_verificat FROM users WHERE id = ? LIMIT 1",
       [verification.user_id]
     );
 
@@ -474,6 +475,18 @@ exports.verifyEmail = async (req, res) => {
       "UPDATE users SET email_verificat = 1 WHERE id = ?",
       [verification.user_id]
     );
+
+    try {
+      await sendEmail({
+        to: userRows[0].email,
+        subject: "Benvingut/da a PadelBook",
+        html: buildWelcomeEmail({
+          nom: userRows[0].nom,
+        }),
+      });
+    } catch (emailError) {
+      console.error("Error enviant email de benvinguda:", emailError);
+    }
 
     return message(res, "Compte verificat correctament.");
   } catch (error) {
