@@ -192,10 +192,13 @@ function LoginPage() {
     const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
 
     if (!siteKey) {
-      console.error("❌ Falta VITE_TURNSTILE_SITE_KEY al frontend");
+      console.warn("Turnstile desactivat: falta VITE_TURNSTILE_SITE_KEY");
+      setTurnstileReady(true);
+      setTurnstileToken("turnstile-disabled");
+      return;
     }
 
-    if (!siteKey || !turnstileContainerRef.current) return;
+    if (!turnstileContainerRef.current) return;
 
     let attempts = 0;
     let intervalId = null;
@@ -275,7 +278,7 @@ function LoginPage() {
       setShowVerificationHelp(false);
       setLoading(true);
 
-      if (!turnstileToken) {
+      if (!turnstileToken && import.meta.env.VITE_TURNSTILE_SITE_KEY) {
         setError("Has de completar la verificació de seguretat.");
         setLoading(false);
         return;
