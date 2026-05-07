@@ -395,9 +395,7 @@
 .pb-navbar__mobile-panel {
   max-width: min(var(--container), calc(100% - 1.75rem));
   margin: 0.35rem auto 0;
-  max-height: 0;
   overflow: hidden;
-  padding: 0;
   display: flex;
   flex-direction: column;
   gap: 0.78rem;
@@ -407,22 +405,13 @@
     linear-gradient(145deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)),
     radial-gradient(circle at top left, rgba(37, 99, 235, 0), transparent 46%);
   box-shadow: none;
-  backdrop-filter: blur(18px);
   opacity: 0;
   pointer-events: none;
   transform: translateY(-10px) scale(0.985);
   transform-origin: top center;
-  visibility: hidden;
   transition:
-    max-height 0.28s ease,
     opacity 0.22s ease,
-    padding 0.28s ease,
-    margin-bottom 0.28s ease,
-    border-color 0.22s ease,
-    background-color 0.22s ease,
-    box-shadow 0.22s ease,
-    transform 0.28s ease,
-    visibility 0s linear 0.28s;
+    transform 0.22s ease;
 }
 
 .pb-navbar__mobile-panel.is-open {
@@ -441,6 +430,7 @@
   pointer-events: auto;
   transform: translateY(0) scale(1);
   visibility: visible;
+  will-change: transform, opacity;
   transition:
     max-height 0.34s ease,
     opacity 0.24s ease,
@@ -709,5 +699,16 @@
   .pb-navbar__mobile-link::before,
   .pb-navbar__mobile-link::after {
     transition: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .pb-navbar,
+  .pb-navbar__dropdown,
+  .pb-navbar__mobile-panel,
+  .ap-floating-action,
+  .ap-court-card,
+  .ap-dates-card {
+    backdrop-filter: none !important;
   }
 }
