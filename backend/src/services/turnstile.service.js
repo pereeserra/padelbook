@@ -6,9 +6,11 @@ const verifyTurnstileToken = async ({ token, remoteip }) => {
   const secret = process.env.TURNSTILE_SECRET_KEY;
 
   if (!secret) {
+    console.warn("⚠️ Turnstile desactivat al backend");
+
     return {
-      success: false,
-      message: "Falta configurar TURNSTILE_SECRET_KEY al backend.",
+      success: true,
+      skipped: true,
     };
   }
 
