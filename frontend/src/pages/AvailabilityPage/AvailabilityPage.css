@@ -542,25 +542,20 @@
 }
 
 .ap-slots-panel {
-  display: none;
+  max-height: 0;
   overflow: hidden;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition:
+    max-height 0.28s ease,
+    opacity 0.22s ease,
+    transform 0.22s ease;
 }
 
 .ap-slots-panel.is-open {
-  display: block;
-  animation: apSlotsFadeIn 0.18s ease;
-}
-
-@keyframes apSlotsFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  max-height: 900px;
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .ap-slots-grid {
