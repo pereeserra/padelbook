@@ -542,18 +542,25 @@
 }
 
 .ap-slots-panel {
+  display: none;
   overflow: hidden;
-  opacity: 0;
-  transform: translateY(-4px);
-  transition:
-    opacity 0.2s ease,
-    transform 0.2s ease;
-  will-change: transform, opacity;
 }
 
 .ap-slots-panel.is-open {
-  opacity: 1;
-  transform: translateY(0);
+  display: block;
+  animation: apSlotsFadeIn 0.18s ease;
+}
+
+@keyframes apSlotsFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .ap-slots-grid {

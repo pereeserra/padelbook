@@ -395,6 +395,10 @@
 .pb-navbar__mobile-panel {
   max-width: min(var(--container), calc(100% - 1.75rem));
   margin: 0.35rem auto 0;
+  max-height: 0;
+  padding: 0;
+  margin-bottom: 0;
+  visibility: hidden;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -415,7 +419,7 @@
 }
 
 .pb-navbar__mobile-panel.is-open {
-  max-height: 620px;
+  max-height: none;
   margin-bottom: 1rem;
   padding: 0.72rem;
   border-color: rgba(148, 163, 184, 0.2);
@@ -432,15 +436,8 @@
   visibility: visible;
   will-change: transform, opacity;
   transition:
-    max-height 0.34s ease,
-    opacity 0.24s ease,
-    padding 0.34s ease,
-    margin-bottom 0.34s ease,
-    border-color 0.24s ease,
-    background-color 0.24s ease,
-    box-shadow 0.24s ease,
-    transform 0.34s cubic-bezier(0.2, 0.8, 0.2, 1),
-    visibility 0s linear 0s;
+    opacity 0.22s ease,
+    transform 0.22s ease;
 }
 
 .pb-navbar__mobile-links,
