@@ -145,9 +145,14 @@ function RegisterPage() {
   }, []);
 
   useEffect(() => {
-    const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
+    if (!siteKey) {
+      console.warn("Turnstile desactivat: falta VITE_TURNSTILE_SITE_KEY");
+      setTurnstileReady(true);
+      setTurnstileToken("turnstile-disabled");
+      return;
+    }
 
-    if (!siteKey || !turnstileContainerRef.current) return;
+    if (!turnstileContainerRef.current) return;
 
     let attempts = 0;
     let intervalId = null;
@@ -263,7 +268,7 @@ function RegisterPage() {
       return "Les contrasenyes no coincideixen.";
     }
 
-    if (!turnstileToken) {
+    if (!turnstileToken && import.meta.env.VITE_TURNSTILE_SITE_KEY) {
       return "Has de completar la verificació de seguretat.";
     }
 
@@ -653,9 +658,9 @@ function RegisterPage() {
             <button
               type="submit"
               className={`btn btn-primary btn-full register__submit-button ${
-                loading || !turnstileToken ? "register__submit-button--disabled" : ""
+                loading || (!turnstileToken && import.meta.env.VITE_TURNSTILE_SITE_KEY) ? "register__submit-button--disabled" : ""
               } ${loading ? "register__submit-button--loading" : ""}`}
-              disabled={loading || !turnstileToken}
+              disabled={loading || (!turnstileToken && import.meta.env.VITE_TURNSTILE_SITE_KEY)}
               aria-busy={loading}
             >
               {loading ? "Creant compte..." : "Crear compte"}
