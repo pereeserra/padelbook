@@ -182,10 +182,6 @@ function Navbar() {
   const isAuthPage = isLoginPage || isRegisterPage;
   const shouldShowMobileNavigation = isMobileView;
 
-  const isAccountRouteActive = () => {
-    return location.pathname === "/my-account";
-  };
-
   // Funcions auxiliars per obtenir el nom d'usuari i les inicials per l'avatar
   const getDisplayName = (nom) => {
     if (!nom) return "Usuari";

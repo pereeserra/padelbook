@@ -239,13 +239,7 @@ exports.getMe = async (req, res) => {
       return fail(res, "Usuari no autenticat", 401);
     }
 
-    if (!req.user || !req.user.id) {
-      console.error("req.user no definit:", req.user);
-      return fail(res, "Usuari no autenticat", 401);
-    }
-
     const userId = req.user.id;
-    console.log("USER ID getMe:", userId);
 
     const [rows] = await db.query(
       "SELECT id, nom, llinatges, email, rol, telefon, email_verificat, created_at FROM users WHERE id = ? LIMIT 1",
@@ -559,43 +553,5 @@ exports.resendVerification = async (req, res) => {
   } catch (error) {
     console.error("Error resendVerification:", error);
     return fail(res, "No s'ha pogut reenviar el correu de verificació.");
-  }
-};
-
-exports.verifyPhone = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const { code } = req.body;
-
-    if (!code) {
-      return fail(res, "Codi no proporcionat.", 400);
-    }
-
-    const [rows] = await db.query(
-      "SELECT * FROM verification_codes WHERE user_id = ? AND code = ? AND type = 'phone_verification' LIMIT 1",
-      [userId, code]
-    );
-
-    if (rows.length === 0) {
-      return fail(res, "Codi invàlid o expirat.", 400);
-    }
-
-    const verification = rows[0];
-
-    if (new Date(verification.expires_at) < new Date()) {
-      return fail(res, "Codi expirat.", 400);
-    }
-
-    await db.query(
-      "DELETE FROM verification_codes WHERE id = ?",
-      [verification.id]
-    );
-
-    return fail(res, "La verificació de telèfon no està disponible actualment.", 501);
-
-    return message(res, "Telèfon verificat correctament.");
-  } catch (error) {
-    console.error("Error verifyPhone:", error);
-    return fail(res, "Error verificant el telèfon.");
   }
 };
