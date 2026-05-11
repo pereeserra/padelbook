@@ -376,7 +376,7 @@ function HomePage() {
 
         <section className="fade-in-up delay-3 home__section">
           <div className="home__section-header">
-            <span className="home__section-kicker">Com funciona</span>
+            <span className="home__section-kicker">Com funciona?</span>
             <h2 className="home__section-title">Un procés simple i agradable</h2>
             <p className="home__section-text">
               L’objectiu és que l’usuari no pensi massa: entra, mira, tria i
