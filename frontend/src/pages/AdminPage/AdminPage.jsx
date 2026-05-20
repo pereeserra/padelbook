@@ -8,6 +8,7 @@ import {
   scrollToElementWithOffset,
   normalizeCollectionResponse,
 } from "../../utils/helpers";
+import { getUserFromToken } from "../../utils/auth";
 import "./AdminPage.css";
 
 function AdminPage() {
@@ -79,17 +80,13 @@ function AdminPage() {
   const [newCourt, setNewCourt] = useState(emptyCourt);
 
   const storedUser = useMemo(() => {
-    try {
-      const rawUser = localStorage.getItem("user");
-      return rawUser ? JSON.parse(rawUser) : null;
-    } catch {
-      return null;
-    }
+    return getUserFromToken();
   }, []);
 
-  const currentUserRole = (storedUser?.rol || "").toLowerCase();
+  const currentUserRole = (storedUser?.rol || "").trim().toLowerCase();
   const canManageUsers = currentUserRole === "admin";
   const isGestorRole = currentUserRole === "gestor";
+  const roleChangeOptions = ["usuari", "gestor", "admin"];
 
   const getAdminRoleLabel = (role) => {
     const normalizedRole = (role || "").toLowerCase();
@@ -853,14 +850,11 @@ function AdminPage() {
     setConfirmingUserRoleId(null);
   };
 
-  const handleToggleUserRole = async (user) => {
+  const handleUpdateUserRole = async (user, nextRole) => {
     if (!canManageUsers) return;
 
     try {
       setUpdatingUserRoleId(user.id);
-
-      const currentRole = (user.rol || "").toLowerCase();
-      const nextRole = currentRole === "admin" ? "usuari" : "admin";
 
       await api.put(`/admin/users/${user.id}/role`, {
         rol: nextRole,
@@ -869,7 +863,7 @@ function AdminPage() {
       setConfirmingUserRoleId(null);
 
       showFeedbackMessage(
-        `El rol de ${user.nom} s'ha actualitzat correctament a "${nextRole}".`,
+        `El rol de ${user.nom} s'ha actualitzat correctament a "${getAdminRoleLabel(nextRole)}".`,
         "success"
       );
 
@@ -2537,19 +2531,30 @@ function AdminPage() {
 
                                           {isConfirmingRoleChange && (
                                             <div className="admin__role-confirm-popover">
-                                              <button
-                                                type="button"
-                                                className="btn btn-primary btn-sm admin__user-role-button"
-                                                onClick={() => handleToggleUserRole(user)}
-                                                disabled={
-                                                  updatingUserRoleId === user.id ||
-                                                  isCurrentUser
-                                                }
-                                              >
-                                                {updatingUserRoleId === user.id
-                                                  ? "Canviant..."
-                                                  : "Confirmar"}
-                                              </button>
+                                              {roleChangeOptions.map((roleOption) => {
+                                                const isCurrentRole =
+                                                  (user.rol || "").toLowerCase() === roleOption;
+
+                                                return (
+                                                  <button
+                                                    key={roleOption}
+                                                    type="button"
+                                                    className="btn btn-primary btn-sm admin__user-role-button"
+                                                    onClick={() =>
+                                                      handleUpdateUserRole(user, roleOption)
+                                                    }
+                                                    disabled={
+                                                      updatingUserRoleId === user.id ||
+                                                      isCurrentUser ||
+                                                      isCurrentRole
+                                                    }
+                                                  >
+                                                    {updatingUserRoleId === user.id
+                                                      ? "Canviant..."
+                                                      : getAdminRoleLabel(roleOption)}
+                                                  </button>
+                                                );
+                                              })}
 
                                               <button
                                                 type="button"
