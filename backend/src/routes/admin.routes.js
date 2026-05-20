@@ -5,6 +5,8 @@ const adminController = require("../controllers/admin.controller");
 const authMiddleware = require("../middleware/auth.middleware");
 const roleMiddleware = require("../middleware/role.middleware");
 
+const adminOrGestorRoles = ["admin", "gestor"];
+
 // Ruta protegida per a administradors per obtenir tots els usuaris
 router.get(
   "/users",
@@ -32,7 +34,7 @@ router.put(
 router.get(
   "/reservations",
   authMiddleware,
-  roleMiddleware("admin"),
+  roleMiddleware(adminOrGestorRoles),
   adminController.getAllReservations
 );
 
@@ -40,7 +42,7 @@ router.get(
 router.get(
   "/reservations/export/csv",
   authMiddleware,
-  roleMiddleware("admin"),
+  roleMiddleware(adminOrGestorRoles),
   adminController.exportReservationsCsv
 );
 
@@ -48,7 +50,7 @@ router.get(
 router.get(
   "/reservations/:id",
   authMiddleware,
-  roleMiddleware("admin"),
+  roleMiddleware(adminOrGestorRoles),
   adminController.getReservationByIdAdmin
 );
 
@@ -56,7 +58,7 @@ router.get(
 router.get(
   "/stats/overview",
   authMiddleware,
-  roleMiddleware("admin"),
+  roleMiddleware(adminOrGestorRoles),
   adminController.getOverviewStats
 );
 
@@ -64,7 +66,7 @@ router.get(
 router.get(
   "/stats/by-court",
   authMiddleware,
-  roleMiddleware("admin"),
+  roleMiddleware(adminOrGestorRoles),
   adminController.getReservationsByCourtStats
 );
 
@@ -72,7 +74,7 @@ router.get(
 router.get(
   "/stats/by-timeslot",
   authMiddleware,
-  roleMiddleware("admin"),
+  roleMiddleware(adminOrGestorRoles),
   adminController.getReservationsByTimeslotStats
 );
 
@@ -80,7 +82,7 @@ router.get(
 router.get(
   "/stats/by-date",
   authMiddleware,
-  roleMiddleware("admin"),
+  roleMiddleware(adminOrGestorRoles),
   adminController.getReservationsByDateStats
 );
 
@@ -88,7 +90,7 @@ router.get(
 router.get(
   "/logs",
   authMiddleware,
-  roleMiddleware("admin"),
+  roleMiddleware(adminOrGestorRoles),
   adminController.getAdminLogs
 );
 
@@ -96,7 +98,7 @@ router.get(
 router.post(
   "/courts",
   authMiddleware,
-  roleMiddleware("admin"),
+  roleMiddleware(adminOrGestorRoles),
   adminController.createCourt
 );
 
@@ -104,7 +106,7 @@ router.post(
 router.put(
   "/courts/:id",
   authMiddleware,
-  roleMiddleware("admin"),
+  roleMiddleware(adminOrGestorRoles),
   adminController.updateCourt
 );
 
@@ -112,7 +114,7 @@ router.put(
 router.delete(
   "/courts/:id",
   authMiddleware,
-  roleMiddleware("admin"),
+  roleMiddleware(adminOrGestorRoles),
   adminController.deleteCourt
 );
 
@@ -120,7 +122,7 @@ router.delete(
 router.get(
   "/maintenance",
   authMiddleware,
-  roleMiddleware("admin"),
+  roleMiddleware(adminOrGestorRoles),
   adminController.getAllMaintenanceBlocks
 );
 
@@ -128,7 +130,7 @@ router.get(
 router.post(
   "/maintenance",
   authMiddleware,
-  roleMiddleware("admin"),
+  roleMiddleware(adminOrGestorRoles),
   adminController.createMaintenanceBlock
 );
 
@@ -136,7 +138,7 @@ router.post(
 router.put(
   "/maintenance/:id",
   authMiddleware,
-  roleMiddleware("admin"),
+  roleMiddleware(adminOrGestorRoles),
   adminController.updateMaintenanceBlock
 );
 
@@ -144,7 +146,7 @@ router.put(
 router.delete(
   "/maintenance/:id",
   authMiddleware,
-  roleMiddleware("admin"),
+  roleMiddleware(adminOrGestorRoles),
   adminController.deleteMaintenanceBlock
 );
 

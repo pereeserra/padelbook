@@ -1397,7 +1397,7 @@ exports.updateUserRole = async (req, res) => {
       return res.status(400).json({ error: "ID d'usuari no vàlid" });
     }
 
-    if (!["usuari", "admin"].includes(rol)) {
+    if (!["usuari", "gestor", "admin"].includes(rol)) {
       return res.status(400).json({ error: "Rol no vàlid" });
     }
 
