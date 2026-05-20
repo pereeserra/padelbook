@@ -89,6 +89,23 @@ function AdminPage() {
 
   const currentUserRole = (storedUser?.rol || "").toLowerCase();
   const canManageUsers = currentUserRole === "admin";
+  const isGestorRole = currentUserRole === "gestor";
+
+  const getAdminRoleLabel = (role) => {
+    const normalizedRole = (role || "").toLowerCase();
+
+    if (normalizedRole === "admin") return "Administrador";
+    if (normalizedRole === "gestor") return "Gestor";
+    return "Usuari";
+  };
+
+  const getAdminRoleBadgeClass = (role) => {
+    const normalizedRole = (role || "").toLowerCase();
+
+    if (normalizedRole === "admin") return "admin__role-badge--admin";
+    if (normalizedRole === "gestor") return "admin__role-badge--gestor";
+    return "admin__role-badge--user";
+  };
 
   const [userSearch, setUserSearch] = useState("");
   const [userRoleFilter, setUserRoleFilter] = useState("tots");
@@ -1503,6 +1520,17 @@ function AdminPage() {
                 d’un espai més complet, més ordenat i amb millor lectura visual.
               </p>
 
+              {isGestorRole && (
+                <div className="admin__role-notice admin__role-notice--gestor">
+                  <span className="admin__role-notice-label">Vista de gestor</span>
+                  <p className="admin__role-notice-text">
+                    Pots gestionar reserves, pistes, manteniment, estadístiques i logs
+                    del club. La gestió d'usuaris i rols queda reservada a
+                    l'administrador principal.
+                  </p>
+                </div>
+              )}
+
               <div
                 className={`admin__hero-tabs ${
                   isMobileView ? "admin__hero-tabs--mobile" : ""
@@ -2351,9 +2379,16 @@ function AdminPage() {
                     </div>
 
                     <div className="admin__summary-inline-card">
+                      <span className="admin__summary-inline-label">Gestors</span>
+                      <span className="admin__summary-inline-value">
+                        {users.filter((user) => (user.rol || "").toLowerCase() === "gestor").length}
+                      </span>
+                    </div>
+
+                    <div className="admin__summary-inline-card">
                       <span className="admin__summary-inline-label">Usuaris</span>
                       <span className="admin__summary-inline-value">
-                        {users.filter((user) => (user.rol || "").toLowerCase() !== "admin").length}
+                        {users.filter((user) => (user.rol || "").toLowerCase() === "usuari").length}
                       </span>
                     </div>
                   </div>
@@ -2395,6 +2430,7 @@ function AdminPage() {
                       >
                         <option value="tots">Tots</option>
                         <option value="usuari">Usuari</option>
+                        <option value="gestor">Gestor</option>
                         <option value="admin">Admin</option>
                       </select>
                     </div>
@@ -2458,13 +2494,9 @@ function AdminPage() {
                                     <td data-label="Email">{user.email}</td>
                                     <td data-label="Rol">
                                       <span
-                                        className={`admin__role-badge ${
-                                          (user.rol || "").toLowerCase() === "admin"
-                                            ? "admin__role-badge--admin"
-                                            : "admin__role-badge--user"
-                                        }`}
+                                        className={`admin__role-badge ${getAdminRoleBadgeClass(user.rol)}`}
                                       >
-                                        {user.rol}
+                                        {getAdminRoleLabel(user.rol)}
                                       </span>
                                     </td>
                                     <td data-label="Registre">{formatDateTime(user.created_at)}</td>
@@ -2550,13 +2582,9 @@ function AdminPage() {
 
                                               <div className="admin__user-detail-summary">
                                                 <span
-                                                  className={`admin__role-badge ${
-                                                    (selectedUser.rol || "").toLowerCase() === "admin"
-                                                      ? "admin__role-badge--admin"
-                                                      : "admin__role-badge--user"
-                                                  }`}
+                                                  className={`admin__role-badge ${getAdminRoleBadgeClass(selectedUser.rol)}`}
                                                 >
-                                                  {selectedUser.rol}
+                                                  {getAdminRoleLabel(selectedUser.rol)}
                                                 </span>
 
                                                 <span className="admin__user-detail-summary-pill">

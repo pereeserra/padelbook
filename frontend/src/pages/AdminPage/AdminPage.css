@@ -67,6 +67,41 @@
   line-height: 1.58;
 }
 
+.admin__role-notice {
+  width: min(100%, 680px);
+  margin-top: 0.8rem;
+  padding: 0.72rem 0.85rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+.admin__role-notice--gestor {
+  background: linear-gradient(135deg, rgba(254, 243, 199, 0.16), rgba(255, 255, 255, 0.08));
+  border-color: rgba(253, 230, 138, 0.28);
+}
+
+.admin__role-notice-label {
+  display: block;
+  margin-bottom: 0.22rem;
+  color: #fef3c7;
+  font-size: 0.76rem;
+  font-weight: 800;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.admin__role-notice-text {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
 .admin__hero-tabs {
   display: inline-flex;
   align-items: center;
@@ -1419,6 +1454,12 @@
   border-color: #93c5fd;
 }
 
+.admin__role-badge--gestor {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fcd34d;
+}
+
 /* DATA */
 .admin__table td:nth-child(5) {
   color: #64748b;
@@ -1641,7 +1682,7 @@
   }
 
   .admin__section-card--users .admin__summary-inline-grid--users {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.5rem;
   }
 
@@ -2396,6 +2437,7 @@
 }
 
 .admin__summary-inline-grid--users {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   margin-bottom: 0.1rem;
 }
 

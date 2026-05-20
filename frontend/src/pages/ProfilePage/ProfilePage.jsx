@@ -185,12 +185,14 @@ function ProfilePage() {
       }
   };
 
+  const profileRole = (profile?.rol || "").toLowerCase();
+
   const roleLabel = useMemo(() => {
-    if (!profile?.rol) return "Usuari";
-    if (profile.rol === "admin") return "Administrador";
-    if (profile.rol === "gestor") return "Gestor";
+    if (!profileRole) return "Usuari";
+    if (profileRole === "admin") return "Administrador";
+    if (profileRole === "gestor") return "Gestor";
     return "Usuari";
-  }, [profile]);
+  }, [profileRole]);
 
   const normalizedProfile = useMemo(() => {
     return {
@@ -326,9 +328,9 @@ function ProfilePage() {
       label: "Rol del compte",
       value: roleLabel,
       text:
-        profile?.rol === "admin"
+        profileRole === "admin"
           ? "Tens accés a eines de gestió i administració."
-          : profile?.rol === "gestor"
+          : profileRole === "gestor"
           ? "Tens accés a eines de gestió del club."
           : "Tens accés a les funcionalitats habituals de reserva.",
     },
@@ -711,12 +713,12 @@ function ProfilePage() {
 
                   <span
                     className={`pb-badge-pill ${
-                      profile?.rol === "admin"
+                      profileRole === "admin"
                         ? "pb-badge-pill--blue"
-                        : profile?.rol === "gestor"
+                        : profileRole === "gestor"
                         ? "pb-badge-pill--amber"
                         : "pb-badge-pill--green"
-                    } profile__hero-role-badge`}
+                    } profile__hero-role-badge profile__hero-role-badge--${profileRole || "usuari"}`}
                   >
                     {roleLabel}
                   </span>
